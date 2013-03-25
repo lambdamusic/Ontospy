@@ -54,7 +54,7 @@ class OntoClass(object):
 		return "<OntoClass object [%d] with uri: %s%s>" % (id(self), self.name, self.namespace)
 	
 	@classmethod	
-	def addInstance():
+	def instanceAddForClass():
 		pass
 
 	def all():  # = all instances
@@ -107,3 +107,10 @@ class OntoInstance(object):
 
 	def __repr__(self):
 		return "<OntoInstance object [%d] with namespace: %s>" % (id(self), self.namespace)
+
+
+
+
+
+
+

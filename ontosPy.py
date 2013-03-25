@@ -4,15 +4,15 @@
 
 """
 OntosPy
-Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
-More info in the __init__.py file.
+Copyright (c) 2013 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
+Run it from the command line and it shows info about the default ontology (FOAF); 
+alternatively pass it a URI as an argument for where to look for an ontology. Eg: 
 
-Run it from the command line and it shows info about the default ontology; alternatively pass it a URI as an argument for where to look for an ontology. Eg: 
+>>> python ontosPy.py
+>>> python ontosPy.py http://xmlns.com/foaf/0.1/
 
->>> python OntosPy.py
->>> python OntosPy.py http://xmlns.com/foaf/0.1/
->>> python OntosPy.py http://purl.org/ontology/mo/
+More info in the README file.
 
 """
 
@@ -20,7 +20,7 @@ Run it from the command line and it shows info about the default ontology; alter
 
 # todo
 
-# 1. change names of methods.. use camelcase and more intuitive division
+# 1. think of a better conceptual model for the code. EG Utils should all be split, ontospy reduced to a minimum etc...
 
 # 2. # how to avoid "RuntimeError: maximum recursion depth exceeded while calling a Python object"  - for big ontologies ? 
 
@@ -39,7 +39,8 @@ from vocabs import OWL
 from vocabs import DUBLINCORE as DC
 from utils import *
 
-from entities import *
+# todo: use separate entities
+# from entities import *
 
 
 
@@ -59,10 +60,12 @@ DC_ANNOTATION_URIS = [DC.contributor, DC.coverage, DC.creator, DC.date, DC.descr
  DC.identifier, DC.language, DC.publisher, DC.relation, DC.rights, DC.source, DC.subject, DC.title, DC.type]
 
 
-DEFAULT_SESSION_NAMESPACE = "http://www.OntosPy.org/session/resource#"
+DEFAULT_SESSION_NAMESPACE = "http://www.ontospy.org/session/resource#"
 
 
+DEFAULT_ONTO = "http://xmlns.com/foaf/0.1/"
 
+DEFAULT_LANGUAGE = "en"
 
 
 ##################
@@ -74,30 +77,38 @@ DEFAULT_SESSION_NAMESPACE = "http://www.OntosPy.org/session/resource#"
 
 
 class OntosPy(object):
-	"""Class that includes methods for querying an RDFS/OWL ontology"""
+	"""
+	Class that includes methods for manipulating an RDF/RDFS/OWL graph at the ontological level
+	"""
 
 
 	def __init__(self, uri=False):
 		"""
-		Sets up variables
+		Class that includes methods for manipulating an RDF/RDFS/OWL graph at the ontological level
 
-		uri: ...
-		language: owl:subclass or rdf:type ... Removed on 26/11 Todo: useful? 
+		uri: a valid ontology uri (could be a local file path too)
+
 		"""
 
 		super(OntosPy, self).__init__()
 
 		self.rdfGraph = ConjunctiveGraph()
 		self.baseURI = None
+
 		self.allclasses = None
+
+		self.allrdfproperties = None
 		self.allobjproperties = None
 		self.alldataproperties = None
+		self.allinferredproperties = None
+
 		self.toplayer = None
-		self.tree = None
-		self.maxdepth = None
+		self.classTreeMaxDepth = None
 		self.sessionGraph = None
 		self.sessionNS = None	
-		self.testallclasses = None
+		# self.testallclasses = None
+
+		self.__classTree = None
 
 		if uri:
 			self.loadUri(uri)
@@ -109,8 +120,8 @@ class OntosPy(object):
 		"""
 		Loads a graph from a URI
 
-		At the moment we're only taking two input formats, Rdf/Xml and N3 - easily extended. 
-			https://rdflib.readthedocs.org/en/latest/plugin_parsers.html	
+		At the moment we're only taking two input formats, Rdf/Xml and N3 . 
+		Could it be easily extended: https://rdflib.readthedocs.org/en/latest/plugin_parsers.html	
 
 		"""
 
@@ -126,33 +137,24 @@ class OntosPy(object):
 				print ("\n*OntosPy* Error Parsing File (follows rdflib Exception):\n")
 				raise
 		finally:
-			self.baseURI = self.get_OntologyURI() or uri
+			self.baseURI = self.ontologyURI() or uri
 			# let's cache some useful info for faster access
 			self.allclasses = self.__getAllClasses()
-			self.allobjproperties = self._getAllProperties(classPredicate = 'owl.objectproperty')
-			self.alldataproperties = self._getAllProperties(classPredicate = 'owl.datatypeproperty')
+
+			self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
+			self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
+			self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
+			self.alldataproperties = self.__getAllProperties(classPredicate = 'owl.datatypeproperty')
+
 			self.toplayer = self.__getTopclasses()
-			self.tree = self.__getTree()
-			self.maxdepth = self.__get_MAXTreeLevel()
+
+			self.__classTree = self.__buildClassTree()
+
+			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
 			self.sessionGraph = ConjunctiveGraph()
 			self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
-			
-			# self.testallclasses = []
-			
-			# # TEST 2011-11-11 REMOVE IF IT CAUSES PROBLEMS
-			# def myrepr(self):
-			# 	return "Class %s%s" % (self.name, self.namespace)
-			
-			# for x in self.allclasses:
-			# 	self.testallclasses.append(type(self.get_name_and_namespace(x)[0], (OntoClass,), 
-			# 		{'namespace' : self.get_name_and_namespace(x)[1], 
-			# 		'name' : self.get_name_and_namespace(x)[0],
-			# 		'__repr__' : myrepr}))
-			# 	# temp = OntoClass(name=self.get_name_and_namespace(x)[0],
-			# 	#  	namespace=self.get_name_and_namespace(x)[1])
-			# 	# self.testallclasses.append(temp)
 
-			printDebug("...OntosPy instance succesfully created for <%s>" % str(self.baseURI))
+			# printDebug("...OntosPy instance succesfully created for <%s>" % str(self.baseURI))
 
 
 	def __repr__(self):
@@ -160,16 +162,11 @@ class OntosPy(object):
 
 
 
-	def get_OntologyURI(self, return_as_string=True):
+	def ontologyURI(self, return_as_string=True):
 		"""
-		In [15]: [x for x in o.rdfGraph.triples((None, RDF.type, OWL.Ontology))]
-		Out[15]:
-		[(rdflib.URIRef('http://purl.com/net/sails'),
-						rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
-						rdflib.URIRef('http://www.w3.org/2002/07/owl#Ontology'))]
+		Returns the ontology URI if defined as an OWL ontology.
 
-		Mind that this will work only for OWL ontologies.
-		In other cases we just return None, and use the URI passed at loading time
+		In other cases it returns None (and OntosPy defaults the URI passed at loading time).
 
 		"""
 		test = [x for x, y, z in self.rdfGraph.triples((None, RDF.type, OWL.Ontology))]
@@ -181,29 +178,17 @@ class OntosPy(object):
 		else:
 			return None
 
-	def get_OntoAnnotations(self, return_as_string=True):
+	def ontologyAnnotations(self, return_as_string=True):
 		"""
-		Tries to get all the available annotations for an OWL ontology.
-		Returns a list of annotations as triples, which can easily be transformed into strings
-		for pretty display.
+		Method that tries to get all the available annotations for an OWL ontology.
+		Annotations are defined in the STANDARD_ANNOTATION_URIS constant.
 
-		In [4]: o.get_OntoAnnotations()
-		Out[4]:
-		[('http://www.w3.org/2000/01/rdf-schema#label',
-						rdflib.Literal('Sails: ontology the models the WW1 naval history domain', language=None, datatype=rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral'))),
-				('http://www.w3.org/2002/07/owl#versionInfo',
-						rdflib.Literal('0.4: refactored classes and added the inheritance info from CIDOC-CRM', language=None, datatype=rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#XMLLiteral')))]
+		Returns a list of 2-elements tuples (annotation-uri, annotation-value)
 
-		In [5]: [(str(x), str(y)) for x,y in o.get_OntoAnnotations()]
-		Out[5]:
-		[('http://www.w3.org/2000/01/rdf-schema#label',
-						'Sails: ontology the models the WW1 naval history domain'),
-				('http://www.w3.org/2002/07/owl#versionInfo',
-						'0.4: refactored classes and added the inheritance info from CIDOC-CRM')]
-
+		return_as_string = boolean (default= True)
 		"""
 		exit = []
-		ontoURI = self.get_OntologyURI(return_as_string=False)
+		ontoURI = self.ontologyURI(return_as_string=False)
 		if ontoURI:
 			for annotationURI in STANDARD_ANNOTATION_URIS:
 				test = [z for x, y, z in self.rdfGraph.triples((ontoURI, annotationURI, None))]
@@ -220,20 +205,68 @@ class OntosPy(object):
 
 
 
-	# NOTE: owl:Class is defined as a subclass of rdfs:Class. The rationale for having a separate OWL class construct lies in
-	# the restrictions on OWL DL (and thus also on OWL Lite), which imply that not all RDFS classes are legal OWL DL classes.
-	# In OWL Full these restrictions do not exist and therefore owl:Class and rdfs:Class are equivalent in OWL Full.
-	# http://www.w3.org/TR/owl-ref/			, section 3.1
+	def ontologyNamespaces(self, only_base = False):
+		""" 
+		Extract ontology namespaces. wrapper function: return either the base namespace only, or all of them
+
+		Namespaces are given in this format:
+
+		In [01]: for x in rdfGraph.namespaces():
+				....:			print x
+				....:
+				....:
+		('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
+		('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
+		(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
+		('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
+		('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
+		(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))
+
+
+				"""
+		# we assume that a base namespace is implied by an empty prefix
+		if only_base:
+			ll = [x for x in self.rdfGraph.namespaces() if x[0] == '']
+			if ll:
+				return ll[0][1]
+			else:
+				return None
+		else:
+			out = []
+			for x in self.rdfGraph.namespaces():
+				if x[0]:
+					out.append(x)
+				else: # if the namespace is blank (== base)
+					prefix = self.__inferNamespacePrefix(x[1])
+					if prefix:
+						out.append((prefix, x[1]))
+					else:
+						out.append(('base', x[1]))
+			return out
+
+
+
+
+	##################
+	#  
+	#  CLASS METHODS
+	# 
+	#  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
+	#
+	##################
+
 
 
 	def __getAllClasses(self, classPredicate = "", includeDomainRange=True, includeImplicit=True, removeBlankNodes = True):
 		"""
-		Extracts all the classes from a model
+		Extracts all the classes from an rdf graph.
 
-		We use the RDFS and OWL predicate by default; also, we extract non explicitly declared classes
+		It uses RDFS and OWL predicate by default; also, we extract non explicitly declared classes.
 
-		classPredicate: rdfs or owl
-		removeBlankNodes: self-explanatory
+		classPredicate: 'rdfs' or 'owl' (defaults to both)
+		includeDomainRange: boolean (defaults to True)
+		includeImplicit: boolean (defaults to True)
+		removeBlankNodes: boolean (defaults to True)
 
 		"""
 		rdfGraph = self.rdfGraph
@@ -270,10 +303,7 @@ class OntosPy(object):
 				exit = addIfYouCan(o, exit)
 
 
-		# exit = remove_duplicates(exit)
-
-		# get a list
-		
+		# get a list	
 		exit = exit.keys()  
 		if removeBlankNodes:
 			exit = [x for x in exit if not isBlankNode(x)]
@@ -281,82 +311,96 @@ class OntosPy(object):
 
 
 	def __getTopclasses(self, classPredicate = ''):
-		""" Finds the topclass in an ontology (works also when we have more than on superclass)
+		""" 
+		Finds the topclass in an ontology (works also multiple inheritance)
 
 		"""
 		returnlist = []
-		# gets all the classes:
-		# 27/7: changed from:  for eachclass in self.__getAllClasses(classPredicate):
+
 		for eachclass in self.allclasses:
-			x = self.get_classDirectSupers(eachclass)
+			x = self.classDirectSupers(eachclass)
 			if not x:
 				returnlist.append(eachclass)
+
 		return sort_uri_list_by_name(returnlist)
 
 
-	def __getTree(self, father=None, out=None):
-		""" Reconstructs the taxonomical tree of an ontology, from the 'topClasses' (= classes with no supers, see below)
-				Returns a dictionary in which each class is a key, and its direct subs are the values.
-				The top classes have key = 0
 
-				Eg.
-				{'0' : [class1, class2], class1: [class1-2, class1-3], class2: [class2-1, class2-2]}
+	def __buildClassTree(self, father=None, out=None):
+		""" 
+		Reconstructs the taxonomical tree of an ontology, from the 'topClasses' (= classes with no supers, see below)
+		
+		Returns a dictionary in which each class is a key, and its direct subs are the values.
+		The top classes have key = 0
+
+			Eg.
+			{	'0': 	[class1, class2], 
+				class1: [class1-2, class1-3], 
+				class2: [class2-1, class2-2]}
 		"""
 		if not father:
 			out = {}
 			topclasses = self.toplayer
 			out[0] = topclasses
 			for top in topclasses:
-				children = self.get_classDirectSubs(top)
+				children = self.classDirectSubs(top)
 				out[top] = children
 				for potentialfather in children:
-					self.__getTree(potentialfather, out)
+					self.__buildClassTree(potentialfather, out)
 			return out
 		else:
-			children = self.get_classDirectSubs(father)
+			children = self.classDirectSubs(father)
 			out[father] = children
 			for ch in children:
-				self.__getTree(ch, out)
+				self.__buildClassTree(ch, out)
 
 
 
-	def get_allClassesFromTree(self, element = 0, out = None):
-		""" methods that returns all the classes found, from the Tree representation.
-			Useful for returning class list according to the tree, as it maintains the ordering of the tree.
-			(needs "__getTree" to be run first)
-				"""
+	def __getAllClassesFromTree(self, element = 0, out = None):
+		""" 
+		Method that returns all the classes available, in the order given by the Tree representation.
+
+		ps: needs "__buildClassTree" to be run first
+		"""
 		if not out:
 			out = []
-		# out += [x for x in self.tree[element] if x not in out]
-		for each in self.tree[element]:
+
+		for each in self.__classTree[element]:
 			if each not in out:
 				out += [each]
-			out += self.get_allClassesFromTree(each, out)
+			out += self.__getAllClassesFromTree(each, out)
 		return remove_duplicates(out)
 
 
 
 
-	def get_classTreeLevel(self, aClass, level = 0, key = 0):
-		""" basic function that returns the level of a class int he tree, by inspecting the tree dictionary.
-				In some cases a class may have different levels, here we just return the first two..... for now.
-				level = position_int, key=classkey_in_treedict
-				"""
-		for element in self.tree[key]:
+	def __printClassTreeLevel(self, aClass, level = 0, key = 0):
+		""" 
+		Returns the depth level (a number) of a class in the class tree, by inspecting the tree dictionary.
+
+		When using a multi-inheritance tree a class may have different levels. This is not supported currently. 
+		So the first appearance of a class in a tree determines its level. [TODO: extend]
+		
+		ARGS:
+		level = position in tree, used for recursion
+		key   = class name, used for recursion so to navigate the dict-representation of the class tree 
+		"""
+		for element in self.__classTree[key]:
 			if element == aClass:
 				return level
-			test = self.get_classTreeLevel(aClass, level + 1, element)
+			test = self.__printClassTreeLevel(aClass, level + 1, element)
 			if test:
 				return test
-		# return 99 # fallback case..
 
 
-	def __get_MAXTreeLevel(self):
-		""" gets the max depth level of the ontology tree
-				"""
+
+	def __ontoMaxTreeLevel(self):
+		"""
+		Returns the max depth of the ontology class tree
+		"""
 		n = 0
 		for aClass in self.allclasses:
-			temp = self.get_classTreeLevel(aClass)
+			temp = self.__printClassTreeLevel(aClass)
 			if temp > n:
 				n = temp
 		return n
@@ -364,31 +408,63 @@ class OntosPy(object):
 
 
 
-	def get_class_byname(self, name, exact = False):
+	def classRepresentation(self, aClass):
+		"""		
+		Method that returns a dictionary with chosen attributes of a class
+		
+		Useful for creating arbitraty representation of a class, eg name + comments + label etc..
+		
+		TODO: refactor as needed.. this could be the basis for an ORM built on top of rdflib...
+						"""
+		temp = {}
+		temp['class'] = aClass
+		temp['classname'] = self.uri2niceString(aClass)
+		temp['comment'] = self.entityComment(aClass)
+		temp['label'] = self.entityLabel(aClass)
+		temp['treelevel'] = self.__printClassTreeLevel(aClass)
+		return temp
+
+
+
+
+
+	def classFind(self, name, exact = False):
 		"""
-		eg: ship = o.get_class_byname("http://purl.com/net/conflict#Ship", True)
-		Gets that class in particular
-		o.get_class_byname("http://purl.com/net/conflict#Ship")
-		GETS a list of classes beginning like that..
+		Find a class from its name (string representation of URI or part of it) within an ontology graph.
+
+		Returns a list that in the 'exact' case will have one element only
+
+		Args:
+		exact: boolean (=exact string matching)
+
+		EG: 
+		ship = o.classFind("http://purl.com/net/conflict#Ship", True)
+		Attempts to match classes with extract name.
+
 		"""
 		temp = []
 		if name:
 			for x in self.allclasses:
 				if exact:
 					if x.__str__().lower() == str(name).lower():
-						return x
+						return [x]
 				else:
 					if x.__str__().lower().find(str(name).lower()) >= 0:
 						temp.append(x)
 		return temp
 
 
+	# SECTION: 
+	# methods for getting ancestors and descendants of classes: by default, we do not include blank nodes
 
-# methods for getting ancestors and descendants of classes: by default, we do not include blank nodes
 
-	def get_classDirectSupers(self, aClass, excludeBnodes = True):
+	def classDirectSupers(self, aClass, excludeBnodes = True):
+		"""
+		Return a list of direct superclasses
+		"""
 		returnlist = []
-		for s, v, o in self.rdfGraph.triples((aClass, RDFS.subClassOf , None)):
+		for o in self.rdfGraph.objects(aClass, RDFS.subClassOf):
+		# for s, v, o in self.rdfGraph.triples((aClass, RDFS.subClassOf , None)):
 			if excludeBnodes:
 				if not isBlankNode(o):
 					returnlist.append(o)
@@ -397,16 +473,22 @@ class OntosPy(object):
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
-	def get_classAllSupers(self, aClass, returnlist = None, excludeBnodes = True ):
+	def classAllSupers(self, aClass, returnlist = None, excludeBnodes = True ):
+		"""
+		Return a list of all superclasses
+		"""
 		if returnlist == None:  # trick to avoid mutable objs python prob...
 			returnlist = []
-		for ssuper in self.get_classDirectSupers(aClass, excludeBnodes):
+		for ssuper in self.classDirectSupers(aClass, excludeBnodes):
 			returnlist.append(ssuper)
-			self.get_classAllSupers(ssuper, returnlist, excludeBnodes)
+			self.classAllSupers(ssuper, returnlist, excludeBnodes)
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
-	def get_classDirectSubs(self, aClass, excludeBnodes = True):
+	def classDirectSubs(self, aClass, excludeBnodes = True):
+		"""
+		Return a list of direct subclasses
+		"""
 		returnlist = []
 		for s, v, o in self.rdfGraph.triples((None, RDFS.subClassOf , aClass)):
 			if excludeBnodes:
@@ -417,32 +499,38 @@ class OntosPy(object):
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
-	def get_classAllSubs(self, aClass, returnlist = None, excludeBnodes = True):
+	def classAllSubs(self, aClass, returnlist = None, excludeBnodes = True):
+		"""
+		Return a list of all subclasses
+		"""
 		if returnlist == None:
 			returnlist = []
-		for sub in self.get_classDirectSubs(aClass, excludeBnodes):
+		for sub in self.classDirectSubs(aClass, excludeBnodes):
 			returnlist.append(sub)
-			self.get_classAllSubs(sub, returnlist, excludeBnodes)
+			self.classAllSubs(sub, returnlist, excludeBnodes)
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
-	def get_classSiblings(self, aClass, excludeBnodes = True):
+	def classSiblings(self, aClass, excludeBnodes = True):
+		"""
+		Return a list of siblings for a given class (= direct children of the same parent(s))
+		"""
 		returnlist = []
-		for father in self.get_classDirectSupers(aClass, excludeBnodes):
-			for child in self.get_classDirectSubs(father, excludeBnodes):
+		for father in self.classDirectSupers(aClass, excludeBnodes):
+			for child in self.classDirectSubs(father, excludeBnodes):
 				if child != aClass:
 					returnlist.append(child)
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
 
-	def mostSpecialized(self, classlist):
+	def classMostSpecialized(self, classlist):
 		"""
 		From a list of classes, returns a list of the leafs only. 
 		If the classes belong to different branches, or they are at the same depth level (= siblings), all of them are returned.
 		"""
 		returnlist = []
-		superslistlists = [self.get_classAllSupers(aClass) for aClass in classlist if aClass in self.allclasses]
+		superslistlists = [self.classAllSupers(aClass) for aClass in classlist if aClass in self.allclasses]
 		for aClass in classlist:
 			flag = False
 			for superslist in superslistlists:
@@ -453,13 +541,13 @@ class OntosPy(object):
 		return returnlist
 
 
-	def mostGeneric(self, classlist):
+	def classMostGeneric(self, classlist):
 		"""
 		From a list of classes, returns a list of the most generic ones only. 
 		If the classes belong to different branches, or both are at the same level, all are returned
 		"""
 		returnlist = []
-		superslist = [self.get_classAllSubs(aClass) for aClass in classlist if aClass in self.allclasses]
+		superslist = [self.classAllSubs(aClass) for aClass in classlist if aClass in self.allclasses]
 		for aClass in classlist:
 			flag = False
 			for supers in superslist:
@@ -470,154 +558,12 @@ class OntosPy(object):
 		return returnlist
 				
 
-	def get_EntityLabel(self, anEntity, language = "default"):
-		"""		Returns the rdfs.label (english) value of an entity (class or property), if existing:
-		# temp = [x for x in g.triples((top,RDFS.label, None))]
 
-		(rdflib.URIRef('file:///Users/mac/Documents/Ontologies/CIDOC-CMR/cidoc_crm_v5.0.2.rdfs#E1'),
-				rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#label'),
-				rdflib.Literal('\u039f\u03bd\u03c4\u03cc\u03c4\u03b7\u03c4\u03b1 CIDOC CRM', language=u'el', datatype=None))
-
-
-		"""
-		if language == 'default':
-			lang = 'en'
-		else:
-			lang = language
-		for s, p, o in self.rdfGraph.triples((anEntity, RDFS.label , None)):
-			try:
-				if o.language == lang:
-					return o # we're returning the RDF.Literal
-			except:
-				continue
-		# if no language specified, just returns the first label found....
-		if language == 'default':
-			for s, p, o in self.rdfGraph.triples((anEntity, RDFS.label , None)):
-				return o
-		return None
-		
-
-	# DEPRECATED : we should be using get_EntityLabel which is more generic
-	def get_classLabel(self, aClass, language = "default"):
-		"""		Returns the rdfs.label (english) value of a class, if existing:
-		# temp = [x for x in g.triples((top,RDFS.label, None))]
-
-		(rdflib.URIRef('file:///Users/mac/Documents/Ontologies/CIDOC-CMR/cidoc_crm_v5.0.2.rdfs#E1'),
-				rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#label'),
-				rdflib.Literal('\u039f\u03bd\u03c4\u03cc\u03c4\u03b7\u03c4\u03b1 CIDOC CRM', language=u'el', datatype=None))
-
-
-		"""
-		if language == 'default':
-			lang = 'en'
-		else:
-			lang = language
-		for s, p, o in self.rdfGraph.triples((aClass, RDFS.label , None)):
-			try:
-				if o.language == lang:
-					return o # we're returning the RDF.Literal
-			except:
-				continue
-		# if no language specified, just returns the first label found....
-		if language == 'default':
-			for s, p, o in self.rdfGraph.triples((aClass, RDFS.label , None)):
-				return o
-		return None
-
-
-
-	def get_classComment(self, aClass, language = "default"):
-		"""		Returns the rdf.comment value of a class, if existing:
-
-		[(rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#AIF-scheme_node'),
-						rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#comment'),
-						rdflib.Literal('In AIF, scheme nodes capture the application of schemes (= patterns of reasoning). In Cohere, this is equivalent to a typed link, where the type is the specific scheme used by the S-node in AIF. \nIt is important to remember that even in AIF we usually have the following structure conposing a graph, that is, an I-node --> edge --> S-node --> edge --> I-node, the translation into Cohere makes the edges instantiation superfluous. Namely, this is translated as follows: (connection (simple_idea --> link (type_S-node) --> simple_idea)).', language=None, datatype=rdflib.URIRef('http://www.w3.org/2001/XMLSchema#string'))),
-
-		"""
-		if language == 'default':
-			lang = 'en'
-		else:
-			lang = language
-		for s, p, o in self.rdfGraph.triples((aClass, RDFS.comment , None)):
-			try:
-				if o.language == lang:
-					return o # # note that we return the RDF literal, not the string (in theory, it can be examined further for lang or other attributes)
-			except:
-				continue
-		# if no language specified, just returns the first label found....
-		if language == 'default':
-			for s, p, o in self.rdfGraph.triples((aClass, RDFS.comment , None)):
-				return o
-		return None
-
-
-
-	def get_classRepresentation(self, aClass):
-		"""		method that returns a dictionary with chosen attributes of a class
-				Useful for creating arbitraty representation of a class, eg name + comments + label etc..
-				Modify as needed.. this could be the basis for an ORM built on top of rdflib...
-						"""
-		temp = {}
-		temp['class'] = aClass
-		temp['classname'] = self.uri2niceString(aClass)
-		temp['comment'] = self.get_classComment(aClass)
-		temp['label'] = self.get_EntityLabel(aClass)
-		temp['treelevel'] = self.get_classTreeLevel(aClass)
-		return temp
-
-
-
-
-	def get_namespaces(self, only_base = False):
-		""" wrapper function: return either the base namespace only, or all of them
-
-		Namespaces are given in this format:
-
-		In [01]: for x in rdfGraph.namespaces():
-				....:			print x
-				....:
-				....:
-		('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
-		('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
-		(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
-		('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
-		('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
-		(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))
-
-
-				"""
-		# we assume that a base namespace is implied by an empty prefix
-		if only_base:
-			ll = [x for x in self.rdfGraph.namespaces() if x[0] == '']
-			if ll:
-				return ll[0][1]
-			else:
-				return None
-		else:
-			out = []
-			for x in self.rdfGraph.namespaces():
-				if x[0]:
-					out.append(x)
-				else: # if the namespace is blank (== base)
-					prefix = self.inferNamespacePrefix(x[1])
-					if prefix:
-						out.append((prefix, x[1]))
-					else:
-						out.append(('base', x[1]))
-			return out
-
-
-
-
-	###########
-	# PROPERTY METHODS 
-	###########
-
-
-	def get_classProperties(self, aClass, class_role = "domain", prop_type = "", inherited = False):
+	def classProperties(self, aClass, class_role = "domain", prop_type = "", inherited = False):
 		"""
 		Gets all the properties for a class
 		Defaults to properties that have that class in the domain space; pass 'range' to have the other ones.
+
 		TODO: prop_type is meant to let us separate out ObjProps from DataTypeProps
 		TODO: If 'inherited' is set to True, it returns ONLY the inherited properties.
 		"""
@@ -635,17 +581,98 @@ class OntosPy(object):
 			else:
 				pass # TODO
 		return exit
+
+
+
+	def classInstances(self, aClass, onlydirect = True):
+		""" 
+		Gets all the (direct by default) instances of a class
+		"""
+		if aClass in self.allclasses:
+			returnlist = []
+			for s, v, o in self.rdfGraph.triples((None , RDF.type , aClass)):
+				returnlist.append(s)
+			if not onlydirect:
+				for sub in self.classAllSubs(aClass):
+					for s, v, o in self.rdfGraph.triples((None , RDF.type , sub)):
+						returnlist.append(s)
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			raise exceptions.Error("Class is not available in current ontology")
+
+
+	
+	###########
+	# GENERIC METHODS FOR ENTITIES
+	###########
+
+
+
+	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = False):
+		"""		
+		Returns the rdfs.label value of an entity (class or property), if existing. 
+		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
+
+		Args:
+		language: 'en', 'it' etc.. 
+		getall: returns a list of all labels rather than a string 
+
+		"""
+
+		if getall: 
+			temp = []
+			for o in self.rdfGraph.objects(anEntity, RDFS.label):
+				temp += [o]
+			return temp
+		else:
+			for o in self.rdfGraph.objects(anEntity, RDFS.label):
+				if getattr(o, 'language') and  getattr(o, 'language') == language:
+					return o
+			return ""
+
+
+	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = False):
+		"""		
+		Returns the rdfs.comment value of an entity (class or property), if existing. 
+		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
+
+		Args:
+		language: 'en', 'it' etc.. 
+		getall: returns a list of all labels rather than a string 
+
+		"""
+
+		if getall: 
+			temp = []
+			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
+				temp += [o]
+			return temp
+		else:
+			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
+				if getattr(o, 'language') and  getattr(o, 'language') == language:
+					return o
+			return ""
+
+
+
+
+
+
+	###########
+	# PROPERTY METHODS 
+	###########
+
 		
 
 
-	def get_propertyRange(self, prop):
+	def propertyRange(self, prop):
 		exit = []
 		for s, v, o in self.rdfGraph.triples((prop, RDFS.range , None)):
 			if o not in exit:
 				exit.append(o)
 		return exit
 		
-	def get_propertyDomain(self, prop):
+	def propertyDomain(self, prop):
 		exit = []
 		for s, v, o in self.rdfGraph.triples((prop, RDFS.domain , None)):
 			if o not in exit:
@@ -653,34 +680,48 @@ class OntosPy(object):
 		return exit
 
 
-	def _getAllProperties(self, classPredicate = ""):
+	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
 		"""
 		Extracts all the properties (OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property) declared in a model.
-		The method is unprotected (single underscore) because we might want to call it from the OntosPy object directly, just to see if there is *any* property available.... 
+		The method is unprotected (single underscore) because we might want to call it from the OntosPy object directly, 
+		just to see if there is *any* property available.... 
+
+		Args:
+
+		classPredicate: one of "rdf.property", "owl.objectproperty", "owl.datatypeproperty"
+		includeImplicit: gets all predicates from triples and infers that they are all RDF properties (even if not explicitly declared)
+
 		"""
 		rdfGraph = self.rdfGraph
-		exit = []
-		if not classPredicate:
-			for s, v, o in rdfGraph.triples((None, RDF.type , RDF.Property)):
-				exit.append(s)
-			for s, v, o in rdfGraph.triples((None, RDF.type , OWL.ObjectProperty)):
-				exit.append(s)
-			for s, v, o in rdfGraph.triples((None, RDF.type , OWL.DatatypeProperty)):
-				exit.append(s)
-		else:
-			if classPredicate == "rdf.property":
-				for s, v, o in rdfGraph.triples((None, RDF.type , RDF.Property)):
-					exit.append(s)
-			elif classPredicate == "owl.objectproperty":
-				for s, v, o in rdfGraph.triples((None, RDF.type , OWL.ObjectProperty)):
-					exit.append(s)
-			elif classPredicate == "owl.datatypeproperty":
-				for s, v, o in rdfGraph.triples((None, RDF.type , OWL.DatatypeProperty)):
-					exit.append(s)
-			else:
-				raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+		exit = {}
 
-		exit = remove_duplicates(exit)
+		if classPredicate not in ['rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
+			raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+
+		def addIfYouCan(x, mydict):
+			if x not in mydict:
+				mydict[x] = None
+			return mydict
+
+		if classPredicate == "rdf.property" or "":
+			for s in rdfGraph.subjects(RDF.type , RDF.Property):
+				exit = addIfYouCan(s, exit)
+			if includeImplicit:
+				# includes everything that appears as a predicate; 
+				# below we add also owl properties due to inheritance: they are instances of of rdf:property subclasses
+				for s in rdfGraph.predicates(None, None):
+					exit = addIfYouCan(s, exit)
+
+		if classPredicate == "owl.objectproperty" or classPredicate == "" or includeImplicit:
+			for s in rdfGraph.subjects(RDF.type , OWL.ObjectProperty):
+				exit = addIfYouCan(s, exit)
+		if classPredicate == "owl.datatypeproperty" or classPredicate == "" or includeImplicit: 
+			for s in rdfGraph.subjects(RDF.type , OWL.DatatypeProperty):
+				exit = addIfYouCan(s, exit)
+
+
+		# get a list	
+		exit = exit.keys() 
 		return sort_uri_list_by_name(exit)
 
 
@@ -689,7 +730,7 @@ class OntosPy(object):
 
 
 	###########
-	# INSTANCE METHODS and SESSION GRAPH
+	# SESSION GRAPH
 	###########
 
 
@@ -710,14 +751,32 @@ class OntosPy(object):
 
 
 
-	def get_instance_byname(self, name, exact = False):
+	###########
+	# INSTANCE METHODS
+	###########
+
+
+	def __getAllInstances(self):
+		returnlist = []
+		for c in self.toplayer:
+			returnlist.extend(self.classInstances(c, onlydirect = False))
+		if returnlist:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return returnlist
+
+
+
+	def instanceFind(self, name, exact = False):
 		"""
-		Not very fast: every time self.get_allInstances() is called.. 
-		TODO: find a better solution, maybe load all instances at startup?
+		Not very fast: every time self.__getAllInstances() is called.. 
+
+		TODO: find a better solution, maybe load all instances at startup? Or maybe use SPARQL directly...
+
 		"""
 		temp = []
 		if name:
-			for x in self.get_allInstances():
+			for x in self.__getAllInstances():
 				if exact:
 					if x.__str__().lower() == str(name).lower():
 						return x
@@ -727,41 +786,17 @@ class OntosPy(object):
 		return temp
 		
 
-	def get_allInstances(self):
-		returnlist = []
-		for c in self.toplayer:
-			returnlist.extend(self.get_classInstances(c, onlydirect = False))
-		if returnlist:
-			return sort_uri_list_by_name(remove_duplicates(returnlist))
-		else:
-			return returnlist
 
 
-
-	def get_classInstances(self, aClass, onlydirect = True):
+	def instanceAddForClass(self, aClass, anInstance, ns = None):
 		""" 
-		Gets all the (direct by default) instances of a class
-		"""
-		if aClass in self.allclasses:
-			returnlist = []
-			for s, v, o in self.rdfGraph.triples((None , RDF.type , aClass)):
-				returnlist.append(s)
-			if not onlydirect:
-				for sub in self.get_classAllSubs(aClass):
-					for s, v, o in self.rdfGraph.triples((None , RDF.type , sub)):
-						returnlist.append(s)
-			return sort_uri_list_by_name(remove_duplicates(returnlist))
-		else:
-			raise exceptions.Error("Class is not available in current ontology")
-
-
-	def addInstance(self, aClass, anInstance, ns = None):
-		""" 2011-07-26: 
-			Adds or creates a class-instance to the session-graph (and returns the instance).
-			If a URIRef object is passed, that's ok. Also, if a string is passed, we create a URI using the 
-			default namespace for the Session graph.
-			p.s. No need to check for duplicates: rdflib does that already!
-	   """
+		2011-07-26: 
+		Adds or creates a class-instance to the session-graph (and returns the instance).
+		If a URIRef object is passed, that's ok. Also, if a string is passed, we create a URI using the 
+		
+		default namespace for the Session graph.
+		p.s. No need to check for duplicates: rdflib does that already!
+	   	"""
 		if aClass in self.allclasses:
 			if type(anInstance) == URIRef:
 				self.sessionGraph.add((anInstance, RDF.type, aClass))
@@ -776,8 +811,9 @@ class OntosPy(object):
 			raise exceptions.Error("Class is not available in current ontology")
 
 
-	def get_instanceFather(self, anInstance, most_specialized=True):
-		""" Returns the class an instance is instantiating.
+	def instanceFather(self, anInstance, most_specialized=True):
+		""" 
+		Returns the class an instance is instantiating.
 	
 		We should try to return only the direct father!		
 		"""
@@ -786,15 +822,19 @@ class OntosPy(object):
 			if o in self.allclasses:  # sometimes there could be other stuff...
 				returnlist.append(o)
 		if most_specialized:
-			return sort_uri_list_by_name(remove_duplicates(self.mostSpecialized(returnlist)))
+			return sort_uri_list_by_name(remove_duplicates(self.classMostSpecialized(returnlist)))
 		else:
 			return sort_uri_list_by_name(remove_duplicates(returnlist))
 
-	def get_instanceSiblings(self, anInstance):
-		""" Returns the siblings of an instance  """
+
+	def instanceSiblings(self, anInstance):
+		""" 
+		Returns the siblings of an instance  
+		"""
+		
 		returnlist = []
-		for aClass in self.get_instanceFather(anInstance):
-			returnlist.extend(self.get_classInstances(aClass))
+		for aClass in self.instanceFather(anInstance):
+			returnlist.extend(self.classInstances(aClass))
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
 
@@ -810,11 +850,13 @@ class OntosPy(object):
 
 
 
-	def printTree(self):
-		""" print directly to stdout the taxonomical tree of an ontology """
+	def printClassTree(self):
+		""" 
+		Print nicely into stdout the taxonomical tree of an ontology 
+		"""
 
 		def tree_inner(rdfGraph, aClass, level):
-			for sub in self.get_classDirectSubs(aClass):
+			for sub in self.classDirectSubs(aClass):
 				printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(sub)))
 				tree_inner(rdfGraph, sub, (level + 1))
 
@@ -824,8 +866,10 @@ class OntosPy(object):
 
 
 
-	def get_HTMLTree(self, element = 0, treedict = None):
-		""" outputs an html tree representation based on the dictionary one above
+	def buildHtmlTree(self, element = 0, treedict = None):
+		""" 
+		Builds an html tree representation based on the internal tree-dictionary representation
+
 		NOTE: Copy and modify this function if you need some different type of html..
 
 		EG:
@@ -848,12 +892,12 @@ class OntosPy(object):
 
 		"""
 		if not treedict:
-			treedict = self.__getTree()
+			treedict = self.__buildClassTree()
 		stringa = "<ul>"
 		for x in treedict[element]:
 			# print x
 			stringa += "<li>%s" % self.uri2niceString(x)
-			stringa += self.get_HTMLTree(x, treedict)
+			stringa += self.buildHtmlTree(x, treedict)
 			stringa += "</li>"
 		stringa += "</ul>"
 		return stringa
@@ -862,17 +906,9 @@ class OntosPy(object):
 
 
 	def uri2niceString(self, aUri):
-		""" from a URI, returns a nice string representation that uses also the namespace symbols
-				Cuts the uri of the namespace, and replaces it with its shortcut (for base, attempts to infer it or
-				leaves it blank)
-
-				In [77]: for x in g.namespaces():
-						....:	print x
-						....:
-						....:
-				('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
-				('', rdflib.URIRef('http://purl.org/ontology/bibo/'))	# <=== note it's blank for the base NS
-				(u'ns', rdflib.URIRef('http://www.w3.org/2003/06/sw-vocab-status/ns#'))
+		""" 
+		From a URI, returns a nice string representation that uses also the namespace symbols
+		Cuts the uri of the namespace, and replaces it with its shortcut (for base, attempts to infer it or leaves it blank)
 
 		"""
 		stringa = aUri.__str__()		#gets the string within a URI
@@ -882,7 +918,7 @@ class OntosPy(object):
 					if aNamespaceTuple[0]: # for base NS, it's empty
 						stringa = aNamespaceTuple[0] + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 					else:
-						prefix = self.inferNamespacePrefix(aNamespaceTuple[1])
+						prefix = self.__inferNamespacePrefix(aNamespaceTuple[1])
 						if prefix:
 							stringa = prefix + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 						else:
@@ -893,9 +929,11 @@ class OntosPy(object):
 
 
 
-	def inferNamespacePrefix(self, aUri):
-		""" Method that from a URI returns the last bit, eg from <'http://www.w3.org/2008/05/skos#'> we extract
-		the <skos> string and use it as a namespace prefix when rendering the ontology
+	def __inferNamespacePrefix(self, aUri):
+		""" 
+		From a URI returns the last bit and simulates a namespace prefix when rendering the ontology.
+
+		eg from <'http://www.w3.org/2008/05/skos#'> it returns the 'skos' string 
 		"""
 		stringa = aUri.__str__()
 		try:
@@ -906,12 +944,16 @@ class OntosPy(object):
 
 
 
-	def get_name_and_namespace(self, aUri):
-		""" Method that from a URI returns the namespace + last bit
-			eg from <'http://www.w3.org/2008/05/skos#something'> we extract
-			the 'http://www.w3.org/2008/05/skos' and 'something'
-			eg from <'http://www.w3.org/2003/01/geo/wgs84_pos'> we extract
-			the 'http://www.w3.org/2003/01/geo/' and 'wgs84_pos'
+	def __splitNameFromNamespace(self, aUri):
+		""" 
+		From a URI returns a tuple (namespace, uri-last-bit)
+
+		Eg
+		from <'http://www.w3.org/2008/05/skos#something'> 
+			==> ('something', 'http://www.w3.org/2008/05/skos')
+		from <'http://www.w3.org/2003/01/geo/wgs84_pos'> we extract
+			==> ('wgs84_pos', 'http://www.w3.org/2003/01/geo/')
+
 		"""
 		stringa = aUri.__str__()
 		try:
@@ -923,10 +965,13 @@ class OntosPy(object):
 		return (name, ns)
 
 
-	def draw_ontograph(self, fileposition):
-		"""visualize the graph using pyGraphViz
-		Possible Layouts: http://rss.acs.unt.edu/Rdoc/library/Rgraphviz/html/GraphvizLayouts.html
+	def drawOntograph(self, fileposition):
 		"""
+		Visualize the graph using pyGraphViz (which needs to be preinstalled)
+
+		More info on Layouts: http://rss.acs.unt.edu/Rdoc/library/Rgraphviz/html/GraphvizLayouts.html
+		"""
+
 		try:
 			import pygraphviz as pgv
 		except:
@@ -938,7 +983,7 @@ class OntosPy(object):
 		G.layout(prog='dot')	# eg dot, neato, twopi, circo, fdp
 		G.draw(fileposition)
 		printDebug("\n\n", "_" * 50, "\n\n")
-		printDebug("Drawn graph at %s" % fileposition)
+		printDebug("Generated graph at %s" % fileposition)
 
 
 
@@ -968,8 +1013,6 @@ class OntosPy(object):
 
 
 
-DEFAULT_ONTO = "http://xmlns.com/foaf/0.1/"
-
 
 def main(argv):
 	"""
@@ -977,8 +1020,6 @@ def main(argv):
 
 	>>> python OntosPy.py
 	>>> python OntosPy.py http://xmlns.com/foaf/0.1/
-	>>> python OntosPy.py http://purl.org/ontology/mo/
-
 
 	"""
 	if argv:
@@ -993,17 +1034,17 @@ def main(argv):
 	print "TRIPLES = %s" % len(rdfGraph)
 	print "_" * 50
 	
-	for x, y in onto.get_OntoAnnotations():
+	for x, y in onto.ontologyAnnotations():
 		print "%s : %s" % (x, y)
 	print "\nNAMESPACES:\n"
-	for x in onto.get_namespaces():
+	for x in onto.ontologyNamespaces():
 		print "%s : %s" % (x[0], x[1])
 
 	print "_" * 50, "\n"
 
 
-	print "MAIN TAXONOMY:\n"
-	onto.printTree()
+	print "CLASS TAXONOMY:\n"
+	onto.printClassTree()
 	print "_" * 50, "\n"
 
 	if False:  # TODO: show on demand depending on keyword
@@ -1014,12 +1055,12 @@ def main(argv):
 		for s in onto.allclasses:
 			# get the subject, treat it as string and strip the initial namespace
 			print "Class : " , onto.uri2niceString(s).upper()
-			print "direct_subclasses: ", str(len(onto.get_classDirectSubs(s))), " = ", 			str([onto.uri2niceString(x) for x in  onto.get_classDirectSubs(s)])
-			print "all_subclasses : ", str(len(onto.get_classAllSubs(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_classAllSubs(s, [])])
-			print "direct_supers : ", str(len(onto.get_classDirectSupers(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_classDirectSupers(s)])
-			print "all_supers : ", str(len(onto.get_classAllSupers(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_classAllSupers(s, [])])
-			print "Domain of : ", str(len(onto.get_classProperties(s, class_role = "domain"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_classProperties(s, class_role = "domain")])
-			print "Range of : ", str(len(onto.get_classProperties(s, class_role = "range"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_classProperties(s, class_role = "range")])
+			print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ", 			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
+			print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
+			print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
+			print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
+			print "Domain of : ", str(len(onto.classProperties(s, class_role = "domain"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classProperties(s, class_role = "domain")])
+			print "Range of : ", str(len(onto.classProperties(s, class_role = "range"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classProperties(s, class_role = "range")])
 			print "_" * 10, "\n"
 
 		print "_" * 50, "\n\n", "_" * 50, "\n\n"
@@ -1027,8 +1068,8 @@ def main(argv):
 		print "\n\n"
 		for s in onto.allobjproperties: 
 			print "ObjProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.get_propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_propertyDomain(s)])
-			print "Range : ", str(len(onto.get_propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_propertyRange(s)])
+			print "Domain : ", str(len(onto.propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+			print "Range : ", str(len(onto.propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
 			print "_" * 10, "\n"
 		
 		
@@ -1037,12 +1078,12 @@ def main(argv):
 		print "\n\n"
 		for s in onto.alldataproperties: 
 			print "DataProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.get_propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_propertyDomain(s)])
-			print "Range : ", str(len(onto.get_propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.get_propertyRange(s)])
+			print "Domain : ", str(len(onto.propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+			print "Range : ", str(len(onto.propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
 			print "_" * 10, "\n"
 	
 	if False:
-		onto.draw_ontograph(rdfGraph, '/tmp/graph.png')
+		onto.drawOntograph(rdfGraph, '/tmp/graph.png')
 
 
 

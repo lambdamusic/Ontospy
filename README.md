@@ -14,6 +14,7 @@ Tested on 2.4 and 3.0
 
 
 
+
 What?
 =======
 
@@ -26,6 +27,14 @@ The file can be used in standalone mode too.
 Note: previously called OntoInspector <http://www.michelepasin.org/software/ontoinspector/>
 
 
+Changelog
+=======
+
+
+25 March 2013 (Monday)
+
+- changed names of methods.. now all camelcased and more intuitive
+- added module to compare two ontologies
 
 
 
@@ -50,7 +59,7 @@ Example: loading and querying the foaf ontology
 	 rdflib.URIRef('http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing'),
 	 rdflib.URIRef('http://www.w3.org/2002/07/owl#Thing')]
 
-	In [4]: onto.printTree()
+	In [4]: onto.printClassTree()
 	foaf:Agent
 	----foaf:Group
 	----foaf:Organization
@@ -74,7 +83,7 @@ Example: loading and querying the foaf ontology
 	--------foaf:OnlineGamingAccount
 
 
-	In [5]: document = onto.find_class_byname("document")
+	In [5]: document = onto.classFind("document")
 
 	In [6]: document
 	Out[6]:
@@ -86,14 +95,14 @@ Example: loading and querying the foaf ontology
 	In [8]: document
 	Out[8]: rdflib.URIRef('http://xmlns.com/foaf/0.1/Document')
 
-	In [9]: onto.get_classAllSubs(document)
+	In [9]: onto.classAllSubs(document)
 	Out[9]:
 	[rdflib.URIRef('http://xmlns.com/foaf/0.1/Image'),
 	 rdflib.URIRef('http://xmlns.com/foaf/0.1/PersonalProfileDocument')]
 
-	In [10]: onto.get_classAllSupers(document)
+	In [10]: onto.classAllSupers(document)
 	Out[10]: []
 
-	In [11]: onto.get_classComment(document)
+	In [11]: onto.entityComment(document)
 	Out[11]: rdflib.Literal('A document.', language=None, datatype=None)
 
