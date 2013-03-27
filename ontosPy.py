@@ -20,6 +20,8 @@ More info in the README file.
 
 # todo
 
+# 0. make the caching of stuff more intelligent: the app consumes too much memory!
+
 # 1. think of a better conceptual model for the code. EG Utils should all be split, ontospy reduced to a minimum etc...
 
 # 2. # how to avoid "RuntimeError: maximum recursion depth exceeded while calling a Python object"  - for big ontologies ? 
@@ -237,7 +239,7 @@ class OntosPy(object):
 				if x[0]:
 					out.append(x)
 				else: # if the namespace is blank (== base)
-					prefix = self.__inferNamespacePrefix(x[1])
+					prefix = inferNamespacePrefix(x[1])
 					if prefix:
 						out.append((prefix, x[1]))
 					else:
@@ -559,7 +561,7 @@ class OntosPy(object):
 				
 
 
-	def classProperties(self, aClass, class_role = "domain", prop_type = "", inherited = False):
+	def classProperties(self, aClass, inherited = False, class_role = "domain", prop_type = "", ):
 		"""
 		Gets all the properties for a class
 		Defaults to properties that have that class in the domain space; pass 'range' to have the other ones.
@@ -579,7 +581,18 @@ class OntosPy(object):
 						if s not in exit:
 							exit.append(s)
 			else:
-				pass # TODO
+				tree =  self.classAllSupers(aClass) + [aClass]
+				for cl in tree:
+					if class_role == "domain":
+						for s, v, o in self.rdfGraph.triples((None, RDFS.domain , cl)):
+							if s not in exit:
+								exit.append(s)
+					elif class_role == "range":
+						for s, v, o in self.rdfGraph.triples((None, RDFS.range , cl)):
+							if s not in exit:
+								exit.append(s)					
+
+
 		return exit
 
 
@@ -918,7 +931,7 @@ class OntosPy(object):
 					if aNamespaceTuple[0]: # for base NS, it's empty
 						stringa = aNamespaceTuple[0] + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 					else:
-						prefix = self.__inferNamespacePrefix(aNamespaceTuple[1])
+						prefix = inferNamespacePrefix(aNamespaceTuple[1])
 						if prefix:
 							stringa = prefix + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 						else:
@@ -929,7 +942,7 @@ class OntosPy(object):
 
 
 
-	def __inferNamespacePrefix(self, aUri):
+	def inferNamespacePrefix(self, aUri):
 		""" 
 		From a URI returns the last bit and simulates a namespace prefix when rendering the ontology.
 
@@ -943,26 +956,6 @@ class OntosPy(object):
 		return prefix
 
 
-
-	def __splitNameFromNamespace(self, aUri):
-		""" 
-		From a URI returns a tuple (namespace, uri-last-bit)
-
-		Eg
-		from <'http://www.w3.org/2008/05/skos#something'> 
-			==> ('something', 'http://www.w3.org/2008/05/skos')
-		from <'http://www.w3.org/2003/01/geo/wgs84_pos'> we extract
-			==> ('wgs84_pos', 'http://www.w3.org/2003/01/geo/')
-
-		"""
-		stringa = aUri.__str__()
-		try:
-			ns = stringa.split("#")[0]
-			name = stringa.split("#")[1]
-		except:
-			ns = stringa.rsplit("/", 1)[0]
-			name = stringa.rsplit("/", 1)[1]
-		return (name, ns)
 
 
 	def drawOntograph(self, fileposition):

@@ -31,7 +31,13 @@ Changelog
 =======
 
 
-25 March 2013 (Monday)
+26 March 2013
+
+- added inheritance to spy.classProperties
+- improved compare script
+
+
+25 March 2013 
 
 - changed names of methods.. now all camelcased and more intuitive
 - added module to compare two ontologies

@@ -78,7 +78,7 @@ def printComparison(results, class_or_prop):
 	
 	Row = namedtuple('Row',[class_or_prop,'VALIDATED'])
 
-	for k,v in results.items():
+	for k,v in sorted(results.items(), key=lambda x: x[1]):
 		data += [Row(k, str(v))]
 
 	pprinttable(data)

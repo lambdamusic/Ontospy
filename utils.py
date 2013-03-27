@@ -16,6 +16,45 @@ from rdflib import URIRef, RDFS, RDF, BNode
 
 
 
+def inferNamespacePrefix(aUri):
+	""" 
+	From a URI returns the last bit and simulates a namespace prefix when rendering the ontology.
+
+	eg from <'http://www.w3.org/2008/05/skos#'> it returns the 'skos' string 
+	"""
+	stringa = aUri.__str__()
+	try:
+		prefix = stringa.replace("#", "").split("/")[-1]
+	except:
+		prefix = ""
+	return prefix
+
+
+
+def splitNameFromNamespace(aUri):
+	""" 
+	From a URI returns a tuple (namespace, uri-last-bit)
+
+	Eg
+	from <'http://www.w3.org/2008/05/skos#something'> 
+		==> ('something', 'http://www.w3.org/2008/05/skos')
+	from <'http://www.w3.org/2003/01/geo/wgs84_pos'> we extract
+		==> ('wgs84_pos', 'http://www.w3.org/2003/01/geo/')
+
+	"""
+	stringa = aUri.__str__()
+	try:
+		ns = stringa.split("#")[0]
+		name = stringa.split("#")[1]
+	except:
+		ns = stringa.rsplit("/", 1)[0]
+		name = stringa.rsplit("/", 1)[1]
+	return (name, ns)
+
+
+
+
+
 def isBlankNode(aClass):
 	""" small utility that checks if a class is a blank node """
 	if type(aClass) == BNode:
