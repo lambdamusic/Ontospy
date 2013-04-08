@@ -1,7 +1,7 @@
 OntosPy
 =======
 
-RDFLIb-based Python toolkit for inspecting ontologies in the Semantic Web.
+RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 
 
 
