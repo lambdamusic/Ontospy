@@ -3,7 +3,7 @@
 # encoding: utf-8
 
 """
-OntosPy
+ONTOSPY
 Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 More info in the __init__.py file.
 

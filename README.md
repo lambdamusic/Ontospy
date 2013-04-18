@@ -2,7 +2,7 @@ OntosPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
-
+Version: 0.1
 
 
 ####Dependencies:
@@ -11,20 +11,20 @@ Tested on 2.4 and 3.0
 
 
 ####Credits: 
-
+todo
 
 
 
 What?
 =======
 
-Originally, I developed this in order to get the hang of the RdfLib library.
+Originally, I developed this in order to get the hang of the RdfLib library (note: it was previously called OntoInspector).
 
-You can pass an OWL or RDFS ontology to the OntosPy class, and it'll give you a bunch of useful information about it. That's all!
+You can pass an OWL or RDFS ontology to the Ontology class, and it'll give you a bunch of useful information about it. That's all!
 
 The file can be used in standalone mode too.
 
-Note: previously called OntoInspector <http://www.michelepasin.org/software/ontoinspector/>
+
 
 
 Changelog
@@ -48,7 +48,7 @@ Example: loading and querying the foaf ontology
 -----------------------
 
 
-	In [1]: from ontosPy import *
+	In [1]: from ontospy import *
 
 	In [2]: onto = OntosPy("http://xmlns.com/foaf/spec/20100809.rdf")
 

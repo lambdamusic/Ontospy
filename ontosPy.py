@@ -3,14 +3,14 @@
 # encoding: utf-8
 
 """
-OntosPy
+ONTOSPY
 Copyright (c) 2013 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 Run it from the command line and it shows info about the default ontology (FOAF); 
 alternatively pass it a URI as an argument for where to look for an ontology. Eg: 
 
->>> python ontosPy.py
->>> python ontosPy.py http://xmlns.com/foaf/0.1/
+>>> python ontospy.py
+>>> python ontospy.py http://xmlns.com/foaf/0.1/
 
 More info in the README file.
 
@@ -18,31 +18,15 @@ More info in the README file.
 
 
 
-# todo
-
-# 0. make the caching of stuff more intelligent: the app consumes too much memory!
-
-# 1. think of a better conceptual model for the code. EG Utils should all be split, ontospy reduced to a minimum etc...
-
-# 2. # how to avoid "RuntimeError: maximum recursion depth exceeded while calling a Python object"  - for big ontologies ? 
-
-# 3. load an ontology from a sparql endpoint, by querying for all classes
-
-
 
 import sys, os, urllib2
 
 import rdflib	 # so we have it available as a namespace
-
-from rdflib import ConjunctiveGraph, Namespace, exceptions
-from rdflib import URIRef, RDFS, RDF, BNode
+from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 from vocabs import OWL
-
 from vocabs import DUBLINCORE as DC
-from utils import *
 
-# todo: use separate entities
-# from entities import *
+from utils import *
 
 
 
@@ -57,17 +41,15 @@ from utils import *
 ##################
 
 STANDARD_ANNOTATION_URIS = [ RDFS.comment, OWL.incompatibleWith, RDFS.isDefinedBy, RDFS.label, OWL.priorVersion, RDFS.seeAlso, OWL.versionInfo]
-
 DC_ANNOTATION_URIS = [DC.contributor, DC.coverage, DC.creator, DC.date, DC.description, DC.format,
  DC.identifier, DC.language, DC.publisher, DC.relation, DC.rights, DC.source, DC.subject, DC.title, DC.type]
 
 
-DEFAULT_SESSION_NAMESPACE = "http://www.ontospy.org/session/resource#"
-
-
+DEFAULT_SESSION_NAMESPACE = "http://www.example.org/session/resource#"
 DEFAULT_ONTO = "http://xmlns.com/foaf/0.1/"
-
 DEFAULT_LANGUAGE = "en"
+
+
 
 
 ##################
@@ -78,7 +60,7 @@ DEFAULT_LANGUAGE = "en"
 
 
 
-class OntosPy(object):
+class Ontology(object):
 	"""
 	Class that includes methods for manipulating an RDF/RDFS/OWL graph at the ontological level
 	"""
@@ -92,9 +74,9 @@ class OntosPy(object):
 
 		"""
 
-		super(OntosPy, self).__init__()
+		super(Ontology, self).__init__()
 
-		self.rdfGraph = ConjunctiveGraph()
+		self.rdfGraph = rdflib.Graph()
 		self.baseURI = None
 
 		self.allclasses = None
@@ -115,7 +97,7 @@ class OntosPy(object):
 		if uri:
 			self.loadUri(uri)
 		else:
-			printDebug("OntosPy instance created. Use the <loadUri> method to load an ontology.")
+			printDebug("Ontology instance created. Use the <loadUri> method to load an ontology.")
 
 
 	def loadUri(self, uri):
@@ -130,14 +112,13 @@ class OntosPy(object):
 		if uri.startswith("www."):
 			uri = "http://%s" % str(uri)  #support for lazy people
 
+		rdf_format = guess_fileformat(uri)
+
 		try:
-			self.rdfGraph.parse(uri)  # defaults to rdf/xml
+			self.rdfGraph.parse(uri, format=rdf_format)
 		except:
-			try:
-				self.rdfGraph.parse(uri, format="n3")
-			except:
-				print ("\n*OntosPy* Error Parsing File (follows rdflib Exception):\n")
-				raise
+			print ("\nError Parsing File Format (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
+			raise
 		finally:
 			self.baseURI = self.ontologyURI() or uri
 			# let's cache some useful info for faster access
@@ -153,14 +134,14 @@ class OntosPy(object):
 			self.__classTree = self.__buildClassTree()
 
 			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
-			self.sessionGraph = ConjunctiveGraph()
+			self.sessionGraph = rdflib.Graph()
 			self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
 
-			# printDebug("...OntosPy instance succesfully created for <%s>" % str(self.baseURI))
+			# printDebug("...Ontology instance succesfully created for <%s>" % str(self.baseURI))
 
 
 	def __repr__(self):
-		return "<OntosPy object [%d] for URI: %s>" % (id(self), self.baseURI)
+		return "<Ontology object for URI: %s - %d triples>" % (self.baseURI, len(self.rdfGraph))
 
 
 
@@ -168,7 +149,7 @@ class OntosPy(object):
 		"""
 		Returns the ontology URI if defined as an OWL ontology.
 
-		In other cases it returns None (and OntosPy defaults the URI passed at loading time).
+		In other cases it returns None (and Ontology defaults the URI passed at loading time).
 
 		"""
 		test = [x for x, y, z in self.rdfGraph.triples((None, RDF.type, OWL.Ontology))]
@@ -251,7 +232,7 @@ class OntosPy(object):
 
 	##################
 	#  
-	#  CLASS METHODS
+	#  METHODS for MANIPULATING RDFS/OWL CLASSES 
 	# 
 	#  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
 	#
@@ -314,7 +295,7 @@ class OntosPy(object):
 
 	def __getTopclasses(self, classPredicate = ''):
 		""" 
-		Finds the topclass in an ontology (works also multiple inheritance)
+		Finds the topclass in an ontology (works also with multiple inheritance)
 
 		"""
 		returnlist = []
@@ -616,7 +597,9 @@ class OntosPy(object):
 
 	
 	###########
-	# GENERIC METHODS FOR ENTITIES
+
+	# GENERIC METHODS FOR RDF RESOURCES (ENTITIES)
+
 	###########
 
 
@@ -672,7 +655,9 @@ class OntosPy(object):
 
 
 	###########
-	# PROPERTY METHODS 
+
+	# METHODS for MANIPULATING RDFS/OWL PROPERTIES
+
 	###########
 
 		
@@ -696,7 +681,7 @@ class OntosPy(object):
 	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
 		"""
 		Extracts all the properties (OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property) declared in a model.
-		The method is unprotected (single underscore) because we might want to call it from the OntosPy object directly, 
+		The method is unprotected (single underscore) because we might want to call it from the Ontology object directly, 
 		just to see if there is *any* property available.... 
 
 		Args:
@@ -743,7 +728,9 @@ class OntosPy(object):
 
 
 	###########
+
 	# SESSION GRAPH
+
 	###########
 
 
@@ -765,7 +752,9 @@ class OntosPy(object):
 
 
 	###########
-	# INSTANCE METHODS
+
+	# METHODS for MANIPULATING RDFS/OWL INSTANCES
+
 	###########
 
 
@@ -858,7 +847,9 @@ class OntosPy(object):
 
 
 	###########
+
 	# UTILITIES  
+
 	###########
 
 
@@ -1011,14 +1002,14 @@ def main(argv):
 	"""
 	If you run from the command line, it shows info about the default onto, or pass it a URI as an argument for where to look for an ontology
 
-	>>> python OntosPy.py
-	>>> python OntosPy.py http://xmlns.com/foaf/0.1/
+	>>> python ontospy.py
+	>>> python ontospy.py http://xmlns.com/foaf/0.1/
 
 	"""
 	if argv:
-		onto = OntosPy(argv[0])
+		onto = Ontology(argv[0])
 	else:
-		onto = OntosPy(DEFAULT_ONTO)
+		onto = Ontology(DEFAULT_ONTO)
 
 	rdfGraph = onto.rdfGraph
 

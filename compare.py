@@ -15,7 +15,7 @@ from collections import namedtuple
 
 import rdflib	 # so we have it available as a namespace
 
-from ontosPy import *
+from ontospy import *
 from utils import *
 
 
@@ -41,8 +41,8 @@ def compare(referenceOnto, somegraph):
 	Desc
 	"""
 
-	spy1 = OntosPy(referenceOnto)
-	spy2 = OntosPy(somegraph)
+	spy1 = Ontology(referenceOnto)
+	spy2 = Ontology(somegraph)
 
 	class_comparison = {}
 	for x in spy2.allclasses:

@@ -15,6 +15,30 @@ from rdflib import URIRef, RDFS, RDF, BNode
 
 
 
+def guess_fileformat(aUri):
+	"""
+	Simple file format guessing (using rdflib format types) based on the suffix
+
+	see rdflib.parse [https://rdflib.readthedocs.org/en/latest/using_graphs.html]
+
+	"""
+	if aUri.endswith(".xml"):
+		return "xml"
+	elif aUri.endswith(".nt"):
+		return "nt"
+	elif aUri.endswith(".n3") or aUri.endswith(".ttl"):
+		return "n3"
+	elif aUri.endswith(".trix"):
+		return "trix"
+	elif aUri.endswith(".rdfa"):
+		return "rdfa"
+	else:  # defaults to XML
+		return "xml"
+
+
+
+
+
 
 def inferNamespacePrefix(aUri):
 	""" 

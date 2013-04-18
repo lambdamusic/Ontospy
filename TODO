@@ -1,0 +1,11 @@
+
+
+# todo
+
+# 0. make the caching of stuff more intelligent: the app consumes too much memory!
+
+# 1. think of a better conceptual model for the code. EG Utils should all be split, ontospy reduced to a minimum etc...
+
+# 2. # how to avoid "RuntimeError: maximum recursion depth exceeded while calling a Python object"  - for big ontologies ? 
+
+# 3. load an ontology from a sparql endpoint, by querying for all classes
