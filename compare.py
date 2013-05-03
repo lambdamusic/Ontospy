@@ -2,9 +2,9 @@
 module that allows the comparison of two ontologies, ie what classes and properties they have in common
 
 
-Example
+Example:compare a local turtle graph to the FOAF ontology
 
-python compare.py -o http://xmlns.com/foaf/0.1/ test/testTurtle.ttl # compare a local turtle graph to the FOAF ontology
+python compare.py -o http://xmlns.com/foaf/0.1/ test/testTurtle.ttl 
 
 """
 
@@ -64,7 +64,6 @@ def compare(referenceOnto, somegraph):
 						'triples' : len(spy2.rdfGraph)}, 
 			'class_comparison' : class_comparison ,
 			'prop_comparison' : prop_comparison}
-
 
 
 

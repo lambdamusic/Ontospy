@@ -50,7 +50,7 @@ Example: loading and querying the foaf ontology
 
 	In [1]: from ontospy import *
 
-	In [2]: onto = OntosPy("http://xmlns.com/foaf/spec/20100809.rdf")
+	In [2]: onto = Ontology("http://xmlns.com/foaf/spec/20100809.rdf")
 
 	In [3]: onto.toplayer
 	Out[3]:
