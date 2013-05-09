@@ -83,7 +83,7 @@ class SparqlEndpoint(object):
 
 	"""
  
-	def __init__(self, endpoint, prefixes={}, verbose=True):
+	def __init__(self, endpoint, prefixes={}, verbose=False):
 		self.sparql = SPARQLWrapper(endpoint)
 		self.prefixes = {
 

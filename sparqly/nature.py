@@ -56,7 +56,7 @@ class NatureEndpoint(SparqlEndpoint):
 	Specialization for Nature endpoint
 	"""
 	
-	def __init__(self, prefixes={}, verbose=True):
+	def __init__(self, prefixes={}, verbose=False):
 		
 		endpoint = "http://data.nature.com/sparql"
 
@@ -69,7 +69,7 @@ class NatureEndpoint(SparqlEndpoint):
 			"prism": "http://prismstandard.org/namespaces/basic/2.1/",
 		}
 
-		super(NatureEndpoint, self).__init__(endpoint, prefixes, verbose=True)
+		super(NatureEndpoint, self).__init__(endpoint, prefixes, verbose)
 
 
 

@@ -44,7 +44,7 @@ class ScigraphEndpoint(SparqlEndpoint):
 	Specialization for ScigraphEndpoint
 	"""
 	
-	def __init__(self, prefixes = {}):
+	def __init__(self, prefixes = {}, verbose=False):
 		
 		endpoint = "http://scigraph.npgsrv.com/triplestore/sparql"
 		# endpoint = "http://localhost:8080/openrdf-sesame/repositories/test1"
@@ -60,7 +60,7 @@ class ScigraphEndpoint(SparqlEndpoint):
 			"subject": "http://ns.nature.com/subjects/",
 		}
 
-		super(ScigraphEndpoint, self).__init__(endpoint, prefixes)
+		super(ScigraphEndpoint, self).__init__(endpoint, prefixes, verbose)
 
 
 

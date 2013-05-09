@@ -30,6 +30,9 @@ The file can be used in standalone mode too.
 Changelog
 =======
 
+2013-05-09
+- changed the default verbose option 
+
 
 26 March 2013
 
