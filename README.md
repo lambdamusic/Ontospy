@@ -30,6 +30,12 @@ The file can be used in standalone mode too.
 Changelog
 =======
 
+2013-05-24
+- added the public -ontologyClassTree- property (previously called __classTree)
+- added the FAMOUS ONTOLOGIES variables for loading stuff more easily
+	eg: o = ontospy.Ontology(ontospy.FAMOUS_ONTOLOGIES.FRBR)
+
+
 2013-05-09
 - changed the default verbose option 
 

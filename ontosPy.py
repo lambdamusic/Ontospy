@@ -26,8 +26,9 @@ from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 from vocabs import OWL
 from vocabs import DUBLINCORE as DC
 
-from utils import *
+from vocabs import famous as FAMOUS_ONTOLOGIES 
 
+from utils import *
 
 
 
@@ -92,7 +93,7 @@ class Ontology(object):
 		self.sessionNS = None	
 		# self.testallclasses = None
 
-		self.__classTree = None
+		self.ontologyClassTree = None
 
 		if uri:
 			self.loadUri(uri)
@@ -131,7 +132,7 @@ class Ontology(object):
 
 			self.toplayer = self.__getTopclasses()
 
-			self.__classTree = self.__buildClassTree()
+			self.ontologyClassTree = self.__buildClassTree()
 
 			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
 			self.sessionGraph = rdflib.Graph()
@@ -348,7 +349,7 @@ class Ontology(object):
 		if not out:
 			out = []
 
-		for each in self.__classTree[element]:
+		for each in self.ontologyClassTree[element]:
 			if each not in out:
 				out += [each]
 			out += self.__getAllClassesFromTree(each, out)
@@ -368,7 +369,7 @@ class Ontology(object):
 		level = position in tree, used for recursion
 		key   = class name, used for recursion so to navigate the dict-representation of the class tree 
 		"""
-		for element in self.__classTree[key]:
+		for element in self.ontologyClassTree[key]:
 			if element == aClass:
 				return level
 			test = self.__printClassTreeLevel(aClass, level + 1, element)
@@ -870,7 +871,7 @@ class Ontology(object):
 
 
 
-	def buildHtmlTree(self, element = 0, treedict = None):
+	def ontologyHtmlTree(self, element = 0, treedict = None):
 		""" 
 		Builds an html tree representation based on the internal tree-dictionary representation
 
@@ -901,7 +902,7 @@ class Ontology(object):
 		for x in treedict[element]:
 			# print x
 			stringa += "<li>%s" % self.uri2niceString(x)
-			stringa += self.buildHtmlTree(x, treedict)
+			stringa += self.ontologyHtmlTree(x, treedict)
 			stringa += "</li>"
 		stringa += "</ul>"
 		return stringa
