@@ -121,7 +121,7 @@ class Ontology(object):
 			print ("\nError Parsing File Format (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
 			raise
 		finally:
-			self.baseURI = self.ontologyURI() or uri
+			self.baseURI = self.__ontologyURI(excludeBNodes=True) or uri
 			# let's cache some useful info for faster access
 			self.allclasses = self.__getAllClasses()
 
@@ -146,19 +146,28 @@ class Ontology(object):
 
 
 
-	def ontologyURI(self, return_as_string=True):
+	def __ontologyURI(self, return_as_string=True, excludeBNodes = False):
 		"""
-		Returns the ontology URI if defined as an OWL ontology.
+		Returns the ontology URI if defined using the pattern
+		<uri> a http://www.w3.org/2002/07/owl#Ontology
 
-		In other cases it returns None (and Ontology defaults the URI passed at loading time).
+		In other cases it returns None (and Ontology defaults the URI passed at loading 
+		time). Also if it's blank node it returns none.
 
 		"""
 		test = [x for x, y, z in self.rdfGraph.triples((None, RDF.type, OWL.Ontology))]
 		if test:
-			if return_as_string:
-				return str(test[0])
+			if excludeBNodes:
+				if not isBlankNode(test[0]):
+					if return_as_string:
+						return str(test[0])
+					else:
+						return test[0]
 			else:
-				return test[0]
+				if return_as_string:
+					return str(test[0])
+				else:
+					return test[0]
 		else:
 			return None
 
@@ -172,7 +181,7 @@ class Ontology(object):
 		return_as_string = boolean (default= True)
 		"""
 		exit = []
-		ontoURI = self.ontologyURI(return_as_string=False)
+		ontoURI = self.__ontologyURI(return_as_string=False)
 		if ontoURI:
 			for annotationURI in STANDARD_ANNOTATION_URIS:
 				test = [z for x, y, z in self.rdfGraph.triples((ontoURI, annotationURI, None))]
@@ -273,7 +282,7 @@ class Ontology(object):
 			for s in rdfGraph.subjects(RDF.type , OWL.Class):
 				exit = addIfYouCan(s, exit)
 
-		if includeDomainRange:  # todo: should I exclude XML literals? 
+		if includeDomainRange:	# todo: should I exclude XML literals? 
 			for o in rdfGraph.objects(None, RDFS.domain):
 				exit = addIfYouCan(o, exit)
 			for o in rdfGraph.objects(None, RDFS.range):
@@ -288,7 +297,7 @@ class Ontology(object):
 
 
 		# get a list	
-		exit = exit.keys()  
+		exit = exit.keys()	
 		if removeBlankNodes:
 			exit = [x for x in exit if not isBlankNode(x)]
 		return sort_uri_list_by_name(exit)
@@ -318,7 +327,7 @@ class Ontology(object):
 		The top classes have key = 0
 
 			Eg.
-			{	'0': 	[class1, class2], 
+			{	'0':	[class1, class2], 
 				class1: [class1-2, class1-3], 
 				class2: [class2-1, class2-2]}
 		"""
@@ -367,7 +376,7 @@ class Ontology(object):
 		
 		ARGS:
 		level = position in tree, used for recursion
-		key   = class name, used for recursion so to navigate the dict-representation of the class tree 
+		key	  = class name, used for recursion so to navigate the dict-representation of the class tree 
 		"""
 		for element in self.ontologyClassTree[key]:
 			if element == aClass:
@@ -399,17 +408,32 @@ class Ontology(object):
 		Useful for creating arbitraty representation of a class, eg name + comments + label etc..
 		
 		TODO: refactor as needed.. this could be the basis for an ORM built on top of rdflib...
-						"""
+		"""
+		
 		temp = {}
 		temp['class'] = aClass
 		temp['classname'] = self.uri2niceString(aClass)
 		temp['comment'] = self.entityComment(aClass)
 		temp['label'] = self.entityLabel(aClass)
 		temp['treelevel'] = self.__printClassTreeLevel(aClass)
+		temp['isdomainfor'] = self.classDomainFor(aClass)
+
 		return temp
 
 
-
+	def propertyRepresentation(self, aProp):
+		"""		
+		Similar to the class representation: could be a stub for an OO version of this..
+		"""		
+		temp = {}
+		temp['prop'] = aProp
+		temp['propname'] = self.uri2niceString(aProp)
+		temp['comment'] = self.entityComment(aProp)
+		temp['label'] = self.entityLabel(aProp)
+		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
+		temp['range'] = [self.classRepresentation(clas) for clas in self.propertyRange(aProp)]
+				
+		return temp
 
 
 	def classFind(self, name, exact = False):
@@ -442,34 +466,24 @@ class Ontology(object):
 	# methods for getting ancestors and descendants of classes: by default, we do not include blank nodes
 
 
-	def classDirectSupers(self, aClass, excludeBnodes = True):
+	def classDirectSupers(self, aClass, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of direct superclasses
 		"""
 		returnlist = []
 		for o in self.rdfGraph.objects(aClass, RDFS.subClassOf):
-		# for s, v, o in self.rdfGraph.triples((aClass, RDFS.subClassOf , None)):
 			if excludeBnodes:
 				if not isBlankNode(o):
 					returnlist.append(o)
 			else:
 				returnlist.append(o)
-		return sort_uri_list_by_name(remove_duplicates(returnlist))
+		if sortUriName:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return remove_duplicates(returnlist)
 
 
-	def classAllSupers(self, aClass, returnlist = None, excludeBnodes = True ):
-		"""
-		Return a list of all superclasses
-		"""
-		if returnlist == None:  # trick to avoid mutable objs python prob...
-			returnlist = []
-		for ssuper in self.classDirectSupers(aClass, excludeBnodes):
-			returnlist.append(ssuper)
-			self.classAllSupers(ssuper, returnlist, excludeBnodes)
-		return sort_uri_list_by_name(remove_duplicates(returnlist))
-
-
-	def classDirectSubs(self, aClass, excludeBnodes = True):
+	def classDirectSubs(self, aClass, excludeBnodes = True, sortUriName = False ):
 		"""
 		Return a list of direct subclasses
 		"""
@@ -480,22 +494,64 @@ class Ontology(object):
 					returnlist.append(s)
 			else:
 				returnlist.append(s)
-		return sort_uri_list_by_name(remove_duplicates(returnlist))
+		if sortUriName:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return remove_duplicates(returnlist)
 
 
-	def classAllSubs(self, aClass, returnlist = None, excludeBnodes = True):
+	def classAllSupers(self, aClass, excludeBnodes = True, sortUriName = False ):
+		"""
+		Return a list of all superclasses >> wrapper with ordering etc..
+		"""
+		returnlist = self.__classAllSupers(aClass, None, excludeBnodes, sortUriName)
+		if sortUriName:			 
+			return sort_uri_list_by_name(returnlist)
+		else:
+			if returnlist:
+				returnlist.reverse()
+		return returnlist
+			
+	def __classAllSupers(self, aClass, returnlist = None, excludeBnodes = True, sortUriName = False ):
+		"""
+		Return a list of all superclasses >> Inner recursive method
+		"""
+		if returnlist == None:	# trick to avoid mutable objs python prob...
+			returnlist = []
+		for ssuper in self.classDirectSupers(aClass, excludeBnodes, sortUriName):
+			returnlist.append(ssuper)
+			self.__classAllSupers(ssuper, returnlist, excludeBnodes, sortUriName)
+		return remove_duplicates(returnlist)
+
+			
+
+	def classAllSubs(self, aClass, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of all subclasses
+		"""
+		returnlist = self.__classAllSubs(aClass, None, excludeBnodes, sortUriName)
+		if sortUriName:			 
+			return sort_uri_list_by_name(returnlist)
+		else:
+			if returnlist:
+				returnlist.reverse()
+		return returnlist
+
+			
+	def __classAllSubs(self, aClass, returnlist = None, excludeBnodes = True, sortUriName = False):
+		"""
+		Return a list of all subclasses >> Inner Recursive Method
 		"""
 		if returnlist == None:
 			returnlist = []
 		for sub in self.classDirectSubs(aClass, excludeBnodes):
 			returnlist.append(sub)
-			self.classAllSubs(sub, returnlist, excludeBnodes)
-		return sort_uri_list_by_name(remove_duplicates(returnlist))
+			self.__classAllSubs(sub, returnlist, excludeBnodes)
+		return remove_duplicates(returnlist)
 
 
-	def classSiblings(self, aClass, excludeBnodes = True):
+
+	def classSiblings(self, aClass, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of siblings for a given class (= direct children of the same parent(s))
 		"""
@@ -504,7 +560,10 @@ class Ontology(object):
 			for child in self.classDirectSubs(father, excludeBnodes):
 				if child != aClass:
 					returnlist.append(child)
-		return sort_uri_list_by_name(remove_duplicates(returnlist))
+		if sortUriName:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return remove_duplicates(returnlist)
 
 
 
@@ -542,39 +601,61 @@ class Ontology(object):
 		return returnlist
 				
 
-
-	def classProperties(self, aClass, inherited = False, class_role = "domain", prop_type = "", ):
+	def classDomainFor(self, aClass, inherited = False , includeRanges=False):
 		"""
-		Gets all the properties for a class
-		Defaults to properties that have that class in the domain space; pass 'range' to have the other ones.
+		Gets all the properties that declare this class as domain.
+		(Returns also the ranges info)
+		"""
+		exit = []
+		if not inherited:
+			for s, v, o in self.rdfGraph.triples((None, RDFS.domain , aClass)):
+				if s not in exit:
+					exit.append(s)
+		else:
+			tree =	self.classAllSupers(aClass) + [aClass]
+			for cl in tree:
+				for s, v, o in self.rdfGraph.triples((None, RDFS.domain , cl)):
+					if s not in exit:
+						exit.append(s)
+		exit = sort_uri_list_by_name(exit)
+		
+		if includeRanges:
+			temp = exit
+			exit = []
+			for x in temp:
+				exit.append((x, self.propertyRange(x)))
+		return exit
 
+
+	def classRangeFor(self, aClass, inherited = False ):
+		"""
+		Gets all the properties that have this class as domain.
 		TODO: prop_type is meant to let us separate out ObjProps from DataTypeProps
 		TODO: If 'inherited' is set to True, it returns ONLY the inherited properties.
 		"""
 		exit = []
-		if aClass in self.allclasses:
-			if not inherited:
-				if class_role == "domain":
-					for s, v, o in self.rdfGraph.triples((None, RDFS.domain , aClass)):
-						if s not in exit:
-							exit.append(s)
-				elif class_role == "range":
-					for s, v, o in self.rdfGraph.triples((None, RDFS.range , aClass)):
-						if s not in exit:
-							exit.append(s)
-			else:
-				tree =  self.classAllSupers(aClass) + [aClass]
-				for cl in tree:
-					if class_role == "domain":
-						for s, v, o in self.rdfGraph.triples((None, RDFS.domain , cl)):
-							if s not in exit:
-								exit.append(s)
-					elif class_role == "range":
-						for s, v, o in self.rdfGraph.triples((None, RDFS.range , cl)):
-							if s not in exit:
-								exit.append(s)					
+		if not inherited:
+			for s, v, o in self.rdfGraph.triples((None, RDFS.range , aClass)):
+				if s not in exit:
+					exit.append(s)
 
+		else:
+			tree =	self.classAllSupers(aClass) + [aClass]
+			for cl in tree:
+				for s, v, o in self.rdfGraph.triples((None, RDFS.range , cl)):
+					if s not in exit:
+						exit.append(s)	
+		return exit
+		
+		
 
+	def classProperties(self, aClass):
+		"""
+		Gets all the properties defined for a class, and their values (= the triples)
+		"""
+		exit = []
+		for s, v, o in self.rdfGraph.triples((aClass, None , None)):
+			exit.append((v,o))
 		return exit
 
 
@@ -605,7 +686,7 @@ class Ontology(object):
 
 
 
-	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = False):
+	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
 		"""		
 		Returns the rdfs.label value of an entity (class or property), if existing. 
 		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
@@ -628,7 +709,7 @@ class Ontology(object):
 			return ""
 
 
-	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = False):
+	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
 		"""		
 		Returns the rdfs.comment value of an entity (class or property), if existing. 
 		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
@@ -669,14 +750,14 @@ class Ontology(object):
 		for s, v, o in self.rdfGraph.triples((prop, RDFS.range , None)):
 			if o not in exit:
 				exit.append(o)
-		return exit
+		return sort_uri_list_by_name(exit)
 		
 	def propertyDomain(self, prop):
 		exit = []
 		for s, v, o in self.rdfGraph.triples((prop, RDFS.domain , None)):
 			if o not in exit:
 				exit.append(o)
-		return exit
+		return sort_uri_list_by_name(exit)
 
 
 	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
@@ -799,7 +880,7 @@ class Ontology(object):
 		
 		default namespace for the Session graph.
 		p.s. No need to check for duplicates: rdflib does that already!
-	   	"""
+		"""
 		if aClass in self.allclasses:
 			if type(anInstance) == URIRef:
 				self.sessionGraph.add((anInstance, RDF.type, aClass))
@@ -832,7 +913,7 @@ class Ontology(object):
 
 	def instanceSiblings(self, anInstance):
 		""" 
-		Returns the siblings of an instance  
+		Returns the siblings of an instance	 
 		"""
 		
 		returnlist = []
@@ -849,7 +930,7 @@ class Ontology(object):
 
 	###########
 
-	# UTILITIES  
+	# UTILITIES	 
 
 	###########
 
@@ -917,7 +998,7 @@ class Ontology(object):
 
 		"""
 		stringa = aUri.__str__()		#gets the string within a URI
-		for aNamespaceTuple in self.rdfGraph.namespaces():
+		for aNamespaceTuple in self.ontologyNamespaces():
 			try: # check if it matches the available NS
 				if stringa.find(aNamespaceTuple[1].__str__()) == 0:
 					if aNamespaceTuple[0]: # for base NS, it's empty
@@ -932,6 +1013,22 @@ class Ontology(object):
 				stringa = "error"
 		return stringa
 
+
+	def niceString2uri(self, aUriString):
+		""" 
+		From a string representing a URI possibly with the namespace qname, returns a URI instance. 
+		
+		gold:Citation  ==> rdflib.term.URIRef(u'http://purl.org/linguistics/gold/Citation')
+		"""
+		
+		for aNamespaceTuple in self.ontologyNamespaces():
+			if aNamespaceTuple[0] and aUriString.find(aNamespaceTuple[0].__str__() + ":") == 0:
+				aUriString_name = aUriString.split(":")[1]
+				return URIRef(aNamespaceTuple[1] + aUriString_name)
+
+		# we dont handle the 'base' URI case 
+		return URIRef(aUriString)
+		
 
 
 	def inferNamespacePrefix(self, aUri):
@@ -1040,12 +1137,12 @@ def main(argv):
 		for s in onto.allclasses:
 			# get the subject, treat it as string and strip the initial namespace
 			print "Class : " , onto.uri2niceString(s).upper()
-			print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ", 			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
-			print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
-			print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
-			print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
-			print "Domain of : ", str(len(onto.classProperties(s, class_role = "domain"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classProperties(s, class_role = "domain")])
-			print "Range of : ", str(len(onto.classProperties(s, class_role = "range"))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.classProperties(s, class_role = "range")])
+			print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
+			print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
+			print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
+			print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
+			print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDomainFor(s, class_role = "domain")])
+			print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classRangeFor(s, class_role = "range")])
 			print "_" * 10, "\n"
 
 		print "_" * 50, "\n\n", "_" * 50, "\n\n"
@@ -1053,8 +1150,8 @@ def main(argv):
 		print "\n\n"
 		for s in onto.allobjproperties: 
 			print "ObjProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-			print "Range : ", str(len(onto.propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+			print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+			print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
 			print "_" * 10, "\n"
 		
 		
@@ -1063,8 +1160,8 @@ def main(argv):
 		print "\n\n"
 		for s in onto.alldataproperties: 
 			print "DataProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.propertyDomain(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-			print "Range : ", str(len(onto.propertyRange(s))), " = ", 		 	str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+			print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+			print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
 			print "_" * 10, "\n"
 	
 	if False:

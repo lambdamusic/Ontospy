@@ -94,19 +94,22 @@ def remove_duplicates(seq, idfun=None):
 	""" removes duplicates from a list, order preserving, as found in
 	http://www.peterbe.com/plog/uniqifiers-benchmark
 	"""
-	if idfun is None:
-		def idfun(x): return x
-	seen = {}
-	result = []
-	for item in seq:
-		marker = idfun(item)
-		# in old Python versions:
-		# if seen.has_key(marker)
-		# but in new ones:
-		if marker in seen: continue
-		seen[marker] = 1
-		result.append(item)
-	return result
+	if seq:
+		if idfun is None:
+			def idfun(x): return x
+		seen = {}
+		result = []
+		for item in seq:
+			marker = idfun(item)
+			# in old Python versions:
+			# if seen.has_key(marker)
+			# but in new ones:
+			if marker in seen: continue
+			seen[marker] = 1
+			result.append(item)
+		return result
+	else:
+		return []
 
 
 
@@ -166,8 +169,8 @@ def pprinttable(rows):
 	>>> pprinttable([data,data])
 	first | second | third
 	------+--------+------
-	    1 |      2 |     3
-	    1 |      2 |     3
+		1 |		 2 |	 3
+		1 |		 2 |	 3
 
 	"""
 	if len(rows) > 1:

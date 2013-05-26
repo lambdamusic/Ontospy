@@ -31,6 +31,12 @@ Changelog
 =======
 
 2013-05-24
+- addded propertyRepresentation method
+- fixed <classAllSupers> and <classAllSubs>: added wrapper so to preserve tree order
+- added classRangeFor and classDomainFor; classProperties is now more generic;
+- changed entityComment and entityLabel to pull out all results by default
+- supers and subs methods: added parameter for sorting so to preserve tree order
+- changed ontologyURI method to private; ignoring blank nodes now
 - added the public -ontologyClassTree- property (previously called __classTree)
 - added the FAMOUS ONTOLOGIES variables for loading stuff more easily
 	eg: o = ontospy.Ontology(ontospy.FAMOUS_ONTOLOGIES.FRBR)

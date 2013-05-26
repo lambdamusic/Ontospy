@@ -9,3 +9,7 @@
 # 2. # how to avoid "RuntimeError: maximum recursion depth exceeded while calling a Python object"  - for big ontologies ? 
 
 # 3. load an ontology from a sparql endpoint, by querying for all classes
+	- add option of preloading onto info, or just do it in real time using SPARQL
+	
+# BUG: if the onto annotations have more than one value we're not returning all of them! 
+eg check the GOLD ontology.....
