@@ -2,7 +2,7 @@ OntosPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
-Version: 0.1
+Version: 1.0
 
 
 ####Dependencies:
@@ -10,25 +10,35 @@ rdflib <http://www.rdflib.net/>
 Tested on 2.4 and 3.0
 
 
-####Credits: 
-todo
 
-
-
-What?
+Description
 =======
 
-Originally, I developed this in order to get the hang of the RdfLib library (note: it was previously called OntoInspector).
+Originally, I developed this script in order to get the hang of the Python RDFLib library (note: it was previously called OntoInspector and hosted on BitBucket). RDFLib provides a number of useful primitives for working with RDF graphs; however it lacks an API aimed at interrogating and modifying a graph based on its defined schema - aka the ontology. 
 
-You can pass an OWL or RDFS ontology to the Ontology class, and it'll give you a bunch of useful information about it. That's all!
+OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
 
-The file can be used in standalone mode too.
+The basic worflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+
+Ps: the library can be used in standalone mode too.
 
 
 
 
 Changelog
 =======
+
+2013-05-31
+- added methods for properties
+
+
+2013-05-27
+- fixed ontoTree so to include OWL.Thing
+- added alpha sorting to __buildClassTree
+- split ontologyURI() and ontologyPrettyURI
+- modified __ontologyURI so to include DC.identifier metadata
+- updated ontologyAnnotations method: now multiple annotations are returned correctly
+- added ontologyPhysicalLocation property
 
 2013-05-24
 - addded propertyRepresentation method

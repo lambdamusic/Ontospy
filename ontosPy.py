@@ -41,9 +41,11 @@ from utils import *
 #
 ##################
 
-STANDARD_ANNOTATION_URIS = [ RDFS.comment, OWL.incompatibleWith, RDFS.isDefinedBy, RDFS.label, OWL.priorVersion, RDFS.seeAlso, OWL.versionInfo]
+STANDARD_ANNOTATION_URIS = [ RDFS.comment, OWL.incompatibleWith, RDFS.isDefinedBy, RDFS.label, 
+								OWL.priorVersion, RDFS.seeAlso, OWL.versionInfo]
 DC_ANNOTATION_URIS = [DC.contributor, DC.coverage, DC.creator, DC.date, DC.description, DC.format,
- DC.identifier, DC.language, DC.publisher, DC.relation, DC.rights, DC.source, DC.subject, DC.title, DC.type]
+					 DC.identifier, DC.language, DC.publisher, DC.relation, DC.rights, DC.source, 
+					 DC.subject, DC.title, DC.type]
 
 
 DEFAULT_SESSION_NAMESPACE = "http://www.example.org/session/resource#"
@@ -78,7 +80,8 @@ class Ontology(object):
 		super(Ontology, self).__init__()
 
 		self.rdfGraph = rdflib.Graph()
-		self.baseURI = None
+		self.ontologyPrettyURI = None
+		self.ontologyPhysicalLocation = None
 
 		self.allclasses = None
 
@@ -86,12 +89,16 @@ class Ontology(object):
 		self.allobjproperties = None
 		self.alldataproperties = None
 		self.allinferredproperties = None
+		self.allproperties = None
 
 		self.toplayer = None
 		self.classTreeMaxDepth = None
 		self.sessionGraph = None
 		self.sessionNS = None	
 		# self.testallclasses = None
+		
+		self.topObjProperties = None
+		self.topDataProperties = None
 
 		self.ontologyClassTree = None
 
@@ -121,82 +128,87 @@ class Ontology(object):
 			print ("\nError Parsing File Format (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
 			raise
 		finally:
-			self.baseURI = self.__ontologyURI(excludeBNodes=True) or uri
+			self.ontologyPhysicalLocation = uri	 # could be a local file with different baseURI
+			self.ontologyPrettyURI = self.ontologyURI(return_as_string=True, tryDC_metadata=True) or uri
 			# let's cache some useful info for faster access
 			self.allclasses = self.__getAllClasses()
-
+ 
 			self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
-			self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
 			self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
 			self.alldataproperties = self.__getAllProperties(classPredicate = 'owl.datatypeproperty')
+			self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
+			# add together only the OWL properties
+			self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties)
 
 			self.toplayer = self.__getTopclasses()
-
 			self.ontologyClassTree = self.__buildClassTree()
-
 			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
+			
+			self.topObjProperties = self.__getTopProps(classPredicate="owl.objectproperty")
+			self.topDataProperties = self.__getTopProps(classPredicate="owl.datatypeproperty")
+			self.ontologyObjPropertyTree = self.__buildPropTree(classPredicate="owl.objectproperty")
+			self.ontologyDataPropertyTree = self.__buildPropTree(classPredicate="owl.datatypeproperty")
+			
 			self.sessionGraph = rdflib.Graph()
 			self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
 
-			# printDebug("...Ontology instance succesfully created for <%s>" % str(self.baseURI))
+			# printDebug("...Ontology instance succesfully created for <%s>" % str(self.ontologyPrettyURI))
 
 
 	def __repr__(self):
-		return "<Ontology object for URI: %s - %d triples>" % (self.baseURI, len(self.rdfGraph))
+		return "<Ontology object for URI: %s - %d triples>" % (self.ontologyPrettyURI, len(self.rdfGraph))
 
 
 
-	def __ontologyURI(self, return_as_string=True, excludeBNodes = False):
+	def ontologyURI(self, return_as_string=False, excludeBNodes = False, tryDC_metadata = False):
 		"""
 		Returns the ontology URI if defined using the pattern
 		<uri> a http://www.w3.org/2002/07/owl#Ontology
 
 		In other cases it returns None (and Ontology defaults the URI passed at loading 
-		time). Also if it's blank node it returns none.
+		time). Also, you can exclude blank nodes if needed (eg for pretty printing)
 
 		"""
-		test = [x for x, y, z in self.rdfGraph.triples((None, RDF.type, OWL.Ontology))]
-		if test:
-			if excludeBNodes:
-				if not isBlankNode(test[0]):
-					if return_as_string:
-						return str(test[0])
-					else:
-						return test[0]
-			else:
-				if return_as_string:
-					return str(test[0])
-				else:
-					return test[0]
-		else:
+		checkOnto = [x for x in self.rdfGraph.subjects(RDF.type, OWL.Ontology)]
+		res = None
+		if not checkOnto:
 			return None
+		else:			 
+			if isBlankNode(checkOnto[0]):
+				if excludeBNodes:
+					return None
+				if tryDC_metadata:
+					checkDC_ID = [x for x in self.rdfGraph.objects(checkOnto[0], DC.identifier)]
+					if checkDC_ID:
+						return str(checkDC_ID[0]) if return_as_string else checkDC_ID[0]
+						
+			return str(checkOnto[0]) if return_as_string else checkOnto[0]
 
-	def ontologyAnnotations(self, return_as_string=True):
+
+
+	def ontologyAnnotations(self, return_as_string=True, remove = []):
 		"""
-		Method that tries to get all the available annotations for an OWL ontology.
-		Annotations are defined in the STANDARD_ANNOTATION_URIS constant.
+		Method that tries to get *all* the available annotations for an OWL ontology.
+		Annotations are defined in the STANDARD_ANNOTATION_URIS and DC_ANNOTATION_URIS constants.
 
-		Returns a list of 2-elements tuples (annotation-uri, annotation-value)
-
-		return_as_string = boolean (default= True)
+		Returns a list of 2-elements tuples (annotation-uri, annotation-values (as list))
+		
+		Remove: list used to dynamically avoid using certain properties
 		"""
 		exit = []
-		ontoURI = self.__ontologyURI(return_as_string=False)
+		ontoURI = self.ontologyURI()
 		if ontoURI:
-			for annotationURI in STANDARD_ANNOTATION_URIS:
-				test = [z for x, y, z in self.rdfGraph.triples((ontoURI, annotationURI, None))]
-				if test:
-					exit.append((str(annotationURI), z))
-			for annotationURI in DC_ANNOTATION_URIS:
-				test = [z for x, y, z in self.rdfGraph.triples((ontoURI, annotationURI, None))]
-				if test:
-					exit.append((str(annotationURI), z))
-		if return_as_string:
-			return [(self.uri2niceString(x), str(y)) for x,y in exit]
-		else:
-			return exit
+			for annotationURI in STANDARD_ANNOTATION_URIS + DC_ANNOTATION_URIS:
+				if annotationURI not in remove:
+					test = [x for x in self.rdfGraph.objects(ontoURI, annotationURI)]
+					if test:
+						if return_as_string:
+							exit.append((self.uri2niceString(annotationURI), [str(x) for x in test if x]))
+						else:
+							exit.append((annotationURI, test))
+		return exit
 
-
+		
 
 	def ontologyNamespaces(self, only_base = False):
 		""" 
@@ -235,7 +247,22 @@ class Ontology(object):
 						out.append((prefix, x[1]))
 					else:
 						out.append(('base', x[1]))
-			return out
+			return sorted(out)
+
+
+
+	def ontologyStats(self):
+		"""
+		Returns a list of tuples containining interesting stats about the ontology
+		"""
+		out = []
+		out += [("Triples", len(self.rdfGraph))]
+		out += [("Classes", len(self.allclasses))]
+		out += [("Object Properties", len(self.allobjproperties))]
+		out += [("Datatype Properties", len(self.alldataproperties))]
+		return out
+
+
 
 
 
@@ -250,16 +277,19 @@ class Ontology(object):
 
 
 
-	def __getAllClasses(self, classPredicate = "", includeDomainRange=True, includeImplicit=True, removeBlankNodes = True):
+	def __getAllClasses(self, classPredicate = "", includeDomainRange=False, includeImplicit=False, removeBlankNodes = True, addOWLThing = True):
 		"""
 		Extracts all the classes from an rdf graph.
 
 		It uses RDFS and OWL predicate by default; also, we extract non explicitly declared classes.
+		
+		OWL:Thing is added by default as the class of all OWL classes.
 
-		classPredicate: 'rdfs' or 'owl' (defaults to both)
-		includeDomainRange: boolean (defaults to True)
-		includeImplicit: boolean (defaults to True)
+		classPredicate: 'rdfs' or 'owl' (defaults to "" = both)
+		includeDomainRange: boolean (defaults to False)
+		includeImplicit: boolean (defaults to False)
 		removeBlankNodes: boolean (defaults to True)
+		addOWLThing: boolean (defaults to True)
 
 		"""
 		rdfGraph = self.rdfGraph
@@ -270,15 +300,13 @@ class Ontology(object):
 				mydict[x] = None
 			return mydict
 
-		if classPredicate == "rdfs":
+		if addOWLThing:
+			exit = addIfYouCan(OWL.Thing, exit)
+
+		if classPredicate == "rdfs" or classPredicate == "":
 			for s in rdfGraph.subjects(RDF.type , RDFS.Class):
 				exit = addIfYouCan(s, exit)
-		elif classPredicate == "owl":
-			for s in rdfGraph.subjects(RDF.type , OWL.Class):
-				exit = addIfYouCan(s, exit)
-		else:
-			for s in rdfGraph.subjects(RDF.type , RDFS.Class):
-				exit = addIfYouCan(s, exit)
+		if classPredicate == "owl" or classPredicate == "":
 			for s in rdfGraph.subjects(RDF.type , OWL.Class):
 				exit = addIfYouCan(s, exit)
 
@@ -303,7 +331,7 @@ class Ontology(object):
 		return sort_uri_list_by_name(exit)
 
 
-	def __getTopclasses(self, classPredicate = ''):
+	def __getTopclasses(self, classPredicate = '', ignoreOWLThing = True):
 		""" 
 		Finds the topclass in an ontology (works also with multiple inheritance)
 
@@ -311,9 +339,12 @@ class Ontology(object):
 		returnlist = []
 
 		for eachclass in self.allclasses:
-			x = self.classDirectSupers(eachclass)
-			if not x:
-				returnlist.append(eachclass)
+			if ignoreOWLThing and (eachclass == OWL.Thing):
+				continue
+			else:
+				x = self.classDirectSupers(eachclass)
+				if not x:
+					returnlist.append(eachclass)
 
 		return sort_uri_list_by_name(returnlist)
 
@@ -321,7 +352,8 @@ class Ontology(object):
 
 	def __buildClassTree(self, father=None, out=None):
 		""" 
-		Reconstructs the taxonomical tree of an ontology, from the 'topClasses' (= classes with no supers, see below)
+		Reconstructs the taxonomical tree of an ontology, from the 'topClasses' 
+		(= classes with no supers, see below)
 		
 		Returns a dictionary in which each class is a key, and its direct subs are the values.
 		The top classes have key = 0
@@ -334,20 +366,22 @@ class Ontology(object):
 		if not father:
 			out = {}
 			topclasses = self.toplayer
-			out[0] = topclasses
+			out[0] = [OWL.Thing]
+			out[OWL.Thing] = sort_uri_list_by_name(topclasses)
 			for top in topclasses:
 				children = self.classDirectSubs(top)
-				out[top] = children
+				out[top] = sort_uri_list_by_name(children)
 				for potentialfather in children:
 					self.__buildClassTree(potentialfather, out)
 			return out
 		else:
 			children = self.classDirectSubs(father)
-			out[father] = children
+			out[father] = sort_uri_list_by_name(children)
 			for ch in children:
 				self.__buildClassTree(ch, out)
 
 
+				
 
 	def __getAllClassesFromTree(self, element = 0, out = None):
 		""" 
@@ -417,22 +451,11 @@ class Ontology(object):
 		temp['label'] = self.entityLabel(aClass)
 		temp['treelevel'] = self.__printClassTreeLevel(aClass)
 		temp['isdomainfor'] = self.classDomainFor(aClass)
+		
+		if aClass in self.allclasses:
+			temp['isdefined'] = True
+			
 
-		return temp
-
-
-	def propertyRepresentation(self, aProp):
-		"""		
-		Similar to the class representation: could be a stub for an OO version of this..
-		"""		
-		temp = {}
-		temp['prop'] = aProp
-		temp['propname'] = self.uri2niceString(aProp)
-		temp['comment'] = self.entityComment(aProp)
-		temp['label'] = self.entityLabel(aProp)
-		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
-		temp['range'] = [self.classRepresentation(clas) for clas in self.propertyRange(aProp)]
-				
 		return temp
 
 
@@ -469,14 +492,16 @@ class Ontology(object):
 	def classDirectSupers(self, aClass, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of direct superclasses
+		Note: it always avoid returning OWL:Thing as that is the implicit superclass of all classes
 		"""
 		returnlist = []
 		for o in self.rdfGraph.objects(aClass, RDFS.subClassOf):
-			if excludeBnodes:
-				if not isBlankNode(o):
+			if not (o == OWL.Thing):
+				if excludeBnodes:
+					if not isBlankNode(o):
+						returnlist.append(o)
+				else:
 					returnlist.append(o)
-			else:
-				returnlist.append(o)
 		if sortUriName:
 			return sort_uri_list_by_name(remove_duplicates(returnlist))
 		else:
@@ -677,10 +702,277 @@ class Ontology(object):
 			raise exceptions.Error("Class is not available in current ontology")
 
 
+
+
+
+	###########
+
+	# METHODS for MANIPULATING RDFS/OWL PROPERTIES
+
+	###########
+
+
+	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
+		"""
+		Extracts all the properties (OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property) declared in a model.
+		The method is unprotected (single underscore) because we might want to call it from the Ontology object directly, 
+		just to see if there is *any* property available.... 
+
+		Args:
+
+		classPredicate: one of "rdf.property", "owl.objectproperty", "owl.datatypeproperty"
+		includeImplicit: gets all predicates from triples and infers that they are all RDF properties (even if not explicitly declared)
+
+		"""
+		rdfGraph = self.rdfGraph
+		exit = {}
+
+		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
+			raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+
+		def addIfYouCan(x, mydict):
+			if x not in mydict:
+				mydict[x] = None
+			return mydict
+
+		if classPredicate == "rdf.property" or "":
+			for s in rdfGraph.subjects(RDF.type , RDF.Property):
+				exit = addIfYouCan(s, exit)
+			if includeImplicit:
+				# includes everything that appears as a predicate; 
+				# below we add also owl properties due to inheritance: they are instances of of rdf:property subclasses
+				for s in rdfGraph.predicates(None, None):
+					exit = addIfYouCan(s, exit)
+
+		if classPredicate == "owl.objectproperty" or classPredicate == "" or includeImplicit:
+			for s in rdfGraph.subjects(RDF.type , OWL.ObjectProperty):
+				exit = addIfYouCan(s, exit)
+		if classPredicate == "owl.datatypeproperty" or classPredicate == "" or includeImplicit: 
+			for s in rdfGraph.subjects(RDF.type , OWL.DatatypeProperty):
+				exit = addIfYouCan(s, exit)
+
+
+		# get a list	
+		exit = exit.keys() 
+		return sort_uri_list_by_name(exit)
+
+
+	def __getTopProps(self, classPredicate = '', includeImplicit=False):
+		""" 
+		Finds the topclass in an ontology (works also with multiple inheritance)
+
+		"""
+		returnlist = []
+		searchspace = []
+				
+		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
+			raise exceptions.Error("ClassPredicate must be blank or either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+
+		if classPredicate == "rdf.property" or classPredicate == "":
+			searchspace += self.allrdfproperties
+		if classPredicate == "owl.objectproperty" or classPredicate == "":
+			searchspace += self.allobjproperties
+		if classPredicate == "owl.datatypeproperty" or classPredicate == "": 
+			searchspace += self.alldataproperties
+		if includeImplicit:
+			searchspace += self.allinferredproperties
+			
+		for eachprop in searchspace:
+			x = self.propertyDirectSupers(eachprop)
+			if not x:
+				returnlist.append(eachprop)
+
+		return sort_uri_list_by_name(returnlist)
+		
+
+	def __buildPropTree(self, classPredicate, father=None, out=None,):
+		""" 
+		Reconstructs the taxonomical property tree of an ontology
+		
+		Returns a dictionary in which each proeprty is a key, and its direct subs are the values.
+		The top properties have key = 0
+		"""
+		if not father:
+			out = {}
+			if classPredicate == "owl.datatypeproperty":
+				topprops = self.topDataProperties
+			else:
+				topprops = self.topObjProperties
+ 
+			out[0] = sort_uri_list_by_name(topprops)
+			for top in topprops:
+				children = self.propertyDirectSubs(top)
+				out[top] = sort_uri_list_by_name(children)
+				for potentialfather in children:
+					self.__buildPropTree(classPredicate, potentialfather, out)
+			return out
+		else:
+			children = self.propertyDirectSubs(father)
+			out[father] = sort_uri_list_by_name(children)
+			for ch in children:
+				self.__buildPropTree(classPredicate, ch, out)
+		
+
+	def propertyRepresentation(self, aProp):
+		"""		
+		Similar to the class representation: could be a stub for an OO version of this..
+		"""		
+		temp = {}
+		temp['prop'] = aProp
+		temp['propname'] = self.uri2niceString(aProp)
+		temp['comment'] = self.entityComment(aProp)
+		temp['label'] = self.entityLabel(aProp)
+		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
+		temp['range'] = [self.classRepresentation(clas) for clas in self.propertyRange(aProp)]
+				
+		return temp
+
+
+	def propertyFind(self, name, exact = False, classPredicate = "", includeImplicit=False):
+		"""
+		Find a property from its name (string representation of URI or part of it) within an ontology graph.
+
+		Returns a list that in the 'exact' case will have one element only
+
+		classPredicate: one of "rdf.property", "owl.objectproperty", "owl.datatypeproperty"
+		
+		EG:
+		> onto.propertyFind("purl.org", classPredicate="owl.objectproperty")
+		"""
+		temp = []
+		searchspace = []
+				
+		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
+			raise exceptions.Error("ClassPredicate must be blank or either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+
+		if classPredicate == "rdf.property" or classPredicate == "":
+			searchspace += self.allrdfproperties
+		if classPredicate == "owl.objectproperty" or classPredicate == "":
+			searchspace += self.allobjproperties
+		if classPredicate == "owl.datatypeproperty" or classPredicate == "": 
+			searchspace += self.alldataproperties
+		if includeImplicit:
+			searchspace += self.allinferredproperties				   
+		
+		if name:
+			for x in searchspace:
+				if exact:
+					if x.__str__().lower() == str(name).lower():
+						return [x]
+				else:
+					if x.__str__().lower().find(str(name).lower()) >= 0:
+						temp.append(x)
+		return temp
+
+
+	def propertyRange(self, prop):
+		exit = []
+		for s, v, o in self.rdfGraph.triples((prop, RDFS.range , None)):
+			if o not in exit:
+				exit.append(o)
+		return sort_uri_list_by_name(exit)
+		
+	def propertyDomain(self, prop):
+		exit = []
+		for s, v, o in self.rdfGraph.triples((prop, RDFS.domain , None)):
+			if o not in exit:
+				exit.append(o)
+		return sort_uri_list_by_name(exit)
+
+
+
+	# SECTION: 
+	# methods for getting property hiearchies: by default, we do not include blank nodes
+
+
+	def propertyDirectSupers(self, aProp, excludeBnodes = True, sortUriName = False):
+		"""
+		Return a list of direct superclasses
+		Note: it always avoid returning OWL:Thing as that is the implicit superclass of all classes
+		"""
+		returnlist = []
+		for o in self.rdfGraph.objects(aProp, RDFS.subPropertyOf):
+			if excludeBnodes:
+				if not isBlankNode(o):
+					returnlist.append(o)
+			else:
+				returnlist.append(o)
+		if sortUriName:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return remove_duplicates(returnlist)
+
+
+	def propertyDirectSubs(self, aProp, excludeBnodes = True, sortUriName = False ):
+		"""
+		Return a list of direct subproperties
+		"""
+		returnlist = []
+		for x in self.rdfGraph.subjects(RDFS.subPropertyOf, aProp):
+			if excludeBnodes:
+				if not isBlankNode(x):
+					returnlist.append(x)
+			else:
+				returnlist.append(x)
+		if sortUriName:
+			return sort_uri_list_by_name(remove_duplicates(returnlist))
+		else:
+			return remove_duplicates(returnlist)
+
+
+	def propertyAllSupers(self, aProp, excludeBnodes = True, sortUriName = False ):
+		"""
+		Return a list of all superprops >> wrapper with ordering etc..
+		"""
+		returnlist = self.__propAllSupers(aProp, None, excludeBnodes, sortUriName)
+		if sortUriName:			 
+			return sort_uri_list_by_name(returnlist)
+		else:
+			if returnlist:
+				returnlist.reverse()
+		return returnlist
+			
+	def __propAllSupers(self, aProp, returnlist = None, excludeBnodes = True, sortUriName = False ):
+		"""
+		Return a list of all superprops >> Inner recursive method
+		"""
+		if returnlist == None:	# trick to avoid mutable objs python prob...
+			returnlist = []
+		for ssuper in self.propertyDirectSupers(aProp, excludeBnodes, sortUriName):
+			returnlist.append(ssuper)
+			self.__propAllSupers(ssuper, returnlist, excludeBnodes, sortUriName)
+		return remove_duplicates(returnlist)		
+
+
+	def propertyAllSubs(self, aProp, excludeBnodes = True, sortUriName = False):
+		"""
+		Return a list of all subproperties
+		"""
+		returnlist = self.__propAllSubs(aProp, None, excludeBnodes, sortUriName)
+		if sortUriName:			 
+			return sort_uri_list_by_name(returnlist)
+		else:
+			if returnlist:
+				returnlist.reverse()
+		return returnlist
+			
+	def __propAllSubs(self, aProp, returnlist = None, excludeBnodes = True, sortUriName = False):
+		"""
+		Return a list of all subproperties >> Inner Recursive Method
+		"""
+		if returnlist == None:
+			returnlist = []
+		for sub in self.propertyDirectSubs(aProp, excludeBnodes):
+			returnlist.append(sub)
+			self.__propAllSubs(sub, returnlist, excludeBnodes)
+		return remove_duplicates(returnlist)
+
+
+
 	
 	###########
 
-	# GENERIC METHODS FOR RDF RESOURCES (ENTITIES)
+	# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES)
 
 	###########
 
@@ -730,79 +1022,6 @@ class Ontology(object):
 				if getattr(o, 'language') and  getattr(o, 'language') == language:
 					return o
 			return ""
-
-
-
-
-
-
-	###########
-
-	# METHODS for MANIPULATING RDFS/OWL PROPERTIES
-
-	###########
-
-		
-
-
-	def propertyRange(self, prop):
-		exit = []
-		for s, v, o in self.rdfGraph.triples((prop, RDFS.range , None)):
-			if o not in exit:
-				exit.append(o)
-		return sort_uri_list_by_name(exit)
-		
-	def propertyDomain(self, prop):
-		exit = []
-		for s, v, o in self.rdfGraph.triples((prop, RDFS.domain , None)):
-			if o not in exit:
-				exit.append(o)
-		return sort_uri_list_by_name(exit)
-
-
-	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
-		"""
-		Extracts all the properties (OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property) declared in a model.
-		The method is unprotected (single underscore) because we might want to call it from the Ontology object directly, 
-		just to see if there is *any* property available.... 
-
-		Args:
-
-		classPredicate: one of "rdf.property", "owl.objectproperty", "owl.datatypeproperty"
-		includeImplicit: gets all predicates from triples and infers that they are all RDF properties (even if not explicitly declared)
-
-		"""
-		rdfGraph = self.rdfGraph
-		exit = {}
-
-		if classPredicate not in ['rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
-			raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
-
-		def addIfYouCan(x, mydict):
-			if x not in mydict:
-				mydict[x] = None
-			return mydict
-
-		if classPredicate == "rdf.property" or "":
-			for s in rdfGraph.subjects(RDF.type , RDF.Property):
-				exit = addIfYouCan(s, exit)
-			if includeImplicit:
-				# includes everything that appears as a predicate; 
-				# below we add also owl properties due to inheritance: they are instances of of rdf:property subclasses
-				for s in rdfGraph.predicates(None, None):
-					exit = addIfYouCan(s, exit)
-
-		if classPredicate == "owl.objectproperty" or classPredicate == "" or includeImplicit:
-			for s in rdfGraph.subjects(RDF.type , OWL.ObjectProperty):
-				exit = addIfYouCan(s, exit)
-		if classPredicate == "owl.datatypeproperty" or classPredicate == "" or includeImplicit: 
-			for s in rdfGraph.subjects(RDF.type , OWL.DatatypeProperty):
-				exit = addIfYouCan(s, exit)
-
-
-		# get a list	
-		exit = exit.keys() 
-		return sort_uri_list_by_name(exit)
 
 
 
@@ -936,21 +1155,36 @@ class Ontology(object):
 
 
 
-	def printClassTree(self):
+	def printClassTree(self, element = 0, treedict = None, level=0):
 		""" 
 		Print nicely into stdout the taxonomical tree of an ontology 
 		"""
+		if not treedict:
+			treedict = self.ontologyClassTree
+		for x in treedict[element]:
+			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			self.printClassTree(x, treedict, (level + 1))
 
-		def tree_inner(rdfGraph, aClass, level):
-			for sub in self.classDirectSubs(aClass):
-				printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(sub)))
-				tree_inner(rdfGraph, sub, (level + 1))
+	def printObjPropTree(self, element = 0, treedict = None, level=0):
+		""" 
+		Print nicely into stdout the taxonomical tree of an ontology 
+		"""
+		if not treedict:
+			treedict = self.ontologyObjPropertyTree
+		for x in treedict[element]:
+			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			self.printObjPropTree(x, treedict, (level + 1))
 
-		for top in self.toplayer:
-			printDebug(self.uri2niceString(top))
-			tree_inner(self.rdfGraph, top, 1)
-
-
+	def printDataPropTree(self, element = 0, treedict = None, level=0):
+		""" 
+		Print nicely into stdout the taxonomical tree of an ontology 
+		"""
+		if not treedict:
+			treedict = self.ontologyDataPropertyTree
+		for x in treedict[element]:
+			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			self.printDataPropTree(x, treedict, (level + 1))
+			
 
 	def ontologyHtmlTree(self, element = 0, treedict = None):
 		""" 
@@ -978,7 +1212,7 @@ class Ontology(object):
 
 		"""
 		if not treedict:
-			treedict = self.__buildClassTree()
+			treedict = self.ontologyClassTree
 		stringa = "<ul>"
 		for x in treedict[element]:
 			# print x

@@ -13,8 +13,6 @@
 from rdflib import Namespace
 
 DCNS = Namespace("http://purl.org/dc/elements/1.1/")
-
-
 contributor = 	DCNS["contributor"]
 coverage = DCNS["coverage"]
 creator	= DCNS["creator"]
