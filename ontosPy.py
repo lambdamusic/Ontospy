@@ -84,6 +84,8 @@ class Ontology(object):
 		self.ontologyPhysicalLocation = None
 
 		self.allclasses = None
+		
+		self.allinstances = None
 
 		self.allrdfproperties = None
 		self.allobjproperties = None
@@ -128,10 +130,14 @@ class Ontology(object):
 			print ("\nError Parsing File Format (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
 			raise
 		finally:
-			self.ontologyPhysicalLocation = uri	 # could be a local file with different baseURI
+			self.ontologyPhysicalLocation = uri	 # TODO could be a local file with different baseURI
 			self.ontologyPrettyURI = self.ontologyURI(return_as_string=True, tryDC_metadata=True) or uri
 			# let's cache some useful info for faster access
 			self.allclasses = self.__getAllClasses()
+			
+			self.toplayer = self.__getTopclasses()
+			
+			self.allinstances = self.__getAllInstances()
  
 			self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
 			self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
@@ -139,8 +145,7 @@ class Ontology(object):
 			self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
 			# add together only the OWL properties
 			self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties)
-
-			self.toplayer = self.__getTopclasses()
+		
 			self.ontologyClassTree = self.__buildClassTree()
 			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
 			
@@ -260,6 +265,7 @@ class Ontology(object):
 		out += [("Classes", len(self.allclasses))]
 		out += [("Object Properties", len(self.allobjproperties))]
 		out += [("Datatype Properties", len(self.alldataproperties))]
+		out += [("Individuals", len(self.allinstances))]
 		return out
 
 
@@ -277,7 +283,7 @@ class Ontology(object):
 
 
 
-	def __getAllClasses(self, classPredicate = "", includeDomainRange=False, includeImplicit=False, removeBlankNodes = True, addOWLThing = True):
+	def __getAllClasses(self, classPredicate = "", includeDomainRange=False, includeImplicit=False, removeBlankNodes = True, addOWLThing = True, excludeRDF_OWL=True):
 		"""
 		Extracts all the classes from an rdf graph.
 
@@ -290,12 +296,18 @@ class Ontology(object):
 		includeImplicit: boolean (defaults to False)
 		removeBlankNodes: boolean (defaults to True)
 		addOWLThing: boolean (defaults to True)
+		excludeRDF_OWL: exclude all classes from RDF/RDFS/OWL vocabs that have been redefined.
 
 		"""
 		rdfGraph = self.rdfGraph
 		exit = {}
 
 		def addIfYouCan(x, mydict):
+			if excludeRDF_OWL:
+				if x.startswith('http://www.w3.org/2002/07/owl#') or  \
+				   x.startswith("http://www.w3.org/1999/02/22-rdf-syntax-ns#") or \
+				   x.startswith("http://www.w3.org/2000/01/rdf-schema#"):
+					return mydict
 			if x not in mydict:
 				mydict[x] = None
 			return mydict
@@ -452,7 +464,7 @@ class Ontology(object):
 		temp['treelevel'] = self.__printClassTreeLevel(aClass)
 		temp['isdomainfor'] = self.classDomainFor(aClass)
 		
-		if aClass in self.allclasses:
+		if aClass != OWL.Thing and aClass in self.allclasses:
 			temp['isdefined'] = True
 			
 
@@ -602,7 +614,8 @@ class Ontology(object):
 		for aClass in classlist:
 			flag = False
 			for superslist in superslistlists:
-				if aClass in superslist:
+				# DIRTY hack to make sure all trees originate from OWL.Thing...
+				if aClass in superslist + [OWL.Thing]:
 					flag = True
 			if flag == False:
 				returnlist.append(aClass)
@@ -824,6 +837,9 @@ class Ontology(object):
 		temp['label'] = self.entityLabel(aProp)
 		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
 		temp['range'] = [self.classRepresentation(clas) for clas in self.propertyRange(aProp)]
+
+		if aProp in self.allproperties:
+			temp['isdefined'] = True
 				
 		return temp
 
@@ -969,88 +985,6 @@ class Ontology(object):
 
 
 
-	
-	###########
-
-	# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES)
-
-	###########
-
-
-
-	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-		"""		
-		Returns the rdfs.label value of an entity (class or property), if existing. 
-		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
-
-		Args:
-		language: 'en', 'it' etc.. 
-		getall: returns a list of all labels rather than a string 
-
-		"""
-
-		if getall: 
-			temp = []
-			for o in self.rdfGraph.objects(anEntity, RDFS.label):
-				temp += [o]
-			return temp
-		else:
-			for o in self.rdfGraph.objects(anEntity, RDFS.label):
-				if getattr(o, 'language') and  getattr(o, 'language') == language:
-					return o
-			return ""
-
-
-	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-		"""		
-		Returns the rdfs.comment value of an entity (class or property), if existing. 
-		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
-
-		Args:
-		language: 'en', 'it' etc.. 
-		getall: returns a list of all labels rather than a string 
-
-		"""
-
-		if getall: 
-			temp = []
-			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
-				temp += [o]
-			return temp
-		else:
-			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
-				if getattr(o, 'language') and  getattr(o, 'language') == language:
-					return o
-			return ""
-
-
-
-
-
-
-	###########
-
-	# SESSION GRAPH
-
-	###########
-
-
-	def setSessionGraphNamespace(self, ns):
-		if ns.startswith("http://"):
-			self.sessionNS = ns
-		else:
-			raise exceptions.Error("Please provide a URI starting with 'http://'..")
-
-	def serializeSessionGraph(self, format=""):
-		""" Shortcut that outputs the session graph
-			TODO: add format specs..
-	   """
-		if format:
-			return self.sessionGraph.serialize(format=format)
-		else:
-			return self.sessionGraph.serialize()
-
-
 
 	###########
 
@@ -1069,17 +1003,30 @@ class Ontology(object):
 			return returnlist
 
 
+	def instanceRepresentation(self, instance):
+		"""		
+		Similar to the class representation: could be a stub for an OO version of this..
+		"""		
+		temp = {}
+		temp['instance'] = instance
+		temp['instancename'] = self.uri2niceString(instance)
+		temp['comment'] = self.entityComment(instance)
+		temp['label'] = self.entityLabel(instance)
+		fathers = self.instanceFather(instance)
+		if fathers:
+			temp['types'] = [self.classRepresentation(f) for f in fathers]
+				
+		return temp
+
 
 	def instanceFind(self, name, exact = False):
 		"""
 		Not very fast: every time self.__getAllInstances() is called.. 
 
-		TODO: find a better solution, maybe load all instances at startup? Or maybe use SPARQL directly...
-
 		"""
 		temp = []
 		if name:
-			for x in self.__getAllInstances():
+			for x in self.allinstances:
 				if exact:
 					if x.__str__().lower() == str(name).lower():
 						return x
@@ -1140,6 +1087,98 @@ class Ontology(object):
 			returnlist.extend(self.classInstances(aClass))
 		return sort_uri_list_by_name(remove_duplicates(returnlist))
 
+
+
+	
+	###########
+
+	# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES)
+
+	###########
+
+
+
+	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
+		"""		
+		Returns the rdfs.label value of an entity (class or property), if existing. 
+		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
+
+		Args:
+		language: 'en', 'it' etc.. 
+		getall: returns a list of all labels rather than a string 
+
+		"""
+
+		if getall: 
+			temp = []
+			for o in self.rdfGraph.objects(anEntity, RDFS.label):
+				temp += [o]
+			return temp
+		else:
+			for o in self.rdfGraph.objects(anEntity, RDFS.label):
+				if getattr(o, 'language') and  getattr(o, 'language') == language:
+					return o
+			return ""
+
+
+	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
+		"""		
+		Returns the rdfs.comment value of an entity (class or property), if existing. 
+		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
+
+		Args:
+		language: 'en', 'it' etc.. 
+		getall: returns a list of all labels rather than a string 
+
+		"""
+
+		if getall: 
+			temp = []
+			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
+				temp += [o]
+			return temp
+		else:
+			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
+				if getattr(o, 'language') and  getattr(o, 'language') == language:
+					return o
+			return ""
+
+
+	def entityTriples(self, anEntity, excludeProps=[]):
+		"""		
+		Returns the pred-obj for any given resource, excluding selected ones..
+
+		"""
+		temp = []
+		for x,y,z in self.rdfGraph.triples((anEntity, None, None)):
+			if y not in excludeProps:
+				temp += [(y, z)]
+		return temp
+
+
+
+
+	###########
+
+	# SESSION GRAPH
+
+	###########
+
+
+	def setSessionGraphNamespace(self, ns):
+		if ns.startswith("http://"):
+			self.sessionNS = ns
+		else:
+			raise exceptions.Error("Please provide a URI starting with 'http://'..")
+
+	def serializeSessionGraph(self, format=""):
+		""" Shortcut that outputs the session graph
+			TODO: add format specs..
+	   """
+		if format:
+			return self.sessionGraph.serialize(format=format)
+		else:
+			return self.sessionGraph.serialize()
 
 
 
@@ -1294,7 +1333,7 @@ class Ontology(object):
 			return "You need to install pygraphviz for this operation."
 
 		G = pgv.AGraph(rankdir="BT") # top bottom direction
-		for s, v, o in rdfGraph.triples((None, RDFS.subClassOf , None)):
+		for s, v, o in self.rdfGraph.triples((None, RDFS.subClassOf , None)):
 			G.add_edge(self.uri2niceString(s), self.uri2niceString(o))
 		G.layout(prog='dot')	# eg dot, neato, twopi, circo, fdp
 		G.draw(fileposition)

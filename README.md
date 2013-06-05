@@ -4,7 +4,7 @@ OntosPy
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 
 #### Version: 
-1.0
+1.1
 
 
 ####Dependencies:
@@ -28,6 +28,9 @@ Ps: the library can be used in standalone mode too.
 
 Changelog
 =======
+
+2013-06-02
+- refactored, fixed a few bugs
 
 2013-05-31
 - added methods for properties
