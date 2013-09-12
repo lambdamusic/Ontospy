@@ -15,6 +15,75 @@ from rdflib import URIRef, RDFS, RDF, BNode
 
 
 
+
+def sortByNamespacePrefix(urisList, nsList):
+	"""
+		Given an ordered list of namespaces prefixes, order a list of uris based on that. 
+		Eg 
+		
+		In [7]: ll
+		Out[7]: 
+		[rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#comment'),
+		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#label'),
+		 rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#equivalentClass')]
+
+		In [8]: sortByNamespacePrefix(ll, [OWL.OWLNS, RDFS])
+		Out[8]: 
+		[rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#equivalentClass'),
+		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#comment'),
+		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#label'),
+		 rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')]
+		 
+	"""
+	exit = []
+	urisList = sort_uri_list_by_name(urisList)
+	for ns in nsList:
+		innerexit = []
+		for uri in urisList:
+			if str(uri).startswith(str(ns)):
+				innerexit += [uri]
+		exit += innerexit
+
+	# add remaining uris (if any)
+	for uri in urisList:
+		if uri not in exit:
+			exit += [uri]
+						
+	return exit
+
+
+
+
+
+def sort_uri_list_by_name(uri_list):
+	""" 
+	 Sorts a list of uris based on the last bit (usually the name) of a uri
+	 It checks whether the last bit is specified using a # or just a /, eg:
+			 rdflib.URIRef('http://purl.org/ontology/mo/Vinyl'),
+			 rdflib.URIRef('http://purl.org/vocab/frbr/core#Work')
+
+	 """
+	def get_last_bit(uri_string):
+		try:
+			x = uri_string.split("#")[1]
+		except:
+			x = uri_string.split("/")[-1]
+		return x
+
+	try:
+		return sorted(uri_list, key=lambda x: get_last_bit(x.__str__()))
+	except:
+		# TODO: do more testing.. maybe use a unicode-safe method instead of __str__
+		print "Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError"
+		return uri_list
+
+
+
+
+
+
+
 def guess_fileformat(aUri):
 	"""
 	Simple file format guessing (using rdflib format types) based on the suffix
@@ -34,8 +103,6 @@ def guess_fileformat(aUri):
 		return "rdfa"
 	else:  # defaults to XML
 		return "xml"
-
-
 
 
 
@@ -111,30 +178,6 @@ def remove_duplicates(seq, idfun=None):
 	else:
 		return []
 
-
-
-
-def sort_uri_list_by_name(uri_list):
-	""" 
-	 Sorts a list of uris based on the last bit (usually the name) of a uri
-	 It checks whether the last bit is specified using a # or just a /, eg:
-			 rdflib.URIRef('http://purl.org/ontology/mo/Vinyl'),
-			 rdflib.URIRef('http://purl.org/vocab/frbr/core#Work')
-
-	 """
-	def get_last_bit(uri_string):
-		try:
-			x = uri_string.split("#")[1]
-		except:
-			x = uri_string.split("/")[-1]
-		return x
-
-	try:
-		return sorted(uri_list, key=lambda x: get_last_bit(x.__str__()))
-	except:
-		# TODO: do more testing.. maybe use a unicode-safe method instead of __str__
-		print "Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError"
-		return uri_list
 
 
 
