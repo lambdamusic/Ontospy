@@ -25,9 +25,6 @@ import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 
 from vocabs import OWL, DUBLINCORE as DC
-					
-
-
 from vocabs import famous as FAMOUS_ONTOLOGIES 
 
 from utils import *
@@ -43,13 +40,6 @@ from utils import *
 #
 ##################
 
-
-# todo: remove if it doesn't break anything
-# STANDARD_ANNOTATION_URIS = [ RDFS.comment, OWL.incompatibleWith, RDFS.isDefinedBy, RDFS.label, 
-#								OWL.priorVersion, RDFS.seeAlso, OWL.versionInfo]
-# DC_ANNOTATION_URIS = [DC.contributor, DC.coverage, DC.creator, DC.date, DC.description, DC.format,
-#					 DC.identifier, DC.language, DC.publisher, DC.relation, DC.rights, DC.source, 
-#					 DC.subject, DC.title, DC.type]
 
 
 DEFAULT_SESSION_NAMESPACE = "http://www.example.org/session/resource#"
@@ -84,13 +74,12 @@ class Ontology(object):
 		super(Ontology, self).__init__()
 
 		self.rdfGraph = rdflib.Graph()
+		self.ontologyURI = None
 		self.ontologyPrettyURI = None
 		self.ontologyPhysicalLocation = None
 
-		self.allclasses = None
-		
+		self.allclasses = None		
 		self.allinstances = None
-
 		self.allrdfproperties = None
 		self.allobjproperties = None
 		self.alldataproperties = None
@@ -101,11 +90,9 @@ class Ontology(object):
 		self.classTreeMaxDepth = None
 		self.sessionGraph = None
 		self.sessionNS = None	
-		# self.testallclasses = None
-		
+		# self.testallclasses = None	
 		self.topObjProperties = None
 		self.topDataProperties = None
-
 		self.ontologyClassTree = None
 
 		if uri:
@@ -114,54 +101,32 @@ class Ontology(object):
 			printDebug("Ontology instance created. Use the <loadUri> method to load an ontology.")
 
 
-	def loadUri(self, uri):
+
+	def loadUri(self, uri, default_format="xml"):
 		"""
-		Loads a graph from a URI
-
-		At the moment we're only taking two input formats, Rdf/Xml and N3 . 
-		Could it be easily extended: https://rdflib.readthedocs.org/en/latest/plugin_parsers.html	
-
+		Loads a graph from a URI (or a python file object containing triples)
 		"""
+			
+		if uri.startswith("www."): #support for lazy people
+			uri = "http://%s" % str(uri)  
 
-		if uri.startswith("www."):
-			uri = "http://%s" % str(uri)  #support for lazy people
+		try:
+			rdf_format = guess_fileformat(uri)
+		except:
+			# in this case it's a python file object
+			rdf_format = default_format	
 
-		rdf_format = guess_fileformat(uri)
 
 		try:
 			self.rdfGraph.parse(uri, format=rdf_format)
 		except:
-			print ("\nError Parsing File Format (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
+			print ("\nError Parsing file URI (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
 			raise
 		finally:
-			self.ontologyPhysicalLocation = uri	 # TODO could be a local file with different baseURI
-			self.ontologyPrettyURI = self.ontologyURI(return_as_string=True, tryDC_metadata=True) or uri
-			# let's cache some useful info for faster access
-			self.allclasses = self.__getAllClasses()
+			self.__setupOntology(uri=uri)
 			
-			self.toplayer = self.__getTopclasses()
-			
-			self.allinstances = self.__getAllInstances()
- 
-			self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
-			self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
-			self.alldataproperties = self.__getAllProperties(classPredicate = 'owl.datatypeproperty')
-			self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
-			# add together only the OWL properties
-			self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties)
-		
-			self.ontologyClassTree = self.__buildClassTree()
-			self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
-			
-			self.topObjProperties = self.__getTopProps(classPredicate="owl.objectproperty")
-			self.topDataProperties = self.__getTopProps(classPredicate="owl.datatypeproperty")
-			self.ontologyObjPropertyTree = self.__buildPropTree(classPredicate="owl.objectproperty")
-			self.ontologyDataPropertyTree = self.__buildPropTree(classPredicate="owl.datatypeproperty")
-			
-			self.sessionGraph = rdflib.Graph()
-			self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
 
-			# printDebug("...Ontology instance succesfully created for <%s>" % str(self.ontologyPrettyURI))
+			
 
 
 	def __repr__(self):
@@ -193,6 +158,171 @@ class Ontology(object):
 
 
 
+
+	##################
+	#  
+	#  METHODS for ONTOLOGIES
+	#
+	##################
+
+
+	def __setupOntology(self, uri):
+		
+		#first make sure we have a uri-string
+		if type(uri) != type("string"):
+			try:
+				uri = uri.name # assuming it's a file
+			except:
+				uri = str(uri)
+		else:
+			if not uri.startswith("http:"):
+				uri = "file://%s" % os.path.realpath(uri) 
+			
+				
+		self.ontologyPhysicalLocation = uri
+		self.ontologyURI = self.__getOntologyURI(return_as_string=False, tryDC_metadata=True) or uri
+		self.ontologyPrettyURI = self.__getOntologyURI(return_as_string=True, tryDC_metadata=True) or uri
+
+		# let's cache some useful info for faster access		
+		self.allclasses = self.__getAllClasses()		
+		self.toplayer = self.__getTopclasses()
+		self.allinstances = self.__getAllInstances()
+
+		self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
+		self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
+		self.alldataproperties = self.__getAllProperties(classPredicate = 'owl.datatypeproperty')
+		self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
+		# add together only the OWL properties
+		self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties)
+	
+		self.ontologyClassTree = self.__buildClassTree()
+		self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
+		
+		self.topObjProperties = self.__getTopProps(classPredicate="owl.objectproperty")
+		self.topDataProperties = self.__getTopProps(classPredicate="owl.datatypeproperty")
+		self.ontologyObjPropertyTree = self.__buildPropTree(classPredicate="owl.objectproperty")
+		self.ontologyDataPropertyTree = self.__buildPropTree(classPredicate="owl.datatypeproperty")
+		
+		self.sessionGraph = rdflib.Graph()
+		self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
+
+		# printDebug("...Ontology instance succesfully created for <%s>" % str(self.ontologyPrettyURI))			
+			
+			
+
+	def __getOntologyURI(self, return_as_string=False, excludeBNodes = False, tryDC_metadata = False):
+		"""
+		Returns the ontology URI  
+		
+		Ideally defined using the pattern
+		<uri> a http://www.w3.org/2002/07/owl#Ontology
+		
+		If it's expressed using a nested triple via a blank node, the DC metadata properties are tested.
+		You can exclude blank nodes if needed (eg for pretty printing)
+		
+		If nothing is found, the graph URI is taken as the defaul ontology URI
+
+		"""
+		ontoMetadata = [x for x in self.rdfGraph.subjects(RDF.type, OWL.Ontology)]
+
+		if not ontoMetadata:
+			return None
+		else:			 
+			if isBlankNode(ontoMetadata[0]):
+				if excludeBNodes:
+					return None
+				if tryDC_metadata:
+					checkDC_ID = [x for x in self.rdfGraph.objects(ontoMetadata[0], DC.identifier)]
+					if checkDC_ID:
+						return str(checkDC_ID[0]) if return_as_string else checkDC_ID[0]
+						
+			return str(ontoMetadata[0]) if return_as_string else ontoMetadata[0]
+			
+			
+
+
+	def ontologyAnnotations(self, niceURI=False, excludeProps=False, excludeBNodes = False, ):
+		"""
+		Method that tries to get *all* the available annotations for an OWL ontology.
+		Returns a list of 2-elements tuples (annotation-uri, annotation-values (as list))
+		"""		
+		if self.ontologyURI:
+			return self.entityTriples(self.ontologyURI, niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
+		
+
+		
+
+	def ontologyNamespaces(self, only_base = False):
+		""" 
+		Extract ontology namespaces. wrapper function: return either the base namespace only, or all of them
+
+		Namespaces are given in this format:
+
+		In [01]: for x in rdfGraph.namespaces():
+				....:			print x
+				....:
+				....:
+		('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
+		('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
+		(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
+		('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
+		('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
+		(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))
+
+
+				"""
+		# we assume that a base namespace is implied by an empty prefix
+		if only_base:
+			ll = [x for x in self.rdfGraph.namespaces() if x[0] == '']
+			if ll:
+				return ll[0][1]
+			else:
+				return None
+		else:
+			out, flag = [], True
+			for x in self.rdfGraph.namespaces():
+				if x[0]:
+					out.append(x)
+				else: 
+					# if the namespace is blank (== we have a base namespace)
+					flag = False
+					prefix = inferNamespacePrefix(x[1])
+					if prefix:
+						out.append((prefix, x[1]))
+					else:
+						out.append(('base', x[1]))
+			if flag:
+				# hack to simulate to base uri for local files
+				out.append(('base', self.ontologyURI + "#"))			
+			return sorted(out)
+
+
+
+	def ontologyStats(self):
+		"""
+		Returns a list of tuples containining interesting stats about the ontology
+		"""
+		out = []
+		out += [("Triples", len(self.rdfGraph))]
+		out += [("Classes", len(self.allclasses))]
+		out += [("Object Properties", len(self.allobjproperties))]
+		out += [("Datatype Properties", len(self.alldataproperties))]
+		out += [("Individuals", len(self.allinstances))]
+		return out
+
+
+
+	def serializeOntologyGraph(self, format=""):
+		""" Shortcut that outputs the ontology graph
+			TODO: add format specs..
+	   """
+		if format:
+			return self.rdfGraph.serialize(format=format)
+		else:
+			return self.rdfGraph.serialize()
+			
+			
+
 	###########
 
 	# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES)
@@ -220,7 +350,7 @@ class Ontology(object):
 		# sorting
 		if type(orderProps) == type([]):
 			orderedUris = sortByNamespacePrefix([y for y,z in temp], orderProps) # order props only
-			orderedUris = [(n+1, x) for n, x in enumerate(orderedUris)]  # create form: [(1, 'something'),(2,'bobby'),(3,'suzy'),(4,'crab')]
+			orderedUris = [(n+1, x) for n, x in enumerate(orderedUris)]	 # create form: [(1, 'something'),(2,'bobby'),(3,'suzy'),(4,'crab')]
 			rank = dict((key, rank) for (rank, key) in orderedUris) # create dict to pass to sorted procedure
 			temp = sorted(temp, key=lambda tup: rank.get(tup[0]))
 		elif orderProps:  # default to alpha sorting unless False
@@ -279,119 +409,6 @@ class Ontology(object):
 
 
 
-
-
-
-
-	##################
-	#  
-	#  METHODS for ONTOLOGIES
-	#
-	##################
-
-
-
-	def ontologyURI(self, return_as_string=False, excludeBNodes = False, tryDC_metadata = False):
-		"""
-		Returns the ontology URI if defined using the pattern
-		<uri> a http://www.w3.org/2002/07/owl#Ontology
-
-		In other cases it returns None (and Ontology defaults the URI passed at loading 
-		time). Also, you can exclude blank nodes if needed (eg for pretty printing)
-
-		"""
-		checkOnto = [x for x in self.rdfGraph.subjects(RDF.type, OWL.Ontology)]
-		res = None
-		if not checkOnto:
-			return None
-		else:			 
-			if isBlankNode(checkOnto[0]):
-				if excludeBNodes:
-					return None
-				if tryDC_metadata:
-					checkDC_ID = [x for x in self.rdfGraph.objects(checkOnto[0], DC.identifier)]
-					if checkDC_ID:
-						return str(checkDC_ID[0]) if return_as_string else checkDC_ID[0]
-						
-			return str(checkOnto[0]) if return_as_string else checkOnto[0]
-
-
-
-	def ontologyAnnotations(self, niceURI=False, excludeProps=False, excludeBNodes = False, ):
-		"""
-		Method that tries to get *all* the available annotations for an OWL ontology.
-		Returns a list of 2-elements tuples (annotation-uri, annotation-values (as list))
-		"""		
-		return self.entityTriples(self.ontologyURI(), niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
-		
-
-		
-
-	def ontologyNamespaces(self, only_base = False):
-		""" 
-		Extract ontology namespaces. wrapper function: return either the base namespace only, or all of them
-
-		Namespaces are given in this format:
-
-		In [01]: for x in rdfGraph.namespaces():
-				....:			print x
-				....:
-				....:
-		('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
-		('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
-		(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
-		('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
-		('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
-		(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))
-
-
-				"""
-		# we assume that a base namespace is implied by an empty prefix
-		if only_base:
-			ll = [x for x in self.rdfGraph.namespaces() if x[0] == '']
-			if ll:
-				return ll[0][1]
-			else:
-				return None
-		else:
-			out = []
-			for x in self.rdfGraph.namespaces():
-				if x[0]:
-					out.append(x)
-				else: # if the namespace is blank (== base)
-					prefix = inferNamespacePrefix(x[1])
-					if prefix:
-						out.append((prefix, x[1]))
-					else:
-						out.append(('base', x[1]))
-			return sorted(out)
-
-
-
-	def ontologyStats(self):
-		"""
-		Returns a list of tuples containining interesting stats about the ontology
-		"""
-		out = []
-		out += [("Triples", len(self.rdfGraph))]
-		out += [("Classes", len(self.allclasses))]
-		out += [("Object Properties", len(self.allobjproperties))]
-		out += [("Datatype Properties", len(self.alldataproperties))]
-		out += [("Individuals", len(self.allinstances))]
-		return out
-
-
-
-	def serializeOntologyGraph(self, format=""):
-		""" Shortcut that outputs the ontology graph
-			TODO: add format specs..
-	   """
-		if format:
-			return self.rdfGraph.serialize(format=format)
-		else:
-			return self.rdfGraph.serialize()
-			
-			
 
 
 
@@ -1353,8 +1370,65 @@ class Ontology(object):
 			G.add_edge(self.uri2niceString(s), self.uri2niceString(o))
 		G.layout(prog='dot')	# eg dot, neato, twopi, circo, fdp
 		G.draw(fileposition)
-		printDebug("\n\n", "_" * 50, "\n\n")
-		printDebug("Generated graph at %s" % fileposition)
+		print("\n\n", "_" * 50, "\n\n")
+		print("Generated graph at %s" % fileposition)
+
+
+	def webViz(self):
+		"""
+			July 10, 2014
+			Visualize the graph using d3  @todo
+		"""
+
+		try:
+			import webbrowser
+		except:
+			return "You need the webbrowser module for this operation."
+
+		filename = 'test.html'
+		
+		if False:		
+			# the simeplest test ever
+			f = open("test.html", "w")
+			f.write("<html><body><h2>It WOrks</h2><p>%s</p></body></html>" % " ".join(["<li>"+str(x)+"</li>" for x in self.allclasses]))
+			f.close()
+			print("\n\n", "_" * 50, "\n\n")
+			print("Generated graph at %s" % os.path.realpath(filename))
+			webbrowser.open('file://'+os.path.realpath("test.html"))
+
+
+			
+			
+		if False:
+			# just opens a d3 file
+			thisdir = os.path.dirname(os.path.realpath(__file__))		
+			print thisdir
+			webbrowser.open('file://'+thisdir+"/htmltemplates/forcedirected.html")
+			
+					
+		if True:
+			# uses a string template with d3
+			from string import Template
+			ss = ""		
+			for x in self.allclasses:
+				if self.classDirectSupers(x):
+					for directSuper in self.classDirectSupers(x):
+						ss += """{source: "%s", target: "%s", type: "test"},\n""" % (self.uri2niceString(x), self.uri2niceString(directSuper))
+				else:
+					ss += """{source: "%s", target: "ROOT", type: "test"},\n""" % (self.uri2niceString(x))		
+			thisdir = os.path.dirname(os.path.realpath(__file__))
+			
+			#open the file
+			filein = open(thisdir + '/htmltemplates/forceDirectedTemplate.html' )
+			#read it
+			src = Template( filein.read() )
+			#do the substitution called $graphedges in html file
+
+			fileout = open("tempviz.html", "w")
+			fileout.write(src.substitute({'graphedges' : ss}))
+			fileout.close()
+			webbrowser.open('file://'+os.path.realpath("tempviz.html"))
+
 
 
 
@@ -1377,8 +1451,8 @@ class Ontology(object):
 
 
 ##################
-# Thu Mar 17 19:07:30 GMT 2011
-# HOW TO USE THIS FILE IN STANDALONE MODE:
+# 
+#  IF USING THIS SCRIPT IN STANDALONE MODE:
 #
 ##################
 
@@ -1387,9 +1461,17 @@ class Ontology(object):
 
 def main(argv):
 	"""
-	If you run from the command line, it shows info about the default onto, or pass it a URI as an argument for where to look for an ontology
+	If you run this script from the command line and pass it a URI as an argument it will return 
+	information about the ontology data it found. 
+	
+	(note: if not URI is provided, it defaults to the FOAF vocabulary 
+
+	So
 
 	>>> python ontospy.py
+
+	Is equivalent to
+
 	>>> python ontospy.py http://xmlns.com/foaf/0.1/
 
 	"""
@@ -1400,17 +1482,19 @@ def main(argv):
 
 	rdfGraph = onto.rdfGraph
 
-	print "_" * 50
-	print "\nGRAPH = %s" % onto.ontologyURI
+	print "_" * 50, "\n"	
 	print "TRIPLES = %s" % len(rdfGraph)
 	print "_" * 50
-	
-	for x, y in onto.ontologyAnnotations():
-		print "%s : %s" % (x, y)
 	print "\nNAMESPACES:\n"
 	for x in onto.ontologyNamespaces():
 		print "%s : %s" % (x[0], x[1])
 
+
+	
+	print "_" * 50, "\n"
+	print "ONTOLOGY METADATA:\n"	
+	for x, y in onto.ontologyAnnotations():
+		print "%s: \n    %s" % (onto.uri2niceString(x),onto.uri2niceString(y))
 	print "_" * 50, "\n"
 
 
@@ -1418,40 +1502,11 @@ def main(argv):
 	onto.printClassTree()
 	print "_" * 50, "\n"
 
-	if False:  # TODO: show on demand depending on keyword
 
-		print "\n\n", "_" * 50, "\n\n"
-		print "Classes found: ", str(len(onto.allclasses)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allclasses])
-		print "_" * 20
-		for s in onto.allclasses:
-			# get the subject, treat it as string and strip the initial namespace
-			print "Class : " , onto.uri2niceString(s).upper()
-			print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
-			print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
-			print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
-			print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
-			print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDomainFor(s, class_role = "domain")])
-			print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classRangeFor(s, class_role = "range")])
-			print "_" * 10, "\n"
-
-		print "_" * 50, "\n\n", "_" * 50, "\n\n"
-		print "Object Properties found: ", str(len(onto.allobjproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allobjproperties])
-		print "\n\n"
-		for s in onto.allobjproperties: 
-			print "ObjProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-			print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
-			print "_" * 10, "\n"
-		
-		
-		print "_" * 50, "\n\n",
-		print "Datatype Properties found: ", str(len(onto.alldataproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.alldataproperties])
-		print "\n\n"
-		for s in onto.alldataproperties: 
-			print "DataProperty : " , onto.uri2niceString(s).upper()
-			print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-			print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
-			print "_" * 10, "\n"
+	# last two methods can be set to True on demand
+	
+	if False:  
+		printClassInformation(onto)
 	
 	if False:
 		onto.drawOntograph(rdfGraph, '/tmp/graph.png')
@@ -1460,6 +1515,42 @@ def main(argv):
 
 
 
+def printClassInformation(onto):
+	"""
+	Terminal printing of some info on available classes etc..
+	"""
+	print "\n\n", "_" * 50, "\n\n"
+	print "Classes found: ", str(len(onto.allclasses)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allclasses])
+	print "_" * 20
+	for s in onto.allclasses:
+		# get the subject, treat it as string and strip the initial namespace
+		print "Class : " , onto.uri2niceString(s).upper()
+		print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
+		print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
+		print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
+		print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
+		print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDomainFor(s, class_role = "domain")])
+		print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classRangeFor(s, class_role = "range")])
+		print "_" * 10, "\n"
+
+	print "_" * 50, "\n\n", "_" * 50, "\n\n"
+	print "Object Properties found: ", str(len(onto.allobjproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allobjproperties])
+	print "\n\n"
+	for s in onto.allobjproperties: 
+		print "ObjProperty : " , onto.uri2niceString(s).upper()
+		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+		print "_" * 10, "\n"
+	
+	
+	print "_" * 50, "\n\n",
+	print "Datatype Properties found: ", str(len(onto.alldataproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.alldataproperties])
+	print "\n\n"
+	for s in onto.alldataproperties: 
+		print "DataProperty : " , onto.uri2niceString(s).upper()
+		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
+		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+		print "_" * 10, "\n"
 
 
 

@@ -1,0 +1,192 @@
+	
+<!-- July 10, 2014: @todo FINISH -->
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+
+	
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+
+var JSON_DATA = {"children": [{"children": [{"name": "Biochemistry", "size": 30}, {"name": "Biological techniques", "size": 32}, {"name": "Biophysics", "size": 14}, {"name": "Biotechnology", "size": 28}, {"name": "Cancer", "size": 40}, {"name": "Cell biology", "size": 23}, {"name": "Chemical biology", "size": 45}, {"name": "Computational biology and bioinformatics", "size": 47}, {"name": "Developmental biology", "size": 28}, {"name": "Drug discovery", "size": 16}, {"name": "Ecology", "size": 34}, {"name": "Evolution", "size": 18}, {"name": "Genetics", "size": 41}, {"name": "Immunology", "size": 36}, {"name": "Microbiology", "size": 21}, {"name": "Molecular biology", "size": 21}, {"name": "Neuroscience", "size": 46}, {"name": "Physiology", "size": 11}, {"name": "Plant sciences", "size": 20}, {"name": "Psychology", "size": 1}, {"name": "Stem cells", "size": 24}, {"name": "Structural biology", "size": 6}, {"name": "Systems biology", "size": 45}, {"name": "Zoology", "size": 6}], "name": "Biological sciences", "size": 24}, {"children": [{"name": "Astronomy and planetary science", "size": 3}, {"name": "Chemistry", "size": 21}, {"name": "Engineering", "size": 6}, {"name": "Materials science", "size": 10}, {"name": "Mathematics and computing", "size": 8}, {"name": "Nanoscience and technology", "size": 9}, {"name": "Optics and photonics", "size": 6}, {"name": "Physics", "size": 9}], "name": "Physical sciences", "size": 8}, {"children": [{"name": "Anatomy", "size": 9}, {"name": "Biomarkers", "size": 3}, {"name": "Diseases", "size": 17}, {"name": "Health care", "size": 16}, {"name": "Health occupations", "size": 2}, {"name": "Medical research", "size": 9}, {"name": "Pathogenesis", "size": 5}, {"name": "Risk factors", "size": 1}, {"name": "Signs and symptoms", "size": 14}], "name": "Health sciences", "size": 9}, {"children": [{"name": "Climate sciences", "size": 9}, {"name": "Ecology", "size": 34}, {"name": "Environmental sciences", "size": 1}, {"name": "Planetary science", "size": 5}, {"name": "Social sciences of Earth and environment", "size": 7}, {"name": "Solid Earth sciences", "size": 18}], "name": "Earth and environmental sciences", "size": 6}, {"children": [{"name": "Business and industry", "size": 5}, {"name": "Developing world", "size": 1}, {"name": "Scientific community", "size": 15}, {"name": "Social sciences", "size": 15}], "name": "Scientific community and society", "size": 4}], "name": "<http://ns.nature.com/subjects/", "size": 5}
+
+var json = JSON_DATA;
+
+
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+    width = 960 - margin.right - margin.left,
+    height = 800 - margin.top - margin.bottom;
+    
+var i = 0,
+    duration = 750,
+    root;
+
+var tree = d3.layout.tree()
+    .size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// d3.json(JSON_FILE, function(json) {
+  root = json;
+  root.x0 = height / 2;
+  root.y0 = 0;
+
+  function toggleAll(d) {
+    if (d.children) {
+      d.children.forEach(toggleAll);
+      toggle(d);
+    }
+  }
+  
+// d3.json("/d/4063550/flare.json", function(error, flare) {
+  // root = flare;
+  root = json;
+  root.x0 = height / 2;
+  root.y0 = 0;
+
+  function collapse(d) {
+    if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
+  }
+
+  root.children.forEach(collapse);
+  update(root);
+// });
+
+d3.select(self.frameElement).style("height", "800px");
+
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+      links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .on("click", click);
+
+  nodeEnter.append("circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeEnter.append("text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6);
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeUpdate.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = svg.selectAll("path.link")
+      .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: source.x0, y: source.y0};
+        return diagonal({source: o, target: o});
+      });
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+}
+
+// Toggle children on click.
+function click(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update(d);
+}
+
+</script>

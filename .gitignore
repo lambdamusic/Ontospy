@@ -36,3 +36,5 @@ nosetests.xml
 
 # mac stuff
 .DS_Store
+
+test
