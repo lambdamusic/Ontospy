@@ -18,16 +18,15 @@ More info in the README file.
 
 
 
-
 import sys, os, urllib2
 
 import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
-
 from vocabs import OWL, DUBLINCORE as DC
 from vocabs import famous as FAMOUS_ONTOLOGIES 
 
 from utils import *
+from utilsRDF import *
 
 
 
@@ -44,7 +43,7 @@ from utils import *
 
 DEFAULT_SESSION_NAMESPACE = "http://www.example.org/session/resource#"
 DEFAULT_ONTO = "http://xmlns.com/foaf/0.1/"
-DEFAULT_LANGUAGE = "en"
+
 
 
 
@@ -77,6 +76,7 @@ class Ontology(object):
 		self.ontologyURI = None
 		self.ontologyPrettyURI = None
 		self.ontologyPhysicalLocation = None
+		self.ontologyNamespaces = None
 
 		self.allclasses = None		
 		self.allinstances = None
@@ -100,74 +100,15 @@ class Ontology(object):
 		else:
 			printDebug("Ontology instance created. Use the <loadUri> method to load an ontology.")
 
-
-
-	def loadUri(self, uri, default_format="xml"):
-		"""
-		Loads a graph from a URI (or a python file object containing triples)
-		"""
-			
-		if uri.startswith("www."): #support for lazy people
-			uri = "http://%s" % str(uri)  
-
-		try:
-			rdf_format = guess_fileformat(uri)
-		except:
-			# in this case it's a python file object
-			rdf_format = default_format	
-
-
-		try:
-			self.rdfGraph.parse(uri, format=rdf_format)
-		except:
-			print ("\nError Parsing file URI (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
-			raise
-		finally:
-			self.__setupOntology(uri=uri)
-			
-
-			
-
-
 	def __repr__(self):
 		return "<Ontology object for URI: %s - %d triples>" % (self.ontologyPrettyURI, len(self.rdfGraph))
 
 
 
-	###########
-	#
-	# SESSION GRAPH
-	#
-	###########
-
-
-	def setSessionGraphNamespace(self, ns):
-		if ns.startswith("http://"):
-			self.sessionNS = ns
-		else:
-			raise exceptions.Error("Please provide a URI starting with 'http://'..")
-
-	def serializeSessionGraph(self, format=""):
-		""" Shortcut that outputs the session graph
-			TODO: add format specs..
-	   """
-		if format:
-			return self.sessionGraph.serialize(format=format)
-		else:
-			return self.sessionGraph.serialize()
-
-
-
-
-	##################
-	#  
-	#  METHODS for ONTOLOGIES
-	#
-	##################
-
-
-	def __setupOntology(self, uri):
-		
+	def __setup(self, uri):
+		"""
+		After a URI/graph has been loaded successfully, set up all the object params
+		"""
 		#first make sure we have a uri-string
 		if type(uri) != type("string"):
 			try:
@@ -176,12 +117,14 @@ class Ontology(object):
 				uri = str(uri)
 		else:
 			if not uri.startswith("http:"):
-				uri = "file://%s" % os.path.realpath(uri) 
+				uri = "file://%s#" % os.path.realpath(uri) 
 			
 				
 		self.ontologyPhysicalLocation = uri
 		self.ontologyURI = self.__getOntologyURI(return_as_string=False, tryDC_metadata=True) or uri
 		self.ontologyPrettyURI = self.__getOntologyURI(return_as_string=True, tryDC_metadata=True) or uri
+		
+		self.ontologyNamespaces = self.__getOntologyNamespaces()
 
 		# let's cache some useful info for faster access		
 		self.allclasses = self.__getAllClasses()		
@@ -209,6 +152,42 @@ class Ontology(object):
 		# printDebug("...Ontology instance succesfully created for <%s>" % str(self.ontologyPrettyURI))			
 			
 			
+	def loadUri(self, uri, default_format="xml"):
+		"""
+		Loads a graph from a URI (or a python file object containing triples)
+		"""
+			
+		try:
+			if uri.startswith("www."): #support for lazy people
+				uri = "http://%s" % str(uri)  
+		except:
+			pass # required if loading triples directly via  file or StringIO
+
+		try:
+			rdf_format = guess_fileformat(uri)
+		except:
+			# in this case it's a python file object
+			rdf_format = default_format	
+
+
+		try:
+			self.rdfGraph.parse(uri, format=rdf_format)
+		except:
+			print ("\nError Parsing file URI (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
+			raise
+		finally:
+			self.__setup(uri=uri)
+			
+
+
+	##################
+	#  
+	#  METHODS for ONTOLOGIES
+	#
+	##################
+
+
+
 
 	def __getOntologyURI(self, return_as_string=False, excludeBNodes = False, tryDC_metadata = False):
 		"""
@@ -239,20 +218,9 @@ class Ontology(object):
 			return str(ontoMetadata[0]) if return_as_string else ontoMetadata[0]
 			
 			
-
-
-	def ontologyAnnotations(self, niceURI=False, excludeProps=False, excludeBNodes = False, ):
-		"""
-		Method that tries to get *all* the available annotations for an OWL ontology.
-		Returns a list of 2-elements tuples (annotation-uri, annotation-values (as list))
-		"""		
-		if self.ontologyURI:
-			return self.entityTriples(self.ontologyURI, niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
 		
 
-		
-
-	def ontologyNamespaces(self, only_base = False):
+	def __getOntologyNamespaces(self, only_base = False):
 		""" 
 		Extract ontology namespaces. wrapper function: return either the base namespace only, or all of them
 
@@ -279,23 +247,36 @@ class Ontology(object):
 			else:
 				return None
 		else:
-			out, flag = [], True
+			out = []
 			for x in self.rdfGraph.namespaces():
 				if x[0]:
 					out.append(x)
 				else: 
 					# if the namespace is blank (== we have a base namespace)
-					flag = False
 					prefix = inferNamespacePrefix(x[1])
 					if prefix:
 						out.append((prefix, x[1]))
 					else:
 						out.append(('base', x[1]))
-			if flag:
-				# hack to simulate to base uri for local files
-				out.append(('base', self.ontologyURI + "#"))			
+			if self.ontologyURI not in [y for x,y in self.rdfGraph.namespaces()]:
+				# if not base namespace is set, try to simulate one
+				out.append(('this', self.ontologyURI))
+		
 			return sorted(out)
 
+
+
+
+	def ontologyAnnotations(self, niceURI=False, excludeProps=False, excludeBNodes = False, ):
+		"""
+		Method that tries to get *all* the available annotations for an OWL ontology.
+		Returns a list of 2-elements tuples (annotation-uri, annotation-values (as list))
+		"""		
+		if self.ontologyURI:
+			# return entityTriples(self, self.ontologyURI, niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
+			
+			return [(uri2niceString(y, self.ontologyNamespaces), z) for y,z in entityTriples(self.rdfGraph, self.ontologyURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)]
+		
 
 
 	def ontologyStats(self):
@@ -321,92 +302,33 @@ class Ontology(object):
 		else:
 			return self.rdfGraph.serialize()
 			
-			
+
+
+
+
+
 
 	###########
-
-	# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES)
-
+	#
+	# SESSION GRAPH
+	#
 	###########
 
 
-	def entityTriples(self, anEntity, niceURI=False, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
-		"""		
-		Returns the pred-obj for any given resource, excluding selected ones..
-		
-		Sorting: by default results are sorted alphabetically and according to namespaces: [RDF, RDFS, OWL.OWLNS, DC.DCNS]
-		"""
-		temp = []
-		if not excludeProps:
-			excludeProps = []
-		
-		# extract predicate/object
-		for x,y,z in self.rdfGraph.triples((anEntity, None, None)):
-			if excludeBNodes and isBlankNode(z):
-				continue
-			if y not in excludeProps:
-				temp += [(y, z)]
-
-		# sorting
-		if type(orderProps) == type([]):
-			orderedUris = sortByNamespacePrefix([y for y,z in temp], orderProps) # order props only
-			orderedUris = [(n+1, x) for n, x in enumerate(orderedUris)]	 # create form: [(1, 'something'),(2,'bobby'),(3,'suzy'),(4,'crab')]
-			rank = dict((key, rank) for (rank, key) in orderedUris) # create dict to pass to sorted procedure
-			temp = sorted(temp, key=lambda tup: rank.get(tup[0]))
-		elif orderProps:  # default to alpha sorting unless False
-			temp = sorted(temp, key=lambda tup: tup[0])
-
-		if niceURI:
-			temp = [(self.uri2niceString(y), z) for y,z in temp]
-
-		return temp
-
-
-	def entityLabel(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-		"""		
-		Returns the rdfs.label value of an entity (class or property), if existing. 
-		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
-
-		Args:
-		language: 'en', 'it' etc.. 
-		getall: returns a list of all labels rather than a string 
-
-		"""
-
-		if getall: 
-			temp = []
-			for o in self.rdfGraph.objects(anEntity, RDFS.label):
-				temp += [o]
-			return temp
+	def setSessionGraphNamespace(self, ns):
+		if ns.startswith("http://"):
+			self.sessionNS = ns
 		else:
-			for o in self.rdfGraph.objects(anEntity, RDFS.label):
-				if getattr(o, 'language') and  getattr(o, 'language') == language:
-					return o
-			return ""
+			raise exceptions.Error("Please provide a URI starting with 'http://'..")
 
-
-	def entityComment(self, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-		"""		
-		Returns the rdfs.comment value of an entity (class or property), if existing. 
-		Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
-
-		Args:
-		language: 'en', 'it' etc.. 
-		getall: returns a list of all labels rather than a string 
-
-		"""
-
-		if getall: 
-			temp = []
-			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
-				temp += [o]
-			return temp
+	def serializeSessionGraph(self, format=""):
+		""" Shortcut that outputs the session graph
+			TODO: add format specs..
+	   """
+		if format:
+			return self.sessionGraph.serialize(format=format)
 		else:
-			for o in self.rdfGraph.objects(anEntity, RDFS.comment):
-				if getattr(o, 'language') and  getattr(o, 'language') == language:
-					return o
-			return ""
-
+			return self.sessionGraph.serialize()
 
 
 
@@ -596,11 +518,13 @@ class Ontology(object):
 		"""
 		
 		temp = {}
+		namespaces = self.ontologyNamespaces
 		temp['class'] = aClass
-		temp['classname'] = self.uri2niceString(aClass)
-		temp['alltriples'] = self.entityTriples(aClass, niceURI=True)
-		temp['comment'] = self.entityComment(aClass)
-		temp['label'] = self.entityLabel(aClass)
+		temp['classname'] = uri2niceString(aClass, namespaces)
+		# temp['alltriples'] = entityTriples(self, aClass, niceURI=True)
+		temp['alltriples'] = [(uri2niceString(y, namespaces), z) for y,z in entityTriples(self.rdfGraph, aClass)] 
+		temp['comment'] = entityComment(self.rdfGraph, aClass)
+		temp['label'] = entityLabel(self.rdfGraph, aClass)
 		temp['treelevel'] = self.__printClassTreeLevel(aClass)
 		temp['isdomainfor'] = self.classDomainFor(aClass)
 		
@@ -973,11 +897,13 @@ class Ontology(object):
 		Similar to the class representation: could be a stub for an OO version of this..
 		"""		
 		temp = {}
+		namespaces = self.ontologyNamespaces
 		temp['prop'] = aProp
-		temp['propname'] = self.uri2niceString(aProp)
-		temp['alltriples'] = self.entityTriples(aProp, niceURI=True)
-		temp['comment'] = self.entityComment(aProp)
-		temp['label'] = self.entityLabel(aProp)
+		temp['propname'] = uri2niceString(aProp, namespaces)
+		# temp['alltriples'] = entityTriples(self, aProp, niceURI=True)
+		temp['alltriples'] = [(uri2niceString(y, namespaces), z) for y,z in entityTriples(self.rdfGraph, aProp)] 
+		temp['comment'] = entityComment(self.rdfGraph, aProp)
+		temp['label'] = entityLabel(self.rdfGraph, aProp)
 		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
 		temp['range'] = [self.classRepresentation(clas) for clas in self.propertyRange(aProp)]
 
@@ -1152,10 +1078,11 @@ class Ontology(object):
 		"""		
 		temp = {}
 		temp['instance'] = instance
-		temp['instancename'] = self.uri2niceString(instance)
-		temp['alltriples'] = self.entityTriples(instance, niceURI=True)
-		temp['comment'] = self.entityComment(instance)
-		temp['label'] = self.entityLabel(instance)
+		temp['instancename'] = uri2niceString(instance, self.ontologyNamespaces)
+		# temp['alltriples'] = entityTriples(self, instance, niceURI=True)
+		temp['alltriples'] = [(uri2niceString(y, self.ontologyNamespaces), z) for y,z in entityTriples(self.rdfGraph, instance)]
+		temp['comment'] = entityComment(self.rdfGraph, instance)
+		temp['label'] = entityLabel(self.rdfGraph, instance)
 		fathers = self.instanceFather(instance)
 		if fathers:
 			temp['types'] = [self.classRepresentation(f) for f in fathers]
@@ -1250,7 +1177,7 @@ class Ontology(object):
 		if not treedict:
 			treedict = self.ontologyClassTree
 		for x in treedict[element]:
-			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			printDebug("%s%s" % ("-" * 4 * level, uri2niceString(x, self.ontologyNamespaces)))
 			self.printClassTree(x, treedict, (level + 1))
 
 	def printObjPropTree(self, element = 0, treedict = None, level=0):
@@ -1260,7 +1187,7 @@ class Ontology(object):
 		if not treedict:
 			treedict = self.ontologyObjPropertyTree
 		for x in treedict[element]:
-			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			printDebug("%s%s" % ("-" * 4 * level, uri2niceString(x, self.ontologyNamespaces)))
 			self.printObjPropTree(x, treedict, (level + 1))
 
 	def printDataPropTree(self, element = 0, treedict = None, level=0):
@@ -1270,7 +1197,7 @@ class Ontology(object):
 		if not treedict:
 			treedict = self.ontologyDataPropertyTree
 		for x in treedict[element]:
-			printDebug("%s%s" % ("-" * 4 * level, self.uri2niceString(x)))
+			printDebug("%s%s" % ("-" * 4 * level, uri2niceString(x, self.ontologyNamespaces)))
 			self.printDataPropTree(x, treedict, (level + 1))
 			
 
@@ -1304,53 +1231,13 @@ class Ontology(object):
 		stringa = "<ul>"
 		for x in treedict[element]:
 			# print x
-			stringa += "<li>%s" % self.uri2niceString(x)
+			stringa += "<li>%s" % uri2niceString(x, self.ontologyNamespaces)
 			stringa += self.ontologyHtmlTree(x, treedict)
 			stringa += "</li>"
 		stringa += "</ul>"
 		return stringa
 
 
-
-
-	def uri2niceString(self, aUri):
-		""" 
-		From a URI, returns a nice string representation that uses also the namespace symbols
-		Cuts the uri of the namespace, and replaces it with its shortcut (for base, attempts to infer it or leaves it blank)
-
-		"""
-		stringa = aUri.__str__()		#gets the string within a URI
-		for aNamespaceTuple in self.ontologyNamespaces():
-			try: # check if it matches the available NS
-				if stringa.find(aNamespaceTuple[1].__str__()) == 0:
-					if aNamespaceTuple[0]: # for base NS, it's empty
-						stringa = aNamespaceTuple[0] + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
-					else:
-						prefix = inferNamespacePrefix(aNamespaceTuple[1])
-						if prefix:
-							stringa = prefix + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
-						else:
-							stringa = "base:" + stringa[len(aNamespaceTuple[1].__str__()):]
-			except:
-				stringa = "error"
-		return stringa
-
-
-	def niceString2uri(self, aUriString):
-		""" 
-		From a string representing a URI possibly with the namespace qname, returns a URI instance. 
-		
-		gold:Citation  ==> rdflib.term.URIRef(u'http://purl.org/linguistics/gold/Citation')
-		"""
-		
-		for aNamespaceTuple in self.ontologyNamespaces():
-			if aNamespaceTuple[0] and aUriString.find(aNamespaceTuple[0].__str__() + ":") == 0:
-				aUriString_name = aUriString.split(":")[1]
-				return URIRef(aNamespaceTuple[1] + aUriString_name)
-
-		# we dont handle the 'base' URI case 
-		return URIRef(aUriString)
-		
 
 
 	def drawOntograph(self, fileposition):
@@ -1367,7 +1254,7 @@ class Ontology(object):
 
 		G = pgv.AGraph(rankdir="BT") # top bottom direction
 		for s, v, o in self.rdfGraph.triples((None, RDFS.subClassOf , None)):
-			G.add_edge(self.uri2niceString(s), self.uri2niceString(o))
+			G.add_edge(uri2niceString(s, self.ontologyNamespaces), uri2niceString(o, self.ontologyNamespaces))
 		G.layout(prog='dot')	# eg dot, neato, twopi, circo, fdp
 		G.draw(fileposition)
 		print("\n\n", "_" * 50, "\n\n")
@@ -1413,9 +1300,9 @@ class Ontology(object):
 			for x in self.allclasses:
 				if self.classDirectSupers(x):
 					for directSuper in self.classDirectSupers(x):
-						ss += """{source: "%s", target: "%s", type: "test"},\n""" % (self.uri2niceString(x), self.uri2niceString(directSuper))
+						ss += """{source: "%s", target: "%s", type: "test"},\n""" % (uri2niceString(x, self.ontologyNamespaces), uri2niceString(directSuper, self.ontologyNamespaces))
 				else:
-					ss += """{source: "%s", target: "ROOT", type: "test"},\n""" % (self.uri2niceString(x))		
+					ss += """{source: "%s", target: "ROOT", type: "test"},\n""" % (uri2niceString(x, self.ontologyNamespaces))		
 			thisdir = os.path.dirname(os.path.realpath(__file__))
 			
 			#open the file
@@ -1479,14 +1366,14 @@ def main(argv):
 		onto = Ontology(argv[0])
 	else:
 		onto = Ontology(DEFAULT_ONTO)
-
+		
 	rdfGraph = onto.rdfGraph
 
 	print "_" * 50, "\n"	
 	print "TRIPLES = %s" % len(rdfGraph)
 	print "_" * 50
 	print "\nNAMESPACES:\n"
-	for x in onto.ontologyNamespaces():
+	for x in onto.ontologyNamespaces:
 		print "%s : %s" % (x[0], x[1])
 
 
@@ -1494,7 +1381,7 @@ def main(argv):
 	print "_" * 50, "\n"
 	print "ONTOLOGY METADATA:\n"	
 	for x, y in onto.ontologyAnnotations():
-		print "%s: \n    %s" % (onto.uri2niceString(x),onto.uri2niceString(y))
+		print "%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
 	print "_" * 50, "\n"
 
 
@@ -1520,36 +1407,36 @@ def printClassInformation(onto):
 	Terminal printing of some info on available classes etc..
 	"""
 	print "\n\n", "_" * 50, "\n\n"
-	print "Classes found: ", str(len(onto.allclasses)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allclasses])
+	print "Classes found: ", str(len(onto.allclasses)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.allclasses])
 	print "_" * 20
 	for s in onto.allclasses:
 		# get the subject, treat it as string and strip the initial namespace
-		print "Class : " , onto.uri2niceString(s).upper()
-		print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSubs(s)])
-		print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([onto.uri2niceString(x) for x in  onto.classAllSubs(s, [])])
-		print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDirectSupers(s)])
-		print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([onto.uri2niceString(x) for x in  onto.classAllSupers(s, [])])
-		print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classDomainFor(s, class_role = "domain")])
-		print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([onto.uri2niceString(x) for x in  onto.classRangeFor(s, class_role = "range")])
+		print "Class : " , uri2niceString(s, onto.ontologyNamespaces).upper()
+		print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSubs(s)])
+		print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSubs(s, [])])
+		print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSupers(s)])
+		print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSupers(s, [])])
+		print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDomainFor(s, class_role = "domain")])
+		print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classRangeFor(s, class_role = "range")])
 		print "_" * 10, "\n"
 
 	print "_" * 50, "\n\n", "_" * 50, "\n\n"
-	print "Object Properties found: ", str(len(onto.allobjproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.allobjproperties])
+	print "Object Properties found: ", str(len(onto.allobjproperties)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.allobjproperties])
 	print "\n\n"
 	for s in onto.allobjproperties: 
-		print "ObjProperty : " , onto.uri2niceString(s).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+		print "ObjProperty : " , uri2niceString(x, onto.ontologyNamespaces).upper()
+		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
+		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
 		print "_" * 10, "\n"
 	
 	
 	print "_" * 50, "\n\n",
-	print "Datatype Properties found: ", str(len(onto.alldataproperties)), " \n", str([onto.uri2niceString(x).upper() for x in onto.alldataproperties])
+	print "Datatype Properties found: ", str(len(onto.alldataproperties)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.alldataproperties])
 	print "\n\n"
 	for s in onto.alldataproperties: 
-		print "DataProperty : " , onto.uri2niceString(s).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([onto.uri2niceString(x) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([onto.uri2niceString(x) for x in  onto.propertyRange(s)])
+		print "DataProperty : " , uri2niceString(x, onto.ontologyNamespaces).upper()
+		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
+		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
 		print "_" * 10, "\n"
 
 
