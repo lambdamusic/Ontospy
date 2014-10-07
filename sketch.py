@@ -32,19 +32,18 @@ class Sketch(object):
 	"""
 	====Sketch v 0.1====
 	
-	Commands: 
-
 	Sketch() ==> creates a new sketch 
 	show() ==> shows the graph in indented mode (turtle)
 	clear()	 ==> clears the graph
-	add()  ==> adds some turtle string to the graph
-	continuousAdd() ==> adds via multiple lines
+	add()  ==> add a turtle string to the graph
 	export()  ==> serialize into a graph format (dot only currenlty)
 	omnigraffle() ==> creates a dot file and tries to open it with your system default app
 	serialize()	 ==> serializes into rdf (arg=format)
 	quit() ==> exit 
 	
-	Have fun!
+	Turtle syntax ==> http://www.w3.org/TR/turtle/
+	
+	====Have fun!====
 	"""
 	def __init__(self, text=""):
 		super(Sketch, self).__init__()
@@ -85,12 +84,14 @@ class Sketch(object):
 	
 	
 	def continuousAdd(self):
-		print "Enter ### when finished"
+		print "Multi-line input. Enter ### when finished."
 		temp = ""
 		sentinel = "###"
 		for line in iter(raw_input, sentinel):
 			if line.strip() == sentinel:
 				break
+			if not line.strip().endswith("."):
+				line += " ."	
 			temp += "%s\n" % line
 		self.add(temp)	
 	
