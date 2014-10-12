@@ -30,19 +30,25 @@ logging.basicConfig()
 
 class Sketch(object):
 	"""
-	====Sketch v 0.1====
+	====Sketch v 0.2====
 	
-	Sketch() ==> creates a new sketch 
-	show() ==> shows the graph in indented mode (turtle)
+	add()  ==> add statements to the graph
+	...........SHORTCUTS: 
+	...........'class' = owl:Class
+	...........'sub' = rdfs:subClassOf
+	...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
+	
+	show() ==> shows the graph. Can take an OPTIONAL argument for the format.
+	...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot'] 
+	
 	clear()	 ==> clears the graph
-	add()  ==> add a turtle string to the graph
-	export()  ==> serialize into a graph format (dot only currenlty)
-	omnigraffle() ==> creates a dot file and tries to open it with your system default app
-	serialize()	 ==> serializes into rdf (arg=format)
+	...........all triples are removed
+	
+	omnigraffle() ==> creates a dot file and opens it with omnigraffle
+	...........First you must set Omingraffle as your system default app for dot files!
+	
 	quit() ==> exit 
-	
-	Turtle syntax ==> http://www.w3.org/TR/turtle/
-	
+
 	====Have fun!====
 	"""
 	def __init__(self, text=""):
@@ -51,8 +57,10 @@ class Sketch(object):
 		self.rdfGraph = rdflib.Graph()
 		self.namespace_manager = NamespaceManager(self.rdfGraph)
 		
+		self.SUPPORTED_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'dot']
+		
 		PREFIXES = [
-					("", "http://this.sketch.com#"),
+					("", "http://this.sketch#"),
 					("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
 					("rdfs", "http://www.w3.org/2000/01/rdf-schema#"),
 					("xml", "http://www.w3.org/XML/1998/namespace"),
@@ -78,8 +86,12 @@ class Sketch(object):
 			pprefix = ""
 			for x,y in self.rdfGraph.namespaces():
 				pprefix += "@prefix %s: <%s> . \n" % (x, y)
+			# add final . if missing
 			if not text.strip().endswith("."):
 				text += " ."
+			# smart replacements
+			text = text.replace(" sub ", " rdfs:subClassOf ")
+			text = text.replace(" class ", " owl:Class ")
 			self.rdfGraph.parse(data=pprefix+text, format="turtle")
 	
 	
@@ -99,13 +111,27 @@ class Sketch(object):
 		p, k = prefixTuple
 		self.rdfGraph.bind(p, k)
 	
-	def clear(self, triple=None):
-		if not triple:
-			self.rdfGraph.remove((None, None, None))
-		else:
-			self.rdfGraph.remove(triple)
+	def clear(self):
+		""""
+		Clears the graph 
+			@todo add ability to remove specific triples
+		"""
+		self.rdfGraph.remove((None, None, None))
 
-	def export(self, format="dot"):
+
+	def serialize(self, aformat="turtle"):
+		"""
+		Serialize graph using the format required
+		"""
+		if aformat and aformat not in self.SUPPORTED_FORMATS:
+			return "Sorry. Allowed formats are %s" % str(self.SUPPORTED_FORMATS)
+		if aformat == "dot":
+			return self.__serializedDot()
+		else:
+			# use stardard rdf serializations
+			return self.rdfGraph.serialize(format=aformat)
+
+	def __serializedDot(self):
 		"""
 		DOT format:
 		digraph graphname {
@@ -119,9 +145,10 @@ class Sketch(object):
 		temp = "digraph graphname {\n%s}" % temp
 		return temp
 
+
 	def omnigraffle(self):
 		""" tries to open an export directly in omnigraffle """
-		temp = self.export("dot")
+		temp = self.serialize("dot")
 		filename = "omnigraffle_sketch.dot"
 		f = open(filename, "w")
 		f.write(temp)
@@ -131,12 +158,9 @@ class Sketch(object):
 		except:
 			os.system("start " + filename)
 
-
-	def serialize(self, format="turtle"):
-		return self.rdfGraph.serialize(format=format)
-
-	def show(self):
-		print self.serialize()
+		
+	def show(self, aformat="turtle"):
+		print self.serialize(aformat)
 
 	def docs(self):
 		print self.__docs__		
@@ -166,19 +190,38 @@ def main(argv):
 	"""
 	
 	if argv:
-		onto = Model(argv[0])
-		for x in onto.getClasses():
-			print x
-		onto.buildPythonClasses()
-		s = Sketch()
+		print "Argument passing not implemented yet"
+		if False:
+			onto = Model(argv[0])
+			for x in onto.getClasses():
+				print x
+			onto.buildPythonClasses()
+			s = Sketch()
 	
 	else:
 
-		# intro1 = """Commands: Sketch() to create a new sketch / quit() to exit."""
-		intro = """Good morning. Ready to Turtle away. Type docs() for help.""" # idea: every time provide a different ontology maxim
+		intro = """Good morning. Ready to Turtle away. Type docs() for help.""" 
+		# idea: every time provide a different ontology maxim!
 		
 		def docs():
 			print "\n".join([x.strip() for x in Sketch.__doc__.splitlines()])
+		
+		default_sketch = Sketch()
+		
+		def add(text=""):
+			default_sketch.add(text)
+		def show(aformat=None):
+			if aformat:
+				default_sketch.show(aformat)
+			else:
+				default_sketch.show()			
+		def bind(prefixTuple):
+			default_sketch.bind(prefixTuple)
+		def clear():
+			default_sketch.clear(triple)
+		def omnigraffle():
+			default_sketch.omnigraffle()
+		
 		
 		try:
 			# note: this requires IPython 0.11 or above

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+>
+  <rdf:Description rdf:about="http://this.sketch#b">
+    <rdf:type rdf:resource="http://this.sketch#c"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://this.sketch#a">
+    <rdf:type rdf:resource="http://this.sketch#b"/>
+  </rdf:Description>
+</rdf:RDF>

@@ -58,10 +58,13 @@ def sortByNamespacePrefix(urisList, nsList):
 
 
 
-def sort_uri_list_by_name(uri_list):
+def sort_uri_list_by_name(uri_list, bypassNamespace=False):
 	""" 
-	 Sorts a list of uris based on the last bit (usually the name) of a uri
-	 It checks whether the last bit is specified using a # or just a /, eg:
+	 Sorts a list of uris 
+	 
+	 bypassNamespace: 
+	 	based on the last bit (usually the name after the namespace) of a uri
+	 	It checks whether the last bit is specified using a # or just a /, eg:
 			 rdflib.URIRef('http://purl.org/ontology/mo/Vinyl'),
 			 rdflib.URIRef('http://purl.org/vocab/frbr/core#Work')
 
@@ -74,7 +77,10 @@ def sort_uri_list_by_name(uri_list):
 		return x
 
 	try:
-		return sorted(uri_list, key=lambda x: get_last_bit(x.__str__()))
+		if bypassNamespace:
+			return sorted(uri_list, key=lambda x: get_last_bit(x.__str__()))
+		else:
+			return sorted(uri_list)
 	except:
 		# TODO: do more testing.. maybe use a unicode-safe method instead of __str__
 		print "Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError"
