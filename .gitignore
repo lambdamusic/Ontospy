@@ -37,5 +37,5 @@ nosetests.xml
 # mac stuff
 .DS_Store
 
-test
+testing
 ontologies
