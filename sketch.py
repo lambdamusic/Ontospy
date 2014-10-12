@@ -93,6 +93,7 @@ class Sketch(object):
 			# smart replacements
 			text = text.replace(" sub ", " rdfs:subClassOf ")
 			text = text.replace(" class ", " owl:Class ")
+			# finally
 			self.rdfGraph.parse(data=pprefix+text, format="turtle")
 	
 	
@@ -105,7 +106,7 @@ class Sketch(object):
 				break
 			if not line.strip().endswith("."):
 				line += " ."	
-			temp += "%s\n" % line
+			temp += "%s" % line
 		self.add(temp)	
 	
 	def bind(self, prefixTuple):
@@ -226,7 +227,7 @@ def main(argv):
 		def bind(prefixTuple):
 			default_sketch.bind(prefixTuple)
 		def clear():
-			default_sketch.clear(triple)
+			default_sketch.clear()
 		def omnigraffle():
 			default_sketch.omnigraffle()
 		
