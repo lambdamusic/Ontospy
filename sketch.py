@@ -3,11 +3,12 @@
 # encoding: utf-8
 
 """
-ONTOSPY2
+TURTLE SKETCH
 Copyright (c) 2014 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
+Use the interpreter interactively to create a turtle model 
 
-September 11, 2014: started rethinking the library using sparql and retriving OWL classes to start with
+Tip: make this file executable: chmod +x sketch.py
 
 
 """
@@ -149,8 +150,15 @@ class Sketch(object):
 	def omnigraffle(self):
 		""" tries to open an export directly in omnigraffle """
 		temp = self.serialize("dot")
-		filename = "omnigraffle_sketch.dot"
-		f = open(filename, "w")
+		
+		try:  # try to put in the user/tmp folder 
+			from os.path import expanduser
+			home = expanduser("~")
+			filename = home + "/tmp/ontospy_sketch.dot"
+			f = open(filename, "w")
+		except:
+			filename = "ontospy_sketch.dot"
+			f = open(filename, "w")
 		f.write(temp)
 		f.close()
 		try:

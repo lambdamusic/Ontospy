@@ -38,4 +38,4 @@ nosetests.xml
 .DS_Store
 
 test
-ontologies-test
+ontologies

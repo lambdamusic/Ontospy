@@ -1,0 +1,3 @@
+digraph graphname {
+":a" -> ":b" [label="rdf:type"];
+}
