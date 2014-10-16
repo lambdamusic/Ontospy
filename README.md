@@ -7,6 +7,12 @@ RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 Check the ``__init__.py`` file
 
 
+####Installation:
+``easy_install ontospy``
+or
+``pip install ontospy``
+
+
 ####Dependencies:
 - <http://www.rdflib.net/> (tested on versions 2.4 and 3.0).
 
