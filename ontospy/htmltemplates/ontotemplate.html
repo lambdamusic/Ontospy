@@ -1,0 +1,33 @@
+<html>
+    <head><title>Test Template</title></head>
+    <body>
+
+	
+		{% for each in classes  %}
+			
+			<div id="">
+				
+				
+				<h2>{{each.classname}}</h2>
+				
+				<p>
+					{% for xx in each.alltriples %}
+					
+					<li>{{xx.0}}
+						<li>{{xx.1}}</li>
+					</li>
+					
+					{% endfor %}
+				</p>
+			
+					
+			</div>
+			
+		
+		
+		{% endfor %}
+
+
+
+    </body>
+</html>

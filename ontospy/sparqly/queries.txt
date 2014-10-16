@@ -1,0 +1,62 @@
+# a number of useful sparql queries
+-----------------------------------------
+
+
+match strings
+
+SELECT *
+WHERE {
+   ?x ?y ?z
+   FILTER (REGEX(STR(?x), "abc", "i"))
+}
+
+
+
+
+select * where {?x scig:mentions <http://ns.nature.com/scigraph/proteingene/o14777> . ?x ?y ?z  }
+
+
+
+STATS ON DATASETS
+-----------------------------------------
+
+
+
+total number of triples
+SELECT (COUNT(*) AS ?no) { ?s ?p ?o  }
+
+total number of entities
+SELECT COUNT(distinct ?s) AS ?no { ?s a []  }
+
+total number of distinct resource URIs (deprecated??)
+SELECT (COUNT(DISTINCT ?s ) AS ?no) { { ?s ?p ?o  } UNION { ?o ?p ?s } FILTER(!isBlank(?s) && !isLiteral(?s)) }     
+    
+total number of distinct classes
+SELECT COUNT(distinct ?o) AS ?no { ?s rdf:type ?o }
+
+total number of distinct predicates
+SELECT count(distinct ?p) { ?s ?p ?o }
+
+total number of distinct subject nodes
+SELECT (COUNT(DISTINCT ?s ) AS ?no) {  ?s ?p ?o   } 
+
+total number of distinct object nodes
+SELECT (COUNT(DISTINCT ?o ) AS ?no) {  ?s ?p ?o  filter(!isLiteral(?o)) }      
+                         
+exhaustive list of classes used in the dataset
+SELECT DISTINCT ?type { ?s a ?type }
+
+exhaustive list of properties used in the dataset
+SELECT DISTINCT ?p { ?s ?p ?o }
+
+table: class vs. total number of instances of the class
+SELECT  ?class (COUNT(?s) AS ?count ) { ?s a ?class } GROUP BY ?class ORDER BY ?count
+
+table: property vs. total number of triples using the property
+SELECT  ?p (COUNT(?s) AS ?count ) { ?s ?p ?o } GROUP BY ?p ORDER BY ?count
+
+table: property vs. total number of distinct subjects in triples using the property
+SELECT  ?p (COUNT(DISTINCT ?s ) AS ?count ) { ?s ?p ?o } GROUP BY ?p ORDER BY ?count
+
+table: property vs. total number of distinct objects in triples using the property
+SELECT  ?p (COUNT(DISTINCT ?o ) AS ?count ) { ?s ?p ?o } GROUP BY ?p ORDER BY ?count
