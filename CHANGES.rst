@@ -1,8 +1,48 @@
 OntosPy Changelog
 =======================
 
-2014-10-16
-- added to CheeseShop
+
+October 16, 2014
+---------------------------------
+- installed package on Pypi
+- added executable: 'sketchonto' (generated via distutils)
+
+
+October 11, 2014
+---------------------------------
+- sketch: added shortcuts 
+	- (sub == rdfs:subClassOf) (class == owl:Class)
+- sketch: added commands for a default_sketch
+
+
+September 19, 2014
+---------------------------------
+- added Sketch utility
+- added a dot file export mechanism 
+	- so that we can open this stuff quickly in omniGraffle
+	- http://paco.to/2004/omnigraffle-and-graphviz
+	- http://en.wikipedia.org/wiki/DOT_(graph_description_language)
+
+EG with labels
+
+digraph graphname {
+     a -> b [label=instanceOf];
+     b -> d [label=isA];
+ }
+
+
+September 3, 2014
+---------------------------------
+- refactored ontology loading routine 
+
+
+July 10, 2014
+---------------------------------
+- added webViz method that integrates d3 stuff
+	- to be tested more!
+	- added the tree view template too
+		- but data format isn't finished yet (ps check also http://bl.ocks.org/mbostock/4063570)	 http://bl.ocks.org/mbostock/4339184		
+
 
 2013-09-23
 - added loadTriples method; separate loadURI from __setupOntology()
