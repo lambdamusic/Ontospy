@@ -12,7 +12,6 @@ More info in the __init__.py file.
 
 
 from rdflib import URIRef, RDFS, RDF, BNode
-# from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 from vocabs import OWL, DUBLINCORE as DC
 # from vocabs import famous as FAMOUS_ONTOLOGIES
 DEFAULT_LANGUAGE = "en"

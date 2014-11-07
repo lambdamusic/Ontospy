@@ -2,6 +2,10 @@ OntosPy Changelog
 =======================
 
 
+November 1, 2014
+---------------------------------
+- added methods to extract OWL.AnnotationProperties
+
 October 16, 2014
 ---------------------------------
 - installed package on Pypi

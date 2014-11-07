@@ -83,6 +83,7 @@ class Ontology(object):
 		self.allrdfproperties = None
 		self.allobjproperties = None
 		self.alldataproperties = None
+		self.allannotationproperties = None
 		self.allinferredproperties = None
 		self.allproperties = None
 
@@ -134,17 +135,21 @@ class Ontology(object):
 		self.allrdfproperties = self.__getAllProperties(classPredicate = 'rdf.property')
 		self.allobjproperties = self.__getAllProperties(classPredicate = 'owl.objectproperty')
 		self.alldataproperties = self.__getAllProperties(classPredicate = 'owl.datatypeproperty')
+		self.allannotationproperties = self.__getAllProperties(classPredicate = 'owl.annotationproperty')
+		
 		self.allinferredproperties = self.__getAllProperties(classPredicate = 'rdf.property', includeImplicit=True)
 		# add together only the OWL properties
-		self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties)
+		self.allproperties = sort_uri_list_by_name(self.allobjproperties + self.alldataproperties + self.allannotationproperties)
 	
 		self.ontologyClassTree = self.__buildClassTree()
 		self.classTreeMaxDepth = self.__ontoMaxTreeLevel()
 		
 		self.topObjProperties = self.__getTopProps(classPredicate="owl.objectproperty")
 		self.topDataProperties = self.__getTopProps(classPredicate="owl.datatypeproperty")
+		self.topAnnotationProperties = self.__getTopProps(classPredicate="owl.annotationproperty")
 		self.ontologyObjPropertyTree = self.__buildPropTree(classPredicate="owl.objectproperty")
 		self.ontologyDataPropertyTree = self.__buildPropTree(classPredicate="owl.datatypeproperty")
+		self.ontologyAnnotationPropertyTree = self.__buildPropTree(classPredicate="owl.annotationproperty")
 		
 		self.sessionGraph = rdflib.Graph()
 		self.sessionNS = Namespace(DEFAULT_SESSION_NAMESPACE)
@@ -154,14 +159,14 @@ class Ontology(object):
 			
 	def loadUri(self, uri, default_format="xml"):
 		"""
-		Loads a graph from a URI (or a python file object containing triples)
+		Loads a schema from a URI (or a python file object containing triples)
 		"""
 			
 		try:
 			if uri.startswith("www."): #support for lazy people
 				uri = "http://%s" % str(uri)  
 		except:
-			pass # required if loading triples directly via  file or StringIO
+			pass # handles exception when loading triples from file or StringIO
 
 		try:
 			rdf_format = guess_fileformat(uri)
@@ -175,6 +180,7 @@ class Ontology(object):
 		except:
 			print ("\nError Parsing file URI (I thought it was *%s*) (follows rdflib Exception):\n" % rdf_format)  
 			raise
+
 		finally:
 			self.__setup(uri=uri)
 			
@@ -793,21 +799,22 @@ class Ontology(object):
 
 	def __getAllProperties(self, classPredicate = "", includeImplicit=False):
 		"""
-		Extracts all the properties (OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property) declared in a model.
-		The method is unprotected (single underscore) because we might want to call it from the Ontology object directly, 
-		just to see if there is *any* property available.... 
-
+		Extracts all the properties declared in a model.
+		
 		Args:
-
-		classPredicate: one of "rdf.property", "owl.objectproperty", "owl.datatypeproperty"
-		includeImplicit: gets all predicates from triples and infers that they are all RDF properties (even if not explicitly declared)
+		> classPredicate: a mapping to one of the allowed OWL props
+		
+		> includeImplicit: gets all predicates from triples and infers that they are all RDF properties (even if not explicitly declared)
+		
+		Corresponding RDF predicates: 
+		OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty, RDF.Property 
 
 		"""
 		rdfGraph = self.rdfGraph
 		exit = {}
 
-		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
-			raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty', 'owl.annotationproperty']:
+			raise exceptions.Error("ClassPredicate must be either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty' or 'owl.annotationproperty' ")
 
 		def addIfYouCan(x, mydict):
 			if x not in mydict:
@@ -830,6 +837,10 @@ class Ontology(object):
 			for s in rdfGraph.subjects(RDF.type , OWL.DatatypeProperty):
 				exit = addIfYouCan(s, exit)
 
+		if classPredicate == "owl.annotationproperty" or classPredicate == "" or includeImplicit: 
+			for s in rdfGraph.subjects(RDF.type , OWL.AnnotationProperty):
+				exit = addIfYouCan(s, exit)
+
 
 		# get a list	
 		exit = exit.keys() 
@@ -844,8 +855,8 @@ class Ontology(object):
 		returnlist = []
 		searchspace = []
 				
-		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty']:
-			raise exceptions.Error("ClassPredicate must be blank or either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty'")
+		if classPredicate not in ["", 'rdf.property', 'owl.objectproperty','owl.datatypeproperty', 'owl.annotationproperty']:
+			raise exceptions.Error("ClassPredicate must be blank or either 'rdf.property' or 'owl.objectproperty' or 'owl.datatypeproperty' or 'owl.annotationproperty'")
 
 		if classPredicate == "rdf.property" or classPredicate == "":
 			searchspace += self.allrdfproperties
@@ -853,6 +864,9 @@ class Ontology(object):
 			searchspace += self.allobjproperties
 		if classPredicate == "owl.datatypeproperty" or classPredicate == "": 
 			searchspace += self.alldataproperties
+		if classPredicate == "owl.annotationproperty" or classPredicate == "": 
+			searchspace += self.allannotationproperties			
+			
 		if includeImplicit:
 			searchspace += self.allinferredproperties
 			
@@ -875,6 +889,8 @@ class Ontology(object):
 			out = {}
 			if classPredicate == "owl.datatypeproperty":
 				topprops = self.topDataProperties
+			elif classPredicate == "owl.annotationproperty":
+				topprops = self.topAnnotationProperties
 			else:
 				topprops = self.topObjProperties
  
