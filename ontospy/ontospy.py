@@ -26,7 +26,7 @@ from vocabs import OWL, DUBLINCORE as DC
 from vocabs import famous as FAMOUS_ONTOLOGIES 
 
 from utils import *
-from utilsRDF import *
+
 
 
 
@@ -62,7 +62,7 @@ class Ontology(object):
 	"""
 
 
-	def __init__(self, uri=False):
+	def __init__(self, uri=False, aformat=""):
 		"""
 		Class that includes methods for manipulating an RDF/RDFS/OWL graph at the ontological level
 
@@ -97,7 +97,7 @@ class Ontology(object):
 		self.ontologyClassTree = None
 
 		if uri:
-			self.loadUri(uri)
+			self.loadUri(uri, aformat)
 		else:
 			printDebug("Ontology instance created. Use the <loadUri> method to load an ontology.")
 
@@ -157,7 +157,7 @@ class Ontology(object):
 		# printDebug("...Ontology instance succesfully created for <%s>" % str(self.ontologyPrettyURI))			
 			
 			
-	def loadUri(self, uri, default_format="xml"):
+	def loadUri(self, uri, aformat=""):
 		"""
 		Loads a schema from a URI (or a python file object containing triples)
 		"""
@@ -168,11 +168,14 @@ class Ontology(object):
 		except:
 			pass # handles exception when loading triples from file or StringIO
 
-		try:
-			rdf_format = guess_fileformat(uri)
-		except:
-			# in this case it's a python file object
-			rdf_format = default_format	
+		if aformat:
+			rdf_format = aformat
+		else:
+			try:
+				rdf_format = guess_fileformat(uri)
+			except:
+				# in this case it's a python file object
+				rdf_format = 'xml'	
 
 
 		try:
@@ -528,7 +531,7 @@ class Ontology(object):
 		temp['class'] = aClass
 		temp['classname'] = uri2niceString(aClass, namespaces)
 		# temp['alltriples'] = entityTriples(self, aClass, niceURI=True)
-		temp['alltriples'] = [(uri2niceString(y, namespaces), z) for y,z in entityTriples(self.rdfGraph, aClass)] 
+		temp['alltriples'] = [(uri2niceString(y, namespaces), uri2niceString(z, namespaces)) for y,z in entityTriples(self.rdfGraph, aClass)] 
 		temp['comment'] = entityComment(self.rdfGraph, aClass)
 		temp['label'] = entityLabel(self.rdfGraph, aClass)
 		temp['treelevel'] = self.__printClassTreeLevel(aClass)
@@ -917,7 +920,7 @@ class Ontology(object):
 		temp['prop'] = aProp
 		temp['propname'] = uri2niceString(aProp, namespaces)
 		# temp['alltriples'] = entityTriples(self, aProp, niceURI=True)
-		temp['alltriples'] = [(uri2niceString(y, namespaces), z) for y,z in entityTriples(self.rdfGraph, aProp)] 
+		temp['alltriples'] = [(uri2niceString(y, namespaces), uri2niceString(z, namespaces)) for y,z in entityTriples(self.rdfGraph, aProp)] 
 		temp['comment'] = entityComment(self.rdfGraph, aProp)
 		temp['label'] = entityLabel(self.rdfGraph, aProp)
 		temp['domain'] = [self.classRepresentation(clas) for clas in self.propertyDomain(aProp)]
@@ -1096,7 +1099,7 @@ class Ontology(object):
 		temp['instance'] = instance
 		temp['instancename'] = uri2niceString(instance, self.ontologyNamespaces)
 		# temp['alltriples'] = entityTriples(self, instance, niceURI=True)
-		temp['alltriples'] = [(uri2niceString(y, self.ontologyNamespaces), z) for y,z in entityTriples(self.rdfGraph, instance)]
+		temp['alltriples'] = [(uri2niceString(y, self.ontologyNamespaces), uri2niceString(z, namespaces)) for y,z in entityTriples(self.rdfGraph, instance)]
 		temp['comment'] = entityComment(self.rdfGraph, instance)
 		temp['label'] = entityLabel(self.rdfGraph, instance)
 		fathers = self.instanceFather(instance)

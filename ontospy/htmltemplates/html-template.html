@@ -1,0 +1,43 @@
+<html>
+    <head><title>Test Template for a genetic html page</title></head>
+    <body>
+
+	
+		{% for each in classes  %}
+			
+			<h1>{{title|default:"Ontology"}}</h1>
+			
+			
+			<div id="">
+				
+				
+				<h2>{{each.classname}}</h2>
+				
+				<div>
+					<table border="1" cellspacing="5" cellpadding="5">
+					{% for xx in each.alltriples %}
+					
+					
+						{# <tr><th>Header</th></tr> #}
+						<tr>
+							<td>{{xx.0}}</td>
+							<td>{{xx.1}}</td>						
+						</tr>
+
+					
+					{% endfor %}
+					</table>
+					
+				</div>
+			
+					
+			</div>
+			
+		
+		
+		{% endfor %}
+
+
+
+    </body>
+</html>
