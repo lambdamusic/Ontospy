@@ -1,0 +1,204 @@
+
+
+<a name="top"></a>
+<h2>Sections</h2>
+{% if classes %}<li><a href="#classes">Classes</a></li>{% endif %}
+{% if objproperties %}<li><a href="#objprop">Object Properties</a></li>{% endif %}
+{% if dataproperties %}<li><a href="#dataprop">Datatype properties</a></li>{% endif %}
+{% if annotationproperties %}<li><a href="#annprop">Annotation properties</a></li>{% endif %}
+{% if instances %}<li><a href="#instances">Instances</a></li>{% endif %}
+
+<hr>
+
+
+
+
+
+
+{% if classes %}
+<br />
+<br />
+<a name="classes"></a>
+<h1>Classes</h1>
+<hr>
+<a href="#top">top</a>
+
+
+	{% for each in classes  %}
+		
+		<br /><br />	
+		<div>
+			
+			
+			<h2>{{each.classname}}</h2>
+			
+			<table>
+			{% for xx in each.alltriples %}
+			
+				<tr>
+					<td>{{xx.0}}</td>
+					<td>{{xx.1}}</td>						
+				</tr>
+			
+			{% endfor %}
+			</table>
+
+		</div>
+		
+	
+	
+	{% endfor %}
+
+{% endif %}
+
+
+{% if objproperties %}
+<br />
+<br />
+<a name="objprop"></a>
+<h1>Object Properties</h1>
+<hr>
+<a href="#top">top</a>
+
+	{% for each in objproperties  %}
+		
+		<br /><br />	
+		<div>
+			
+			
+			<h2>{{each.propname}}</h2>
+			
+			<table>
+			{% for xx in each.alltriples %}
+			
+				<tr>
+					<td>{{xx.0}}</td>
+					<td>{{xx.1}}</td>						
+				</tr>
+			
+			{% endfor %}
+			</table>
+
+		</div>
+		
+	
+	
+	{% endfor %}
+{% endif %}
+
+
+
+{% if dataproperties %}
+<br />
+<br />
+<a name="dataprop"></a>
+<h1>Datatype Properties</h1>
+<hr>
+<a href="#top">top</a>
+
+	{% for each in dataproperties  %}
+		
+		<br /><br />	
+		<div>
+			
+			
+			<h2>{{each.propname}}</h2>
+			
+			<table>
+			{% for xx in each.alltriples %}
+			
+				<tr>
+					<td>{{xx.0}}</td>
+					<td>{{xx.1}}</td>						
+				</tr>
+			
+			{% endfor %}
+			</table>
+
+		</div>
+		
+	
+	
+	{% endfor %}
+	
+{% endif %}	
+	
+	
+
+
+
+{% if annotationproperties %}
+<br />
+<br />
+<a name="annprop"></a>
+<h1>Annotation Properties</h1>
+<hr>
+<a href="#top">top</a>
+
+	{% for each in annotationproperties  %}
+		
+		<br /><br />	
+		<div>
+			
+			
+			<h2>{{each.propname}}</h2>
+			
+			<table>
+			{% for xx in each.alltriples %}
+			
+				<tr>
+					<td>{{xx.0}}</td>
+					<td>{{xx.1}}</td>						
+				</tr>
+			
+			{% endfor %}
+			</table>
+
+		</div>
+		
+	
+	
+	{% endfor %}
+	
+{% endif %}	
+	
+
+
+{% if instances %}
+
+<br />
+<br />
+<a name="instances"></a>
+<h1>Instances</h1>
+<hr>
+<a href="#top">top</a>
+
+	{% for each in instances  %}
+		
+		<br /><br />	
+		<div>
+			
+			
+			<h2>{{each.instancename}}</h2>
+			
+			<table>
+			{% for xx in each.alltriples %}
+			
+				<tr>
+					<td>{{xx.0}}</td>
+					<td>{{xx.1}}</td>						
+				</tr>
+			
+			{% endfor %}
+			</table>
+
+		</div>
+		
+	
+	
+	{% endfor %}
+	
+{% endif %}
+
+
+		
