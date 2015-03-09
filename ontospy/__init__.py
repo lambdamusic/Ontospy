@@ -1,8 +1,6 @@
-VERSION = 1.3
+#!/usr/bin/env python
 
-#
-# def main():
-#     """Entry point for the application script"""
-#     print("Call your main application code here")
+# encoding: utf-8
 
 
+# version number in ontospy.py

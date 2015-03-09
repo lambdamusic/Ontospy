@@ -13,8 +13,8 @@ setup(
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
-    # http://packaging.python.org/en/latest/tutorial.html#version
-    version='1.0.0b2',
+    # https://packaging.python.org/en/latest/distributing.html#version
+    version='1.1.1',
 
     description='A Python project for working with RDF/OWL ontologies',
     long_description=long_description,
@@ -35,7 +35,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',

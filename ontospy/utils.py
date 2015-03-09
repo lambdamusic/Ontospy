@@ -192,6 +192,62 @@ def uri2niceString(aUri, namespaces = None):
 	('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
 	(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))]
 	
+	2015-03-09: if a uri has no local component (eg 'bibo:') it's returned in full. 
+	
+	"""
+	if not namespaces:
+		namespaces = []
+		
+	if type(aUri) == rdflib.term.URIRef:	
+		# we have a URI: try to create a qName
+		stringa = aUri.toPython()  
+		for aNamespaceTuple in namespaces:
+			try: # check if it matches the available NS
+				prefix = aNamespaceTuple[0]
+				fulluri = aNamespaceTuple[1].__str__()
+			
+			
+				if stringa.find(fulluri) == 0:
+					if len(fulluri) == len(stringa):
+						#if the namespace has no local component, dont' shorten it (eg avoid things like 'bibo:')
+						stringa = fulluri  
+					elif prefix: # for base NS, it's empty
+						stringa = prefix + ":" + stringa[len(fulluri):]
+					else:
+						new_prefix = inferNamespacePrefix(aNamespaceTuple[1])
+						if new_prefix:
+							stringa = new_prefix + ":" + stringa[len(fulluri):]
+						else:
+							stringa = "base:" + stringa[len(fulluri):]
+			except:
+				stringa = "error"
+				
+	elif type(aUri) == rdflib.term.Literal:
+		stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
+	else:
+		if type(aUri) == type(u''):
+			stringa = aUri
+		else:
+			stringa = aUri.toPython()			
+	return stringa
+
+
+
+
+def OLD_uri2niceString(aUri, namespaces = None):
+	""" 
+	From a URI, returns a nice string representation that uses also the namespace symbols
+	Cuts the uri of the namespace, and replaces it with its shortcut (for base, attempts to infer it or leaves it blank)
+
+	Namespaces are a list 
+	
+	[('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
+	('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
+	(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
+	('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
+	('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
+	(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))]
+	
 	"""
 	if not namespaces:
 		namespaces = []
@@ -216,9 +272,15 @@ def uri2niceString(aUri, namespaces = None):
 	elif type(aUri) == rdflib.term.Literal:
 		stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
 	else:
-		stringa = aUri.toPython()			
+		if type(aUri) == type(u''):
+			stringa = aUri
+		else:
+			stringa = aUri.toPython()			
 	return stringa
-
+	
+	
+	
+	
 
 def niceString2uri(aUriString, namespaces = None):
 	""" 

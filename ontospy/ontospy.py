@@ -16,6 +16,8 @@ More info in the README file.
 
 """
 
+VERSION = "1.1.1"
+
 
 
 import sys, os, urllib2
