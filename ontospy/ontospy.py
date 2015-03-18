@@ -25,7 +25,7 @@ from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 from vocabs import OWL, DUBLINCORE as DC
 from vocabs import famous as FAMOUS_ONTOLOGIES 
 
-from lib.utils import *
+from libs.utils import *
 
 
 
