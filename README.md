@@ -30,9 +30,18 @@ The basic worflow is simple: load an ontology by instantiating the ``Ontology`` 
 Ps: the library can be used in standalone mode too.
 
 
+Example: inspecting an ontology from the command line
+-----------------------
+You can use the `ontospy` script to print out in the terminal some basic info any RDF ontology. 
+
+	> python ontospy.py <ontology-uri>
+
+To see the latest options available use:
+	
+	> python ontospy.py -h
 
 
-Example: loading and querying the foaf ontology
+Example: loading and querying the foaf ontology using python
 -----------------------
 
 

@@ -1,34 +1,52 @@
 #!/usr/bin/env python
-
 # encoding: utf-8
+
+
+
 
 """
 ONTOSPY
-Copyright (c) 2013 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
-Run it from the command line and it shows info about the default ontology (FOAF); 
-alternatively pass it a URI as an argument for where to look for an ontology. Eg: 
+Run it from the command line by passing it an ontology URI as an argument in order to 
+show basic info about that ontology (FOAF). 
 
->>> python ontospy.py
 >>> python ontospy.py http://xmlns.com/foaf/0.1/
 
 More info in the README file.
 
 """
 
-VERSION = "1.1.1"
 
-
-
-import sys, os, urllib2
+import sys, os, urllib2, optparse
 
 import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
 from vocabs import OWL, DUBLINCORE as DC
 from vocabs import famous as FAMOUS_ONTOLOGIES 
 
-from utils import *
+from lib.utils import *
 
+
+
+##################
+#
+#  metadata
+#
+##################
+
+
+
+__version__ = "1.2.0"
+__copyright__ = "CopyRight (C) 2015 by Michele Pasin"
+__license__ = "MIT"
+__author__ = "Michele Pasin"
+__author_email__ = "michele dot pasin at gmail dot com"
+
+USAGE = "%prog <ontology-uri> [options]"
+VERSION = "%prog v" + __version__
+
+AGENT = "%s/%s" % (__name__, __version__)
 
 
 
@@ -1098,10 +1116,11 @@ class Ontology(object):
 		Similar to the class representation: could be a stub for an OO version of this..
 		"""		
 		temp = {}
+		namespaces = self.ontologyNamespaces
 		temp['instance'] = instance
-		temp['instancename'] = uri2niceString(instance, self.ontologyNamespaces)
+		temp['instancename'] = uri2niceString(instance, namespaces)
 		# temp['alltriples'] = entityTriples(self, instance, niceURI=True)
-		temp['alltriples'] = [(uri2niceString(y, self.ontologyNamespaces), uri2niceString(z, namespaces)) for y,z in entityTriples(self.rdfGraph, instance)]
+		temp['alltriples'] = [(uri2niceString(y, namespaces), uri2niceString(z, namespaces)) for y,z in entityTriples(self.rdfGraph, instance)]
 		temp['comment'] = entityComment(self.rdfGraph, instance)
 		temp['label'] = entityLabel(self.rdfGraph, instance)
 		fathers = self.instanceFather(instance)
@@ -1367,102 +1386,137 @@ class Ontology(object):
 
 
 
-def main(argv):
+def parse_options():
 	"""
-	If you run this script from the command line and pass it a URI as an argument it will return 
-	information about the ontology data it found. 
+	parse_options() -> opts, args
+
+	Parse any command-line options given returning both
+	the parsed options and arguments.
 	
-	(note: if not URI is provided, it defaults to the FOAF vocabulary 
-
-	So
-
-	>>> python ontospy.py
-
-	Is equivalent to
-
-	>>> python ontospy.py http://xmlns.com/foaf/0.1/
-
+	https://docs.python.org/2/library/optparse.html
+	
 	"""
-	if argv:
-		onto = Ontology(argv[0])
+	
+	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	
+	parser.add_option("-e", "--entities",
+			action="store_true", default=False, dest="entities",
+			help="Print out detailed information for all entities in the ontology.")
+
+	opts, args = parser.parse_args()
+
+	if len(args) < 1:
+		parser.print_help()
+		raise SystemExit, 1
+
+	return opts, args
+
+
+
+
+	
+def main ():
+	""" command line script """
+	
+	opts, args = parse_options()
+	entities = opts.entities 
+
+	try:
+		onto = Ontology(args[0])
+	except:
+		# print "Please specify a valid endpoint. Use -h for more info."
+		raise SystemExit, 1	
+	
+	if entities:
+		printEntitiesInformation(onto)
 	else:
-		onto = Ontology(DEFAULT_ONTO)
+		printBasicInfo(onto)
 		
-	rdfGraph = onto.rdfGraph
-
-	print "_" * 50, "\n"	
-	print "TRIPLES = %s" % len(rdfGraph)
-	print "_" * 50
-	print "\nNAMESPACES:\n"
-	for x in onto.ontologyNamespaces:
-		print "%s : %s" % (x[0], x[1])
 
 
+
+
+ 
 	
-	print "_" * 50, "\n"
-	print "ONTOLOGY METADATA:\n"	
-	for x, y in onto.ontologyAnnotations():
-		print "%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
-	print "_" * 50, "\n"
-
-
-	print "CLASS TAXONOMY:\n"
-	onto.printClassTree()
-	print "_" * 50, "\n"
-
-
-	# last two methods can be set to True on demand
-	
-	if False:  
-		printClassInformation(onto)
-	
-	if False:
-		onto.drawOntograph(rdfGraph, '/tmp/graph.png')
-
-
-
-
-
-def printClassInformation(onto):
-	"""
-	Terminal printing of some info on available classes etc..
-	"""
-	print "\n\n", "_" * 50, "\n\n"
-	print "Classes found: ", str(len(onto.allclasses)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.allclasses])
-	print "_" * 20
-	for s in onto.allclasses:
-		# get the subject, treat it as string and strip the initial namespace
-		print "Class : " , uri2niceString(s, onto.ontologyNamespaces).upper()
-		print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSubs(s)])
-		print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSubs(s, [])])
-		print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSupers(s)])
-		print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSupers(s, [])])
-		print "Domain of : ", str(len(onto.classDomainFor(s, class_role = "domain"))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDomainFor(s, class_role = "domain")])
-		print "Range of : ", str(len(onto.classRangeFor(s, class_role = "range"))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classRangeFor(s, class_role = "range")])
-		print "_" * 10, "\n"
-
-	print "_" * 50, "\n\n", "_" * 50, "\n\n"
-	print "Object Properties found: ", str(len(onto.allobjproperties)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.allobjproperties])
-	print "\n\n"
-	for s in onto.allobjproperties: 
-		print "ObjProperty : " , uri2niceString(x, onto.ontologyNamespaces).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
-		print "_" * 10, "\n"
-	
-	
-	print "_" * 50, "\n\n",
-	print "Datatype Properties found: ", str(len(onto.alldataproperties)), " \n", str([uri2niceString(x, onto.ontologyNamespaces).upper() for x in onto.alldataproperties])
-	print "\n\n"
-	for s in onto.alldataproperties: 
-		print "DataProperty : " , uri2niceString(x, onto.ontologyNamespaces).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
-		print "_" * 10, "\n"
-
-
-
-
-
 if __name__ == '__main__':
-	main(sys.argv[1:])
+	import sys
+	try:
+		main()
+		sys.exit(0)
+	except KeyboardInterrupt, e: # Ctrl-C
+		raise e
+
+
+#
+#
+# #
+# #
+# # ===========
+# # OLD MAIN
+# # ===========
+#
+#
+#
+#
+#
+#
+# def main(argv):
+# 	"""
+# 	If you run this script from the command line and pass it a URI as an argument it will return
+# 	information about the ontology data it found.
+#
+# 	(note: if not URI is provided, it defaults to the FOAF vocabulary
+#
+# 	So
+#
+# 	>>> python ontospy.py
+#
+# 	Is equivalent to
+#
+# 	>>> python ontospy.py http://xmlns.com/foaf/0.1/
+#
+# 	"""
+# 	if argv:
+# 		onto = Ontology(argv[0])
+# 	else:
+# 		onto = Ontology(DEFAULT_ONTO)
+#
+# 	rdfGraph = onto.rdfGraph
+#
+# 	print "_" * 50, "\n"
+# 	print "TRIPLES = %s" % len(rdfGraph)
+# 	print "_" * 50
+# 	print "\nNAMESPACES:\n"
+# 	for x in onto.ontologyNamespaces:
+# 		print "%s : %s" % (x[0], x[1])
+#
+#
+#
+# 	print "_" * 50, "\n"
+# 	print "ONTOLOGY METADATA:\n"
+# 	for x, y in onto.ontologyAnnotations():
+# 		print "%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
+# 	print "_" * 50, "\n"
+#
+#
+# 	print "CLASS TAXONOMY:\n"
+# 	onto.printClassTree()
+# 	print "_" * 50, "\n"
+#
+#
+# 	# last two methods can be set to True on demand
+#
+# 	if True:
+# 		printClassInformation(onto)
+#
+# 	if False:
+# 		onto.drawOntograph(rdfGraph, '/tmp/graph.png')
+#
+#
+#
+#
+#
+#
+#
+# if __name__ == '__main__':
+# 	main(sys.argv[1:])
