@@ -304,7 +304,7 @@ class Ontology(object):
 		if self.ontologyURI:
 			# return entityTriples(self, self.ontologyURI, niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
 			
-			return [(uri2niceString(y, self.ontologyNamespaces), z) for y,z in entityTriples(self.rdfGraph, self.ontologyURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)]
+			return [(uri2niceString(y, self.ontologyNamespaces), uri2niceString(z, self.ontologyNamespaces)) for y,z in entityTriples(self.rdfGraph, self.ontologyURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)]
 		
 
 
