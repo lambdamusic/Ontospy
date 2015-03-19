@@ -1,3 +1,20 @@
+
+# trick to manage package versions in one place only
+# http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
+import re
+VERSIONFILE="ontospy/_version.py"
+verstrline = open(VERSIONFILE, "rt").read()
+VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+mo = re.search(VSRE, verstrline, re.M)
+if mo:
+    VERSIONSTRING = mo.group(1)
+else:
+    raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
+	
+	
+
+# setup.py proper begins here
+
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
@@ -5,7 +22,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
@@ -14,7 +31,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/distributing.html#version
-    version='1.2.0',
+    version=VERSIONSTRING,
 
     description='A Python project for working with RDF/OWL ontologies',
     long_description=long_description,

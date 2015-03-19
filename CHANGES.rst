@@ -1,6 +1,8 @@
 OntosPy Changelog
 =======================
 
+**note**: this file is not being maintained
+
 
 November 1, 2014
 ---------------------------------
