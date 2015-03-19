@@ -125,7 +125,7 @@ This is a (still rather rudimentary) interactive environment aimed at facilitati
 
 It is meant to be used from the command line (tip: make this file executable: `chmod +x sketch.py`) and requires you to type in RDF statements using the Turtle serialization. 
 
-*Note*: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to `usr/local/bin` (on unix-based systems). So all you have to do to run this is type `sketchonto`. 
+*Note*: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to `usr/local/bin` (on unix-based systems). You can run it by typing `sketchonto`. 
 
 	[lambdamusic]@here:~/code/python>sketch.py 
 	Good morning. Ready to Turtle away. Type docs() for help.
