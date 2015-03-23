@@ -11,7 +11,8 @@ Copyright (c) 2010-2015 __Michele Pasin__ <michelepasin.org>. All rights reserve
 
 from rdflib import RDFS, RDF, BNode
 import rdflib
-from vocabs import OWL, DUBLINCORE as DC
+
+import OWL, DUBLINCORE as DC
 DEFAULT_LANGUAGE = "en"
 
 
