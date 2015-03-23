@@ -22,11 +22,9 @@ import sys, os, urllib2, optparse
 
 import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
-# from vocabs import OWL, DUBLINCORE as DC
-# from vocabs import famous as FAMOUS_ONTOLOGIES
+
 
 from libs.utils import *
-
 import libs.OWL
 import libs.DUBLINCORE as DC
 import libs.famous as FAMOUS_ONTOLOGIES

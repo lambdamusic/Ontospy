@@ -11,7 +11,7 @@
 
 
 
-__version__ = "1.2.2"
+__version__ = "1.2.2.3"
 __copyright__ = "CopyRight (C) 2015 by Michele Pasin"
 __license__ = "MIT"
 __author__ = "Michele Pasin"

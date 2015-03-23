@@ -11,9 +11,258 @@ Copyright (c) 2010-2015 __Michele Pasin__ <michelepasin.org>. All rights reserve
 
 from rdflib import RDFS, RDF, BNode
 import rdflib
+import sys
 
 import OWL, DUBLINCORE as DC
 DEFAULT_LANGUAGE = "en"
+
+
+
+
+
+
+
+
+# ===========
+# generic python utils
+# ===========
+
+
+
+
+def remove_duplicates(seq, idfun=None):
+	""" removes duplicates from a list, order preserving, as found in
+	http://www.peterbe.com/plog/uniqifiers-benchmark
+	"""
+	if seq:
+		if idfun is None:
+			def idfun(x): return x
+		seen = {}
+		result = []
+		for item in seq:
+			marker = idfun(item)
+			# in old Python versions:
+			# if seen.has_key(marker)
+			# but in new ones:
+			if marker in seen: continue
+			seen[marker] = 1
+			result.append(item)
+		return result
+	else:
+		return []
+
+
+
+
+
+
+def printDebug(s):
+	try:
+		print s
+	except: 
+		pass
+
+
+
+
+
+def pprinttable(rows):
+	"""
+	Pretty prints a table via python
+	http://stackoverflow.com/questions/5909873/python-pretty-printing-ascii-tables
+
+	Example
+
+	>>> from collections import namedtuple
+	>>> Row = namedtuple('Row',['first','second','third'])
+	>>> data = Row(1,2,3)
+	>>> data
+	Row(first=1, second=2, third=3)
+	>>> pprinttable([data])
+	 first = 1
+	second = 2
+	 third = 3
+	>>> pprinttable([data,data])
+	first | second | third
+	------+--------+------
+		1 |		 2 |	 3
+		1 |		 2 |	 3
+
+	"""
+	if len(rows) > 1:
+		headers = rows[0]._fields
+		lens = []
+		for i in range(len(rows[0])):
+			lens.append(len(max([x[i] for x in rows] + [headers[i]],key=lambda x:len(str(x)))))
+		formats = []
+		hformats = []
+		for i in range(len(rows[0])):
+			if isinstance(rows[0][i], int):
+				formats.append("%%%dd" % lens[i])
+			else:
+				formats.append("%%-%ds" % lens[i])
+			hformats.append("%%-%ds" % lens[i])
+		pattern = " | ".join(formats)
+		hpattern = " | ".join(hformats)
+		separator = "-+-".join(['-' * n for n in lens])
+		print hpattern % tuple(headers)
+		print separator
+		for line in rows:
+			print pattern % tuple(line)
+	elif len(rows) == 1:
+		row = rows[0]
+		hwidth = len(max(row._fields,key=lambda x: len(x)))
+		for i in range(len(row)):
+			print "%*s = %s" % (hwidth,row._fields[i],row[i])
+
+
+
+
+
+
+
+def _safe_print(u, errors="replace"):
+    """Safely print the given string.
+    
+    If you want to see the code points for unprintable characters then you
+    can use `errors="xmlcharrefreplace"`.
+	http://code.activestate.com/recipes/576602-safe-print/
+    """
+    s = u.encode(sys.stdout.encoding or "utf-8", errors)
+    print(s)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ===========
+# utils for terminal printing of ontology info
+# ===========
+
+
+
+
+def printBasicInfo(onto):
+	"""
+	Terminal printing of basic ontology information
+	"""
+	rdfGraph = onto.rdfGraph
+
+	_safe_print("_" * 50 + "\n")	
+	_safe_print("TRIPLES = %s" % len(rdfGraph))
+	_safe_print("_" * 50) 
+	_safe_print("\nNAMESPACES:\n") 
+	for x in onto.ontologyNamespaces:
+		_safe_print("%s : %s" % (x[0], x[1])) 
+
+	
+	_safe_print("_" * 50 + "\n")
+	_safe_print("ONTOLOGY METADATA:\n"	)
+	for x, y in onto.ontologyAnnotations():
+		_safe_print("%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces)))
+	_safe_print("_" * 50 + "\n")
+
+
+	_safe_print("CLASS TAXONOMY:\n")
+	onto.printClassTree()
+	_safe_print("_" * 50 + "\n")
+
+
+
+
+def printEntitiesInformation(onto):
+	"""
+	Terminal printing of detailed entities information
+	"""
+
+	# _safe_print("*" * 50, "\n\nONTOLOGY ENTITIES FOR: %s\n\n" % onto.ontologyURI, "*" * 50
+	_safe_print("...Extracting Ontology Entities For: %s" % onto.ontologyURI)
+
+	if onto.allclasses:
+		_safe_print(" \n" + "=" * 20 + "\nCLASSES\n" + "=" * 20 + " \n")
+	for s in onto.allclasses:
+		# get the subject, treat it as string and strip the initial namespace
+		_safe_print("Class : " + uri2niceString(s, onto.ontologyNamespaces).upper())
+		_safe_print("direct_subclasses: " + str(len(onto.classDirectSubs(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSubs(s)]))
+		_safe_print("all_subclasses : " + str(len(onto.classAllSubs(s, []))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSubs(s, [])]))
+		_safe_print("direct_supers : " + str(len(onto.classDirectSupers(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSupers(s)]))
+		_safe_print("all_supers : " + str(len(onto.classAllSupers(s, []))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSupers(s, [])]))
+		
+		domains_for_this = onto.classDomainFor(s)[0][1]  # domain method returns nested tuples @TODO revise
+		_safe_print("Domain of : " + str(len(domains_for_this)) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  domains_for_this]))
+		_safe_print("Range of : " + str(len(onto.classRangeFor(s, inherited=True))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classRangeFor(s, inherited=True)]))
+		_safe_print("_" * 10 + "\n")
+
+
+	if onto.allobjproperties:
+		_safe_print(" \n" + "=" * 20 + "\nOBJECT PROPERTIES\n" + "=" * 20 + " \n")
+
+	for s in onto.allobjproperties: 
+		_safe_print("ObjProperty : " + uri2niceString(s, onto.ontologyNamespaces).upper())
+		_safe_print("Domain : " + str(len(onto.propertyDomain(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)]))
+		_safe_print("Range : " + str(len(onto.propertyRange(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)]))
+		_safe_print("_" * 10 + "\n")
+	
+
+	if onto.alldataproperties:
+		_safe_print(" \n" + "=" * 20 + "\nDATATYPE PROPERTIES\n" + "=" * 20 + " \n")
+
+	for s in onto.alldataproperties: 
+		_safe_print("DataProperty : " + uri2niceString(s, onto.ontologyNamespaces).upper())
+		_safe_print("Domain : " + str(len(onto.propertyDomain(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)]))
+		_safe_print("Range : " + str(len(onto.propertyRange(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)]))
+		_safe_print("_" * 10 + "\n")
+
+
+	if onto.allannotationproperties:
+		_safe_print(" \n" + "=" * 20 + "\nANNOTATION PROPERTIES\n" + "=" * 20 + " \n")
+
+	for s in onto.allannotationproperties: 
+		_safe_print("AnnotationProperty : " + uri2niceString(s, onto.ontologyNamespaces).upper())
+		_safe_print("Domain : " + str(len(onto.propertyDomain(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)]))
+		_safe_print("Range : " + str(len(onto.propertyRange(s))) + " = " + str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)]))
+		_safe_print("_" * 10 + "\n")
+		
+
+	if onto.allinstances:
+		_safe_print(" \n" + "=" * 20 + "\nINSTANCES\n" + "=" * 20 + " \n")
+
+	for s in onto.allinstances: 
+		_safe_print("Instance : " + uri2niceString(s, onto.ontologyNamespaces).upper()	)	
+		_safe_print("Parent class: " + str(len(onto.instanceFather(s))) + " = " +  str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.instanceFather(s)])  ) 
+
+
+	# summary
+	tot = len(onto.allclasses) + len(onto.allobjproperties) + len(onto.alldataproperties) + len(onto.allannotationproperties) + len(onto.allinstances)	
+	_safe_print("*" * 50)
+	_safe_print("ONTOLOGY ENTITIES FOUND: %d" % tot)
+
+	_safe_print("Classes: %s" % str(len(onto.allclasses)))
+	_safe_print("Object Properties : %s" % str(len(onto.allobjproperties)))
+	_safe_print("Datatype Properties : %s" % str(len(onto.alldataproperties)))
+	_safe_print("Annotation Properties : %s" % str(len(onto.allannotationproperties)))
+	_safe_print("Instances : %s" % str(len(onto.allinstances))	)
+	_safe_print("*" * 50)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -181,6 +430,7 @@ def isBlankNode(aClass):
 
 
 
+	
 def uri2niceString(aUri, namespaces = None):
 	""" 
 	From a URI, returns a nice string representation that uses also the namespace symbols
@@ -228,10 +478,16 @@ def uri2niceString(aUri, namespaces = None):
 	elif type(aUri) == rdflib.term.Literal:
 		stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
 	else:
-		if type(aUri) == type(u''):
-			stringa = aUri
-		else:
-			stringa = aUri.toPython()			
+		try:
+			# if it's not a Resource of Literal... we enter the realm of encoding errors
+			if type(aUri) == type(u''):
+				stringa = aUri
+			elif type(aUri) == type(''):  # <type 'str'>
+				stringa = "\"%s\"" % aUri  # 2015-03-23: @TODO needs more research	
+			else:
+				stringa = aUri.toPython()  # @TODO dbcheck	
+		except:
+			stringa = "WARNING: This string could not be printed due to an encoding error"	
 	return stringa
 
 
@@ -417,221 +673,8 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 
 
-# ===========
-# utils for terminal printing of ontology info
-# ===========
 
 
-
-
-def printBasicInfo(onto):
-	"""
-	Terminal printing of basic ontology information
-	"""
-	rdfGraph = onto.rdfGraph
-
-	print "_" * 50, "\n"	
-	print "TRIPLES = %s" % len(rdfGraph)
-	print "_" * 50
-	print "\nNAMESPACES:\n"
-	for x in onto.ontologyNamespaces:
-		print "%s : %s" % (x[0], x[1])
-
-	
-	print "_" * 50, "\n"
-	print "ONTOLOGY METADATA:\n"	
-	for x, y in onto.ontologyAnnotations():
-		print "%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
-	print "_" * 50, "\n"
-
-
-	print "CLASS TAXONOMY:\n"
-	onto.printClassTree()
-	print "_" * 50, "\n"
-
-
-
-
-def printEntitiesInformation(onto):
-	"""
-	Terminal printing of detailed entities information
-	"""
-
-	# print "*" * 50, "\n\nONTOLOGY ENTITIES FOR: %s\n\n" % onto.ontologyURI, "*" * 50
-	print "...Extracting Ontology Entities For: %s" % onto.ontologyURI
-
-	if onto.allclasses:
-		print " \n", "=" * 20, "\nCLASSES\n", "=" * 20, " \n"
-	for s in onto.allclasses:
-		# get the subject, treat it as string and strip the initial namespace
-		print "Class : " , uri2niceString(s, onto.ontologyNamespaces).upper()
-		print "direct_subclasses: ", str(len(onto.classDirectSubs(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSubs(s)])
-		print "all_subclasses : ", str(len(onto.classAllSubs(s, []))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSubs(s, [])])
-		print "direct_supers : ", str(len(onto.classDirectSupers(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classDirectSupers(s)])
-		print "all_supers : ", str(len(onto.classAllSupers(s, []))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classAllSupers(s, [])])
-		
-		domains_for_this = onto.classDomainFor(s)[0][1]  # domain method returns nested tuples @TODO revise
-		print "Domain of : ", str(len(domains_for_this)), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  domains_for_this])
-		print "Range of : ", str(len(onto.classRangeFor(s, inherited=True))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.classRangeFor(s, inherited=True)])
-		print "_" * 10, "\n"
-
-
-	if onto.allobjproperties:
-		print " \n", "=" * 20, "\nOBJECT PROPERTIES\n", "=" * 20,  " \n"
-
-	for s in onto.allobjproperties: 
-		print "ObjProperty : " , uri2niceString(s, onto.ontologyNamespaces).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
-		print "_" * 10, "\n"
-	
-
-	if onto.alldataproperties:
-		print " \n","=" * 20, "\nDATATYPE PROPERTIES\n", "=" * 20, " \n"
-
-	for s in onto.alldataproperties: 
-		print "DataProperty : " , uri2niceString(s, onto.ontologyNamespaces).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
-		print "_" * 10, "\n"
-
-
-	if onto.allannotationproperties:
-		print " \n", "=" * 20,  "\nANNOTATION PROPERTIES\n", "=" * 20, " \n"
-
-	for s in onto.allannotationproperties: 
-		print "AnnotationProperty : " , uri2niceString(s, onto.ontologyNamespaces).upper()
-		print "Domain : ", str(len(onto.propertyDomain(s))), " = ",				str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyDomain(s)])
-		print "Range : ", str(len(onto.propertyRange(s))), " = ",			str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.propertyRange(s)])
-		print "_" * 10, "\n"
-		
-
-	if onto.allinstances:
-		print " \n", "=" * 20, "\nINSTANCES\n", "=" * 20, " \n"
-
-	for s in onto.allinstances: 
-		print "Instance : " , uri2niceString(s, onto.ontologyNamespaces).upper()		
-		print "Parent class: ", str(len(onto.instanceFather(s))), " = ",  str([uri2niceString(x, onto.ontologyNamespaces) for x in  onto.instanceFather(s)])   
-
-
-	# summary
-	tot = len(onto.allclasses) + len(onto.allobjproperties) + len(onto.alldataproperties) + len(onto.allannotationproperties) + len(onto.allinstances)	
-	print "*" * 50
-	print "ONTOLOGY ENTITIES FOUND: %d" % tot
-
-	print "Classes: %s" % str(len(onto.allclasses))
-	print "Object Properties : %s" % str(len(onto.allobjproperties))
-	print "Datatype Properties : %s" % str(len(onto.alldataproperties))
-	print "Annotation Properties : %s" % str(len(onto.allannotationproperties))
-	print "Instances : %s" % str(len(onto.allinstances))	
-	print "*" * 50
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ===========
-# generic python utils
-# ===========
-
-
-
-
-def remove_duplicates(seq, idfun=None):
-	""" removes duplicates from a list, order preserving, as found in
-	http://www.peterbe.com/plog/uniqifiers-benchmark
-	"""
-	if seq:
-		if idfun is None:
-			def idfun(x): return x
-		seen = {}
-		result = []
-		for item in seq:
-			marker = idfun(item)
-			# in old Python versions:
-			# if seen.has_key(marker)
-			# but in new ones:
-			if marker in seen: continue
-			seen[marker] = 1
-			result.append(item)
-		return result
-	else:
-		return []
-
-
-
-
-
-
-def printDebug(s):
-	try:
-		print s
-	except: 
-		pass
-
-
-
-
-
-def pprinttable(rows):
-	"""
-	Pretty prints a table via python
-	http://stackoverflow.com/questions/5909873/python-pretty-printing-ascii-tables
-
-	Example
-
-	>>> from collections import namedtuple
-	>>> Row = namedtuple('Row',['first','second','third'])
-	>>> data = Row(1,2,3)
-	>>> data
-	Row(first=1, second=2, third=3)
-	>>> pprinttable([data])
-	 first = 1
-	second = 2
-	 third = 3
-	>>> pprinttable([data,data])
-	first | second | third
-	------+--------+------
-		1 |		 2 |	 3
-		1 |		 2 |	 3
-
-	"""
-	if len(rows) > 1:
-		headers = rows[0]._fields
-		lens = []
-		for i in range(len(rows[0])):
-			lens.append(len(max([x[i] for x in rows] + [headers[i]],key=lambda x:len(str(x)))))
-		formats = []
-		hformats = []
-		for i in range(len(rows[0])):
-			if isinstance(rows[0][i], int):
-				formats.append("%%%dd" % lens[i])
-			else:
-				formats.append("%%-%ds" % lens[i])
-			hformats.append("%%-%ds" % lens[i])
-		pattern = " | ".join(formats)
-		hpattern = " | ".join(hformats)
-		separator = "-+-".join(['-' * n for n in lens])
-		print hpattern % tuple(headers)
-		print separator
-		for line in rows:
-			print pattern % tuple(line)
-	elif len(rows) == 1:
-		row = rows[0]
-		hwidth = len(max(row._fields,key=lambda x: len(x)))
-		for i in range(len(row)):
-			print "%*s = %s" % (hwidth,row._fields[i],row[i])
 
 
 
