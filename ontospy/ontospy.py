@@ -1312,7 +1312,7 @@ class Ontology(object):
 			# just opens a d3 file
 			thisdir = os.path.dirname(os.path.realpath(__file__))		
 			print thisdir
-			webbrowser.open('file://'+thisdir+"/templates/forcedirected.html")
+			webbrowser.open('file://'+thisdir+"/data/templates/forcedirected.html")
 			
 					
 		if True:
@@ -1328,7 +1328,7 @@ class Ontology(object):
 			thisdir = os.path.dirname(os.path.realpath(__file__))
 			
 			#open the file
-			filein = open(thisdir + '/templates/forceDirectedTemplate.html' )
+			filein = open(thisdir + '/data/templates/forceDirectedTemplate.html' )
 			#read it
 			src = Template( filein.read() )
 			#do the substitution called $graphedges in html file
