@@ -1,4 +1,11 @@
-""" Unit test stub for ontosPy	"""
+""" 
+Unit test stub for ontosPy	
+
+Launch with 
+
+python test_simple.py
+
+"""
 
 import unittest, os, sys
 from ontospy import ontospy
