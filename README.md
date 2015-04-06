@@ -117,7 +117,7 @@ More options are available; use `-h` to list them all:
 
 
 
-#### Sketching a Turtle model
+#### Creating a Turtle sketch
 
 The library includes a little utility called `sketch.py`. 
 
