@@ -51,7 +51,7 @@ More options are available; use `-h` to list them all:
 
 
 
-	In [1]: from ontospy import *
+	In [1]: from ontospy.ontospy import *
 
 	In [2]: onto = Ontology("http://xmlns.com/foaf/spec/20100809.rdf")
 
