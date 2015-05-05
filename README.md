@@ -1,4 +1,4 @@
-OntosPy
+OntoSPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.

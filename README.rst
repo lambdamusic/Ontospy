@@ -1,4 +1,4 @@
-OntosPy
+OntoSPy
 =======================
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
@@ -7,9 +7,9 @@ RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 Description
 ------------
 
-OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
+OntoSPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
 
-The basic worflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic workflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
 
 For more up to date documentation, please visit https://github.com/lambdamusic/OntoSPy
 
@@ -17,7 +17,7 @@ For more up to date documentation, please visit https://github.com/lambdamusic/O
 Example
 ---------------------------------------------------
 
-Import ontosPy and instantiate the Ontology object with the FOAF ontology::
+Import ontoSPy and instantiate the Ontology object with the FOAF ontology::
 
 
 	In [1]: from ontospy.ontospy import *

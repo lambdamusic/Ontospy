@@ -1333,10 +1333,16 @@ class Ontology(object):
 			src = Template( filein.read() )
 			#do the substitution called $graphedges in html file
 
-			fileout = open("tempviz.html", "w")
+			from os.path import expanduser
+			home = expanduser("~")
+			location = home + "/ontospy-viz.html"
+			
+			
+			fileout = open(location, "w")
 			fileout.write(src.substitute({'graphedges' : ss}))
 			fileout.close()
-			webbrowser.open('file://'+os.path.realpath("tempviz.html"))
+			# webbrowser.open('file://'+os.path.realpath("ontospy-viz.html"))
+			webbrowser.open('file://'+location) # note: requires 2 forwards slashes + 1 for path
 
 
 
