@@ -28,7 +28,7 @@ all_subclasses : 0 = []
 direct_supers : 0 = []
 all_supers : 0 = []
 Domain of : 1 = [u'skos:hasTopConcept']
-Range of : 2 = [u'skos:inScheme', u'skos:topConceptOf']
+Range of : 2 = [u'skos:topConceptOf', u'skos:inScheme']
 __________
 
 Class : SKOS:ORDEREDCOLLECTION
@@ -87,7 +87,7 @@ __________
 
 ObjProperty : SKOS:MEMBER
 Domain : 1 = [u'skos:Collection']
-Range : 1 = [u'N70ab2a52e9ec4b749d420f07fdde9135']
+Range : 1 = [u'N20a02f56096c4d8eb68c08954da94ac9']
 __________
 
 ObjProperty : SKOS:MEMBERLIST

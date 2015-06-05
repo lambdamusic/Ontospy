@@ -31,13 +31,12 @@ logging.basicConfig()
 
 class Sketch(object):
 	"""
-	====Sketch v 0.2====
+	====Sketch v 0.3====
 	
-	add()  ==> add statements to the graph
+	add()  ==> add turtle statements to the graph (http://www.w3.org/TR/turtle/)
 	...........SHORTCUTS: 
 	...........'class' = owl:Class
 	...........'sub' = rdfs:subClassOf
-	...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
 	
 	show() ==> shows the graph. Can take an OPTIONAL argument for the format.
 	...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot'] 
@@ -49,8 +48,8 @@ class Sketch(object):
 	...........First you must set Omingraffle as your system default app for dot files!
 	
 	quit() ==> exit 
-
-	====Have fun!====
+	
+	====Happy modeling====
 	"""
 	def __init__(self, text=""):
 		super(Sketch, self).__init__()
@@ -75,16 +74,16 @@ class Sketch(object):
 		if text:
 			self.add(text)
 		
-	def add(self, text=""):
+	def add(self, text="", default_continuousAdd=True):
 		"""add some turtle text"""
-		if not text:
+		if not text and default_continuousAdd:
 			self.continuousAdd()
 		else:
 			pprefix = ""
 			for x,y in self.rdfGraph.namespaces():
 				pprefix += "@prefix %s: <%s> . \n" % (x, y)
 			# add final . if missing
-			if not text.strip().endswith("."):
+			if text and (not text.strip().endswith(".")):
 				text += " ."
 			# smart replacements
 			text = text.replace(" sub ", " rdfs:subClassOf ")
@@ -93,6 +92,7 @@ class Sketch(object):
 			self.rdfGraph.parse(data=pprefix+text, format="turtle")
 	
 	
+	# note: problem here if typying ### on first line! 
 	def continuousAdd(self):
 		print "Multi-line input. Enter ### when finished."
 		temp = ""
@@ -103,7 +103,7 @@ class Sketch(object):
 			if not line.strip().endswith("."):
 				line += " ."	
 			temp += "%s" % line
-		self.add(temp)	
+		self.add(temp, False) # default_continuousAdd=False	
 	
 	def bind(self, prefixTuple):
 		p, k = prefixTuple
