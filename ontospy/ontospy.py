@@ -1,4 +1,4 @@
-import sys, os, urllib2, time
+import sys, os, urllib2, time, optparse
 
 import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
@@ -198,7 +198,7 @@ class Graph(object):
 		if source: # add triples dynamically
 			self.__loadRDF(source, text, endpoint, rdf_format)
 		
-		printDebug("started scanning...")
+		printDebug("started scanning...\n----------")
 						
 		self.__extractNamespaces()
 		
@@ -546,29 +546,14 @@ class Graph(object):
 ##################
 
 
-def main(argv):
-	"""
 
-	"""
-	DEFAULT_ONTO = "data/schemas/pizza.ttl"
-	
-	sTime = time.time()
-	
-	if argv:
-		g = Graph(argv[0])
-	else:
-		print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
-		g = Graph(DEFAULT_ONTO)
-
+def shellPrintOverview(g, opts):
 	ontologies = g.ontologies
 	
 	for o in ontologies:
-		# print "Ontology URI:", o.uri
-		# print "Annotations:"
-		print "\nMetadata\n-----------"
+		print "-----------\nMetadata:"
 		o.printTriples()
-	
-	
+		
 	if False:
 		print "Top Layer:", str([cc.qname for cc in g.toplayer])
 	
@@ -578,25 +563,110 @@ def main(argv):
 	#		print "...direct Supers: ", len(c.directSupers), str([cc.qname for cc in c.directSupers])
 	#		print "...direct Subs: ", len(c.directSubs), str([cc.qname for cc in c.directSubs])
 
-
 		# c.triplesPrint()
 	
-	if True:
-		print "\nMain Taxonomy\n-----------"
+	if opts['classtaxonomy']:
+		print "\nClass Taxonomy\n" + "-" * 10 
 		g.printClassTree(showids=False)
-
-
-	# finally:
 	
+	if opts['propertytaxonomy']:
+		print "\nProperty Taxonomy\n" + "-" * 10 
+		g.printPropertyTree(showids=False)
+		
+
+
+
+
+
+
+
+
+def parse_options():
+	"""
+	parse_options() -> opts, args
+
+	Parse any command-line options given returning both
+	the parsed options and arguments.
+	
+	https://docs.python.org/2/library/optparse.html
+	
+	"""
+	
+	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	
+	parser.add_option("-e", "--entities",
+			action="store_true", default=False, dest="entities",
+			help="Print detailed information for all entities in the ontology.")
+
+	parser.add_option("-c", "--classtaxonomy",
+			action="store_true", default=False, dest="classtaxonomy",
+			help="Print the class taxonomy.")
+
+	parser.add_option("-p", "--propertytaxonomy",
+			action="store_true", default=False, dest="propertytaxonomy",
+			help="Print the property taxonomy.")
+						
+	opts, args = parser.parse_args()
+
+	# if len(args) < 1:
+	# 	parser.print_help()
+	# 	raise SystemExit, 1
+
+	return opts, args
+
+
+	
+def main():
+	""" command line script """
+	
+	opts, args = parse_options()
+	
+	print_opts = {
+					'entities' : opts.entities, 
+					'classtaxonomy' : opts.classtaxonomy, 
+					'propertytaxonomy' : opts.propertytaxonomy
+				}
+	
+	DEFAULT_ONTO = "data/schemas/pizza.ttl"
+	
+	sTime = time.time()
+	
+	if opts.entities:
+		# @TODO
+		print "Sorry not implemented yet"
+		sys.exit(0)
+
+	else:
+	
+		if args:
+			g = Graph(args[0])
+		else:
+			print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
+			g = Graph(DEFAULT_ONTO)
+		
+		shellPrintOverview(g, print_opts)
+
+
+	# finally:	
 	# print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
-	print "*" * 30
+	print "-" * 10 
 	print "Time:	   %0.2fs" %  tTime
-		
 
-if __name__ == '__main__':
-	main(sys.argv[1:])
+
+
+ 
 	
+if __name__ == '__main__':
+	import sys
+	try:
+		main()
+		sys.exit(0)
+	except KeyboardInterrupt, e: # Ctrl-C
+		raise e
+
+
+
 	
 
