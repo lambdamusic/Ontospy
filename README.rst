@@ -14,7 +14,7 @@ The basic workflow is simple: load an ontology by instantiating the ``Ontology``
 For more up to date documentation, please visit https://github.com/lambdamusic/OntoSPy
 
 
-Example
+Example @check
 ---------------------------------------------------
 
 Import ontoSPy and instantiate the Ontology object with the FOAF ontology::

@@ -98,6 +98,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
+         'ontospy': ['data/schemas/*.*'],
          'ontospy': ['data/templates/*.*'],
     },
 
@@ -112,7 +113,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'sketchonto=ontospy.sketch:main',
+            'sketchonto=ontospy.tools.sketch:main',
         ],
     },
 )

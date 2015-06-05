@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; OntoSPy 1.2.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="OntoSPy 1.2.3 documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">OntoSPy 1.2.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>In this section we introduce the main features of DJFacet and the concept of faceted search.</p>
+<div class="section" id="what-are-dynamic-taxonomies-systems">
+<h2>What are dynamic taxonomies systems?<a class="headerlink" href="#what-are-dynamic-taxonomies-systems" title="Permalink to this headline">¶</a></h2>
+<p>Dynamic taxonomies systems, also known as faceted search systems, are one of the most recent advances in search interfaces of the last years.  In a nutshell, this approach allows users to explore a collection of information by <em>incrementally adding</em> or <em>removing</em> filters representing concepts that describe the information available.</p>
+<p>Dynamic taxonomies systems are currenlty used by dozens of web applications in e-commerce, e-government, cultural heritage and various other sectors.</p>
+<p>An introductory article on <a class="reference external" href="http://www.alistapart.com/articles/design-patterns-faceted-navigation/">A List Apart</a> describes faceted search as follows:</p>
+<div class="topic">
+<p class="topic-title first">A definition:</p>
+<p>The faceted navigation model leverages metadata fields and values to provide users with visible options for clarifying and refining queries. Faceted navigation [...] features an integrated, incremental search and browse experience that lets users begin with a classic keyword search and then scan a list of results. It also serves up a custom map (usually to the left of results) that provides insights into the content and its organization and offers a variety of useful next steps. That’s where faceted navigation proves its power. In keeping with the principles of progressive disclosure and incremental construction, users can formulate the equivalent of a sophisticated Boolean query by taking a series of small, simple steps.</p>
+</div>
+<p>This <a class="reference external" href="http://www.michelepasin.org/techblog/2009/03/05/faceted-browsing-a-conceptual-map/">mindmap</a> provides a lot more information about existing faceted browsers and the principles behind them. You do not need all this theory in order to set up DJFacet, but skimming through it might turn out to be useful for you. Alternatively, check out the <a class="reference internal" href="#learning"><span>Other learning resources</span></a> section at the bottom of this page.</p>
+</div>
+<div class="section" id="features-of-djfacet">
+<h2>Features of DJFacet<a class="headerlink" href="#features-of-djfacet" title="Permalink to this headline">¶</a></h2>
+<p>There are several faceted search systems out there, which vary a great degree in terms of the language they&#8217;re written in, the back-ends supported and obviously the user interface capabilities (wikipedia maintains an <a class="reference external" href="http://en.wikipedia.org/wiki/Faceted_search">extensive list</a> of them).</p>
+<p>DJFacet is entirely dependent on the Django Python framework, so if you&#8217;re using other environments unfortunately you won&#8217;t be able to enjoy the many features of DJFacet, which are:</p>
+<div class="section" id="simplicity">
+<h3>Simplicity<a class="headerlink" href="#simplicity" title="Permalink to this headline">¶</a></h3>
+<p>DJFacet has been designed so to be easy-to-use: installation and integration with existing Django projects doesn&#8217;t require more than a couple of hours, provided you&#8217;ve understood the principles behind the facets configuration.</p>
+</div>
+<div class="section" id="back-end-agnostic">
+<h3>Back-end agnostic<a class="headerlink" href="#back-end-agnostic" title="Permalink to this headline">¶</a></h3>
+<p>DJFacet rests on Django&#8217;s Database API, which provides a layer of abstraction between the raw SQL and Python. A number of relational databases are supported (<a class="reference external" href="https://docs.djangoproject.com/en/1.3/ref/settings/#engine">click here</a> to see a list). Even when other back-ends will be added in the future, DJFacet is guaranteed to keep working.</p>
+</div>
+<div class="section" id="minimal-look-feel">
+<h3>Minimal look&amp;feel<a class="headerlink" href="#minimal-look-feel" title="Permalink to this headline">¶</a></h3>
+<p>The user interface that comes by default with DJFacet is purposely minimal and thus easily modifiable. The search templates, organized via inheritance and inclusion mechanisms, can be singularly overridden when necessary.</p>
+</div>
+<div class="section" id="rest-architecture">
+<h3>REST architecture<a class="headerlink" href="#rest-architecture" title="Permalink to this headline">¶</a></h3>
+<p>DJFacet supports a REST architecture: every item in your database is represented uniquely using a deterministic algorithm. Moreover, every search page generates a unique url, thus your users can easily create bookmarks and use the browser&#8217;s back button.</p>
+</div>
+<div class="section" id="it-supports-pivoting">
+<h3>It supports pivoting<a class="headerlink" href="#it-supports-pivoting" title="Permalink to this headline">¶</a></h3>
+<p>Most faceted search systems available let you search for <em>one object-type</em> only (e.g., <em>cars</em>, or <em>products</em>), by manipulating facets representing some of its key features (e.g., <em>color</em>, <em>price</em>). If your information space is more complex, you might want to be able to use the facets to narrow down different <em>types</em> of result sets. For example, a bibliographical faceted search system could let users use the &#8216;publication-date&#8217; facet when searching for <em>books</em> or for <em>authors</em>.
+The technical term for this functionality is <em>pivoting</em>, and is a quite advanced feature in faceted search systems. In a nutshell, the type of objects being searched for can be <em>changed dynamically</em> while keeping the currently selected search options. As a results, you are effectively changing the main <em>perspective</em> (the <em>pivot</em>) of a search. This is possible because when the objects being searched for map to tables (i.e., Django models) that are connected in the database, we can use that connection to generate a new query. DJFacets architecture lets you define as many pivots as you like, just by adding a few extra lines of code.</p>
+</div>
+<div class="section" id="it-has-a-caching-system">
+<h3>It has a caching system<a class="headerlink" href="#it-has-a-caching-system" title="Permalink to this headline">¶</a></h3>
+<p>If the facets generated from your database have a large number of terms (also called <em>zoom points</em>) and you have several of these query-intensive facets, the loading time of the search interface could increase too much. To address this problem, DJFacet provides a dedicated caching system. By using a management command, you can pre-load all the facets and cache them for a quicker recollection when needed.</p>
+</div>
+<div class="section" id="it-s-still-being-improved">
+<h3>It&#8217;s still being improved...<a class="headerlink" href="#it-s-still-being-improved" title="Permalink to this headline">¶</a></h3>
+<p>DJFacet has various other features (hierarchical facets, custom facets) that are still in the making. Stay tuned for more!</p>
+</div>
+</div>
+<div class="section" id="key-terms">
+<span id="keyterms"></span><h2>Key terms<a class="headerlink" href="#key-terms" title="Permalink to this headline">¶</a></h2>
+<p>The following list provides some definitions for the most common concepts used in faceted search systems.</p>
+<div class="section" id="taxonomy">
+<h3>Taxonomy<a class="headerlink" href="#taxonomy" title="Permalink to this headline">¶</a></h3>
+<p>A taxonomy, or taxonomic scheme, is a particular classification (&#8220;the taxonomy of ...&#8221;), arranged in a <strong>hierarchical</strong> structure. Typically this is organized by supertype-subtype relationships, also called generalization-specialization relationships, or less formally, parent-child relationships.</p>
+</div>
+<div class="section" id="dynamic-taxonomy">
+<h3>Dynamic Taxonomy<a class="headerlink" href="#dynamic-taxonomy" title="Permalink to this headline">¶</a></h3>
+<p>Dynamic taxonomies (DT, also recently known as <strong>faceted search systems</strong>) are a general knowledge management model based on a multidimensional classification of heterogeneous data objects and are used to explore/browse complex information bases in a guided yet unconstrained way through a visual interface. The model is primarily concerned with user-centered access, and object classification is not addressed in the base model.</p>
+</div>
+<div class="section" id="facet">
+<h3>Facet<a class="headerlink" href="#facet" title="Permalink to this headline">¶</a></h3>
+<p>A facet comprises &#8220;clearly defined, mutually exclusive, and collectively exhaustive aspects, properties or characteristics of a class or specific subject&#8221;. For example, a collection of books might be classified using an <strong>author</strong> facet, a <strong>subject</strong> facet, a <strong>date</strong> facet, etc.</p>
+</div>
+<div class="section" id="facet-value">
+<h3>Facet-Value<a class="headerlink" href="#facet-value" title="Permalink to this headline">¶</a></h3>
+<p>A single entity within a facet; for example, the entity &#8216;<strong>history</strong>&#8216; within the <strong>subject</strong> facet. Facet-values are also known as <em>concepts</em>, <em>terms</em>, <em>zoom points</em> or <em>filters</em>.</p>
+</div>
+<div class="section" id="facets-group">
+<h3>Facets-Group<a class="headerlink" href="#facets-group" title="Permalink to this headline">¶</a></h3>
+<p>A set of facets which are grouped together because they share some intrinsic feature. For example, the <strong>author</strong> facet and <strong>publication-date</strong> facet can be grouped in the <strong>publication-information</strong> facet-group.</p>
+</div>
+<div class="section" id="zooming-in-out">
+<h3>Zooming in/out<a class="headerlink" href="#zooming-in-out" title="Permalink to this headline">¶</a></h3>
+<p>The action of narrowing/broadening a search space by selecting/deselecting facet-values.</p>
+</div>
+</div>
+<div class="section" id="other-learning-resources">
+<span id="learning"></span><h2>Other learning resources<a class="headerlink" href="#other-learning-resources" title="Permalink to this headline">¶</a></h2>
+<p>If you want to learn more about the theory and applications of faceted search systems, the resources listed below may be of help.</p>
+<p><strong>Introductory</strong> materials:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.alistapart.com/articles/design-patterns-faceted-navigation/">Design Patterns: Faceted Navigation</a>. An online article on <a class="reference external" href="http://www.alistapart.com/">http://www.alistapart.com/</a></li>
+<li><a class="reference external" href="http://www.webdesignpractices.com/navigation/facets.html">Use of Faceted Classification</a>. An online article on <a class="reference external" href="http://www.webdesignpractices.com">http://www.webdesignpractices.com</a></li>
+</ul>
+<p>More <strong>advanced</strong> resources:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://www.springer.com/computer/database+management+&amp;+information+retrieval/book/978-3-642-02358-3">Dynamic Taxonomies and Faceted Search</a>, Sacco, Giovanni Maria; Tzitzikas, Yannis (Eds.), Springer, 2009. This book contains an in-depth analysis of all aspects of dynamic taxonomies.</li>
+<li><a class="reference external" href="http://www.miskatonic.org/library/facet-biblio.html">Putting Facets on the Web: An Annotated Bibliography</a>. An online bibliography by Miskatonic University Press</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#what-are-dynamic-taxonomies-systems">What are dynamic taxonomies systems?</a></li>
+<li><a class="reference internal" href="#features-of-djfacet">Features of DJFacet</a><ul>
+<li><a class="reference internal" href="#simplicity">Simplicity</a></li>
+<li><a class="reference internal" href="#back-end-agnostic">Back-end agnostic</a></li>
+<li><a class="reference internal" href="#minimal-look-feel">Minimal look&amp;feel</a></li>
+<li><a class="reference internal" href="#rest-architecture">REST architecture</a></li>
+<li><a class="reference internal" href="#it-supports-pivoting">It supports pivoting</a></li>
+<li><a class="reference internal" href="#it-has-a-caching-system">It has a caching system</a></li>
+<li><a class="reference internal" href="#it-s-still-being-improved">It&#8217;s still being improved...</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-terms">Key terms</a><ul>
+<li><a class="reference internal" href="#taxonomy">Taxonomy</a></li>
+<li><a class="reference internal" href="#dynamic-taxonomy">Dynamic Taxonomy</a></li>
+<li><a class="reference internal" href="#facet">Facet</a></li>
+<li><a class="reference internal" href="#facet-value">Facet-Value</a></li>
+<li><a class="reference internal" href="#facets-group">Facets-Group</a></li>
+<li><a class="reference internal" href="#zooming-in-out">Zooming in/out</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-learning-resources">Other learning resources</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/intro.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">OntoSPy 1.2.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Michele Pasin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -25,7 +25,7 @@ Originally, I developed this script in order to get the hang of the Python RDFLi
 
 OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
 
-The basic worflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic workflow is simple: load a graph instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
 
 Ps: the library can be used in standalone mode too.
 
@@ -36,7 +36,7 @@ Examples
 These are some basic examples that should be enough to get you started. More extensive documentation will (hopefully) be made available soon!
 
 
-####Inspecting an ontology from the command line
+####Inspecting an ontology from the command line @check
 
 You can use the `ontospy` script from a terminal to print out basic info about any RDF model. 
 
@@ -47,7 +47,7 @@ More options are available; use `-h` to list them all:
 	> python ontospy.py -h
 
 
-####Loading and querying the FOAF ontology
+####Loading and querying the FOAF ontology @check
 
 
 
@@ -117,7 +117,7 @@ More options are available; use `-h` to list them all:
 
 
 
-#### Creating a Turtle sketch
+#### Creating a Turtle sketch @check
 
 The library includes a little utility called `sketch.py`. 
 
