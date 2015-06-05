@@ -1,10 +1,10 @@
-OntosPy
+OntoSPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 
 #### Version: 
-Check the ``__init__.py`` file
+Check the ``ontospy/_version.py`` file
 
 
 ####Installation:
@@ -30,22 +30,28 @@ The basic worflow is simple: load an ontology by instantiating the ``Ontology`` 
 Ps: the library can be used in standalone mode too.
 
 
-Example: inspecting an ontology from the command line
------------------------
-You can use the `ontospy` script to print out in the terminal some basic info any RDF ontology. 
+Examples
+----------
+
+These are some basic examples that should be enough to get you started. More extensive documentation will (hopefully) be made available soon!
+
+
+####Inspecting an ontology from the command line
+
+You can use the `ontospy` script from a terminal to print out basic info about any RDF model. 
 
 	> python ontospy.py <ontology-uri>
 
-To see the latest options available use:
+More options are available; use `-h` to list them all:
 	
 	> python ontospy.py -h
 
 
-Example: loading and querying the foaf ontology using python
------------------------
+####Loading and querying the FOAF ontology
 
 
-	In [1]: from ontospy import *
+
+	In [1]: from ontospy.ontospy import *
 
 	In [2]: onto = Ontology("http://xmlns.com/foaf/spec/20100809.rdf")
 
@@ -111,13 +117,17 @@ Example: loading and querying the foaf ontology using python
 
 
 
-Example: sketching a turtle model
------------------------
+#### Creating a Turtle sketch
+
 The library includes a little utility called `sketch.py`. 
 
-This is meant to be used from the command line (Tip: make this file executable: chmod +x sketch.py) and essentially loads up an interactive python environment where you can quickly sketch out an rdf model in turtle. 
+This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.
 
-	[michele.pasin]@here:~/code/python>sketch.py 
+It is meant to be used from the command line (tip: make this file executable: `chmod +x sketch.py`) and requires you to type in RDF statements using the Turtle serialization. 
+
+*Note*: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to `usr/local/bin` (on unix-based systems). You can run it by typing `sketchonto`. 
+
+	[lambdamusic]@here:~/code/python>sketch.py 
 	Good morning. Ready to Turtle away. Type docs() for help.
 	In [1]: docs()
 

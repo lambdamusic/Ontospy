@@ -22,32 +22,14 @@ import sys, os, urllib2, optparse
 
 import rdflib	 # so we have it available as a namespace
 from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
-from vocabs import OWL, DUBLINCORE as DC
-from vocabs import famous as FAMOUS_ONTOLOGIES 
-
-from lib.utils import *
 
 
+from libs.utils import *
+import libs.OWL
+import libs.DUBLINCORE as DC
+import libs.famous as FAMOUS_ONTOLOGIES
 
-##################
-#
-#  metadata
-#
-##################
-
-
-
-__version__ = "1.2.0"
-__copyright__ = "CopyRight (C) 2015 by Michele Pasin"
-__license__ = "MIT"
-__author__ = "Michele Pasin"
-__author_email__ = "michele dot pasin at gmail dot com"
-
-USAGE = "%prog <ontology-uri> [options]"
-VERSION = "%prog v" + __version__
-
-AGENT = "%s/%s" % (__name__, __version__)
-
+from _version import *
 
 
 
@@ -304,7 +286,7 @@ class Ontology(object):
 		if self.ontologyURI:
 			# return entityTriples(self, self.ontologyURI, niceURI=niceURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)
 			
-			return [(uri2niceString(y, self.ontologyNamespaces), z) for y,z in entityTriples(self.rdfGraph, self.ontologyURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)]
+			return [(uri2niceString(y, self.ontologyNamespaces), uri2niceString(z, self.ontologyNamespaces)) for y,z in entityTriples(self.rdfGraph, self.ontologyURI, excludeProps=excludeProps, excludeBNodes = excludeBNodes)]
 		
 
 
@@ -1330,7 +1312,7 @@ class Ontology(object):
 			# just opens a d3 file
 			thisdir = os.path.dirname(os.path.realpath(__file__))		
 			print thisdir
-			webbrowser.open('file://'+thisdir+"/htmltemplates/forcedirected.html")
+			webbrowser.open('file://'+thisdir+"/data/templates/forcedirected.html")
 			
 					
 		if True:
@@ -1346,28 +1328,21 @@ class Ontology(object):
 			thisdir = os.path.dirname(os.path.realpath(__file__))
 			
 			#open the file
-			filein = open(thisdir + '/htmltemplates/forceDirectedTemplate.html' )
+			filein = open(thisdir + '/data/templates/forceDirectedTemplate.html' )
 			#read it
 			src = Template( filein.read() )
 			#do the substitution called $graphedges in html file
 
-			fileout = open("tempviz.html", "w")
+			from os.path import expanduser
+			home = expanduser("~")
+			location = home + "/ontospy-viz.html"
+			
+			
+			fileout = open(location, "w")
 			fileout.write(src.substitute({'graphedges' : ss}))
 			fileout.close()
-			webbrowser.open('file://'+os.path.realpath("tempviz.html"))
-
-
-
-
-
-
-
-
-
-
-
-
-
+			# webbrowser.open('file://'+os.path.realpath("ontospy-viz.html"))
+			webbrowser.open('file://'+location) # note: requires 2 forwards slashes + 1 for path
 
 
 
@@ -1379,7 +1354,7 @@ class Ontology(object):
 
 ##################
 # 
-#  IF USING THIS SCRIPT IN STANDALONE MODE:
+#  STANDALONE MODE:
 #
 ##################
 
@@ -1446,77 +1421,3 @@ if __name__ == '__main__':
 	except KeyboardInterrupt, e: # Ctrl-C
 		raise e
 
-
-#
-#
-# #
-# #
-# # ===========
-# # OLD MAIN
-# # ===========
-#
-#
-#
-#
-#
-#
-# def main(argv):
-# 	"""
-# 	If you run this script from the command line and pass it a URI as an argument it will return
-# 	information about the ontology data it found.
-#
-# 	(note: if not URI is provided, it defaults to the FOAF vocabulary
-#
-# 	So
-#
-# 	>>> python ontospy.py
-#
-# 	Is equivalent to
-#
-# 	>>> python ontospy.py http://xmlns.com/foaf/0.1/
-#
-# 	"""
-# 	if argv:
-# 		onto = Ontology(argv[0])
-# 	else:
-# 		onto = Ontology(DEFAULT_ONTO)
-#
-# 	rdfGraph = onto.rdfGraph
-#
-# 	print "_" * 50, "\n"
-# 	print "TRIPLES = %s" % len(rdfGraph)
-# 	print "_" * 50
-# 	print "\nNAMESPACES:\n"
-# 	for x in onto.ontologyNamespaces:
-# 		print "%s : %s" % (x[0], x[1])
-#
-#
-#
-# 	print "_" * 50, "\n"
-# 	print "ONTOLOGY METADATA:\n"
-# 	for x, y in onto.ontologyAnnotations():
-# 		print "%s: \n    %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
-# 	print "_" * 50, "\n"
-#
-#
-# 	print "CLASS TAXONOMY:\n"
-# 	onto.printClassTree()
-# 	print "_" * 50, "\n"
-#
-#
-# 	# last two methods can be set to True on demand
-#
-# 	if True:
-# 		printClassInformation(onto)
-#
-# 	if False:
-# 		onto.drawOntograph(rdfGraph, '/tmp/graph.png')
-#
-#
-#
-#
-#
-#
-#
-# if __name__ == '__main__':
-# 	main(sys.argv[1:])

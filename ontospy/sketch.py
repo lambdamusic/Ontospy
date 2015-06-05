@@ -67,10 +67,6 @@ class Sketch(object):
 					("xml", "http://www.w3.org/XML/1998/namespace"),
 					("xsd", "http://www.w3.org/2001/XMLSchema#"),
 					('foaf', "http://xmlns.com/foaf/0.1/"),
-					("npg", "http://ns.nature.com/terms/"),
-					("npgg", "http://ns.nature.com/graphs/"),
-					("npgx", "http://ns.nature.com/extensions/"),
-					("bibo", "http://purl.org/ontology/bibo/"),
 					("skos", "http://www.w3.org/2004/02/skos/core#"),
 					("owl", "http://www.w3.org/2002/07/owl#"),
 					]

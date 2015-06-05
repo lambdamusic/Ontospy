@@ -37,6 +37,4 @@ nosetests.xml
 # mac stuff
 .DS_Store
 
-testing
-ontologies
 dev
