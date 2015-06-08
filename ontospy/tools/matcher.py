@@ -4,6 +4,7 @@
 
 """
 >python tools/matcher.py data/schemas/npgcore_latest.ttl data/schemas/foaf.rdf 
+
 Loaded 630 triples
 started scanning...
 ----------
@@ -73,25 +74,25 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv"):
 	counter = 0
 	
 	try:
-		writer = csv.writer(f)
+		writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
 		writer.writerow( ('entity name source', 'entity name destination', 'entity uri source', 'entity uri destination') )
 		
 		for x in graph1.classes:
-			l1 = str(x.bestLabel())
+			l1 = unicode(x.bestLabel())
 		
 			for y in graph2.classes:
-				l2 = str(y.bestLabel())
+				l2 = unicode(y.bestLabel())
 						
 				if similar(l1, l2) > confidence:	
-					counter += 1				
-					writer.writerow([l1, l2, x.uri, y.uri])
+					counter += 1		
+					row = [l1, l2, x.uri, y.uri]		
+					writer.writerow([s.encode('utf8') if type(s) is unicode else s for s in row])
 
 
 	finally:
 		f.close()
 		
 	printDebug("%d candidates found." % counter)
-				
 				
 
 
