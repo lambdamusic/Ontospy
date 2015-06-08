@@ -78,10 +78,10 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv"):
 		writer.writerow( ('entity name source', 'entity name destination', 'entity uri source', 'entity uri destination') )
 		
 		for x in graph1.classes:
-			l1 = unicode(x.bestLabel())
+			l1 = unicode(x.bestLabel(qname_allowed=True))
 		
 			for y in graph2.classes:
-				l2 = unicode(y.bestLabel())
+				l2 = unicode(y.bestLabel(qname_allowed=True))
 						
 				if similar(l1, l2) > confidence:	
 					counter += 1		
