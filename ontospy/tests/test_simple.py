@@ -32,12 +32,12 @@ class TestLoadOntologies(unittest.TestCase):
 		
 		for f in os.listdir(DATA_FOLDER):
 			if not f.startswith('.'):
-				print "Loading... >", f		
+				print "\nLoading... >", f		
 				
 				o = ontospy.Graph(DATA_FOLDER + f)
 				
 				# self.assertEqual(type(o), ontospy.Ontology)
-				print "Success."
+				print "Success.\n"
 
 
 	#

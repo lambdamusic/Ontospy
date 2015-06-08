@@ -26,11 +26,15 @@ class RDF_Entity(object):
 		
 		self.uri = uri # rdflib.Uriref
 		self.qname = self.__buildQname(namespaces)	
+		self.locale	 = inferURILocalSymbol(self.uri)[0]
 		self.rdftype = rdftype	
 		self.triples = None
 		self.rdfgraph = rdflib.Graph()
 
-
+		self._children = []
+		self._parents = []
+		# self.siblings = []
+		
 	def serialize(self, format="turtle"):
 		if self.triples:
 			if not self.rdfgraph:
@@ -50,6 +54,7 @@ class RDF_Entity(object):
 			printDebug(bcolors.BLUE + ".... " + unicode(x[2]) + bcolors.ENDC) 
 
 	def __buildQname(self, namespaces):
+		""" extracts a qualified name for a uri """
 		return uri2niceString(self.uri, namespaces)
 
 	def _buildGraph(self):
@@ -67,8 +72,8 @@ class RDF_Entity(object):
 		""" returns all ancestors in the taxonomy """
 		if not cl:
 			cl = self
-		if cl.parents:
-			for x in cl.parents:
+		if cl.parents():
+			for x in cl.parents():
 				return [x] + self.ancestors(x)
 		else:
 			return []	
@@ -83,7 +88,32 @@ class RDF_Entity(object):
 		else:
 			return []
 
+	def parents(self):
+		"""wrapper around property"""
+		return self._parents
 
+	def children(self):
+		"""wrapper around property"""
+		return self._children
+
+	def getproperty(self, aPropURIRef):
+		""" 
+		generic way to extract some prop value eg
+			In [11]: c.getproperty(rdflib.RDF.type)
+			Out[11]: 
+			[rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class'),
+			 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')]
+		"""
+		return list(self.rdfgraph.objects(None, aPropURIRef))
+
+	def bestLabel(self):
+		""" returns the best available label for an entity """
+		if self.getproperty(rdflib.RDFS.label):
+			return self.getproperty(RDFS.label)[0]
+		elif self.getproperty(rdflib.namespace.SKOS.prefLabel):
+			return self.getproperty(rdflib.namespace.SKOS.prefLabel)[0]
+		else:
+			return self.locale
 
 
 
@@ -158,13 +188,7 @@ class OntoClass(RDF_Entity):
 		...
 		"""
 		super(OntoClass, self).__init__(uri, rdftype, namespaces)
-		# self.uri = uri
-		# self.qname = self.__buildQname(namespaces)
 
-		self.children = []
-		self.parents = []
-		# self.siblings = []
-		
 		self.domain_of = []
 		self.range_of = []
 		
@@ -179,8 +203,8 @@ class OntoClass(RDF_Entity):
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()
-		printDebug("Parents......: %d" % len(self.parents))
-		printDebug("Children.....: %d" % len(self.children))
+		printDebug("Parents......: %d" % len(self.parents()))
+		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
 		printDebug("Descendants..: %d" % len(self.descendants()))
 		printDebug("Domain of....: %d" % len(self.domain_of))
@@ -214,10 +238,6 @@ class OntoProperty(RDF_Entity):
 		"""
 		super(OntoProperty, self).__init__(uri, rdftype, namespaces)
 
-		self.children = []
-		self.parents = []
-		# self.siblings = []
-		
 		self.rdftype = inferMainPropertyType(rdftype)
 		
 		self.domains = []
@@ -235,8 +255,8 @@ class OntoProperty(RDF_Entity):
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()
-		printDebug("Parents......: %d" % len(self.parents))
-		printDebug("Children.....: %d" % len(self.children))
+		printDebug("Parents......: %d" % len(self.parents()))
+		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
 		printDebug("Descendants..: %d" % len(self.descendants()))
 		printDebug("Has Domain...: %d" % len(self.domains))

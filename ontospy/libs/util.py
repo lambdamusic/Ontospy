@@ -80,6 +80,7 @@ def inferMainPropertyType(uriref):
 
 
 
+
 def printGenericTree(element, level=0, showids=True):
 	""" 
 	Print nicely into stdout the taxonomical tree of an ontology. 
@@ -100,7 +101,7 @@ def printGenericTree(element, level=0, showids=True):
 		_id_ = ""
 	
 	printDebug("%s%s%s" % (_id_ , "-" * 4 * level, element.qname))
-	for sub in element.children:
+	for sub in element.children():
 		printGenericTree(sub, (level + 1), showids)
 	
 	
@@ -223,7 +224,8 @@ def inferNamespacePrefix(aUri):
 	""" 
 	From a URI returns the last bit and simulates a namespace prefix when rendering the ontology.
 
-	eg from <'http://www.w3.org/2008/05/skos#'> it returns the 'skos' string 
+	eg from <'http://www.w3.org/2008/05/skos#'> 
+		it returns the 'skos' string 
 	"""
 	stringa = aUri.__str__()
 	try:
@@ -234,7 +236,7 @@ def inferNamespacePrefix(aUri):
 
 
 
-def splitNameFromNamespace(aUri):
+def inferURILocalSymbol(aUri):
 	""" 
 	From a URI returns a tuple (namespace, uri-last-bit)
 

@@ -1,12 +1,27 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+
+
+"""
+ONTOSPY
+Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+
+Run it from the command line by passing it an ontology URI. 
+
+>>> python ontospy.py -h
+
+More info in the README file.
+
+"""
+
+
 import sys, os, urllib2, time, optparse
 
-import rdflib	 # so we have it available as a namespace
-from rdflib import Namespace, exceptions, URIRef, RDFS, RDF, BNode
-from rdflib.namespace import OWL, DC
+import rdflib
 
 from libs.util import *
 from libs.entities import *
-
 from libs.queryHelper import QueryHelper
 
 from _version import *
@@ -86,16 +101,14 @@ class Graph(object):
 		else:
 
 			if type(source) == type("string"):
-				self.IS_URL = True
-				
+				self.IS_URL = True				
 				if source.startswith("www."): #support for lazy people
 					source = "http://%s" % str(source)
 				self.graphuri = source	# default uri is www location
 				rdf_format = rdf_format or guess_fileformat(source)
 
 			elif type(source) == file:
-				self.IS_FILE = True
-				
+				self.IS_FILE = True				
 				self.graphuri = source.name # default uri is filename
 				rdf_format = rdf_format or guess_fileformat(source.name)
 			
@@ -131,15 +144,13 @@ class Graph(object):
 		return list(qres)
 			
 
-	def __extractNamespaces(self, only_base = False):
+	def __extractNamespaces(self):
 		""" 
-		Extract graph namespaces. Returns either the base namespace only, or all of them.
+		Extract graph namespaces.
 		Namespaces are given in this format:
 
 			In [01]: for x in graph.namespaces():
 					....:			print x
-					....:
-					....:
 			('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
 			('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
 			(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
@@ -151,31 +162,17 @@ class Graph(object):
 		"""
 
 		exit = []
+
 		if self.IS_ENDPOINT==True:
 			return False
+
 		else:
-			if only_base:
-				ll = [x for x in self.rdfgraph.namespaces() if x[0] == '']
-				exit = ll[0][1] if ll else None
-			else:
-				out = []
-				for x in self.rdfgraph.namespaces():
-					if x[0]:
-						out.append(x)
-					else: 
-						# if the namespace is blank (== we have a base namespace)
-						prefix = inferNamespacePrefix(x[1])
-						if prefix:
-							out.append((prefix, x[1]))
-						else:
-							out.append(('base', x[1]))
-				if self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
-					# if not base namespace is set, try to simulate one
-					out.append(('', self.graphuri))	 # use to be '_temp' ... WHY?
-		
-				exit = sorted(out)
-		# finally..
-		self.namespaces = exit
+			
+			if self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
+				# if not base namespace is set, try to simulate one 
+				self.rdfgraph.bind("_file_", rdflib.Namespace(self.graphuri))
+	
+			self.namespaces = sorted(self.rdfgraph.namespaces())
 		
 
 
@@ -206,13 +203,13 @@ class Graph(object):
 		printDebug("Ontologies found: %d" % len(self.ontologies))
 						
 		self.__extractClasses()
-		printDebug("Classes	   found: %d" % len(self.classes))
+		printDebug("Classes found...: %d" % len(self.classes))
 		
 		self.__extractProperties()
 		printDebug("Properties found: %d" % len(self.properties))
-		printDebug("...Annotation	: %d" % len(self.annotationProperties))
-		printDebug("...Datatype		: %d" % len(self.datatypeProperties))
-		printDebug("...Object		: %d" % len(self.objectProperties))
+		printDebug("Annotation......: %d" % len(self.annotationProperties))
+		printDebug("Datatype........: %d" % len(self.datatypeProperties))
+		printDebug("Object..........: %d" % len(self.objectProperties))
 		
 		self.__computeTopLayer()
 
@@ -257,7 +254,8 @@ class Graph(object):
 			
 			
 		else:
-			printDebug("No owl:Ontologies found")
+			pass
+			# printDebug("No owl:Ontologies found")
 			
 		#finally		
 		self.ontologies = out
@@ -281,21 +279,35 @@ class Graph(object):
 		2015-06-04: removed sparql 1.1 queries
 		2015-05-25: optimized via sparql queries in order to remove BNodes
 		2015-05-09: new attempt 
+		
+		Note: queryHelper.getAllClasses() returns a list of tuples, 
+		(class, classRDFtype) 
+		so in some cases that's duplicates if a class is both RDFS.CLass and OWL.Class
+		In this case we keep only OWL.Class as it is more informative.
 		"""
 		self.classes = [] # @todo: keep adding? 
 		
 		qres = self.queryHelper.getAllClasses()
-		# instantiate classes 
-		
+
 		for candidate in qres:
-			# tip: OntoClass(uri, rdftype=None, namespaces = None)
-			self.classes += [OntoClass(candidate[0], candidate[1], self.namespaces)]
+			
+			test_existing_cl = self.getClass(uri=candidate[0])
+			if not test_existing_cl:
+				# create it
+				self.classes += [OntoClass(candidate[0], candidate[1], self.namespaces)]
+			else:
+				# update it
+				if candidate[1] == rdflib.OWL.Class:
+					# prefer OWL.Class over RDFS.Class
+					test_existing_cl.rdftype = rdflib.OWL.Class 
+					
 				
 		
 		#add more data
 		for aClass in self.classes:
 			
 			aClass.triples = self.queryHelper.entityTriples(aClass.uri)
+			aClass._buildGraph() # force construction of mini graph
 					
 			# add direct Supers				
 			directSupers = self.queryHelper.getClassDirectSupers(aClass.uri)
@@ -303,19 +315,24 @@ class Graph(object):
 			for x in directSupers:
 				superclass = self.getClass(uri=x[0])
 				if superclass: 
-					aClass.parents.append(superclass)
+					aClass._parents.append(superclass)
 					
 					# add inverse relationships (= direct subs for superclass)
-					if aClass not in superclass.children:
-						 superclass.children.append(aClass)
+					if aClass not in superclass.children():
+						 superclass._children.append(aClass)
 			
 
 
 
-	def __extractProperties(self, removeBlankNodes = True):
+	def __extractProperties(self):
 		""" 
 		2015-06-04: removed sparql 1.1 queries
-		2015-06-03: analogous to get classes		
+		2015-06-03: analogous to get classes	
+		
+		# instantiate properties making sure duplicates are pruned
+		# but the most specific rdftype is kept 
+		# eg OWL:ObjectProperty over RDF:property
+			
 		"""
 		self.properties = [] # @todo: keep adding? 
 		self.annotationProperties = [] 
@@ -323,14 +340,17 @@ class Graph(object):
 		self.datatypeProperties = [] 
 		
 		qres = self.queryHelper.getAllProperties()
-		
-		# instantiate properties 
-		
+				
 		for candidate in qres:
-			if removeBlankNodes and isBlankNode(candidate[0]):
-				pass
-			else: # tip: candidate[1] is the RDF type of the property
+
+			test_existing_prop = self.getProperty(uri=candidate[0])
+			if not test_existing_prop:
+				# create it
 				self.properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
+			else:
+				# update it
+				if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
+					test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
 
 
 		#add more data
@@ -356,11 +376,11 @@ class Graph(object):
 			for x in directSupers:
 				superprop = self.getProperty(uri=x[0])
 				if superprop: 
-					aProp.parents.append(superprop)
+					aProp._parents.append(superprop)
 				
 					# add inverse relationships (= direct subs for superprop)
-					if aProp not in superprop.children:
-						 superprop.children.append(aProp)
+					if aProp not in superprop.children():
+						 superprop._children.append(aProp)
 		
 					
 					
@@ -449,14 +469,14 @@ class Graph(object):
 
 		exit = []
 		for c in self.classes:
-			if not c.parents:
+			if not c.parents():
 				exit += [c]
 		self.toplayer = exit # sorted(exit, key=lambda x: x.id) # doesnt work
 
 		# properties 
 		exit = []
 		for c in self.properties:
-			if not c.parents:
+			if not c.parents():
 				exit += [c]
 		self.toplayerProperties = exit # sorted(exit, key=lambda x: x.id) # doesnt work
 		
@@ -551,7 +571,7 @@ def shellPrintOverview(g, opts):
 	ontologies = g.ontologies
 	
 	for o in ontologies:
-		print "-----------\nMetadata:"
+		print "-----------\nMetadata:\n"
 		o.printTriples()
 		
 	if False:
@@ -609,8 +629,8 @@ def parse_options():
 	opts, args = parser.parse_args()
 
 	# if len(args) < 1:
-	# 	parser.print_help()
-	# 	raise SystemExit, 1
+	#	parser.print_help()
+	#	raise SystemExit, 1
 
 	return opts, args
 

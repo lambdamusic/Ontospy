@@ -12,8 +12,8 @@ Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 
 import rdflib
-from rdflib import RDFS, RDF, BNode
-from rdflib.namespace import OWL, DC
+# from rdflib import RDFS, RDF, BNode
+# from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
 
@@ -29,7 +29,13 @@ class QueryHelper(object):
 	def __init__(self, rdfgraph):
 		super(QueryHelper, self).__init__() 
 		self.rdfgraph = rdfgraph
-
+		
+		# Bind a few prefix, namespace pairs for easier sparql querying
+		self.rdfgraph.bind("rdf", rdflib.namespace.RDF)
+		self.rdfgraph.bind("rdfs", rdflib.namespace.RDFS)
+		self.rdfgraph.bind("owl", rdflib.namespace.OWL)
+		self.rdfgraph.bind("skos", rdflib.namespace.SKOS)
+		
 		
 	def getOntology(self):
 		qres = self.rdfgraph.query(
@@ -182,6 +188,8 @@ class QueryHelper(object):
 							 { ?x a owl:AnnotationProperty }
 						} . 
 						?x a ?c 
+   					 FILTER(!isBlank(?x)
+   					   ) .
 					} ORDER BY	?c ?x
 				 """)
 		return list(qres)
