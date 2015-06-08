@@ -30,9 +30,9 @@ class bcolors:
 	BLUE = '\033[94m'  # blue
 	GREEN = '\033[92m' # green
 	YELLOW = '\033[93m' # yellow
-	RED = '\033[91m'    # red
-	ENDC = '\033[0m'     
-	BOLD = '\033[1m'     # bold black
+	RED = '\033[91m'	# red
+	ENDC = '\033[0m'	 
+	BOLD = '\033[1m'	 # bold black
 	UNDERLINE = '\033[4m'  # underline (note: must be ended)
 
 
@@ -54,8 +54,8 @@ def inferMainPropertyType(uriref):
 	(without the OWL ontology - which would be the propert way)
 	
 	In [3]: for x in g.properties:
-	   ...:     print x.rdftype
-	   ...:     
+	   ...:		print x.rdftype
+	   ...:		
 	http://www.w3.org/2002/07/owl#FunctionalProperty
 	http://www.w3.org/2002/07/owl#FunctionalProperty
 	http://www.w3.org/2002/07/owl#InverseFunctionalProperty
@@ -81,7 +81,7 @@ def inferMainPropertyType(uriref):
 
 
 
-def printGenericTree(element, level=0, showids=True):
+def printGenericTree(element, level=0, showids=True, labels=False):
 	""" 
 	Print nicely into stdout the taxonomical tree of an ontology. 
 	
@@ -94,18 +94,47 @@ def printGenericTree(element, level=0, showids=True):
 	"""
 
 	if showids:
-		_id_ = bcolors.GREEN +  \
+		_id_ = bcolors.BLUE +	\
 		"[%d]%s" % (element.id, " " * (4  - len(str(element.id)))) +  \
 			bcolors.ENDC
 	else:
 		_id_ = ""
 	
-	printDebug("%s%s%s" % (_id_ , "-" * 4 * level, element.qname))
+	if labels:
+		bestLabel = element.bestLabel(qname_allowed=False)
+		if bestLabel:
+			bestLabel = bcolors.PINK + " (\"%s\")" % bestLabel + bcolors.ENDC
+	else:
+		bestLabel = ""
+		
+	printDebug("%s%s%s%s" % (_id_ , "-" * 4 * level, element.qname, bestLabel))
 	for sub in element.children():
-		printGenericTree(sub, (level + 1), showids)
+		printGenericTree(sub, (level + 1), showids, labels)
 	
 	
+
+def firstStringInList(literalEntities, prefLanguage="en"):
+	"""
+	from a list of literals, returns the one in prefLanguage
+	if no language specification is available, return first element 
+	"""
+	match = ""
 	
+	if len(literalEntities) == 1:
+		match = literalEntities[0]
+	elif len(literalEntities) > 1:
+		for x in literalEntities:
+			if getattr(x, 'language') and  getattr(x, 'language') == prefLanguage:
+				match = x
+		if not match: # don't bother about language
+			match = literalEntities[0]
+	return match
+
+def firstEnglishStringInList(literalEntities,): 
+	return firstStringInList(literalEntities, "en")
+
+
+
 
 		
 # ========
@@ -489,30 +518,24 @@ def printBasicInfo(onto):
 
 
 
-def remove_duplicates(seq, idfun=None):
+def remove_duplicates(seq, idfun=None): 
 	""" removes duplicates from a list, order preserving, as found in
 	http://www.peterbe.com/plog/uniqifiers-benchmark
 	"""
-	if seq:
-		if idfun is None:
-			def idfun(x): return x
-		seen = {}
-		result = []
-		for item in seq:
-			marker = idfun(item)
-			# in old Python versions:
-			# if seen.has_key(marker)
-			# but in new ones:
-			if marker in seen: continue
-			seen[marker] = 1
-		printGenericTree(item)
-		return result
-	else:
-		return []
-
-
-
-
+	# order preserving
+	if idfun is None:
+		def idfun(x): return x
+	seen = {}
+	result = []
+	for item in seq:
+		marker = idfun(item)
+		# in old Python versions:
+		# if seen.has_key(marker)
+		# but in new ones:
+		if marker in seen: continue
+		seen[marker] = 1
+		result.append(item)
+	return result
 
 
 

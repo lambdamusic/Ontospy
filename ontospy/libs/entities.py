@@ -68,25 +68,39 @@ class RDF_Entity(object):
 
 	# methods added to RDF_Entity even though they apply only to some subs
 				
-	def ancestors(self, cl=None):
+	def ancestors(self, cl=None, noduplicates=True):
 		""" returns all ancestors in the taxonomy """
 		if not cl:
 			cl = self
 		if cl.parents():
+			bag = []
 			for x in cl.parents():
-				return [x] + self.ancestors(x)
+				bag += [x] + self.ancestors(x, noduplicates)
+			# finally:
+			if noduplicates:
+				return remove_duplicates(bag) 
+			else:
+				return bag
 		else:
 			return []	
-	
-	def descendants(self, cl=None):
+
+		
+	def descendants(self, cl=None, noduplicates=True):
 		""" returns all descendants in the taxonomy """
 		if not cl:
 			cl = self
-		if cl.children:
-			for x in cl.children:
-				return [x] + self.descendants(x)
+		if cl.children():
+			bag = []
+			for x in cl.children():
+				bag += [x] + self.descendants(x, noduplicates)
+			# finally:
+			if noduplicates:
+				return remove_duplicates(bag) 
+			else:
+				return bag
 		else:
 			return []
+
 
 	def parents(self):
 		"""wrapper around property"""
@@ -96,25 +110,39 @@ class RDF_Entity(object):
 		"""wrapper around property"""
 		return self._children
 
-	def getproperty(self, aPropURIRef):
+	def getValuesForProperty(self, aPropURIRef):
 		""" 
 		generic way to extract some prop value eg
-			In [11]: c.getproperty(rdflib.RDF.type)
+			In [11]: c.getValuesForProperty(rdflib.RDF.type)
 			Out[11]: 
 			[rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class'),
 			 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')]
 		"""
 		return list(self.rdfgraph.objects(None, aPropURIRef))
+					
 
-	def bestLabel(self):
-		""" returns the best available label for an entity """
-		if self.getproperty(rdflib.RDFS.label):
-			return self.getproperty(RDFS.label)[0]
-		elif self.getproperty(rdflib.namespace.SKOS.prefLabel):
-			return self.getproperty(rdflib.namespace.SKOS.prefLabel)[0]
+	def bestLabel(self, prefLanguage="en", qname_allowed=True):
+		"""
+		facility for extrating the best available label for an entity
+
+		..This checks RFDS.label, SKOS.prefLabel and finally the qname local component
+		"""
+
+		test = self.getValuesForProperty(rdflib.RDFS.label)
+		
+		if test:
+			return firstEnglishStringInList(test)
 		else:
-			return self.locale
+			test = self.getValuesForProperty(rdflib.namespace.SKOS.prefLabel)
+			if test:
+				return firstEnglishStringInList(test)
+			else:
+				if qname_allowed:
+					return self.locale
+				else:
+					return ""
 
+				
 
 
 class Ontology(RDF_Entity):
