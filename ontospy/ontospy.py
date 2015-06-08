@@ -120,11 +120,13 @@ class Graph(object):
 		try:
 			if self.IS_TEXT == True:			
 				self.rdfgraph.parse(data=source, format=rdf_format)
+				printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
 			else:
 				self.rdfgraph.parse(source, format=rdf_format)
+				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
 			# set up the query helper too
 			self.queryHelper = QueryHelper(self.rdfgraph)	
-			printDebug("Loaded %d triples" % len(self.rdfgraph))
+			
 		
 		except:
 			printDebug("\nError Parsing Graph (assuming RDF serialization was *%s*)\n" % (rdf_format))	 
