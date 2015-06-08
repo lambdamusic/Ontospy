@@ -483,7 +483,7 @@ class Graph(object):
 		self.toplayerProperties = exit # sorted(exit, key=lambda x: x.id) # doesnt work
 		
 
-	def printClassTree(self, element = 0, level=0, showids=True):
+	def printClassTree(self, element = None, showids=True, labels=False):
 		""" 
 		Print nicely into stdout the class tree of an ontology 
 		
@@ -495,14 +495,13 @@ class Graph(object):
 		
 		if not element:	 # first time
 			for x in self.toplayer:
-				# NOTE: this is the util.printClassTree
-				printGenericTree(x, level, showids)
+				printGenericTree(x, 0, showids, labels)
 		
 		else:
-			printGenericTree(element)		
+			printGenericTree(element, 0, showids, labels)		
 
 
-	def printPropertyTree(self, element = 0, level=0, showids=True):
+	def printPropertyTree(self, element = None, level=0, showids=True, labels=False):
 		""" 
 		Print nicely into stdout the property tree of an ontology 
 		
@@ -514,11 +513,10 @@ class Graph(object):
 		
 		if not element:	 # first time
 			for x in self.toplayerProperties:
-				# NOTE: this is the util.printPropertyTree
-				printGenericTree(x, level, showids)
+				printGenericTree(x, 0, level, showids)
 		
 		else:
-			printGenericTree(element)
+			printGenericTree(element, 0, showids, labels)
 			
 			
 
