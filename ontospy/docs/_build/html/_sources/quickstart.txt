@@ -3,6 +3,23 @@ Quick Start
 For the ones who have little time
 
 
+Running the tests
+++++++++++++++++++++++++++++++++++++++++++++
+Make sure you're in the ontospy root folder 
+
+.. code-block:: python
+
+    [michele.pasin]@Tartaruga:~/ontospy>python tests/test_simple.py 
+    -------------------
+    OntosPy version:  %prog v2.0.0 
+    -------------------
+
+    TEST 1: Loading ontologies from data/schemas/ folder.
+    =================
+    ...etc......
+    
+    
+
 Inspect a graph
 ++++++++++++++++++++++++++++++++++++++++++++
 
@@ -183,3 +200,51 @@ Access a quick description of a class or property
 
 
 
+Include labels in property tree
+++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: shell
+
+    > ontospy.py data/schemas/foaf.rdf -c -l
+    ----------
+    Loaded 630 triples from <data/schemas/foaf.rdf>
+    started scanning...
+    ----------
+    Ontologies found: 1
+    Classes found...: 15
+    Properties found: 67
+    Annotation......: 7
+    Datatype........: 26
+    Object..........: 34
+    -----------
+    Metadata:
+
+    http://xmlns.com/foaf/0.1/
+    => http://purl.org/dc/elements/1.1/title
+    .... Friend of a Friend (FOAF) vocabulary
+    => http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+    .... http://www.w3.org/2002/07/owl#Ontology
+    => http://purl.org/dc/elements/1.1/description
+    .... The Friend of a Friend (FOAF) RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
+
+    Class Taxonomy
+    ----------
+    http://www.w3.org/2000/10/swap/pim/contact#Person ("Person")
+    ----foaf:Person ("Person")
+    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing ("Spatial Thing")
+    ----foaf:Person ("Person")
+    foaf:Agent ("Agent")
+    ----foaf:Group ("Group")
+    ----foaf:Organization ("Organization")
+    ----foaf:Person ("Person")
+    foaf:Document ("Document")
+    ----foaf:Image ("Image")
+    ----foaf:PersonalProfileDocument ("PersonalProfileDocument")
+    foaf:LabelProperty ("Label Property")
+    foaf:OnlineAccount ("Online Account")
+    ----foaf:OnlineChatAccount ("Online Chat Account")
+    ----foaf:OnlineEcommerceAccount ("Online E-commerce Account")
+    ----foaf:OnlineGamingAccount ("Online Gaming Account")
+    foaf:Project ("Project")
+    ----------
+    Time:	   2.77s

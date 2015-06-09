@@ -48,6 +48,20 @@
   <div class="section" id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
 <p>For the ones who have little time</p>
+<div class="section" id="running-the-tests">
+<h2>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h2>
+<p>Make sure you&#8217;re in the ontospy root folder</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="p">]</span><span class="nd">@Tartaruga</span><span class="p">:</span><span class="o">~/</span><span class="n">ontospy</span><span class="o">&gt;</span><span class="n">python</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_simple</span><span class="o">.</span><span class="n">py</span>
+<span class="o">-------------------</span>
+<span class="n">OntosPy</span> <span class="n">version</span><span class="p">:</span>  <span class="o">%</span><span class="n">prog</span> <span class="n">v2</span><span class="o">.</span><span class="mf">0.0</span>
+<span class="o">-------------------</span>
+
+<span class="n">TEST</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Loading</span> <span class="n">ontologies</span> <span class="kn">from</span> <span class="nn">data</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span> <span class="n">folder</span><span class="o">.</span>
+<span class="o">=================</span>
+<span class="o">...</span><span class="n">etc</span><span class="o">......</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="inspect-a-graph">
 <h2>Inspect a graph<a class="headerlink" href="#inspect-a-graph" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">ontospy2</span>
@@ -206,6 +220,54 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="include-labels-in-property-tree">
+<h2>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy.py data/schemas/foaf.rdf -c -l
+----------
+Loaded <span class="m">630</span> triples from &lt;data/schemas/foaf.rdf&gt;
+started scanning...
+----------
+Ontologies found: 1
+Classes found...: 15
+Properties found: 67
+Annotation......: 7
+Datatype........: 26
+Object..........: 34
+-----------
+Metadata:
+
+http://xmlns.com/foaf/0.1/
+<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/title
+.... Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> <span class="nv">vocabulary</span>
+<span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+.... http://www.w3.org/2002/07/owl#Ontology
+<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/description
+.... The Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
+
+Class Taxonomy
+----------
+http://www.w3.org/2000/10/swap/pim/contact#Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing <span class="o">(</span><span class="s2">&quot;Spatial Thing&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+foaf:Agent <span class="o">(</span><span class="s2">&quot;Agent&quot;</span><span class="o">)</span>
+----foaf:Group <span class="o">(</span><span class="s2">&quot;Group&quot;</span><span class="o">)</span>
+----foaf:Organization <span class="o">(</span><span class="s2">&quot;Organization&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+foaf:Document <span class="o">(</span><span class="s2">&quot;Document&quot;</span><span class="o">)</span>
+----foaf:Image <span class="o">(</span><span class="s2">&quot;Image&quot;</span><span class="o">)</span>
+----foaf:PersonalProfileDocument <span class="o">(</span><span class="s2">&quot;PersonalProfileDocument&quot;</span><span class="o">)</span>
+foaf:LabelProperty <span class="o">(</span><span class="s2">&quot;Label Property&quot;</span><span class="o">)</span>
+foaf:OnlineAccount <span class="o">(</span><span class="s2">&quot;Online Account&quot;</span><span class="o">)</span>
+----foaf:OnlineChatAccount <span class="o">(</span><span class="s2">&quot;Online Chat Account&quot;</span><span class="o">)</span>
+----foaf:OnlineEcommerceAccount <span class="o">(</span><span class="s2">&quot;Online E-commerce Account&quot;</span><span class="o">)</span>
+----foaf:OnlineGamingAccount <span class="o">(</span><span class="s2">&quot;Online Gaming Account&quot;</span><span class="o">)</span>
+foaf:Project <span class="o">(</span><span class="s2">&quot;Project&quot;</span><span class="o">)</span>
+----------
+Time:          2.77s
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -217,6 +279,7 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Quick Start</a><ul>
+<li><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
 <li><a class="reference internal" href="#inspect-a-graph">Inspect a graph</a></li>
 <li><a class="reference internal" href="#get-a-class">Get a class</a></li>
 <li><a class="reference internal" href="#pretty-print-triples">Pretty Print Triples</a></li>
@@ -224,6 +287,7 @@
 <li><a class="reference internal" href="#query-via-sparql">Query via Sparql</a></li>
 <li><a class="reference internal" href="#descendands-and-ancestors">Descendands and ancestors</a></li>
 <li><a class="reference internal" href="#access-a-quick-description-of-a-class-or-property">Access a quick description of a class or property</a></li>
+<li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
 </ul>
 </li>
 </ul>

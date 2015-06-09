@@ -587,11 +587,11 @@ def shellPrintOverview(g, opts):
 	
 	if opts['classtaxonomy']:
 		print "\nClass Taxonomy\n" + "-" * 10 
-		g.printClassTree(showids=False)
+		g.printClassTree(showids=False, labels=opts['labels'])
 	
 	if opts['propertytaxonomy']:
 		print "\nProperty Taxonomy\n" + "-" * 10 
-		g.printPropertyTree(showids=False)
+		g.printPropertyTree(showids=False, labels=opts['labels'])
 		
 
 
@@ -625,7 +625,11 @@ def parse_options():
 	parser.add_option("-p", "--propertytaxonomy",
 			action="store_true", default=False, dest="propertytaxonomy",
 			help="Print the property taxonomy.")
-						
+
+	parser.add_option("-l", "--labels",
+			action="store_true", default=False, dest="labels",
+			help="Print entities labels (if available) as well as URIs.")
+									
 	opts, args = parser.parse_args()
 
 	# if len(args) < 1:
@@ -644,7 +648,8 @@ def main():
 	print_opts = {
 					'entities' : opts.entities, 
 					'classtaxonomy' : opts.classtaxonomy, 
-					'propertytaxonomy' : opts.propertytaxonomy
+					'propertytaxonomy' : opts.propertytaxonomy,
+					'labels' : opts.labels,
 				}
 	
 	DEFAULT_ONTO = "data/schemas/pizza.ttl"
