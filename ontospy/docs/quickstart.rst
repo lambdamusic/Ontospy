@@ -299,3 +299,176 @@ Match two models (in development)
       -c CONFIDENCE, --confidence=CONFIDENCE
                             @TODO 0.1-0.9 degree of confidence for similarity
                             matching.
+                            
+
+
+
+
+Querying a SPARQL endpoint
+++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: python
+
+    In [12]: g = ontospy.Graph("http://data.semanticweb.org/sparql", endpoint=True)
+    started scanning...
+    ----------
+    Ontologies found: 20
+    Classes found...: 105
+    Properties found: 53
+    Annotation......: 5
+    Datatype........: 18
+    Object..........: 30
+
+    In [13]: g.pri
+    g.printClassTree     g.printPropertyTree  
+
+    In [13]: g.printClassTree()
+    [656] http://swrc.ontoware.org/ontology#ResearchTopic
+    [657] http://www.w3.org/2002/12/cal/ical#Vcalendar
+    [658] http://www.w3.org/2002/12/cal/ical#Vevent
+    [608] ----http://data.semanticweb.org/ns/swc/ontology#OrganisedEvent
+    [566] --------http://data.semanticweb.org/ns/swc/ontology#AcademicEvent
+    [585] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceEvent
+    [610] ------------http://data.semanticweb.org/ns/swc/ontology#PanelEvent
+    [633] ------------http://data.semanticweb.org/ns/swc/ontology#SessionEvent
+    [590] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoSession
+    [613] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperSession
+    [618] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterSession
+    [641] ------------http://data.semanticweb.org/ns/swc/ontology#TalkEvent
+    [589] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoPresentation
+    [598] ----------------http://data.semanticweb.org/ns/swc/ontology#IndustrialTalk
+    [602] ----------------http://data.semanticweb.org/ns/swc/ontology#KeynoteTalk
+    [612] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperPresentation
+    [617] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterPresentation
+    [650] ----------------http://data.semanticweb.org/ns/swc/ontology#WelcomeTalk
+    [643] ------------http://data.semanticweb.org/ns/swc/ontology#TrackEvent
+    [599] ----------------http://data.semanticweb.org/ns/swc/ontology#IndustrialTrack
+    [628] ----------------http://data.semanticweb.org/ns/swc/ontology#ResearchTrack
+    [646] ------------http://data.semanticweb.org/ns/swc/ontology#TutorialEvent
+    [651] ------------http://data.semanticweb.org/ns/swc/ontology#WorkshopEvent
+    [607] --------http://data.semanticweb.org/ns/swc/ontology#NonAcademicEvent
+    [572] ------------http://data.semanticweb.org/ns/swc/ontology#BreakEvent
+    [580] ----------------http://data.semanticweb.org/ns/swc/ontology#CoffeeBreak
+    [597] ----------------http://data.semanticweb.org/ns/swc/ontology#FreeTimeBreak
+    [604] ----------------http://data.semanticweb.org/ns/swc/ontology#MealBreak
+    [583] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceClosingEvent
+    [586] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceOpeningEvent
+    [605] ------------http://data.semanticweb.org/ns/swc/ontology#MealEvent
+    [584] ----------------http://data.semanticweb.org/ns/swc/ontology#ConferenceDinner
+    [635] ------------http://data.semanticweb.org/ns/swc/ontology#SocialEvent
+    [584] ----------------http://data.semanticweb.org/ns/swc/ontology#ConferenceDinner
+    [595] ----------------http://data.semanticweb.org/ns/swc/ontology#Excursion
+    [627] ----------------http://data.semanticweb.org/ns/swc/ontology#Reception
+    [659] http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+    [567] ----http://data.semanticweb.org/ns/swc/ontology#AccommodationPlace
+    [581] ----http://data.semanticweb.org/ns/swc/ontology#CommunalPlace
+    [587] ----http://data.semanticweb.org/ns/swc/ontology#ConferenceVenuePlace
+    [606] ----http://data.semanticweb.org/ns/swc/ontology#MeetingRoomPlace
+    [615] ----http://data.semanticweb.org/ns/swc/ontology#Place
+    [593] --------http://data.semanticweb.org/ns/swc/ontology#DrinkingPlace
+    [594] --------http://data.semanticweb.org/ns/swc/ontology#EatingPlace
+    [660] http://xmlns.com/foaf/0.1/Document
+    [570] ----http://data.semanticweb.org/ns/swc/ontology#ArgumentativeDocument
+    [611] --------http://data.semanticweb.org/ns/swc/ontology#Paper
+    [639] ------------http://data.semanticweb.org/ns/swc/ontology#SystemDemonstration
+    [640] ------------http://data.semanticweb.org/ns/swc/ontology#SystemDescription
+    [654] ------------http://swrc.ontoware.org/ontology#InProceedings
+    [601] ----------------http://data.semanticweb.org/ns/swc/ontology#InvitedPaper
+    [616] --------http://data.semanticweb.org/ns/swc/ontology#Poster
+    [634] --------http://data.semanticweb.org/ns/swc/ontology#SlideSet
+    [622] ----http://data.semanticweb.org/ns/swc/ontology#Proceedings
+    [655] --------http://swrc.ontoware.org/ontology#Proceedings
+    [623] ----http://data.semanticweb.org/ns/swc/ontology#Programme
+    [661] http://xmlns.com/foaf/0.1/Group
+    [662] http://xmlns.com/foaf/0.1/Organization
+    [663] http://xmlns.com/foaf/0.1/Person
+    [664] http://xmlns.com/foaf/0.1/Project
+    [665] http://xmlns.com/wordnet/1.6/Announcement
+    [573] ----http://data.semanticweb.org/ns/swc/ontology#Call
+    [574] --------http://data.semanticweb.org/ns/swc/ontology#CallForDemos
+    [575] --------http://data.semanticweb.org/ns/swc/ontology#CallForPapers
+    [576] --------http://data.semanticweb.org/ns/swc/ontology#CallForParticipation
+    [577] --------http://data.semanticweb.org/ns/swc/ontology#CallForPosters
+    [578] --------http://data.semanticweb.org/ns/swc/ontology#CallForProposals
+    [666] http://xmlns.com/wordnet/1.6/Document
+    [571] ----http://data.semanticweb.org/ns/swc/ontology#Artefact
+    [611] --------http://data.semanticweb.org/ns/swc/ontology#Paper
+    [639] ------------http://data.semanticweb.org/ns/swc/ontology#SystemDemonstration
+    [640] ------------http://data.semanticweb.org/ns/swc/ontology#SystemDescription
+    [654] ------------http://swrc.ontoware.org/ontology#InProceedings
+    [601] ----------------http://data.semanticweb.org/ns/swc/ontology#InvitedPaper
+    [616] --------http://data.semanticweb.org/ns/swc/ontology#Poster
+    [622] --------http://data.semanticweb.org/ns/swc/ontology#Proceedings
+    [655] ------------http://swrc.ontoware.org/ontology#Proceedings
+    [623] --------http://data.semanticweb.org/ns/swc/ontology#Programme
+    [634] --------http://data.semanticweb.org/ns/swc/ontology#SlideSet
+    [667] http://xmlns.com/wordnet/1.6/Event-1
+    [608] ----http://data.semanticweb.org/ns/swc/ontology#OrganisedEvent
+    [566] --------http://data.semanticweb.org/ns/swc/ontology#AcademicEvent
+    [585] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceEvent
+    [610] ------------http://data.semanticweb.org/ns/swc/ontology#PanelEvent
+    [633] ------------http://data.semanticweb.org/ns/swc/ontology#SessionEvent
+    [590] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoSession
+    [613] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperSession
+    [618] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterSession
+    [641] ------------http://data.semanticweb.org/ns/swc/ontology#TalkEvent
+    [589] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoPresentation
+    [598] ----------------http://data.semanticweb.org/ns/swc/ontology#IndustrialTalk
+    [602] ----------------http://data.semanticweb.org/ns/swc/ontology#KeynoteTalk
+    [612] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperPresentation
+    [617] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterPresentation
+    [650] ----------------http://data.semanticweb.org/ns/swc/ontology#WelcomeTalk
+    [643] ------------http://data.semanticweb.org/ns/swc/ontology#TrackEvent
+    [599] ----------------http://data.semanticweb.org/ns/swc/ontology#IndustrialTrack
+    [628] ----------------http://data.semanticweb.org/ns/swc/ontology#ResearchTrack
+    [646] ------------http://data.semanticweb.org/ns/swc/ontology#TutorialEvent
+    [651] ------------http://data.semanticweb.org/ns/swc/ontology#WorkshopEvent
+    [607] --------http://data.semanticweb.org/ns/swc/ontology#NonAcademicEvent
+    [572] ------------http://data.semanticweb.org/ns/swc/ontology#BreakEvent
+    [580] ----------------http://data.semanticweb.org/ns/swc/ontology#CoffeeBreak
+    [597] ----------------http://data.semanticweb.org/ns/swc/ontology#FreeTimeBreak
+    [604] ----------------http://data.semanticweb.org/ns/swc/ontology#MealBreak
+    [583] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceClosingEvent
+    [586] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceOpeningEvent
+    [605] ------------http://data.semanticweb.org/ns/swc/ontology#MealEvent
+    [584] ----------------http://data.semanticweb.org/ns/swc/ontology#ConferenceDinner
+    [635] ------------http://data.semanticweb.org/ns/swc/ontology#SocialEvent
+    [584] ----------------http://data.semanticweb.org/ns/swc/ontology#ConferenceDinner
+    [595] ----------------http://data.semanticweb.org/ns/swc/ontology#Excursion
+    [627] ----------------http://data.semanticweb.org/ns/swc/ontology#Reception
+    [668] http://xmlns.com/wordnet/1.6/Menu
+    [669] http://xmlns.com/wordnet/1.6/Role-1
+    [630] ----http://data.semanticweb.org/ns/swc/ontology#Role
+    [568] --------http://data.semanticweb.org/ns/swc/ontology#AdditionalReviewer
+    [569] --------http://data.semanticweb.org/ns/swc/ontology#Administrator
+    [579] --------http://data.semanticweb.org/ns/swc/ontology#Chair
+    [582] --------http://data.semanticweb.org/ns/swc/ontology#ConferenceChair
+    [588] --------http://data.semanticweb.org/ns/swc/ontology#Delegate
+    [591] --------http://data.semanticweb.org/ns/swc/ontology#DemosChair
+    [592] --------http://data.semanticweb.org/ns/swc/ontology#DogfoodTsar
+    [596] --------http://data.semanticweb.org/ns/swc/ontology#ExhibitionChair
+    [600] --------http://data.semanticweb.org/ns/swc/ontology#IndustryChair
+    [603] --------http://data.semanticweb.org/ns/swc/ontology#LocalOrganiser
+    [609] --------http://data.semanticweb.org/ns/swc/ontology#OrganisingCommitteeMember
+    [614] --------http://data.semanticweb.org/ns/swc/ontology#PhDSymposiumChair
+    [619] --------http://data.semanticweb.org/ns/swc/ontology#PostersChair
+    [620] --------http://data.semanticweb.org/ns/swc/ontology#Presenter
+    [621] --------http://data.semanticweb.org/ns/swc/ontology#PrintedProceedingsChair
+    [624] --------http://data.semanticweb.org/ns/swc/ontology#ProgrammeChair
+    [625] --------http://data.semanticweb.org/ns/swc/ontology#ProgrammeCommitteeMember
+    [626] --------http://data.semanticweb.org/ns/swc/ontology#PublicityChair
+    [629] --------http://data.semanticweb.org/ns/swc/ontology#Reviewer
+    [631] --------http://data.semanticweb.org/ns/swc/ontology#SWChallengeChair
+    [632] --------http://data.semanticweb.org/ns/swc/ontology#SessionChair
+    [637] --------http://data.semanticweb.org/ns/swc/ontology#SponsorshipChair
+    [638] --------http://data.semanticweb.org/ns/swc/ontology#SubmissionsChair
+    [642] --------http://data.semanticweb.org/ns/swc/ontology#TrackChair
+    [644] --------http://data.semanticweb.org/ns/swc/ontology#Treasurer
+    [645] --------http://data.semanticweb.org/ns/swc/ontology#Tutor
+    [647] --------http://data.semanticweb.org/ns/swc/ontology#TutorialPresenter
+    [648] --------http://data.semanticweb.org/ns/swc/ontology#TutorialsChair
+    [649] --------http://data.semanticweb.org/ns/swc/ontology#Webmaster
+    [652] --------http://data.semanticweb.org/ns/swc/ontology#WorkshopOrganiser
+    [653] --------http://data.semanticweb.org/ns/swc/ontology#WorkshopsChair
+    [670] http://xmlns.com/wordnet/1.6/Sponsorship
+    [636] ----http://data.semanticweb.org/ns/swc/ontology#Sponsorship

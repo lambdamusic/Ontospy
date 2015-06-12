@@ -12,8 +12,6 @@ Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 
 import rdflib
-# from rdflib import RDFS, RDF, BNode
-# from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
 
@@ -85,8 +83,6 @@ class QueryHelper(object):
 							 union 
 							 { ?z rdfs:subClassOf ?x }
 							 union 
-							 { ?y rdf:type ?x } 
-							 union 
 							 { ?y rdfs:domain ?x }
 							 union 
 							 { ?y rdfs:range ?x } 
@@ -106,7 +102,50 @@ class QueryHelper(object):
 				 ORDER BY  ?x
 				 """)
 		return list(qres)
-			
+
+
+	
+	def getAllClassesFromInstancesToo(self):
+		"""
+		by default, obscure all RDF/RDFS/OWL/XML stuff
+		NOTE: this is more expensive!
+		
+		added: { ?y rdf:type ?x } 
+		"""
+		qres = self.rdfgraph.query(
+			  """SELECT DISTINCT ?x ?c
+				 WHERE {
+						 { 
+							 { ?x a owl:Class } 
+							 union 
+							 { ?x a rdfs:Class }
+							 union 
+							 { ?x rdfs:subClassOf ?y }
+							 union 
+							 { ?z rdfs:subClassOf ?x }
+							 union 
+							 { ?y rdf:type ?x } 
+							 union 
+							 { ?y rdfs:domain ?x }
+							 union 
+							 { ?y rdfs:range ?x } 
+						 } . 
+				 
+						 ?x a ?c
+			 
+					 FILTER(
+					   !STRSTARTS(STR(?x), "http://www.w3.org/2002/07/owl")
+					   && !STRSTARTS(STR(?x), "http://www.w3.org/1999/02/22-rdf-syntax-ns")
+					   && !STRSTARTS(STR(?x), "http://www.w3.org/2000/01/rdf-schema")
+					   && !STRSTARTS(STR(?x), "http://www.w3.org/2001/XMLSchema")
+					   && !STRSTARTS(STR(?x), "http://www.w3.org/XML/1998/namespace")
+					   && (!isBlank(?x))
+					   ) .
+				 }	 
+				 ORDER BY  ?x
+				 """)
+		return list(qres)
+		
 
 	def getClassDirectSupers(self, aURI):
 		aURI = str(aURI)
@@ -188,8 +227,8 @@ class QueryHelper(object):
 							 { ?x a owl:AnnotationProperty }
 						} . 
 						?x a ?c 
-   					 FILTER(!isBlank(?x)
-   					   ) .
+					 FILTER(!isBlank(?x)
+					   ) .
 					} ORDER BY	?c ?x
 				 """)
 		return list(qres)

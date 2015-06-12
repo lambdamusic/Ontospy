@@ -7,17 +7,5 @@ import ontospy
 import rdflib
 
 
-
-g = ontospy.Graph("data/schemas/cidoc_crm_v5.1-draft-2014March.rdfs")
-
-c = g.getClass("E31_Document")[0]
-
-print c
-
-for x in c.ancestors():
-	print x
-
-print "*" * 10
-
-for x in c.ancestors(noduplicates=False):
-	print x
+# g = ontospy.Graph("http://dbpedia.org/sparql", endpoint=True)
+g = ontospy.Graph("http://factforge.net/sparql", endpoint=True)

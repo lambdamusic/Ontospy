@@ -19,6 +19,7 @@ More info in the README file.
 import sys, os, urllib2, time, optparse
 
 import rdflib
+from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 from libs.util import *
 from libs.entities import *
@@ -47,7 +48,8 @@ class Graph(object):
 		"""
 		super(Graph, self).__init__() 
 
-		self.rdfgraph = rdflib.Graph()
+		self.rdfgraph = rdflib.Graph()			
+			
 		self.graphuri	= None
 		self.queryHelper = None # instantiated after we have a graph
 		
@@ -63,7 +65,7 @@ class Graph(object):
 		self.toplayer = []
 		self.toplayerProperties = []
 		
-		# keep track of the rdf source
+		# keep track of the rdf source		
 		self.IS_ENDPOINT = False
 		self.IS_FILE = False
 		self.IS_URL = False
@@ -95,9 +97,11 @@ class Graph(object):
 		
 		elif endpoint:
 			self.IS_ENDPOINT = True
-			# @TODO 
-			raise Exception("Sorry - the SPARQL component is not available yet.")
+			# replace graph with ConjunctiveGraph
+			self.rdfgraph = rdflib.ConjunctiveGraph(store=SPARQLStore(source))			
+			self.graphuri = source	# default uri is www location
 
+				
 		else:
 
 			if type(source) == type("string"):
@@ -115,12 +119,14 @@ class Graph(object):
 			else:
 				raise Exception("You passed an unknown object. Only URIs and files are accepted.") 
 			
-		#FINALLY, DO THE LOADING BIT:		
+		#FINALLY, TRY LOADING:		
 
 		try:
-			if self.IS_TEXT == True:			
+			if self.IS_TEXT:			
 				self.rdfgraph.parse(data=source, format=rdf_format)
 				printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
+			elif self.IS_ENDPOINT:
+				pass
 			else:
 				self.rdfgraph.parse(source, format=rdf_format)
 				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
@@ -571,7 +577,7 @@ def shellPrintOverview(g, opts):
 	ontologies = g.ontologies
 	
 	for o in ontologies:
-		print "-----------\nMetadata:\n"
+		print "-----------\nOntology Annotations:"
 		o.printTriples()
 		
 	if False:
