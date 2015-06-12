@@ -248,3 +248,54 @@ Include labels in property tree
     foaf:Project ("Project")
     ----------
     Time:	   2.77s
+
+
+
+
+
+Match two models (in development)
+++++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: python
+
+    ontospy> python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl 
+    Match classes or properties? [c|p]: c
+    ----------
+    Loaded 630 triples from <data/schemas/foaf.rdf>
+    started scanning...
+    ----------
+    Ontologies found: 1
+    Classes found...: 15
+    Properties found: 67
+    Annotation......: 7
+    Datatype........: 26
+    Object..........: 34
+    ----------
+    Loaded 1215 triples from <data/schemas/bibo.owl>
+    started scanning...
+    ----------
+    Ontologies found: 1
+    Classes found...: 65
+    Properties found: 117
+    Annotation......: 12
+    Datatype........: 54
+    Object..........: 51
+    ----------
+    Now matching...
+    31 candidates found.
+    ----------
+    Time:	   7.14s
+
+    # results are saved by default in same folder
+    
+    > python tools/matcher.py -h
+    Usage: 
+
+    Options:
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -o OUTPUTFILE, --outputfile=OUTPUTFILE
+                            The name of the output csv file.
+      -c CONFIDENCE, --confidence=CONFIDENCE
+                            @TODO 0.1-0.9 degree of confidence for similarity
+                            matching.

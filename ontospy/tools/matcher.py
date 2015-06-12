@@ -48,8 +48,8 @@ PersonalProfileDocument ==~== Term: npg:Document
 """
 
 
-USAGE = "Usage..."
-VERSION = 0.1
+USAGE = "python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl -o ~/output.csv"
+VERSION = 0.2
 
 
 import ontospy, rdflib
@@ -62,7 +62,7 @@ def similar(a, b):
 	return SequenceMatcher(None, a, b).ratio()
 
 	
-def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv"):
+def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", class_or_prop="c", verbose=False):
 	""" 
 	takes two graphs and matches its classes based on qname, label etc.. 
 	@todo extend to properties and skos etc..
@@ -75,19 +75,42 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv"):
 	
 	try:
 		writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
-		writer.writerow( ('entity name source', 'entity name destination', 'entity uri source', 'entity uri destination') )
+		writer.writerow( ('name 1', 'name 2', 'uri 1', 'uri 2') )
 		
-		for x in graph1.classes:
-			l1 = unicode(x.bestLabel(qname_allowed=True))
+		# a) match classes
 		
-			for y in graph2.classes:
-				l2 = unicode(y.bestLabel(qname_allowed=True))
+		if class_or_prop == "c":
+		
+			for x in graph1.classes:
+				l1 = unicode(x.bestLabel(qname_allowed=True))
+		
+				for y in graph2.classes:
+					l2 = unicode(y.bestLabel(qname_allowed=True))
 						
-				if similar(l1, l2) > confidence:	
-					counter += 1		
-					row = [l1, l2, x.uri, y.uri]		
-					writer.writerow([s.encode('utf8') if type(s) is unicode else s for s in row])
+					if similar(l1, l2) > confidence:	
+						counter += 1		
+						row = [l1, l2, x.uri, y.uri]		
+						writer.writerow([s.encode('utf8') if type(s) is unicode else s for s in row])
+						if verbose:
+							print "%s ==~== %s" % (l1, l2)
 
+
+		# b) match properties
+
+		elif class_or_prop == "p":
+		
+			for x in graph1.properties:
+				l1 = unicode(x.bestLabel(qname_allowed=True))
+		
+				for y in graph2.properties:
+					l2 = unicode(y.bestLabel(qname_allowed=True))
+						
+					if similar(l1, l2) > confidence:	
+						counter += 1		
+						row = [l1, l2, x.uri, y.uri]		
+						writer.writerow([s.encode('utf8') if type(s) is unicode else s for s in row])
+						if verbose:
+							print "%s ==~== %s" % (l1, l2)
 
 	finally:
 		f.close()
@@ -111,23 +134,15 @@ def parse_options():
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
-	# parser.add_option("-c", "--confidence",
-	#		action="store_true", default=False, dest="confidence",
-	#		help="Print detailed information for all entities in the ontology.")
-
 	parser.add_option("-o", "--outputfile",
 			action="store", type="string", default="matching_results.csv", dest="outputfile",
 			help="The name of the output csv file.")
-			
-	parser.add_option("-c", "--confidence",
-			action="store", type="float", default=0.5, dest="confidence",
-			help="@TODO 0.1-0.9 degree of confidence for similarity matching.")
-						
-	opts, args = parser.parse_args()
 
-	# if len(args) < 1:
-	#	parser.print_help()
-	#	raise SystemExit, 1
+	parser.add_option("-v", "--verbose",
+			action="store_true", default=False, dest="verbose",
+			help="Verbose mode: prints results on screen too.")
+			
+	opts, args = parser.parse_args()
 
 	return opts, args
 
@@ -138,20 +153,36 @@ def main():
 	""" command line script """
 	
 	opts, args = parse_options()
-	
+		
 	if len(args) < 2:
 		printDebug("Please provide two arguments.") 
 		sys.exit(0)
 
-	if type(opts.confidence) != float:
-		opts.confidence = 0.5
+	var = raw_input("Match classes or properties? [c|p, c=default]:")
+	if var == "c" or var == "p":
+		class_or_prop = var
+	else:
+		class_or_prop = "c"
 	
+	print class_or_prop
+
+	var = raw_input("Degree of confidence? [1-10, 5=default]: ")
+	try:
+		confidence = int(var)
+		if not (confidence <= 10 and confidence >= 1):
+			confidence = 5
+	except:
+		confidence = 5
+		
+	print confidence
+	confidence = confidence / (10 * 1.0) #transform in decimal
+							
 	sTime = time.time()
 	
 	g1 = ontospy.Graph(args[0])
 	g2 = ontospy.Graph(args[1])
-	
-	matcher(g1, g2, opts.confidence, opts.outputfile)
+		
+	matcher(g1, g2, confidence, opts.outputfile, class_or_prop, opts.verbose)
 	
 	# finally:	
 	# print some stats.... 
