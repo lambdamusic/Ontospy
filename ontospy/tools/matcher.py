@@ -53,7 +53,7 @@ VERSION = 0.2
 
 
 import ontospy, rdflib
-import time, optparse, csv
+import time, optparse, csv, os
 from difflib import SequenceMatcher
 from libs.util import *
 
@@ -62,7 +62,7 @@ def similar(a, b):
 	return SequenceMatcher(None, a, b).ratio()
 
 	
-def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", class_or_prop="c", verbose=False):
+def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", class_or_prop="classes", verbose=False):
 	""" 
 	takes two graphs and matches its classes based on qname, label etc.. 
 	@todo extend to properties and skos etc..
@@ -79,7 +79,7 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", 
 		
 		# a) match classes
 		
-		if class_or_prop == "c":
+		if class_or_prop == "classes":
 		
 			for x in graph1.classes:
 				l1 = unicode(x.bestLabel(qname_allowed=True))
@@ -97,7 +97,7 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", 
 
 		# b) match properties
 
-		elif class_or_prop == "p":
+		elif class_or_prop == "properties":
 		
 			for x in graph1.properties:
 				l1 = unicode(x.bestLabel(qname_allowed=True))
@@ -135,7 +135,7 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 	parser.add_option("-o", "--outputfile",
-			action="store", type="string", default="matching_results.csv", dest="outputfile",
+			action="store", type="string", default="", dest="outputfile",
 			help="The name of the output csv file.")
 
 	parser.add_option("-v", "--verbose",
@@ -159,10 +159,12 @@ def main():
 		sys.exit(0)
 
 	var = raw_input("Match classes or properties? [c|p, c=default]:")
-	if var == "c" or var == "p":
-		class_or_prop = var
+	if var == "c":
+		class_or_prop = "classes"
+	elif var == "p":
+		class_or_prop = "properties"
 	else:
-		class_or_prop = "c"
+		class_or_prop = "classes"
 	
 	print class_or_prop
 
@@ -178,10 +180,19 @@ def main():
 	confidence = confidence / (10 * 1.0) #transform in decimal
 							
 	sTime = time.time()
-	
+
+	# automatically name the file unless a name is provided with -o option
+	if not opts.outputfile:
+		try:
+			opts.outputfile = "%s_%s_matching_%s.csv" % (os.path.splitext(args[0])[0].split("/")[-1], 
+									os.path.splitext(args[1])[0].split("/")[-1], class_or_prop)
+										
+		except:
+			opts.outputfile = "ontospy_matching_%s.csv" % (class_or_prop)
+				
 	g1 = ontospy.Graph(args[0])
 	g2 = ontospy.Graph(args[1])
-		
+				
 	matcher(g1, g2, confidence, opts.outputfile, class_or_prop, opts.verbose)
 	
 	# finally:	
