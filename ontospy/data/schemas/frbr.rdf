@@ -1,0 +1,1640 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY dcterms "http://purl.org/dc/terms/" >
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY skos "http://www.w3.org/2008/05/skos#" >
+    <!ENTITY swrl "http://www.w3.org/2003/11/swrl#" >
+    <!ENTITY core "http://purl.org/vocab/frbr/core#" >
+    <!ENTITY dc "http://purl.org/dc/elements/1.1/" >
+    <!ENTITY swrlb "http://www.w3.org/2003/11/swrlb#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://purl.org/spar/frbr/"
+     xmlns:frbr="http://purl.org/spar/frbr/"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:swrl="http://www.w3.org/2003/11/swrl#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:swrlb="http://www.w3.org/2003/11/swrlb#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:core="http://purl.org/vocab/frbr/core#"
+     xmlns:skos="http://www.w3.org/2008/05/skos#"
+     xmlns:dcterms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="http://purl.org/spar/frbr">
+        <dc:creator rdf:datatype="&xsd;string">Paolo Ciccarese</dc:creator>
+        <dc:creator rdf:datatype="&xsd;string">Silvio Peroni</dc:creator>
+        <dc:date>2011-06-29</dc:date>
+        <dc:title xml:lang="en">Essential FRBR in OWL2 DL</dc:title>
+        <rdfs:comment>FRBR DL is an OWL 2 DL expression of the FRBR model.</rdfs:comment>
+        <dc:description xml:lang="en">This vocabulary is an expression in OWL 2 DL of the basic concepts and relations described in the IFLA report on the Functional Requirements for Bibliographic Records (FRBR), also described in Ian Davis&#39;s RDF vocabulary (http://vocab.org/frbr/core).</dc:description>
+        <dc:rights xml:lang="en">This work is distributed under a Creative Commons Attribution License (http://creativecommons.org/licenses/by/3.0/).</dc:rights>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <owl:AnnotationProperty rdf:about="&dc;creator"/>
+    <owl:AnnotationProperty rdf:about="&skos;note">
+        <rdfs:label xml:lang="en">skos:note</rdfs:label>
+        <rdfs:isDefinedBy rdf:resource="http://www.w3.org/2008/05/skos#"/>
+    </owl:AnnotationProperty>
+    <owl:AnnotationProperty rdf:about="&rdfs;isDefinedBy"/>
+    <owl:AnnotationProperty rdf:about="&dc;date"/>
+    <owl:AnnotationProperty rdf:about="&rdfs;label"/>
+    <owl:AnnotationProperty rdf:about="&dc;description"/>
+    <owl:AnnotationProperty rdf:about="&rdfs;comment"/>
+    <owl:AnnotationProperty rdf:about="&dc;title"/>
+    <owl:AnnotationProperty rdf:about="&dc;rights"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#abridgement -->
+
+    <owl:ObjectProperty rdf:about="&core;abridgement">
+        <rdfs:label xml:lang="en">has abridgement</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression abridged in another one.
+
+In the abridged expression some content of the previous expression is removed, but the result does not alter the content to the extent that it becomes a new work. The expressions resulting from such modification are generally autonomous in nature (i.e., they do not normally require reference to the prior expression in order to be used or understood). </rdfs:comment>
+        <rdfs:range rdf:resource="&core;Expression"/>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <owl:inverseOf rdf:resource="&core;abridgementOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#abridgementOf -->
+
+    <owl:ObjectProperty rdf:about="&core;abridgementOf">
+        <rdfs:label xml:lang="en">is abridgement of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the entire expression of an abridged one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#adaption -->
+
+    <owl:ObjectProperty rdf:about="&core;adaption">
+        <rdfs:label xml:lang="en">has adaption</rdfs:label>
+        <rdfs:comment xml:lang="en">A work/expression adapted in another one.
+
+This property describe the modification of an original work that is sufficient in degree to warrant their being considered as new works, rather than simply different expressions of the same work. If there exists a relation of this kind among two different expressions, they always refer to different works.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;adaptionOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#adaptionOf -->
+
+    <owl:ObjectProperty rdf:about="&core;adaptionOf">
+        <rdfs:label xml:lang="en">is adaption of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the work/expression of an adapted one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#alternate -->
+
+    <owl:ObjectProperty rdf:about="&core;alternate">
+        <rdfs:label xml:lang="en">has alternate</rdfs:label>
+        <rdfs:comment xml:lang="en">A manifestation having another one as alternate.
+
+The alternate relationship involves manifestations that effectively serve as alternates for each other. The alternate relationship obtains, for example, when a publication, sound recording, video, etc. is issued in more than one format or when it is released simultaneously by different publishers in different countries.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Manifestation"/>
+        <rdfs:range rdf:resource="&core;Manifestation"/>
+        <owl:inverseOf rdf:resource="&core;alternateOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#alternateOf -->
+
+    <owl:ObjectProperty rdf:about="&core;alternateOf">
+        <rdfs:label xml:lang="en">is alternate of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the manifestation of an alternative one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#arrangement -->
+
+    <owl:ObjectProperty rdf:about="&core;arrangement">
+        <rdfs:label xml:lang="en">has arrangement</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression arranged in another one.
+
+In the arranged expression some content of the previous expression is changed in some way, but the result does not alter the content to the extent that it becomes a new work. The expressions resulting from such modification are generally autonomous in nature (i.e., they do not normally require reference to the prior expression in order to be used or understood).</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <rdfs:range rdf:resource="&core;Expression"/>
+        <owl:inverseOf rdf:resource="&core;arrangementOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#arrangementOf -->
+
+    <owl:ObjectProperty rdf:about="&core;arrangementOf">
+        <rdfs:label xml:lang="en">is arrangement of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the original expression of an arranged one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#complement -->
+
+    <owl:ObjectProperty rdf:about="&core;complement">
+        <rdfs:label xml:lang="en">has complement</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression work/expression having another one as complement.
+
+This property describes works that are intended to be combined with or inserted into the related work. In other words, they are intended to be integrated in some way with the other work, but were not part of the original conception of that prior work. If there exists a relation of this kind among two different expressions, then they always refer to different works.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;complementOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#complementOf -->
+
+    <owl:ObjectProperty rdf:about="&core;complementOf">
+        <rdfs:label xml:lang="en">is complement of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the work/expression of that is a complement of another one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#creator -->
+
+    <owl:ObjectProperty rdf:about="&core;creator">
+        <rdfs:label xml:lang="en">has creator</rdfs:label>
+        <rdfs:comment xml:lang="en">A work linked to its creator.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Work"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#creatorOf -->
+
+    <owl:ObjectProperty rdf:about="&core;creatorOf">
+        <rdfs:label xml:lang="en">is creator of</rdfs:label>
+        <rdfs:comment xml:lang="en">The creator of a particular work.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;creator"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntityOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#embodiment -->
+
+    <owl:ObjectProperty rdf:about="&core;embodiment">
+        <rdfs:label xml:lang="en">has embodiment</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression embodied in a manifestation.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <rdfs:range rdf:resource="&core;Manifestation"/>
+        <owl:inverseOf rdf:resource="&core;embodimentOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#embodimentOf -->
+
+    <owl:ObjectProperty rdf:about="&core;embodimentOf">
+        <rdfs:label xml:lang="en">is embodiment of</rdfs:label>
+        <rdfs:comment xml:lang="en">A manifestation that embodies an expression.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#exemplar -->
+
+    <owl:ObjectProperty rdf:about="&core;exemplar">
+        <rdfs:label xml:lang="en">has exemplar</rdfs:label>
+        <rdfs:comment xml:lang="en">A manifestation exemplified in an item.</rdfs:comment>
+        <rdfs:range rdf:resource="&core;Item"/>
+        <rdfs:domain rdf:resource="&core;Manifestation"/>
+        <owl:inverseOf rdf:resource="&core;exemplarOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#exemplarOf -->
+
+    <owl:ObjectProperty rdf:about="&core;exemplarOf">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:label xml:lang="en">is exemplar of</rdfs:label>
+        <rdfs:comment xml:lang="en">An item that exemplifies a manifestation.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#imitation -->
+
+    <owl:ObjectProperty rdf:about="&core;imitation">
+        <rdfs:label xml:lang="en">has imitation</rdfs:label>
+        <rdfs:comment xml:lang="en">An work/expression imitated in another one.
+
+This property describes works that are intended to be an imitation another original work that is sufficient in degree to warrant their being considered as new works, rather than simply different expressions of the same work. If there exists a relation of this kind among two different expressions, then they always refer to different works.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;imitationOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#imitationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;imitationOf">
+        <rdfs:label xml:lang="en">is imitation of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the work/expression of an imitated one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#owner -->
+
+    <owl:ObjectProperty rdf:about="&core;owner">
+        <rdfs:label xml:lang="en">has owner</rdfs:label>
+        <rdfs:comment xml:lang="en">An item linked to its owner.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Item"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#ownerOf -->
+
+    <owl:ObjectProperty rdf:about="&core;ownerOf">
+        <rdfs:label xml:lang="en">is owner of</rdfs:label>
+        <rdfs:comment xml:lang="en">The owner of a particular item.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;owner"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntityOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#part -->
+
+    <owl:ObjectProperty rdf:about="&core;part">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:label xml:lang="en">has part</rdfs:label>
+        <rdfs:comment xml:lang="en">A part of an endeavour.</rdfs:comment>
+        <skos:note xml:lang="en">Unlike the FRBR version in RDF http://vocab.org/frbr/core.html the present version defines partonomy relationships transitive.</skos:note>
+        <owl:inverseOf rdf:resource="&core;partOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#partOf -->
+
+    <owl:ObjectProperty rdf:about="&core;partOf">
+        <rdf:type rdf:resource="&owl;TransitiveProperty"/>
+        <rdfs:label xml:lang="en">is part of</rdfs:label>
+        <rdfs:comment xml:lang="en">An endeavour incorporating another endeavour.</rdfs:comment>
+        <skos:note xml:lang="en">Unlike the FRBR version in RDF http://vocab.org/frbr/core.html the present version defines partonomy relationships transitive.</skos:note>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#producer -->
+
+    <owl:ObjectProperty rdf:about="&core;producer">
+        <rdfs:label xml:lang="en">has producer</rdfs:label>
+        <rdfs:comment xml:lang="en">A manifestation linked to its prodecer.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Manifestation"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#producerOf -->
+
+    <owl:ObjectProperty rdf:about="&core;producerOf">
+        <rdfs:label xml:lang="en">is producer of</rdfs:label>
+        <rdfs:comment xml:lang="en">The producer of a particular manifestation.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;producer"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntityOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#realization -->
+
+    <owl:ObjectProperty rdf:about="&core;realization">
+        <rdfs:label xml:lang="en">has realization</rdfs:label>
+        <rdfs:comment xml:lang="en">A work realized through an expression.</rdfs:comment>
+        <rdfs:range rdf:resource="&core;Expression"/>
+        <rdfs:domain rdf:resource="&core;Work"/>
+        <owl:inverseOf rdf:resource="&core;realizationOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#realizationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;realizationOf">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:label xml:lang="en">is realization of</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression that realizes a work.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#realizer -->
+
+    <owl:ObjectProperty rdf:about="&core;realizer">
+        <rdfs:label xml:lang="en">has realizer</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression linked to its realizer.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntity"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#realizerOf -->
+
+    <owl:ObjectProperty rdf:about="&core;realizerOf">
+        <rdfs:label xml:lang="en">is realizer of</rdfs:label>
+        <rdfs:comment xml:lang="en">The realizer of a particular expression.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;realizer"/>
+        <rdfs:subPropertyOf rdf:resource="&core;responsibleEntityOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#reconfiguration -->
+
+    <owl:ObjectProperty rdf:about="&core;reconfiguration">
+        <rdfs:label xml:lang="en">has reconfiguration</rdfs:label>
+        <rdfs:comment xml:lang="en">An item reconfigured in another one.
+
+The reconfiguration relationship is one in which one or more items are changed in such a way that a new item or items result. Most commonly, an item of one manifestation is bound with an item of a different manifestation to make a new item. </rdfs:comment>
+        <rdfs:range rdf:resource="&core;Item"/>
+        <rdfs:domain rdf:resource="&core;Item"/>
+        <owl:inverseOf rdf:resource="&core;reconfigurationOf"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#reconfigurationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;reconfigurationOf">
+        <rdfs:label xml:lang="en">is reconfiguration of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the manifestation of a reconfigured one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#relatedEndeavour -->
+
+    <owl:ObjectProperty rdf:about="&core;relatedEndeavour">
+        <rdfs:label xml:lang="en">has related endeavour</rdfs:label>
+        <rdfs:range rdf:resource="&core;Endeavour"/>
+        <rdfs:domain rdf:resource="&core;Endeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#reproduction -->
+
+    <owl:ObjectProperty rdf:about="&core;reproduction">
+        <rdfs:label xml:lang="en">has reproduction</rdfs:label>
+        <rdfs:comment xml:lang="en">A manifestation/item reproduced in another one.
+
+A reproduction indicates the relationship as it would be drawn from the first manifestation/item in the relationship to the second manifestation/item in the relationship.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;reproductionOf"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Item"/>
+                    <rdf:Description rdf:about="&core;Manifestation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Item"/>
+                    <rdf:Description rdf:about="&core;Manifestation"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#reproductionOf -->
+
+    <owl:ObjectProperty rdf:about="&core;reproductionOf">
+        <rdfs:label xml:lang="en">is reproduction of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the manifestation/item of a reproduced one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#responsibleEntity -->
+
+    <owl:ObjectProperty rdf:about="&core;responsibleEntity">
+        <rdfs:label xml:lang="en">has responsible entity</rdfs:label>
+        <rdfs:comment xml:lang="en">Any endeavour having a particular entity that is responsible of it.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Endeavour"/>
+        <rdfs:range rdf:resource="&core;ResponsibleEntity"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#responsibleEntityOf -->
+
+    <owl:ObjectProperty rdf:about="&core;responsibleEntityOf">
+        <rdfs:label xml:lang="en">is responsible entity of</rdfs:label>
+        <rdfs:comment xml:lang="en">An entity that is resposible for a particular endeavour.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;responsibleEntity"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#revision -->
+
+    <owl:ObjectProperty rdf:about="&core;revision">
+        <rdfs:label xml:lang="en">has revision</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression revised in another one.
+
+A revision has the intent to alter or update the content of the prior expression, but without changing the content so much that it becomes a new work.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <rdfs:range rdf:resource="&core;Expression"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;revisionOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#revisionOf -->
+
+    <owl:ObjectProperty rdf:about="&core;revisionOf">
+        <rdfs:label xml:lang="en">is revision of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the previous expression of a revised one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#subject -->
+
+    <owl:ObjectProperty rdf:about="&core;subject">
+        <rdfs:label xml:lang="en">has subject</rdfs:label>
+        <rdfs:comment xml:lang="en">A work linked to a particular subject it is talking about.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Work"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;CorporateBody"/>
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <rdf:Description rdf:about="&core;Subject"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#subjectOf -->
+
+    <owl:ObjectProperty rdf:about="&core;subjectOf">
+        <rdfs:label xml:lang="en">is subject of</rdfs:label>
+        <rdfs:comment xml:lang="en">A subject a work talks abbout.</rdfs:comment>
+        <owl:inverseOf rdf:resource="&core;subject"/>
+        <rdfs:subPropertyOf rdf:resource="&owl;topObjectProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#successor -->
+
+    <owl:ObjectProperty rdf:about="&core;successor">
+        <rdfs:label xml:lang="en">has successor</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression work/expression having another one as successor.
+
+The successor type of relationship involves a kind of linear progression of content from one work/expression to the other. In some cases, the content of the successor may be closely connected to the content of the preceding work, which would result in a work that is referential. In others, such as with loosely connected parts of a trilogy, the successor will be autonomous. Serial publications that result from the merger or split of their predecessors and stand on their own without requiring reference to the predecessor are also examples of autonomous works that fall within the successor relationship type. If there exists a relation of this kind among two different expressions, then they always refer to different works.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;successorOf"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#successorOf -->
+
+    <owl:ObjectProperty rdf:about="&core;successorOf">
+        <rdfs:label xml:lang="en">is successor of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the previous work/expression of a succeeded one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#summarization -->
+
+    <owl:ObjectProperty rdf:about="&core;summarization">
+        <rdfs:label xml:lang="en">has summarization</rdfs:label>
+        <rdfs:comment xml:lang="en">A work/expression summarized in another one.
+
+This property describe the summarization of an original work that is sufficient in degree to warrant their being considered as new works, rather than simply different expressions of the same work. If there exists a relation of this kind among two different expressions, they always refer to different works.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;summarizationOf"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#summarizationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;summarizationOf">
+        <rdfs:label xml:lang="en">is summarization of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the original work/expression of a summarized one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#supplement -->
+
+    <owl:ObjectProperty rdf:about="&core;supplement">
+        <rdfs:label xml:lang="en">has supplement</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression work/expression having another one as supplement.
+
+The supplement relationship type involves works/expressions that are intended to be used in conjunction with another work/expression. Some of these, such as indices, concordances, teachers&#39; guides, glosses, and instruction manuals for electronic resources will be so closely associated with the content of the related work/expression that they are useless without the other work/expression.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;supplementOf"/>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#supplementOf -->
+
+    <owl:ObjectProperty rdf:about="&core;supplementOf">
+        <rdfs:label xml:lang="en">is supplement of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the work/expression of a particular supplement of it.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#transformation -->
+
+    <owl:ObjectProperty rdf:about="&core;transformation">
+        <rdfs:label xml:lang="en">has transformation</rdfs:label>
+        <rdfs:comment xml:lang="en">An work/expression transformed in another one.
+
+This property describes works that are intended to be a trasformation another original work that is sufficient in degree to warrant their being considered as new works, rather than simply different expressions of the same work. If there exists a relation of this kind among two different expressions, then they always refer to different works.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;transformationOf"/>
+        <rdfs:domain>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:domain>
+        <rdfs:range>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </rdfs:range>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#transformationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;transformationOf">
+        <rdfs:label xml:lang="en">is transformation of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the original work/expression of a trasformed one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#translation -->
+
+    <owl:ObjectProperty rdf:about="&core;translation">
+        <rdfs:label xml:lang="en">has translation</rdfs:label>
+        <rdfs:comment xml:lang="en">An expression translated in another one.
+
+It allows to refer to a literal translation, in which the intent is to render the intellectual content of the previous expression as accurately as possible.</rdfs:comment>
+        <rdfs:domain rdf:resource="&core;Expression"/>
+        <rdfs:range rdf:resource="&core;Expression"/>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+        <owl:inverseOf rdf:resource="&core;translationOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#translationOf -->
+
+    <owl:ObjectProperty rdf:about="&core;translationOf">
+        <rdfs:label xml:lang="en">is translation of</rdfs:label>
+        <rdfs:comment xml:lang="en">It identifies the original expression of a translated one.</rdfs:comment>
+        <rdfs:subPropertyOf rdf:resource="&core;relatedEndeavour"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.w3.org/2002/07/owl#topObjectProperty -->
+
+    <owl:ObjectProperty rdf:about="&owl;topObjectProperty"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Concept -->
+
+    <owl:Class rdf:about="&core;Concept">
+        <rdfs:label xml:lang="en">concept</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;Subject"/>
+        <rdfs:comment xml:lang="en">An abstract notion or idea.
+
+The entity defined as concept encompasses a comprehensive range of abstractions that may be the subject of a work: fields of knowledge, disciplines, schools of thought (philosophies, religions, political ideologies, etc.), theories, processes, techniques, practices, etc.  A concept may be broad in nature or narrowly defined and precise. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#CorporateBody -->
+
+    <owl:Class rdf:about="&core;CorporateBody">
+        <rdfs:label xml:lang="en">corporate body</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;ResponsibleEntity"/>
+        <owl:disjointWith rdf:resource="&core;Person"/>
+        <rdfs:comment xml:lang="en">An organization or group of individuals and/or organizations acting as a unit.
+
+The entity defined as corporate body encompasses organizations and groups of individuals and/or organizations that are identified by a particular name, including occasional groups and groups that are constituted as meetings, conferences, congresses, expeditions, exhibitions, festivals, fairs, etc.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Endeavour -->
+
+    <owl:Class rdf:about="&core;Endeavour">
+        <rdfs:label xml:lang="en">endeavour</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Expression"/>
+                    <rdf:Description rdf:about="&core;Item"/>
+                    <rdf:Description rdf:about="&core;Manifestation"/>
+                    <rdf:Description rdf:about="&core;Work"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:comment xml:lang="en">It describes different aspects of user interests in the products of intellectual or artistic artifact.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Event -->
+
+    <owl:Class rdf:about="&core;Event">
+        <rdfs:label xml:lang="en">event</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;Subject"/>
+        <rdfs:comment xml:lang="en">An action or occurrence.
+
+The entity defined as event encompasses a comprehensive range of actions and occurrences that may be the subject of a work: historical events, epochs, periods of time, etc. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Expression -->
+
+    <owl:Class rdf:about="&core;Expression">
+        <rdfs:label xml:lang="en">expression</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;embodiment"/>
+                        <owl:someValuesFrom rdf:resource="&core;Manifestation"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;realizationOf"/>
+                        <owl:someValuesFrom rdf:resource="&core;Work"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;part"/>
+                        <owl:allValuesFrom rdf:resource="&core;Expression"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;partOf"/>
+                        <owl:allValuesFrom rdf:resource="&core;Expression"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:disjointWith rdf:resource="&core;Item"/>
+        <owl:disjointWith rdf:resource="&core;Manifestation"/>
+        <owl:disjointWith rdf:resource="&core;Work"/>
+        <rdfs:comment xml:lang="en">The intellectual or artistic realization of a work in the form of alpha-numeric, musical, or choreographic notation, sound, image, object, movement, etc., or any combination of such forms.
+
+An expression is the specific intellectual or artistic form that a work takes each time it is &quot;realized.&quot; Expression encompasses, for example, the specific words, sentences, paragraphs, etc. that result from the realization of a work in the form of a text, or the particular sounds, phrasing, etc. resulting from the realization of a musical work.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Item -->
+
+    <owl:Class rdf:about="&core;Item">
+        <rdfs:label xml:lang="en">item</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;part"/>
+                        <owl:allValuesFrom rdf:resource="&core;Item"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;partOf"/>
+                        <owl:allValuesFrom rdf:resource="&core;Item"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;exemplarOf"/>
+                        <owl:someValuesFrom rdf:resource="&core;Manifestation"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:disjointWith rdf:resource="&core;Manifestation"/>
+        <owl:disjointWith rdf:resource="&core;Work"/>
+        <rdfs:comment xml:lang="en">A single exemplar of a manifestation.
+
+The entity defined as item is a concrete entity. It is in many instances a single physical object (e.g., a copy of a one-volume monograph, a single audio cassette, etc.). There are instances, however, where the entity defined as item comprises more than one physical object (e.g., a monograph issued as two separately bound volumes, a recording issued on three separate compact discs, etc.). </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Manifestation -->
+
+    <owl:Class rdf:about="&core;Manifestation">
+        <rdfs:label xml:lang="en">manifestation</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;part"/>
+                        <owl:allValuesFrom rdf:resource="&core;Manifestation"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;partOf"/>
+                        <owl:allValuesFrom rdf:resource="&core;Manifestation"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;embodimentOf"/>
+                        <owl:someValuesFrom rdf:resource="&core;Expression"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;exemplar"/>
+                        <owl:someValuesFrom rdf:resource="&core;Item"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:disjointWith rdf:resource="&core;Work"/>
+        <rdfs:comment xml:lang="en">The physical embodiment of an expression of a work.
+
+The entity defined as manifestation encompasses a wide range of materials and formats. As an entity, manifestation represents all the physical objects that bear the same characteristics, in respect to both intellectual content and physical form. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Object -->
+
+    <owl:Class rdf:about="&core;Object">
+        <rdfs:label xml:lang="en">object</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;Subject"/>
+        <rdfs:comment xml:lang="en">A material thing.
+
+The entity defined as object encompasses a comprehensive range of material things that may be the subject of a work: animate and inanimate objects occurring in nature; fixed, movable, and moving objects that are the product of human creation; objects that no longer exist. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Person -->
+
+    <owl:Class rdf:about="&core;Person">
+        <rdfs:label xml:lang="en">person</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;ResponsibleEntity"/>
+        <rdfs:comment xml:lang="en">An individual. The entity defined as person encompasses individuals that are deceased as well as those that are living.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Place -->
+
+    <owl:Class rdf:about="&core;Place">
+        <rdfs:label xml:lang="en">place</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&core;Subject"/>
+        <rdfs:comment xml:lang="en">A location.
+
+The entity defined as place encompasses a comprehensive range of locations: terrestrial and extra-terrestrial; historical and contemporary; geographic features and geo-political jurisdictions. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#ResponsibleEntity -->
+
+    <owl:Class rdf:about="&core;ResponsibleEntity">
+        <rdfs:label xml:lang="en">responsible entity</rdfs:label>
+        <rdfs:comment xml:lang="en">It represents those responsible for the intellectual or artistic content, the physical production and dissemination, or the custodianship of any endeavour.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Subject -->
+
+    <owl:Class rdf:about="&core;Subject">
+        <rdfs:label xml:lang="en">subject</rdfs:label>
+        <rdfs:comment xml:lang="en">It represents an additional set of entities that serve as the subjects of works.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://purl.org/vocab/frbr/core#Work -->
+
+    <owl:Class rdf:about="&core;Work">
+        <rdfs:label xml:lang="en">work</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;realization"/>
+                        <owl:someValuesFrom rdf:resource="&core;Expression"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&core;Endeavour"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;part"/>
+                        <owl:allValuesFrom rdf:resource="&core;Work"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&core;partOf"/>
+                        <owl:allValuesFrom rdf:resource="&core;Work"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:comment xml:lang="en">A distinct intellectual or artistic creation.
+
+A work is an abstract entity; there is no single material object one can point to as the work. We recognize the work through individual realizations or expressions of the work, but the work itself exists only in the commonality of content between and among the various expressions of the work. When we speak of Homer&#39;s Iliad as a work, our point of reference is not a particular recitation or text of the work, but the intellectual creation that lies behind all the various expressions of the work. </rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="&core;Concept"/>
+            <rdf:Description rdf:about="&core;Event"/>
+            <rdf:Description rdf:about="&core;Object"/>
+            <rdf:Description rdf:about="&core;Place"/>
+        </owl:members>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Rules
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <swrl:Variable rdf:about="urn:swrl#e1"/>
+    <swrl:Variable rdf:about="urn:swrl#w1"/>
+    <swrl:Variable rdf:about="urn:swrl#e2"/>
+    <swrl:Variable rdf:about="urn:swrl#w2"/>
+    <swrl:Imp>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;supplement"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:SameIndividualAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:SameIndividualAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;revision"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;complement"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;successor"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;adaption"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;imitation"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+            </swrl:AtomList>
+        </swrl:body>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;transformation"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:SameIndividualAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:SameIndividualAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;abridgement"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;arrangement"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                    </swrl:AtomList>
+                </rdf:rest>
+            </swrl:AtomList>
+        </swrl:body>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:SameIndividualAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:SameIndividualAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:DifferentIndividualsAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:DifferentIndividualsAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;summarization"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                    </swrl:AtomList>
+                </rdf:rest>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:body>
+    </swrl:Imp>
+    <swrl:Imp>
+        <swrl:body>
+            <swrl:AtomList>
+                <rdf:first>
+                    <swrl:IndividualPropertyAtom>
+                        <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w1"/>
+                    </swrl:IndividualPropertyAtom>
+                </rdf:first>
+                <rdf:rest>
+                    <swrl:AtomList>
+                        <rdf:first>
+                            <swrl:IndividualPropertyAtom>
+                                <swrl:propertyPredicate rdf:resource="&core;realizationOf"/>
+                                <swrl:argument1 rdf:resource="urn:swrl#e2"/>
+                                <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                            </swrl:IndividualPropertyAtom>
+                        </rdf:first>
+                        <rdf:rest>
+                            <swrl:AtomList>
+                                <rdf:rest rdf:resource="&rdf;nil"/>
+                                <rdf:first>
+                                    <swrl:IndividualPropertyAtom>
+                                        <swrl:propertyPredicate rdf:resource="&core;translation"/>
+                                        <swrl:argument1 rdf:resource="urn:swrl#e1"/>
+                                        <swrl:argument2 rdf:resource="urn:swrl#e2"/>
+                                    </swrl:IndividualPropertyAtom>
+                                </rdf:first>
+                            </swrl:AtomList>
+                        </rdf:rest>
+                    </swrl:AtomList>
+                </rdf:rest>
+            </swrl:AtomList>
+        </swrl:body>
+        <swrl:head>
+            <swrl:AtomList>
+                <rdf:rest rdf:resource="&rdf;nil"/>
+                <rdf:first>
+                    <swrl:SameIndividualAtom>
+                        <swrl:argument1 rdf:resource="urn:swrl#w1"/>
+                        <swrl:argument2 rdf:resource="urn:swrl#w2"/>
+                    </swrl:SameIndividualAtom>
+                </rdf:first>
+            </swrl:AtomList>
+        </swrl:head>
+    </swrl:Imp>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.2.1782) http://owlapi.sourceforge.net -->
+
+
+
