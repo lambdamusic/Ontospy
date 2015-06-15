@@ -104,6 +104,7 @@ class QueryHelper(object):
 		return list(qres)
 
 
+	#legacy
 	
 	def getAllClassesFromInstancesToo(self):
 		"""
