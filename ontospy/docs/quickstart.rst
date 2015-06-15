@@ -303,6 +303,30 @@ Match two models (in development)
 
 
 
+Getting data from multiple ontologies
+++++++++++++++++++++++++++++++++++++++++++
+
+.. code-block:: python
+
+    In [30]: g2 = ontospy.Graph("data/schemas/npgmusic_mix.ttl")
+    ----------
+    Loaded 3225 triples from <data/schemas/npgmusic_mix.ttl>
+    started scanning...
+    ----------
+    Ontologies found: 2
+    Classes found...: 109
+    Properties found: 301
+    Annotation......: 10
+    Datatype........: 107
+    Object..........: 184
+
+    In [31]: for o in g2.ontologies:
+       ....:     print o, len(o.classes)
+       ....:     
+    <OntoSPy: Ontology object for uri *http://ns.nature.com/terms/*> 49
+    <OntoSPy: Ontology object for uri *http://purl.org/ontology/mo/*> 54
+
+
 
 Querying a SPARQL endpoint
 ++++++++++++++++++++++++++++++++++++++++++++

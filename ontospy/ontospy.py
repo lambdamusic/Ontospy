@@ -16,14 +16,9 @@ More info in the README file.
 """
 
 
-import sys, os, urllib2, time, optparse
+import sys, os, time, optparse
 
-import rdflib
-
-from libs.util import *
-from libs.graph import *
-from libs.entities import *
-from libs.queryHelper import QueryHelper
+from libs.graph import Graph, SparqlEndpoint
 
 from _version import *
 

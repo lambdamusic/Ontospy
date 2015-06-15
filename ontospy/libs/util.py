@@ -281,8 +281,12 @@ def inferURILocalSymbol(aUri):
 		ns = stringa.split("#")[0]
 		name = stringa.split("#")[1]
 	except:
-		ns = stringa.rsplit("/", 1)[0]
-		name = stringa.rsplit("/", 1)[1]
+		if "/" in stringa:
+			ns = stringa.rsplit("/", 1)[0]
+			name = stringa.rsplit("/", 1)[1]
+		else:
+			ns = ""
+			name = stringa
 	return (name, ns)
 
 

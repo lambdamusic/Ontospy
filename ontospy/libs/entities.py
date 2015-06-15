@@ -164,35 +164,10 @@ class Ontology(RDF_Entity):
 
 		self.classes = []			
 		self.properties = [] 
-		self.annotationProperties = [] 
-		self.objectProperties = []
-		self.datatypeProperties = []
+		# self.annotationProperties = []
+		# self.objectProperties = []
+		# self.datatypeProperties = []
 
-
-	def stats(self):
-		"""
-		Returns a list of tuples containining interesting stats about the ontology
-		"""
-		out = []
-		# out += [("Triples", len(self.rdfGraph))]
-		out += [("Classes", len(self.classesList))]
-		# out += [("Object Properties", len(self.allobjproperties))]
-		# out += [("Datatype Properties", len(self.alldataproperties))]
-		# out += [("Individuals", len(self.allinstances))]
-		return out
-		
-	def classesList(self):
-		print "@todo"
-		return []
-
-	def classesTree(self):
-		print "@todo"
-
-	def propertiesList(self):
-		print "@todo"
-
-	def propertiesTree(self):
-		print "@todo"
 
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
@@ -219,6 +194,7 @@ class OntoClass(RDF_Entity):
 
 		self.domain_of = []
 		self.range_of = []
+		self.ontology = None
 		
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
@@ -270,7 +246,7 @@ class OntoProperty(RDF_Entity):
 		
 		self.domains = []
 		self.ranges = []
-		
+		self.ontology = None
 
 	def __repr__(self):
 		return "<Property *%s*>" % ( self.uri)

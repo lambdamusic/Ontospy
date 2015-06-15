@@ -21,9 +21,12 @@ import sys, os, urllib2, time, optparse
 import rdflib
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
-from util import *
-from entities import *
-from queryHelper import QueryHelper
+from libs.util import *
+from libs.entities import *
+from libs.queryHelper import QueryHelper
+
+from _version import *
+
 
 
 class Graph(object):
@@ -123,8 +126,7 @@ class Graph(object):
 				self.rdfgraph.parse(data=source, format=rdf_format)
 				printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
 			elif self.IS_ENDPOINT:
-				printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
-				printDebug("(note: support for sparql endpoints is still experimental)")
+				pass
 			else:
 				self.rdfgraph.parse(source, format=rdf_format)
 				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
@@ -202,7 +204,7 @@ class Graph(object):
 			self.__loadRDF(source, text, endpoint, rdf_format)
 		
 		printDebug("started scanning...\n----------")
-					
+						
 		self.__extractNamespaces()
 		
 		self.__extractOntologies()
@@ -314,13 +316,6 @@ class Graph(object):
 			
 			aClass.triples = self.queryHelper.entityTriples(aClass.uri)
 			aClass._buildGraph() # force construction of mini graph
-			
-			# attach to an ontology 
-			for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-				onto = self.getOntology(str(uri))
-				if onto:
-					onto.classes += [aClass]
-					aClass.ontology = onto
 					
 			# add direct Supers				
 			directSupers = self.queryHelper.getClassDirectSupers(aClass.uri)
@@ -381,15 +376,6 @@ class Graph(object):
 			aProp.triples = self.queryHelper.entityTriples(aProp.uri)
 			aProp._buildGraph() # force construction of mini graph
 
-			# attach to an ontology [2015-06-15: no property type distinction yet]
-			for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-				onto = self.getOntology(str(uri))
-				if onto:
-					onto.properties += [aProp]
-					aProp.ontology = onto
-					
-					
-					
 			self.__buildDomainRanges(aProp)
 			
 			# add direct Supers				
@@ -485,38 +471,7 @@ class Graph(object):
 					return x
 			return None
 			
-
-	def getOntology(self, id=None, uri=None, match=None):
-		""" 
-		get the saved-ontology with given ID or via other methods...	
-		"""
-		
-		if not id and not uri and not match:
-			return None
-			
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not uri.startswith("http://"):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			for x in self.ontologies:
-				if match.lower() in x.uri.lower():
-					res += [x]
-			return res
-		else:
-			for x in self.ontologies:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
-			
-								
+					
 
 	def __computeTopLayer(self):
 
@@ -619,6 +574,141 @@ class SparqlEndpoint(Graph):
 		Init ontology object. Load the graph in memory, then setup all necessary attributes.
 		"""
 		super(SparqlEndpoint, self).__init__(source, text=False, endpoint=True, rdf_format=None)	
+
+
+
+
+##################
+# 
+#  COMMAND LINE 
+#
+##################
+
+
+
+def shellPrintOverview(g, opts):
+	ontologies = g.ontologies
+	
+	for o in ontologies:
+		print "-----------\nOntology Annotations:"
+		o.printTriples()
+		
+	if False:
+		print "Top Layer:", str([cc.qname for cc in g.toplayer])
+	
+	# if False:
+	#	for c in g.classes:
+	#		print c.qname
+	#		print "...direct Supers: ", len(c.directSupers), str([cc.qname for cc in c.directSupers])
+	#		print "...direct Subs: ", len(c.directSubs), str([cc.qname for cc in c.directSubs])
+
+		# c.triplesPrint()
+	
+	if opts['classtaxonomy']:
+		print "\nClass Taxonomy\n" + "-" * 10 
+		g.printClassTree(showids=False, labels=opts['labels'])
+	
+	if opts['propertytaxonomy']:
+		print "\nProperty Taxonomy\n" + "-" * 10 
+		g.printPropertyTree(showids=False, labels=opts['labels'])
+		
+
+
+
+
+
+
+
+
+def parse_options():
+	"""
+	parse_options() -> opts, args
+
+	Parse any command-line options given returning both
+	the parsed options and arguments.
+	
+	https://docs.python.org/2/library/optparse.html
+	
+	"""
+	
+	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	
+	parser.add_option("-e", "--entities",
+			action="store_true", default=False, dest="entities",
+			help="Print detailed information for all entities in the ontology.")
+
+	parser.add_option("-c", "--classtaxonomy",
+			action="store_true", default=False, dest="classtaxonomy",
+			help="Print the class taxonomy.")
+
+	parser.add_option("-p", "--propertytaxonomy",
+			action="store_true", default=False, dest="propertytaxonomy",
+			help="Print the property taxonomy.")
+
+	parser.add_option("-l", "--labels",
+			action="store_true", default=False, dest="labels",
+			help="Print entities labels (if available) as well as URIs.")
+									
+	opts, args = parser.parse_args()
+
+	# if len(args) < 1:
+	#	parser.print_help()
+	#	raise SystemExit, 1
+
+	return opts, args
+
+
+	
+def main():
+	""" command line script """
+	
+	opts, args = parse_options()
+	
+	print_opts = {
+					'entities' : opts.entities, 
+					'classtaxonomy' : opts.classtaxonomy, 
+					'propertytaxonomy' : opts.propertytaxonomy,
+					'labels' : opts.labels,
+				}
+	
+	DEFAULT_ONTO = "data/schemas/pizza.ttl"
+	
+	sTime = time.time()
+	
+	if opts.entities:
+		# @TODO
+		print "Sorry not implemented yet"
+		sys.exit(0)
+
+	else:
+	
+		if args:
+			g = Graph(args[0])
+		else:
+			print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
+			g = Graph(DEFAULT_ONTO)
+		
+		shellPrintOverview(g, print_opts)
+
+
+	# finally:	
+	# print some stats.... 
+	eTime = time.time()
+	tTime = eTime - sTime
+	print "-" * 10 
+	print "Time:	   %0.2fs" %  tTime
+
+
+
+ 
+	
+if __name__ == '__main__':
+	import sys
+	try:
+		main()
+		sys.exit(0)
+	except KeyboardInterrupt, e: # Ctrl-C
+		raise e
 
 
 
