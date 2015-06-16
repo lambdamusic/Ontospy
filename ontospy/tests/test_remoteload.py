@@ -3,7 +3,7 @@ Unit test stub for ontosPy
 
 Launch with 
 
-python test_endpoints.py
+python test_remoteload.py
 
 """
 
@@ -14,12 +14,16 @@ import ontospy
 
 
 ENDPOINTS = [
-				# "http://uriburner.com/sparql", 
+				"http://dbpedia.org/sparql", 
 				"http://data.semanticweb.org/sparql", 
-				# "http://zbw.eu/beta/sparql/", 
-				"http://factforge.net/sparql", 
-				"http://sparql.vivo.ufl.edu/"
 			]
+
+
+# other endpoints that should be tested:
+# "http://uriburner.com/sparql", 
+# "http://zbw.eu/beta/sparql/", 
+# "http://factforge.net/sparql", 
+# "http://sparql.vivo.ufl.edu/"
 
 
 
