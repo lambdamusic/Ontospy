@@ -315,6 +315,8 @@ class Graph(object):
 			aClass.triples = self.queryHelper.entityTriples(aClass.uri)
 			aClass._buildGraph() # force construction of mini graph
 			
+			aClass.queryHelper = self.queryHelper
+			
 			# attach to an ontology 
 			for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
 				onto = self.getOntology(str(uri))

@@ -148,6 +148,33 @@ class QueryHelper(object):
 		return list(qres)
 		
 
+	def getClassInstances(self, aURI):
+		aURI = str(aURI)
+		qres = self.rdfgraph.query(
+			  """SELECT DISTINCT ?x
+				 WHERE {
+					 { ?x rdf:type <%s> }  
+					 FILTER (!isBlank(?x))
+				 } ORDER BY ?x	  
+				 """ % (aURI))
+		return list(qres)
+
+	def getClassInstancesCount(self, aURI):
+		aURI = str(aURI)
+		qres = self.rdfgraph.query(
+			  """SELECT (COUNT(?x) AS ?count )
+				 WHERE {
+					 { ?x rdf:type <%s> }  
+					 FILTER (!isBlank(?x))
+				 } ORDER BY ?x	  
+				 """ % (aURI))
+		try:
+			return int(list(qres)[0][0])
+		except:
+			printDebug("Error with <getClassInstancesCount>")
+			return 0
+
+				
 	def getClassDirectSupers(self, aURI):
 		aURI = str(aURI)
 		qres = self.rdfgraph.query(

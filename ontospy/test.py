@@ -7,7 +7,11 @@ import ontospy
 import rdflib
 
 
-g = ontospy.Graph("data/schema", endpoint=True)
+g = ontospy.Graph("data/schemas/fabio.rdf")
+
+
+for x in g.classes:
+	print x, x.count()
 
 
 # g = ontospy.Graph("http://dbpedia.org/sparql", endpoint=True)

@@ -195,14 +195,27 @@ class OntoClass(RDF_Entity):
 		self.domain_of = []
 		self.range_of = []
 		self.ontology = None
+		self.queryHelper = None  # the original graph the class derives from
 		
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
 
 	
-	# @todo: does this go here? 
 	def instances(self):  # = all instances
-		pass
+		return self.all()
+		
+	def all(self):
+		out = []
+		if self.queryHelper:
+			qres = self.queryHelper.getClassInstances(self.uri)
+			out = list(qres)
+		return out
+		
+	def count(self):
+		if self.queryHelper:
+			return self.queryHelper.getClassInstancesCount(self.uri)
+		else:
+			return 0
 
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
@@ -213,6 +226,7 @@ class OntoClass(RDF_Entity):
 		printDebug("Descendants..: %d" % len(self.descendants()))
 		printDebug("Domain of....: %d" % len(self.domain_of))
 		printDebug("Range of.....: %d" % len(self.range_of))
+		printDebug("Instances....: %d" % self.count())
 		self.printTriples()
 
 			
