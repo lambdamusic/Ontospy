@@ -19,7 +19,7 @@ More info in the README file.
 import sys, os, time, optparse
 
 from libs.graph import Graph, SparqlEndpoint
-
+from tools.catalog import viewCatalog
 from _version import *
 
 

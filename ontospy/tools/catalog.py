@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+
+# encoding: utf-8
+
+"""
+RDF MODELS CATALOG
+Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+
+Shows a list of ontologies by querying http://prefix.cc/popular/all
+
+++ Tip: make this file executable: chmod +x catalog.py ++ 
+
+"""
+
+USAGE = "python tools/catalog.py "
+VERSION = 0.1
+
+
+import ontospy, rdflib
+import time, optparse, csv, os
+from difflib import SequenceMatcher
+from libs.util import *
+
+
+	
+def viewCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
+	""" 
+	extracts a list of ontology URIs from http://prefix.cc/popular/all
+	"""
+
+	printDebug("----------\nReading source...")
+	
+	g = ontospy.Graph(source)
+	
+	out = []
+	for x in g.ontologies:
+		if query:
+			if query in unicode(x.prefix) or query in unicode(x.uri):
+				out += [(unicode(x.prefix), unicode(x.uri))]
+		else:
+			out += [(unicode(x.prefix), unicode(x.uri))]
+		
+	printDebug("----------\n%d results found." % len(out))
+	
+	return out			
+
+
+
+
+def parse_options():
+	"""
+	parse_options() -> opts, args
+
+	Parse any command-line options given returning both
+	the parsed options and arguments.
+	
+	https://docs.python.org/2/library/optparse.html
+	
+	"""
+	
+	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	
+	parser.add_option("-q", "--query",
+			action="store", type="string", default="", dest="query",
+			help="A query string that matches the catalog entries.")
+			
+	opts, args = parser.parse_args()
+
+	return opts, args
+
+
+
+	
+def main():
+	""" command line script """
+	
+	opts, args = parse_options()
+		
+			
+	sTime = time.time()
+				
+	options = viewCatalog(query=opts.query)
+	
+	for x in options:
+		print x[0], " ==> ", x[1]
+	
+	# finally:	
+	# print some stats.... 
+	eTime = time.time()
+	tTime = eTime - sTime
+	printDebug("-" * 10) 
+	printDebug("Time:	   %0.2fs" %  tTime)
+
+
+
+
+				
+	
+if __name__ == '__main__':
+	import sys
+	try:
+		main()
+		sys.exit(0)
+	except KeyboardInterrupt, e: # Ctrl-C
+		raise e

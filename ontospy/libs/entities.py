@@ -154,13 +154,14 @@ class Ontology(RDF_Entity):
 		return "<OntoSPy: Ontology object for uri *%s*>" % (self.uri)
 
 
-	def __init__(self, uri, rdftype=None, namespaces=None):
+	def __init__(self, uri, rdftype=None, namespaces=None, prefPrefix=""):
 		"""
 		Init ontology object. Load the graph in memory, then setup all necessary attributes.
 		"""
 		super(Ontology, self).__init__(uri, rdftype, namespaces)	
 		# self.uri = uri # rdflib.Uriref
 		self.annotations = self.triples
+		self.prefix = prefPrefix
 
 		self.classes = []			
 		self.properties = [] 

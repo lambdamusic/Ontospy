@@ -255,9 +255,14 @@ class Graph(object):
 							out += [Ontology(checkDC_ID[0])]
 						else:
 							vannprop = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespaceUri")
+							vannpref = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespacePrefix")
 							checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], vannprop)]
 							if checkDC_ID:
-								out += [Ontology(checkDC_ID[0])]
+								checkDC_prefix = [x for x in self.rdfgraph.objects(candidate[0], vannpref)]
+								if checkDC_prefix:
+									out += [Ontology(checkDC_ID[0], prefPrefix=checkDC_prefix[0])]
+								else:
+									out += [Ontology(checkDC_ID[0])]
 						
 				else:
 					out += [Ontology(candidate[0])]
