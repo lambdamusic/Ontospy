@@ -83,11 +83,11 @@ def parse_options():
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
-	parser.add_option("-e", "--entities",
-			action="store_true", default=False, dest="entities",
-			help="Print detailed information for all entities in the ontology.")
+	# parser.add_option("-e", "--entities",
+	# 		action="store_true", default=False, dest="entities",
+	# 		help="Print detailed information for all entities in the ontology.")
 
-	parser.add_option("-a", "--ontoannotations",
+	parser.add_option("-a", "--annotations",
 			action="store_true", default=False, dest="ontoannotations",
 			help="Print the ontology annotations/metadata.")
 			
@@ -116,34 +116,29 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	# get file location
+	dirname, filename = os.path.split(os.path.abspath(__file__))
+	DEFAULT_ONTO = dirname + "/data/schemas/pizza.ttl"
+	
 	opts, args = parse_options()
 	
 	print_opts = {
 					'ontoannotations' : opts.ontoannotations, 
-					'entities' : opts.entities, 
+					# 'entities' : opts.entities, 
 					'classtaxonomy' : opts.classtaxonomy, 
 					'propertytaxonomy' : opts.propertytaxonomy,
 					'labels' : opts.labels,
 				}
 	
-	DEFAULT_ONTO = "data/schemas/pizza.ttl"
-	
 	sTime = time.time()
-	
-	if opts.entities:
-		# @TODO
-		print "Sorry not implemented yet"
-		sys.exit(0)
 
+	if args:
+		g = Graph(args[0])
 	else:
+		print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
+		g = Graph(DEFAULT_ONTO)
 	
-		if args:
-			g = Graph(args[0])
-		else:
-			print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
-			g = Graph(DEFAULT_ONTO)
-		
-		shellPrintOverview(g, print_opts)
+	shellPrintOverview(g, print_opts)
 
 
 	# finally:	
