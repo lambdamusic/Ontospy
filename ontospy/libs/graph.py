@@ -227,9 +227,15 @@ class Graph(object):
 
 	
 	
-	def __extractOntologies(self, exclude_BNodes = False, tryDC_metadata = True, return_string=False):
+	def __extractOntologies(self, exclude_BNodes = False, return_string=False):
 		"""
 		returns Ontology class instances
+		
+        [ a owl:Ontology ;
+            vann:preferredNamespacePrefix "bsym" ;
+            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
+			
+			
 				
 		"""
 		out = []
@@ -243,18 +249,16 @@ class Graph(object):
 				if isBlankNode(candidate[0]):
 					if exclude_BNodes:
 						continue
-					if tryDC_metadata:
-						# @todo: transform into SPARQL EG
-						# qres2 = self.rdfgraph.query(
-						#	  """SELECT DISTINCT ?z
-						#		 WHERE {
-						#			<%s> dc:identifier ?z
-						#		 }""" % str(candidate[0]))
-							   
-						checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], DC.identifier)]
+					else:
+						checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], rdflib.namespace.DC.identifier)]
 						if checkDC_ID:
 							out += [Ontology(checkDC_ID[0])]
-							
+						else:
+							vannprop = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespaceUri")
+							checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], vannprop)]
+							if checkDC_ID:
+								out += [Ontology(checkDC_ID[0])]
+						
 				else:
 					out += [Ontology(candidate[0])]
 			
