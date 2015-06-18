@@ -19,7 +19,7 @@ More info in the README file.
 import sys, os, time, optparse
 
 from libs.graph import Graph, SparqlEndpoint
-from tools.catalog import viewCatalog
+
 from _version import *
 
 
@@ -101,7 +101,7 @@ def parse_options():
 
 	parser.add_option("-l", "--labels",
 			action="store_true", default=False, dest="labels",
-			help="Print entities labels (if available) as well as URIs.")
+			help="Print entities labels as well as URIs (used in conjunction with -c or -p).")
 									
 	opts, args = parser.parse_args()
 

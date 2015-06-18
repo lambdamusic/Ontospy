@@ -3,23 +3,21 @@
 # encoding: utf-8
 
 """
-RDF MODELS CATALOG
+RDF MODELS ONLINECATALOG
 Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 Shows a list of ontologies by querying http://prefix.cc/popular/all
 
-++ Tip: make this file executable: chmod +x catalog.py ++ 
-
 """
 
-USAGE = "python tools/catalog.py "
 VERSION = 0.1
+USAGE = "python ontospy/tools/catalog.py"
 
 
-import ontospy, rdflib
-import time, optparse, csv, os
-from difflib import SequenceMatcher
-from libs.util import *
+import time, optparse, os, rdflib
+
+from ontospy import ontospy
+from ontospy.libs.util import *
 
 
 	
@@ -62,7 +60,7 @@ def parse_options():
 	
 	parser.add_option("-q", "--query",
 			action="store", type="string", default="", dest="query",
-			help="A query string that matches the catalog entries.")
+			help="A query string used to match the catalog entries.")
 			
 	opts, args = parser.parse_args()
 
