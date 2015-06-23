@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick Start - Command Line Usage &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5.0 alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="quick-start-command-line-usage">
+<h1>Quick Start - Command Line Usage<a class="headerlink" href="#quick-start-command-line-usage" title="Permalink to this headline">¶</a></h1>
+<p>For the ones who value time.</p>
+<div class="section" id="inspecting-an-ontology">
+<h2>Inspecting an ontology<a class="headerlink" href="#inspecting-an-ontology" title="Permalink to this headline">¶</a></h2>
+<hr class="docutils" />
+<div class="section" id="include-labels-in-property-tree">
+<h3>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy.py data/schemas/foaf.rdf -c -l
+----------
+Loaded <span class="m">630</span> triples from &lt;data/schemas/foaf.rdf&gt;
+started scanning...
+----------
+Ontologies found: 1
+Classes found...: 15
+Properties found: 67
+Annotation......: 7
+Datatype........: 26
+Object..........: 34
+-----------
+Metadata:
+
+http://xmlns.com/foaf/0.1/
+<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/title
+.... Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> <span class="nv">vocabulary</span>
+<span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+.... http://www.w3.org/2002/07/owl#Ontology
+<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/description
+.... The Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
+
+Class Taxonomy
+----------
+http://www.w3.org/2000/10/swap/pim/contact#Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing <span class="o">(</span><span class="s2">&quot;Spatial Thing&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+foaf:Agent <span class="o">(</span><span class="s2">&quot;Agent&quot;</span><span class="o">)</span>
+----foaf:Group <span class="o">(</span><span class="s2">&quot;Group&quot;</span><span class="o">)</span>
+----foaf:Organization <span class="o">(</span><span class="s2">&quot;Organization&quot;</span><span class="o">)</span>
+----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
+foaf:Document <span class="o">(</span><span class="s2">&quot;Document&quot;</span><span class="o">)</span>
+----foaf:Image <span class="o">(</span><span class="s2">&quot;Image&quot;</span><span class="o">)</span>
+----foaf:PersonalProfileDocument <span class="o">(</span><span class="s2">&quot;PersonalProfileDocument&quot;</span><span class="o">)</span>
+foaf:LabelProperty <span class="o">(</span><span class="s2">&quot;Label Property&quot;</span><span class="o">)</span>
+foaf:OnlineAccount <span class="o">(</span><span class="s2">&quot;Online Account&quot;</span><span class="o">)</span>
+----foaf:OnlineChatAccount <span class="o">(</span><span class="s2">&quot;Online Chat Account&quot;</span><span class="o">)</span>
+----foaf:OnlineEcommerceAccount <span class="o">(</span><span class="s2">&quot;Online E-commerce Account&quot;</span><span class="o">)</span>
+----foaf:OnlineGamingAccount <span class="o">(</span><span class="s2">&quot;Online Gaming Account&quot;</span><span class="o">)</span>
+foaf:Project <span class="o">(</span><span class="s2">&quot;Project&quot;</span><span class="o">)</span>
+----------
+Time:          2.77s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="show-a-list-of-ontologies-from-the-web">
+<h2>Show a list of ontologies from the web<a class="headerlink" href="#show-a-list-of-ontologies-from-the-web" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py
+Usage: python ontospy/tools/catalog.py
+
+Options:
+  --version   show program&#39;s version number and exit
+  -h, --help  show this help message and exit
+  -a, --all   Show all entries found by querying http://prefix.cc/popular/all.
+  -q QUERY    A query string used to match the catalog entries.
+</pre></div>
+</div>
+<p>Pass an argument to show only ontology that match it:</p>
+<div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py -q agent
+----------
+Reading source...
+----------
+Loaded <span class="m">6497</span> triples from &lt;http://prefix.cc/popular/all.file.vann&gt;
+started scanning...
+----------
+Ontologies found: 1624
+Classes found...: 0
+Properties found: 0
+Annotation......: 0
+Datatype........: 0
+Object..........: 0
+----------
+<span class="m">3</span> results found.
+<span class="nv">agents</span>  <span class="o">==</span>&gt;  http://eulersharp.sourceforge.net/2003/03swap/agent#
+<span class="nv">swanag</span>  <span class="o">==</span>&gt;  http://purl.org/swan/1.2/agents/
+<span class="nv">agent</span>  <span class="o">==</span>&gt;  http://eulersharp.sourceforge.net/2003/03swap/agent#
+----------
+Time:      10.04s
+</pre></div>
+</div>
+</div>
+<div class="section" id="match-2-models">
+<h2>Match 2 models<a class="headerlink" href="#match-2-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="match-two-models-in-development">
+<h3>Match two models (in development)<a class="headerlink" href="#match-two-models-in-development" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>ontospy&gt; python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl
+Match classes or properties? [c|p]: c
+----------
+Loaded 630 triples from &lt;data/schemas/foaf.rdf&gt;
+started scanning...
+----------
+Ontologies found: 1
+Classes found...: 15
+Properties found: 67
+Annotation......: 7
+Datatype........: 26
+Object..........: 34
+----------
+Loaded 1215 triples from &lt;data/schemas/bibo.owl&gt;
+started scanning...
+----------
+Ontologies found: 1
+Classes found...: 65
+Properties found: 117
+Annotation......: 12
+Datatype........: 54
+Object..........: 51
+----------
+Now matching...
+31 candidates found.
+----------
+Time:          7.14s
+
+# results are saved by default in same folder
+
+&gt; python tools/matcher.py -h
+Usage:
+
+Options:
+  --version             show program&#39;s version number and exit
+  -h, --help            show this help message and exit
+  -o OUTPUTFILE, --outputfile=OUTPUTFILE
+                        The name of the output csv file.
+  -c CONFIDENCE, --confidence=CONFIDENCE
+                        @TODO 0.1-0.9 degree of confidence for similarity
+                        matching.
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick Start - Command Line Usage</a><ul>
+<li><a class="reference internal" href="#inspecting-an-ontology">Inspecting an ontology</a><ul>
+<li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#show-a-list-of-ontologies-from-the-web">Show a list of ontologies from the web</a></li>
+<li><a class="reference internal" href="#match-2-models">Match 2 models</a><ul>
+<li><a class="reference internal" href="#match-two-models-in-development">Match two models (in development)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/quickstart_cmdline.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Michele Pasin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

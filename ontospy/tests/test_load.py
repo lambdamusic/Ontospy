@@ -16,7 +16,7 @@ DATA_FOLDER = "ontospy/data/schemas/"
 
 
 # sanity check
-print "-------------------\nOntosPy version: ",  ontospy.VERSION, "\n-------------------"
+print "-------------------\nOntoSPy ",  ontospy.VERSION, "\n-------------------"
 
 
 class TestLoadOntologies(unittest.TestCase):

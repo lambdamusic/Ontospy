@@ -57,12 +57,20 @@ def parse_options():
 	"""
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
-	
-	parser.add_option("-q", "--query",
+
+	parser.add_option("-a", "--all",
+			action="store_true", default=False, dest="all",
+			help="Show all entries found by querying http://prefix.cc/popular/all.")
+
+	parser.add_option("-q", "",
 			action="store", type="string", default="", dest="query",
 			help="A query string used to match the catalog entries.")
 			
 	opts, args = parser.parse_args()
+
+	if not opts.all and not opts.query:
+		parser.print_help()
+		sys.exit(0)
 
 	return opts, args
 
