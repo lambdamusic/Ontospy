@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Start - Command Line Usage &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    <title>Quick Start - Command Line &mdash; OntoSPy 1.5.0 alpha documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,7 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="index.html" /> 
+    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="index.html" />
+    <link rel="next" title="Running the tests" href="tests.html" />
+    <link rel="prev" title="Quick Start - Python" href="quickstart.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -32,6 +34,12 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tests.html" title="Running the tests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start - Python"
+             accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -41,17 +49,23 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="quick-start-command-line-usage">
-<h1>Quick Start - Command Line Usage<a class="headerlink" href="#quick-start-command-line-usage" title="Permalink to this headline">¶</a></h1>
-<p>For the ones who value time.</p>
-<div class="section" id="inspecting-an-ontology">
-<h2>Inspecting an ontology<a class="headerlink" href="#inspecting-an-ontology" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="quick-start-command-line">
+<h1>Quick Start - Command Line<a class="headerlink" href="#quick-start-command-line" title="Permalink to this headline">¶</a></h1>
+<p>OntoSPy comes with a bunch of executable scripts. If you install OntosPy via one of the suggested methods, an executable is automatically compiled at installation time and added to <cite>usr/local/bin</cite> (on unix-based systems).</p>
+<p>That should be enough to get you going. Currenlty the utility scripts available are 4:</p>
+<p><code class="docutils literal"><span class="pre">ontospy</span></code>, <code class="docutils literal"><span class="pre">ontospy-catalog</span></code>,  <code class="docutils literal"><span class="pre">ontospy-match</span></code>, <code class="docutils literal"><span class="pre">ontospy-sketch</span></code>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This documentation is not up to date.</p>
+</div>
+<div class="section" id="the-ontospy-utility-inspect-an-ontology-quickly">
+<h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly<a class="headerlink" href="#the-ontospy-utility-inspect-an-ontology-quickly" title="Permalink to this headline">¶</a></h2>
 <hr class="docutils" />
 <div class="section" id="include-labels-in-property-tree">
 <h3>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy.py data/schemas/foaf.rdf -c -l
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy foaf.rdf -c -l
 ----------
-Loaded <span class="m">630</span> triples from &lt;data/schemas/foaf.rdf&gt;
+Loaded <span class="m">630</span> triples from &lt;foaf.rdf&gt;
 started scanning...
 ----------
 Ontologies found: 1
@@ -96,8 +110,9 @@ Time:          2.77s
 </div>
 </div>
 </div>
-<div class="section" id="show-a-list-of-ontologies-from-the-web">
-<h2>Show a list of ontologies from the web<a class="headerlink" href="#show-a-list-of-ontologies-from-the-web" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-catalog-utility-discover-commonly-used-models">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models<a class="headerlink" href="#the-ontospy-catalog-utility-discover-commonly-used-models" title="Permalink to this headline">¶</a></h2>
+<p>Show a list of ontologies from the web</p>
 <div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py
 Usage: python ontospy/tools/catalog.py
 
@@ -132,10 +147,9 @@ Time:      10.04s
 </pre></div>
 </div>
 </div>
-<div class="section" id="match-2-models">
-<h2>Match 2 models<a class="headerlink" href="#match-2-models" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="match-two-models-in-development">
-<h3>Match two models (in development)<a class="headerlink" href="#match-two-models-in-development" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="the-ontospy-match-utility-bootstrap-mappings-between-two-models">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models<a class="headerlink" href="#the-ontospy-match-utility-bootstrap-mappings-between-two-models" title="Permalink to this headline">¶</a></h2>
+<p>Match two models (in development)</p>
 <div class="highlight-python"><div class="highlight"><pre>ontospy&gt; python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl
 Match classes or properties? [c|p]: c
 ----------
@@ -180,6 +194,112 @@ Options:
 </pre></div>
 </div>
 </div>
+<div class="section" id="the-ontospy-sketch-utility-sketch-a-turtle-model">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model<a class="headerlink" href="#the-ontospy-sketch-utility-sketch-a-turtle-model" title="Permalink to this headline">¶</a></h2>
+<p>The library includes a little utility called <cite>ontospy-sketch</cite>.</p>
+<p>This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.</p>
+<p>It is meant to be used from the command line and requires you to type in RDF statements using the Turtle serialization.</p>
+<p><em>Note</em>: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to <cite>usr/local/bin</cite> (on unix-based systems). You can run it by typing <cite>sketchonto</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; ontospy-sketch
+Good morning. Ready to Turtle away. Type docs() for help.
+In [1]: docs()
+
+====Sketch v 0.2====
+
+add()  ==&gt; add statements to the graph
+...........SHORTCUTS:
+...........&#39;class&#39; = owl:Class
+...........&#39;sub&#39; = rdfs:subClassOf
+...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
+
+show() ==&gt; shows the graph. Can take an OPTIONAL argument for the format.
+...........eg one of[&#39;xml&#39;, &#39;n3&#39;, &#39;turtle&#39;, &#39;nt&#39;, &#39;pretty-xml&#39;, dot&#39;]
+
+clear()  ==&gt; clears the graph
+...........all triples are removed
+
+omnigraffle() ==&gt; creates a dot file and opens it with omnigraffle
+...........First you must set Omingraffle as your system default app for dot files!
+
+quit() ==&gt; exit
+
+====Have fun!====
+
+
+In [2]: add()
+Multi-line input. Enter ### when finished.
+:person a class
+:mike a :person
+:person sub :agent
+:organization sub :agent
+:worksIn rdfs:domain :person
+:worksIn rdfs:range :organization
+:mike :worksIn :DamageInc
+:DamageInc a :organization
+
+In [3]: show()
+@prefix : &lt;http://this.sketch#&gt; .
+@prefix bibo: &lt;http://purl.org/ontology/bibo/&gt; .
+@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
+@prefix npg: &lt;http://ns.nature.com/terms/&gt; .
+@prefix npgg: &lt;http://ns.nature.com/graphs/&gt; .
+@prefix npgx: &lt;http://ns.nature.com/extensions/&gt; .
+@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+@prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+:mike a :person ;
+    :worksIn :DamageInc .
+
+:worksIn rdfs:domain :person ;
+    rdfs:range :organization .
+
+:DamageInc a :organization .
+
+:organization rdfs:subClassOf :agent .
+
+:person a owl:Class ;
+    rdfs:subClassOf :agent .
+
+
+
+In [4]: show(&quot;xml&quot;)
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;rdf:RDF
+   xmlns=&quot;http://this.sketch#&quot;
+   xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
+   xmlns:rdfs=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;
+&gt;
+  &lt;rdf:Description rdf:about=&quot;http://this.sketch#mike&quot;&gt;
+    &lt;rdf:type rdf:resource=&quot;http://this.sketch#person&quot;/&gt;
+    &lt;worksIn rdf:resource=&quot;http://this.sketch#DamageInc&quot;/&gt;
+  &lt;/rdf:Description&gt;
+  &lt;rdf:Description rdf:about=&quot;http://this.sketch#organization&quot;&gt;
+    &lt;rdfs:subClassOf rdf:resource=&quot;http://this.sketch#agent&quot;/&gt;
+  &lt;/rdf:Description&gt;
+  &lt;rdf:Description rdf:about=&quot;http://this.sketch#DamageInc&quot;&gt;
+    &lt;rdf:type rdf:resource=&quot;http://this.sketch#organization&quot;/&gt;
+  &lt;/rdf:Description&gt;
+  &lt;rdf:Description rdf:about=&quot;http://this.sketch#person&quot;&gt;
+    &lt;rdf:type rdf:resource=&quot;http://www.w3.org/2002/07/owl#Class&quot;/&gt;
+    &lt;rdfs:subClassOf rdf:resource=&quot;http://this.sketch#agent&quot;/&gt;
+  &lt;/rdf:Description&gt;
+  &lt;rdf:Description rdf:about=&quot;http://this.sketch#worksIn&quot;&gt;
+    &lt;rdfs:domain rdf:resource=&quot;http://this.sketch#person&quot;/&gt;
+    &lt;rdfs:range rdf:resource=&quot;http://this.sketch#organization&quot;/&gt;
+  &lt;/rdf:Description&gt;
+&lt;/rdf:RDF&gt;
+
+In [5]: omnigraffle()
+### saves a dot file and tries to open it with your default editor
+### if you&#39;re on a mac and have omnigraffle - that could be the one!
+
+In [6]: quit()
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -191,20 +311,24 @@ Options:
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Quick Start - Command Line Usage</a><ul>
-<li><a class="reference internal" href="#inspecting-an-ontology">Inspecting an ontology</a><ul>
+<li><a class="reference internal" href="#">Quick Start - Command Line</a><ul>
+<li><a class="reference internal" href="#the-ontospy-utility-inspect-an-ontology-quickly">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly</a><ul>
 <li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#show-a-list-of-ontologies-from-the-web">Show a list of ontologies from the web</a></li>
-<li><a class="reference internal" href="#match-2-models">Match 2 models</a><ul>
-<li><a class="reference internal" href="#match-two-models-in-development">Match two models (in development)</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#the-ontospy-catalog-utility-discover-commonly-used-models">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models</a></li>
+<li><a class="reference internal" href="#the-ontospy-match-utility-bootstrap-mappings-between-two-models">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models</a></li>
+<li><a class="reference internal" href="#the-ontospy-sketch-utility-sketch-a-turtle-model">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model</a></li>
 </ul>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quick Start - Python</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tests.html"
+                        title="next chapter">Running the tests</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -235,6 +359,12 @@ Options:
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="tests.html" title="Running the tests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start - Python"
+             >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>
     </div>

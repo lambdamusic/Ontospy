@@ -21,36 +21,7 @@ The basic worflow is simple: load a graph by instantiating the ``Graph`` class; 
 Ps: the library can be used in standalone mode too.
 
 .. warning::
-	This documentation is still largely inclomplete. In the meantime, please use the quickstart section for code examples. 
-
-
-Installation
---------------
-
-``pip install ontospy`` or ``easy_install ontospy``
-
-
-Tests
----------------------------------
-Go to the installation folder and run `test_load.py`. A selection of ontologies will be loaded and inspected. 
-
-.. code-block:: python
-
-	python ontospy/tests/test_load.py 
-	-------------------
-	OntoSPy  v1.5.0 
-	-------------------
-
-	TEST 1: Loading ontologies from ontospy/data/schemas/ folder.
-	=================
-
-	Loading... > bfo-1.1.owl
-	----------
-	Loaded 429 triples from <ontospy/data/schemas/bfo-1.1.owl>
-	started scanning...
-	----------
-	Ontologies found: 1
-	# etc....
+	This documentation needs to be updated. 
 
 
 
@@ -60,9 +31,10 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   .. intro
+   installation
    quickstart
    quickstart_cmdline
+   tests
    
    
 

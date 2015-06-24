@@ -11,7 +11,7 @@ Shows a list of ontologies by querying http://prefix.cc/popular/all
 """
 
 VERSION = 0.1
-USAGE = "python ontospy/tools/catalog.py"
+USAGE = "ontospy-catalog <options>"
 
 
 import time, optparse, os, rdflib
