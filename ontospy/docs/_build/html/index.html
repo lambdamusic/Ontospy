@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="#" />
-    <link rel="next" title="Quick Start" href="quickstart.html" /> 
+    <link rel="next" title="Installation" href="installation.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -34,7 +34,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="quickstart.html" title="Quick Start"
+          <a href="installation.html" title="Installation"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>
@@ -56,47 +56,33 @@
 <p>Ps: the library can be used in standalone mode too.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">This documentation is still largely inclomplete. In the meantime, please use the quickstart section for code examples.</p>
-</div>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span></code> or <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">ontospy</span></code></p>
-</div>
-<div class="section" id="tests">
-<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
-<p>Go to the installation folder and run <cite>test_load.py</cite>. A selection of ontologies will be loaded and inspected.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">python</span> <span class="n">ontospy</span><span class="o">/</span><span class="n">tests</span><span class="o">/</span><span class="n">test_load</span><span class="o">.</span><span class="n">py</span>
-<span class="o">-------------------</span>
-<span class="n">OntoSPy</span>  <span class="n">v1</span><span class="o">.</span><span class="mf">5.0</span>
-<span class="o">-------------------</span>
-
-<span class="n">TEST</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Loading</span> <span class="n">ontologies</span> <span class="kn">from</span> <span class="nn">ontospy</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span> <span class="n">folder</span><span class="o">.</span>
-<span class="o">=================</span>
-
-<span class="n">Loading</span><span class="o">...</span> <span class="o">&gt;</span> <span class="n">bfo</span><span class="o">-</span><span class="mf">1.1</span><span class="o">.</span><span class="n">owl</span>
-<span class="o">----------</span>
-<span class="n">Loaded</span> <span class="mi">429</span> <span class="n">triples</span> <span class="kn">from</span> <span class="o">&lt;</span><span class="n">ontospy</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="n">bfo</span><span class="o">-</span><span class="mf">1.1</span><span class="o">.</span><span class="n">owl</span><span class="o">&gt;</span>
-<span class="n">started</span> <span class="n">scanning</span><span class="o">...</span>
-<span class="o">----------</span>
-<span class="n">Ontologies</span> <span class="n">found</span><span class="p">:</span> <span class="mi">1</span>
-<span class="c"># etc....</span>
-</pre></div>
+<p class="last">This documentation needs to be updated.</p>
 </div>
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-web-recommended">Installation: Web (recommended)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#inspecting-a-graph">Inspecting a graph</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-data-from-multiple-ontologies">Getting data from multiple ontologies</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Quick Start - Command Line Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#inspecting-an-ontology">Inspecting an ontology</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#show-a-list-of-ontologies-from-the-web">Show a list of ontologies from the web</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#match-2-models">Match 2 models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Quick Start - Command Line</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-utility-inspect-an-ontology-quickly">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-catalog-utility-discover-commonly-used-models">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-utility-bootstrap-mappings-between-two-models">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-sketch-utility-sketch-a-turtle-model">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Running the tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests">Tests</a></li>
 </ul>
 </li>
 </ul>
@@ -122,8 +108,6 @@
   <ul>
 <li><a class="reference internal" href="#">Welcome to OntoSPy&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#in-a-nutshell">In a nutshell</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#tests">Tests</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>
@@ -131,8 +115,8 @@
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="quickstart.html"
-                        title="next chapter">Quick Start</a></p>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -164,7 +148,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="quickstart.html" title="Quick Start"
+          <a href="installation.html" title="Installation"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>

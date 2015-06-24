@@ -1,8 +1,11 @@
-Quick Start
+Quick Start - Python
 ************************
-For the ones who value time.
-    
+For the ones who have little time.
 
+.. warning::
+  This documentation is not up to date.
+
+    
 
 
 Inspecting a graph
@@ -13,7 +16,7 @@ Load the graph
 
 .. code-block:: python
 
-	In [1]: import ontospy2
+	In [1]: import ontospy
 	INFO:rdflib:RDFLib Version: 4.2.0
 
 	In [2]: g = ontospy2.Graph("npgcore_latest.ttl")
