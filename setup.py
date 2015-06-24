@@ -11,7 +11,8 @@ if mo:
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 	
-	
+
+
 
 # setup.py proper begins here
 
@@ -98,7 +99,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['data/templates/*.*'],
+         'ontospy': ['data/schemas/*.*', 'data/moreschemas/*.*', 'data/templates/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -112,7 +113,10 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'sketchonto=ontospy.sketch:main',
+            'ontospy-sketch=ontospy.tools.sketch:main', 
+            'ontospy-match=ontospy.tools.matcher:main', 
+            'ontospy-catalog=ontospy.tools.catalog:main', 
+            'ontospy=ontospy.ontospy:main'
         ],
     },
 )

@@ -1,0 +1,1507 @@
+@prefix :        <http://ns.nature.com/terms/> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix event:   <http://purl.org/NET/c4dm/event.owl#> .
+@prefix fabio:   <http://purl.org/spar/fabio/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix npg:     <http://ns.nature.com/terms/> .
+@prefix npgd:    <http://ns.nature.com/datasets/> .
+@prefix npgg:    <http://ns.nature.com/graphs/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+npg:  a       owl:Ontology ;
+      npg:webpage <http://www.nature.com/ontologies/core/> ;
+      dc:creator "Tony Hammond <mailto:tony.hammond@macmillan.com>" , "Michele Pasin <mailto:michele.pasin@macmillan.com>" ;
+      dc:date "2015-05-21T13:02:15Z" ;
+      dc:publisher "Macmillan Publishers Limited" ;
+      dc:rights "This work is distributed under a Creative Commons Attribution 4.0 (CC BY 4.0) License <http://creativecommons.org/licenses/by/4.0/>."@en ;
+      dcterms:license <http://creativecommons.org/licenses/by/4.0/> ;
+      <http://purl.org/vocab/vann/preferredNamespacePrefix>
+              "npg" ;
+      <http://purl.org/vocab/vann/preferredNamespaceUri>
+              "http://ns.nature.com/terms/" ;
+      owl:imports <http://www.w3.org/2004/02/skos/core> ;
+      owl:versionInfo "1.0.42-SNAPSHOT" ;
+      skos:definition "The Core Ontology is a formal model providing definitions for the key concepts of interest to content publishing at Macmillan Science and Education."@en ;
+      skos:note "For further information about this ontology or for any queries please use the contact address <mailto:developers@nature.com>."@en ;
+      skos:prefLabel "Core Ontology"@en .
+
+npg:Abstract
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Component ;
+      owl:equivalentClass <http://purl.org/spar/fabio/Abstract> ;
+      skos:definition "The :Abstract class represents a brief description of a scholarly work, usually author generated. Instances of :Abstract normally do not exist in isolation, but are linked to a :Document instance (of which they provide a summary)."@en ;
+      skos:prefLabel "Abstract"@en .
+
+npg:Agent
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Thing ;
+      owl:equivalentClass foaf:Agent ;
+      skos:definition "The :Agent class groups together all entities that can be the subject of an action. These can be single persons (:Person), or groups of people organised as a legal entity (:Organization)."@en ;
+      skos:prefLabel "Agent"@en .
+
+npg:AggregationEvent
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Event ;
+      skos:definition "The :AggregationEvent class groups together all events related to the construction of a publication."@en ;
+      skos:prefLabel "Aggregation Event"@en .
+
+npg:Article
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Document ;
+      owl:equivalentClass <http://purl.org/spar/fabio/Article> , bibo:Article ;
+      skos:definition "The :Article class represents a scholarly work normally published as an item of a serial publication. In particular, this concept refers to the abstract notion of an article, rather than any of its realisations after it becomes embodied via a physical medium."@en ;
+      skos:note "With reference to the FRBR model [http://www.ifla.org/publications/functional-requirements-for-bibliographic-records], an :Article can be mapped directly to the frbr:Expression concept. It is worth noting though that within the NPG core ontology we do not have any notion of a frbr:Work. Hence multiple versions of the same article (e.g. language translations, or revisions) are characterised as such simply by means of some relationship."@en ;
+      skos:prefLabel "Article"@en .
+
+npg:ArticleType
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Type ;
+      skos:definition "The :ArticleType class represents the various kinds of publication which can be used to index and group content published by Macmillan Science and Education. The instances of :ArticleType are organised hierarchically using the SKOS vocabulary."@en ;
+      skos:prefLabel "Article Type"@en .
+
+npg:Asset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Thing ;
+      skos:definition "The :Asset class groups together all physical entities which can be stored in digital systems."@en ;
+      skos:prefLabel "Asset"@en .
+
+npg:BinaryAsset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:BlobAsset ;
+      skos:definition "The :BinaryAsset class represents the physical rendition of a generic binary object."@en ;
+      skos:prefLabel "Binary Asset"@en .
+
+npg:BlobAsset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Asset ;
+      skos:definition "The :BlobAsset class groups together all assets used to store blobs - i.e. documents, images, or other media objects - within digital systems."@en ;
+      skos:prefLabel "Blob Asset"@en .
+
+npg:Blog
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Serial ;
+      owl:disjointWith npg:Journal ;
+      skos:definition "The :Blog class represents an informal serial publication."@en ;
+      skos:prefLabel "Blog"@en .
+
+npg:BlogPost
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Document ;
+      skos:definition "The :BlogPost class represents an informal work published as an item of a :Blog."@en ;
+      skos:prefLabel "Blog Post"@en .
+
+npg:Collection
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Document ;
+      owl:disjointWith npg:Article ;
+      owl:equivalentClass bibo:Collection ;
+      skos:definition "The :Collection class represents a group of documents which are published (or republished) as part of a new composite publication. Often these documents have been published elsewhere, but since they share a common theme or belong to an identifiable narrative it is of interest to publish them again within a different container. (See also :Issue.)"@en ;
+      skos:prefLabel "Collection"@en .
+
+npg:Component
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Publication ;
+      owl:disjointWith npg:Serial , npg:Document , npg:Dataset ;
+      skos:definition "The :Component class groups together all individuals that normally come into existence as part of a :Document."@en ;
+      skos:prefLabel "Component"@en .
+
+npg:Concept
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Thing ;
+      owl:equivalentClass skos:Concept ;
+      skos:definition "The :Concept class groups together all individuals which do not exist in the physical world (i.e. have no extension in spacetime)."@en ;
+      skos:prefLabel "Concept"@en .
+
+npg:Contributor
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Component ;
+      skos:definition "The :Contributor class represents a document component detailing a contributor (personal or corporate) to the work being published. This class is disjoint from the :Agent class. Hence a :Contributor instance can be described as the name used to refer to a person or organisation in the context of a publication."@en ;
+      skos:prefLabel "Contributor"@en .
+
+npg:Dataset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Publication ;
+      skos:definition "The :Dataset class represents a collection of related sets of information modelled in a known way and stored in a computer system."@en ;
+      skos:note "We are currently using this class for RDF datasets."@en ;
+      skos:prefLabel "Dataset"@en .
+
+npg:Document
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Publication ;
+      owl:disjointWith npg:Serial , npg:Component ;
+      skos:definition "The :Document class groups together all publications which were created to be distributed and consumed as individual, self-contained entities."@en ;
+      skos:prefLabel "Document"@en .
+
+npg:Event
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Thing ;
+      owl:equivalentClass <http://purl.org/NET/c4dm/event.owl#Event> ;
+      skos:definition "The :Event class groups together events of varying granularity. Events differ from :Concept entities because they have an extension in time; they differ from :Asset entities because they do not have an extension in space."@en ;
+      skos:prefLabel "Event"@en .
+
+npg:ExternalArticle
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Article ;
+      skos:definition "The :ExternalArticle class represents an article which is externally published."@en ;
+      skos:note "The :ExternalArticle class subclasses the :Article class."@en ;
+      skos:prefLabel "External Article"@en .
+
+npg:ExternalContributor
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Contributor ;
+      skos:definition "The :ExternalContributor class represents a contributor from an article which is externally published."@en ;
+      skos:note "The :ExternalContributor class subclasses the :Contributor class."@en ;
+      skos:prefLabel "External Contributor"@en .
+
+npg:Figure
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Image ;
+      owl:disjointWith npg:Illustration ;
+      skos:definition "The :Figure class represents a numbered and captioned image within a publication. This image typically results as a direct outcome of the work described in the publication."@en ;
+      skos:prefLabel "Figure"@en .
+
+npg:Graph
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Dataset ;
+      owl:disjointWith npg:KnowledgeBase ;
+      skos:definition "The :Graph class represents a collection of related sets of information modelled in RDF and organized as a named graph."@en ;
+      skos:note "Each Graph instance is associated with instances of a particular class. For example, the 'npgg:articles' :Graph instance is a named graph which contains all the instances of the :Article class. The :Graph instances themselves are then used to describe the RDF graph, providing sometimes known as an RDF annotation. This may furnish various kinds of information about the RDF graph: provenance, rights, metrics, validation reports, etc."@en ;
+      skos:prefLabel "Graph"@en .
+
+npg:Illustration
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Image ;
+      owl:disjointWith npg:Figure ;
+      skos:definition "The :Illustration class represents a numbered and captioned image within a publication. This image typically illustrates a point about the work described in the publication."@en ;
+      skos:prefLabel "Illustration"@en .
+
+npg:Image
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Component ;
+      skos:definition "The :Image class represents a graphical element within a publication."@en ;
+      skos:prefLabel "Image"@en .
+
+npg:ImageAsset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:BlobAsset ;
+      skos:definition "The :ImageAsset class represents the physical rendition of an image asset in an encoded format."@en ;
+      skos:prefLabel "Image Asset"@en .
+
+npg:Issue
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Collection ;
+      owl:equivalentClass <http://purl.org/spar/fabio/JournalIssue> ;
+      skos:definition "The :Issue class represents an aggregate object which is published periodically as part of a :Serial and is normally composed by one or more articles. (See also :Collection.)"@en ;
+      skos:prefLabel "Issue"@en .
+
+npg:Item
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:AggregationEvent ;
+      skos:definition "The :Item class represents the state of a document after this has been added to a :Collection by someone, at a specific time, and within a specific sequence."@en ;
+      skos:prefLabel "Item"@en .
+
+npg:Journal
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Serial ;
+      owl:disjointWith npg:Blog ;
+      owl:equivalentClass <http://purl.org/spar/fabio/Journal> ;
+      skos:definition "The :Journal class represents a scholarly serial publication, considered from both the scholarly and the commercial perspectives. Thus a journal is more than the sum of its publications (i.e. the set of all the :Issue instances it has published); it is an entity characterised by many properties, e.g. its founders, its impact factor, etc."@en ;
+      skos:prefLabel "Journal"@en .
+
+npg:KnowledgeBase
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Dataset ;
+      owl:disjointWith npg:Graph ;
+      skos:definition "The :KnowledgeBase class represents a collection of related sets of information modelled in RDF and consisting of various objects, e.g. one or more graphs, other RDF datasets etc."@en ;
+      skos:note "Differently from datasets, knowledge-bases refer to a composite dataset intended to be used as a consistent whole."@en ;
+      skos:prefLabel "KnowledgeBase"@en .
+
+npg:Organization
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Agent ;
+      owl:equivalentClass foaf:Organization ;
+      skos:definition "The :Organization class represents an organised body of people normally having a legal status."@en ;
+      skos:prefLabel "Organization"@en .
+
+npg:PdfAsset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:BlobAsset ;
+      skos:definition "The :PdfAsset class represents the physical rendition of a document asset in PDF format."@en ;
+      skos:prefLabel "Pdf Asset"@en .
+
+npg:Person
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Agent ;
+      skos:definition "The :Person class represents a single person entity."@en ;
+      skos:prefLabel "Person"@en .
+
+npg:Publication
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Concept ;
+      skos:definition "The :Publication class groups together all individuals (or part of) created as the result of the publishing process. Note that we are not referring here to the physical artefacts, but just their abstract counterparts."@en ;
+      skos:prefLabel "Publication"@en .
+
+npg:PublicationEvent
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Event ;
+      skos:definition "The :PublicationEvent class groups together events that happen within the publishing process, broadly conceived. For example, the submission of an article, or the acceptance of a paper."@en ;
+      skos:prefLabel "Publication Event"@en .
+
+npg:PublicationState
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Type ;
+      skos:definition "The :PublicationState class groups together publish-state and review-state individuals."@en ;
+      skos:prefLabel "Publication State"@en .
+
+npg:PublishEvent
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:PublicationEvent ;
+      skos:definition "The :PublishEvent class represents events related to the publication of a document. This is intended in a strict sense, i.e. the time when a publication is made 'public'."@en ;
+      skos:note "In order to differentiate these events further, the :PublishState vocabulary is used."@en ;
+      skos:prefLabel "Publish Event"@en .
+
+npg:PublishState
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:PublicationState ;
+      skos:definition "The :PublishState class provides a categorisation of the possible states a document may have after it has been published. For example, whether it’s an 'Advanced online publication' or an 'Issue publication'.  This categorisation is implemented as a SKOS vocabulary."@en ;
+      skos:prefLabel "Publish State"@en .
+
+npg:Publisher
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Organization ;
+      skos:definition "The :Publisher class represents organizations involved in the publishing business."@en ;
+      skos:prefLabel "Publisher"@en .
+
+npg:ReviewEvent
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:PublicationEvent ;
+      skos:definition "The :ReviewEvent class models events related to the reviewing of a document (before its publication). In order to differentiate these events further, the :ReviewState vocabulary is used."@en ;
+      skos:prefLabel "Review Event"@en .
+
+npg:ReviewState
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:PublicationState ;
+      skos:definition "The :ReviewState class provides a categorisation of the possible states a document may have as a result of a reviewing process. For example, whether it’s been 'Received' or 'Accepted'.  This categorisation is implemented as a SKOS vocabulary."@en ;
+      skos:prefLabel "Review State"@en .
+
+npg:Section
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Component ;
+      skos:definition "The :Section class represents a part of a document."@en ;
+      skos:prefLabel "Section"@en .
+
+npg:Serial
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Publication ;
+      owl:disjointWith npg:Document , npg:Component , npg:Dataset ;
+      owl:equivalentClass <http://purl.org/spar/fabio/Periodical> ;
+      skos:definition "The :Serial class represents publications which appear in a new edition on a regular schedule. For example, a journal, a magazine or a blog. The :PublishEvent class is used to provide more details about the time, place and other contextual information relevant to when a new edition gets published."@en ;
+      skos:prefLabel "Serial"@en .
+
+npg:SeverityLevel
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Type ;
+      skos:definition "The :SeverityLevel class represents a system status. The syslog standard (RFC 5424) for computer message logging is used to provide a reference set of states. This categorisation is implemented as a SKOS concept scheme."@en ;
+      skos:prefLabel "Severity Level"@en .
+
+npg:Subject
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Type ;
+      owl:equivalentClass <http://purl.org/spar/fabio/SubjectTerm> ;
+      skos:definition "The :Subject class represents a topic, field of study or research area which can be used to categorise the contents of a publication. The instances of :Subject are organised hierarchically using the SKOS vocabulary."@en ;
+      skos:prefLabel "Subject"@en .
+
+npg:Summary
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Component ;
+      skos:definition "The :Summary class represents a brief description of a scholarly work, usually editorially generated."@en ;
+      skos:prefLabel "Summary"@en .
+
+npg:SummaryType
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Type ;
+      skos:definition "The :SummaryType class represents an instance from  a categorisation of types of :Summary. For example, 'Long Summary', 'Short Summary', etc. This categorisation is implemented as a SKOS concept scheme."@en ;
+      skos:prefLabel "Summary Type"@en .
+
+npg:Thing
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf owl:Thing ;
+      skos:definition "The :Thing class groups together all individuals used by Macmillan Science and Education within the NPG publishing world."@en ;
+      skos:prefLabel "Thing"@en .
+
+npg:Type
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Concept ;
+      skos:definition "The :Type class groups together  all domain-specific categorisations relevant to the NPG publishing world."@en ;
+      skos:note "All of the :Type categorisations are implemented as self-contained reusable SKOS vocabularies (although not all of them are taxonomies in the strict sense of hierarchical vocabularies)."@en ;
+      skos:prefLabel "Type"@en .
+
+npg:Website
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Publication ;
+      skos:definition "The :Website class represents a site that maintains one or more pages on the Web."@en ;
+      skos:prefLabel "Website"@en .
+
+npg:XmlAsset
+      a       owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:subClassOf npg:Asset ;
+      skos:definition "The :XmlAsset class represents the physical rendition of a document asset in XML format."@en ;
+      skos:prefLabel "Xml Asset"@en .
+
+npg:assetFolderName
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Journal ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :assetFolderName property specifies a folder name for file storage assets."@en ;
+      skos:prefLabel "Asset Folder Name"@en .
+
+npg:assetVersion
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :assetVersion property specifies the version of an :Asset associated with a :PublishEvent."@en ;
+      skos:prefLabel "Asset Version"@en .
+
+npg:baseUriTemplate
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :baseUriTemplate property specifies a string template for an asset base URI."@en ;
+      skos:prefLabel "Base URI Template"@en .
+
+npg:body
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :body property specifies the main body content of a publication as a string."@en ;
+      skos:prefLabel "Body"@en .
+
+npg:bodyXml
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :bodyXml property specifies the main body content of a publication as an XML string."@en ;
+      skos:prefLabel "Body (XML)"@en .
+
+npg:caption
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Image ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :caption property specifies the caption of a figure or illustration as a string."@en ;
+      skos:prefLabel "Caption"@en .
+
+npg:captionXml
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Image ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :captionXml property specifies the caption of a figure or illustration as an XML string."@en ;
+      skos:prefLabel "Caption (XML)"@en .
+
+npg:citation
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :citation property specifies the full citation of a publication as a single string for reference purposes."@en ;
+      skos:prefLabel "Citation"@en .
+
+npg:citationData
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :citationData property specifies the full citation of a publication as a single string for machine use."@en ;
+      skos:note "This is an alternative representation of the :citation property."@en ;
+      skos:prefLabel "Citation (Data)"@en .
+
+npg:citationXml
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :citationXML property specifies the full citation of a publication as a single string containing XML for user presentation."@en ;
+      skos:note "This is an alternative representation of the :citation property."@en ;
+      skos:prefLabel "Citation (XML)"@en .
+
+npg:class
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :class property specifies the class a domain model refers to."@en ;
+      skos:prefLabel "Class"@en .
+
+npg:code
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :code property specifies an integer number representing an internal ID for an object."@en ;
+      skos:note "This property is used by the doamin ontologies for managing terms."@en ;
+      skos:prefLabel "Code"@en .
+
+npg:contributorList
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdf:List ;
+      owl:equivalentProperty
+              bibo:contributorList ;
+      skos:definition "The :contributorList property specifies an ordered list of contributors."@en ;
+      skos:prefLabel "Contributor List"@en .
+
+npg:count
+      a       owl:ObjectProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :count property specifies a map which records the number of instances of an entity."@en ;
+      skos:prefLabel "Count"@en .
+
+npg:coverDate
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:date ;
+      skos:definition "The :coverDate property specifies the full date of a publication as it is displayed on its cover."@en ;
+      skos:note "This is not necessarily the actual date of publication."@en ;
+      skos:prefLabel "Cover Date"@en .
+
+npg:coverYear
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYear ;
+      skos:definition "The :coverDate property specifies the year date of a publication as it is displayed on its cover."@en ;
+      skos:note "This is not necessarily the actual date of publication."@en ;
+      skos:prefLabel "Cover Year"@en .
+
+npg:coverYearMonth
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYearMonth ;
+      skos:definition "The :coverDate property specifies the year and month date of a publication as it is displayed on its cover."@en ;
+      skos:note "This is not necessarily the actual date of publication."@en ;
+      skos:prefLabel "Cover YearMonth"@en .
+
+npg:credit
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Image ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :credit property specifies the photographer, illustrator, or copyright holder for an image in a publication."@en ;
+      skos:prefLabel "Credit"@en .
+
+npg:date
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Event ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:date ;
+      skos:definition "The :date property specifies the full date of an event as a string."@en ;
+      skos:prefLabel "Date"@en .
+
+npg:dateEnd
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :dateEnd property specifies the end date for a serial publication."@en ;
+      skos:prefLabel "Date End"@en .
+
+npg:dateStart
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :dateStart property specifies the start date for a serial publication."@en ;
+      skos:prefLabel "Date Start"@en .
+
+npg:dateTime
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Event ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:dateTime ;
+      skos:definition "The :dateTime property specifies the full date of an event as a string, including a time component."@en ;
+      skos:prefLabel "DateTime"@en .
+
+npg:datetime
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :datetime property specifies a system-generated datetime for an entity."@en ;
+      skos:prefLabel "Datetime"@en .
+
+npg:doi
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:doi ;
+      skos:definition "The :doi property specifies a DOI number for a publication."@en ;
+      skos:prefLabel "DOI"@en .
+
+npg:doiLink
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :doiLink property relates a publication to the URI minted from the DOI."@en ;
+      skos:prefLabel "DOI Link"@en .
+
+npg:eissn
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:eissn ;
+      skos:definition "The :eissn property specifies an E-ISSN number for a serial."@en ;
+      skos:prefLabel "E-ISSN"@en .
+
+npg:example
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :example property specifies an example of an entity."@en ;
+      skos:note "This property is similar to void:exampleResource. But see also skos:example."@en ;
+      skos:prefLabel "Example"@en .
+
+npg:familyName
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Contributor ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              foaf:familyName ;
+      skos:definition "The :familyName property specifies the family name of a person."@en ;
+      skos:prefLabel "Family Name"@en .
+
+npg:figureList
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdf:List ;
+      skos:definition "The :figureList property specifies an ordered list of figures for a publication."@en ;
+      skos:prefLabel "Figure List"@en .
+
+npg:fileExtension
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :fileExtension property specifies the extension part of the filename of an asset."@en ;
+      skos:prefLabel "File Extension"@en .
+
+npg:filename
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :filename property specifies the filename of an asset."@en ;
+      skos:prefLabel "Filename"@en .
+
+npg:filesize
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :filesize property specifies an integer value for the size (in bytes) of an asset."@en ;
+      skos:prefLabel "Filesize"@en .
+
+npg:givenName
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Contributor ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              foaf:givenName ;
+      skos:definition "The :givenName property specifies the given name of a person."@en ;
+      skos:prefLabel "Given Name"@en .
+
+npg:graph
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :graph property specifies the full URI of any graph."@en ;
+      skos:prefLabel "Graph"@en .
+
+npg:hasAbstract
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Abstract ;
+      skos:definition "The :hasAbstract property relates an article to the abstract for an article."@en ;
+      skos:prefLabel "Has Abstract"@en .
+
+npg:hasArticle
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:PublicationEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Article ;
+      skos:definition "The :hasArticle property relates a publication-event to an article."@en ;
+      skos:prefLabel "Has Article"@en .
+
+npg:hasArticleType
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ArticleType ;
+      skos:definition "The :hasArticleType relates an article to an article-type."@en ;
+      skos:prefLabel "Has Article Type"@en .
+
+npg:hasAsset
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Asset ;
+      skos:definition "The :hasAsset property relates a publication to an asset."@en ;
+      skos:prefLabel "Has Asset"@en .
+
+npg:hasBlog
+      a       owl:ObjectProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Blog ;
+      rdfs:subPropertyOf npg:hasSerial ;
+      skos:definition "The :hasBlog property relates a serial to a blog associated with it."@en ;
+      skos:prefLabel "Has Blog"@en .
+
+npg:hasBroaderSubject
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Subject ;
+      rdfs:subPropertyOf npg:hasSubject ;
+      skos:definition "The :hasBroaderSubject property relates a publication to a broader subject term than it is actually classified with."@en ;
+      skos:prefLabel "Has Broader Subject"@en .
+
+npg:hasCollection
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:PublicationEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Collection ;
+      skos:definition "The :hasCollection property relates a publication-event to a collection."@en ;
+      skos:prefLabel "Has Collection"@en .
+
+npg:hasContributor
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Document ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Contributor ;
+      skos:definition "The :hasContributor property relates a publication to a string containing the name of one of the authors of that publication."@en ;
+      skos:note "Normally, the contributor name is a non-disambiguated person name, meaning that several contributor instances may refer to the same person."@en ;
+      skos:prefLabel "Has Contributor"@en .
+
+npg:hasCorrespondingContributor
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Contributor ;
+      rdfs:subPropertyOf npg:hasContributor ;
+      skos:definition "The :hasCorrespondingContributor property relates an article to the name of its corresponding author."@en ;
+      skos:prefLabel "Has Corresponding Contributor"@en .
+
+npg:hasCurrentIssue
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Issue ;
+      rdfs:subPropertyOf npg:hasIssue ;
+      skos:definition "The :hasCurrentIssue property relates a publication to the current issue."@en ;
+      skos:prefLabel "Has Current Issue"@en .
+
+npg:hasExternalArticle
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ExternalArticle ;
+      skos:definition "The :hasExternalArticle property relates an article to an external article."@en ;
+      skos:prefLabel "Has External Article"@en .
+
+npg:hasExternalContributor
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ExternalContributor ;
+      skos:definition "The :hasExternalArticle property relates an article to an external contributor."@en ;
+      skos:prefLabel "Has External Contributor"@en .
+
+npg:hasFigure
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Figure ;
+      skos:definition "The :hasFigure property relates a publication to a figure."@en ;
+      skos:prefLabel "Has Figure"@en .
+
+npg:hasGraph
+      a       owl:ObjectProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Graph ;
+      skos:definition "The :hasGraph property relates an entity to the RDF named graph associated with it."@en ;
+      skos:prefLabel "Has Graph"@en .
+
+npg:hasIllustration
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Illustration ;
+      skos:definition "The :hasIllustration property relates a publication to an illustration."@en ;
+      skos:prefLabel "Has Illustration"@en .
+
+npg:hasImage
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Image ;
+      skos:definition "The :hasImage property relates a publication to an image."@en ;
+      skos:prefLabel "Has Image"@en .
+
+npg:hasImageAsset
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Image ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ImageAsset ;
+      skos:definition "The :hasImageAsset property relates an image to an image-asset."@en ;
+      skos:prefLabel "Has Image Asset"@en .
+
+npg:hasIssue
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:PublicationEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Issue ;
+      skos:definition "The :hasIssue property relates a publication-event to an issue."@en ;
+      skos:prefLabel "Has Issue"@en .
+
+npg:hasItem
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Item ;
+      skos:definition "The :hasItem property relates a publication to an item."@en ;
+      skos:prefLabel "Has Item"@en .
+
+npg:hasJournal
+      a       owl:ObjectProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Journal ;
+      rdfs:subPropertyOf npg:hasSerial ;
+      skos:definition "The :hasJournal property relates a publication to a journal."@en ;
+      skos:prefLabel "Has Journal"@en .
+
+npg:hasNextIssue
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Issue ;
+      rdfs:subPropertyOf npg:hasIssue ;
+      skos:definition "The :hasNextIssue property relates a publication to the next issue."@en ;
+      skos:prefLabel "Has Next Issue"@en .
+
+npg:hasPdfAsset
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:PdfAsset ;
+      skos:definition "The :hasPdfAsset property relates a publication to a pdf-asset."@en ;
+      skos:prefLabel "Has PDF Asset"@en .
+
+npg:hasPreviousIssue
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Issue ;
+      rdfs:subPropertyOf npg:hasIssue ;
+      skos:definition "The :hasPreviousIssue property relates a publication to the previous issue."@en ;
+      skos:prefLabel "Has Previous Issue"@en .
+
+npg:hasPrimaryArticleType
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ArticleType ;
+      rdfs:subPropertyOf npg:hasArticleType ;
+      skos:definition "The :hasPrimaryArticleType property relates an article to an article-type that can be used for grouping purposes."@en ;
+      skos:prefLabel "Has Primary Article Type"@en .
+
+npg:hasPublication
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:PublicationEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publication ;
+      skos:definition "The :hasPublication property relates a publication-event to a publication."@en ;
+      skos:prefLabel "Has Publication"@en .
+
+npg:hasPublishEvent
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:PublishEvent ;
+      skos:definition "The :hasPublishEvent property relates a publication to a publish-event that describes some recognized change in the status of a publication's publish history."@en ;
+      skos:prefLabel "Has Publish Event"@en .
+
+npg:hasPublishState
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:PublishEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:PublishState ;
+      skos:definition "The :hasPublishState property relates a publish-event to a publish-state that describes some recognized change in the status of a publication's publish history."@en ;
+      skos:prefLabel "Has Publish State"@en .
+
+npg:hasPublisher
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publisher ;
+      owl:equivalentProperty
+              dcterms:publisher ;
+      skos:definition "The :hasPublisher property relates a publication to the organization that publishes it."@en ;
+      skos:prefLabel "Has Publisher"@en .
+
+npg:hasReviewEvent
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ReviewEvent ;
+      skos:definition "The :hasReviewEvent property relates a publication to a review-event that describes some recognized change in the status of a publication's review history."@en ;
+      skos:prefLabel "Has Review Event"@en .
+
+npg:hasReviewState
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:ReviewEvent ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:ReviewState ;
+      skos:definition "The :hasReviewState property relates a review-event to a review-state that describes some recognized change in the status of a publication's review history."@en ;
+      skos:prefLabel "Has Review State"@en .
+
+npg:hasRoot
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Type ;
+      skos:definition "The :hasRoot property relates a :Type instance to a toplevel :Type instance within the same domain model."@en ;
+      skos:prefLabel "Has Root"@en .
+
+npg:hasSection
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Item ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Section ;
+      skos:definition "The :hasSection property relates an item to a section component."@en ;
+      skos:prefLabel "Has Section"@en .
+
+npg:hasSerial
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Serial ;
+      skos:definition "The :hasSerial property relates a publication to a serial."@en ;
+      skos:prefLabel "Has Serial"@en .
+
+npg:hasSubject
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Subject ;
+      owl:equivalentProperty
+              <http://purl.org/spar/fabio/hasSubjectTerm> ;
+      skos:definition "The :hasSubject property relates a publication to a subject term which describes one of the main topics the publication is about."@en ;
+      skos:prefLabel "Has Subject"@en .
+
+npg:hasSummary
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Article ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Summary ;
+      skos:definition "The :hasSummary property relates an article to an article summary."@en ;
+      skos:prefLabel "Has Summary"@en .
+
+npg:hasSummaryType
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Summary ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:SummaryType ;
+      skos:definition "The :hasSummaryType property relates a summary to a summary-type classification."@en ;
+      skos:prefLabel "Has Summary Type"@en .
+
+npg:hasWebsite
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Website ;
+      rdfs:subPropertyOf npg:hasSerialPublication ;
+      skos:definition "The :hasWebsite property relates a publication to a website."@en ;
+      skos:prefLabel "Has Website"@en .
+
+npg:hasXmlAsset
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:XmlAsset ;
+      skos:definition "The :hasXmlAsset property relates a publication to an xml-asset."@en ;
+      skos:prefLabel "Has XML Asset"@en .
+
+npg:hash
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :hash property specifies a hash value over an entity URI used as a data integrity check."@en ;
+      skos:prefLabel "Hash "@en .
+
+npg:id
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :id property provides a unique ID for a thing."@en ;
+      skos:note "The :id value forms the local part of the full URI for an entity name."@en ;
+      skos:prefLabel "ID"@en .
+
+npg:idHash
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:deprecated "true"^^xsd:boolean ;
+      skos:definition "The :idHash property specifies a string hash value for an ID."@en ;
+      skos:prefLabel "ID Hash"@en .
+
+npg:imageList
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdf:List ;
+      skos:definition "The :imageList property specifies an ordered list of images for a publication."@en ;
+      skos:prefLabel "Image List"@en .
+
+npg:isAssetOf
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publication ;
+      owl:inverseOf npg:hasAsset ;
+      skos:definition "The :isAssetOf property relates an asset to the publication it represents."@en ;
+      skos:prefLabel "Is Asset Of"@en .
+
+npg:isCorresponding
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Contributor ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isCorresponding property marks whether a contributor is a corresponding author."@en ;
+      skos:prefLabel "Is Corresponding"@en .
+
+npg:isCurated
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Image ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isCurated property marks whether an image is editiorially managed."@en ;
+      skos:prefLabel "Is Curated"@en .
+
+npg:isEventWorkflow
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isEventWorkflow property marks whether a publication is in the new metadata-based (event) workflow."@en ;
+      skos:prefLabel "Is Event Workflow"@en .
+
+npg:isGroup
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Contributor ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isGroup property marks whether a contributor name refers to a collective agent, i.e. a group of people or an institution."@en ;
+      skos:prefLabel "Is Group"@en .
+
+npg:isIssueBased
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Journal ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isIssueBased property marks whether a journal publishes issues."@en ;
+      skos:prefLabel "Is Issue Based"@en .
+
+npg:isLeaf
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isLeaf property marks whether a SKOS concept is a leaf SKOS concept."@en ;
+      skos:prefLabel "Is Leaf"@en .
+
+npg:isNamedResource
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :isNamedResource property marks whether an object resource is named or is unnamed (i.e. a blank node)."@en ;
+      skos:prefLabel "Is Named Resource"@en .
+
+npg:isPrimaryArticleType
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:ArticleType ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isPrimaryArticleType property marks whether an article-type can be used for grouping purposes."@en ;
+      skos:prefLabel "Is PrimaryArticleType"@en .
+
+npg:isPublishReady
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isPublishReady property marks whether a type is ready for publishing."@en ;
+      skos:prefLabel "Is Publish Ready"@en .
+
+npg:isRepeatable
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :isRepeatable property marks whether a property can be repeated."@en ;
+      skos:prefLabel "Is Repeatable"@en .
+
+npg:isRoot
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isRoot property marks whether a SKOS concept is a SKOS top concept."@en ;
+      skos:prefLabel "Is Root"@en .
+
+npg:isTestInstance
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:boolean ;
+      skos:definition "The :isTestInstance property marks whether a resource is to be used for test purposes only."@en ;
+      skos:prefLabel "Is Test Instance"@en .
+
+npg:isVocabulary
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :isVocabulary property marks whether a class is used for a controlled vocabulary."@en ;
+      skos:prefLabel "Is Vocabulary"@en .
+
+npg:issn
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:issn ;
+      skos:definition "The :issn property specifies an ISSN number for a serial."@en ;
+      skos:prefLabel "ISSN"@en .
+
+npg:issue
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Journal ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:issue ;
+      skos:definition "The :issue property specifies an issue label for a journal."@en ;
+      skos:prefLabel "Issue"@en .
+
+npg:issueEnd
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :issueEnd property specifies the end issue for a serial publication."@en ;
+      skos:prefLabel "Issue End"@en .
+
+npg:issueStart
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :issueStart property specifies the start issue for a serial publication."@en ;
+      skos:prefLabel "Issue Start"@en .
+
+npg:itemList
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Collection ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdf:List ;
+      skos:definition "The :itemList property specifies an ordered list of items."@en ;
+      skos:prefLabel "Item List"@en .
+
+npg:itemNumber
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Item ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :itemNumber property specifies the number of an item within a collection."@en ;
+      skos:prefLabel "Item Number"@en .
+
+npg:itemReferenceList
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Collection ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdf:List ;
+      skos:definition "The :itemReferenceList property specifies an ordered list of item references."@en ;
+      skos:prefLabel "Item Reference List"@en .
+
+npg:itemType
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Item ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :itemType property specifies the type of an item."@en ;
+      skos:prefLabel "Item Type"@en .
+
+npg:name
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Contributor ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              foaf:name ;
+      skos:definition "The :name property specifies the full name for a thing."@en ;
+      skos:prefLabel "Name"@en .
+
+npg:namespace
+      a       owl:ObjectProperty ;
+      rdfs:domain owl:Class ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :namespace property provides the RDF namespace used in creating instances of a class."@en ;
+      skos:prefLabel "Namespace"@en .
+
+npg:number
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Component ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :number property specifies a sequence number for a component such as a figure."@en ;
+      skos:prefLabel "Number"@en .
+
+npg:orcid
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :orcid property relates a publication to an ORCID record."@en ;
+      skos:note "As we currently have no persons as such registered in our data model, we use the :orcid property with the :Contributor publication component that proxies for a person."@en ;
+      skos:prefLabel "ORCID"@en .
+
+npg:otherCode
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :otherCode property specifies a number or string used by external applications as an ID for an entity."@en ;
+      skos:prefLabel "Other Code"@en .
+
+npg:pageEnd
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Document ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:pageEnd ;
+      skos:definition "The :pageEnd property specifies an ending page number for a document."@en ;
+      skos:prefLabel "Page End"@en .
+
+npg:pageStart
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Document ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:pageStart ;
+      skos:definition "The :pageStart property specifies a starting page number for a document."@en ;
+      skos:prefLabel "Page Start"@en .
+
+npg:pages
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Document ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:pages ;
+      skos:definition "The :pages property specifies a page range numbering for a document."@en ;
+      skos:prefLabel "Pages"@en .
+
+npg:publicationDate
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:date ;
+      skos:definition "The :publicationDate property specifies the full date of a publication as a string."@en ;
+      skos:prefLabel "Publication Date"@en .
+
+npg:publicationDateTime
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:dateTime ;
+      skos:definition "The :publicationDateTime property specifies the full date of a publication as a string, including the time of publication."@en ;
+      skos:prefLabel "Publication DateTime"@en .
+
+npg:publicationName
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :publicationName property specifies a string name for an external publication."@en ;
+      skos:prefLabel "Publication Name"@en .
+
+npg:publicationYear
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYear ;
+      skos:definition "The :publicationYear property specifies the year date of a publication as a string."@en ;
+      skos:prefLabel "Publication Year"@en .
+
+npg:publicationYearMonth
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYearMonth ;
+      skos:definition "The :publicationYearMonth property specifies the year and month date of a publication as a string."@en ;
+      skos:prefLabel "Publication YearMonth"@en .
+
+npg:relation
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publication ;
+      skos:definition "The :relation property relates a publication to a publication."@en ;
+      skos:prefLabel "Relation"@en .
+
+npg:replacedBy
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publication ;
+      owl:inverseOf npg:replaces ;
+      skos:definition "The :replacedBy property relates a publication to another publication that replaces it."@en ;
+      skos:prefLabel "Replaced By"@en .
+
+npg:replaces
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range npg:Publication ;
+      owl:inverseOf npg:replacedBy ;
+      skos:definition "The :replaces property relates a publication to another publication that it replaces."@en ;
+      skos:prefLabel "Replaces"@en .
+
+npg:repository
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :repository property relates an asset to a storage repository."@en ;
+      skos:prefLabel "Repository"@en .
+
+npg:repositoryId
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Asset ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :repositoryId property specifies a (local) repository ID for an asset."@en ;
+      skos:prefLabel "Repository ID"@en .
+
+npg:sectionLevel
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Section ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :sectionLevel property specifies the level number of a section."@en ;
+      skos:prefLabel "Section Level"@en .
+
+npg:shortTitle
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:shortTitle ;
+      skos:definition "The :shortTitle property specifies an abbreviated title for a publication."@en ;
+      skos:prefLabel "Short Title"@en .
+
+npg:sortLetter
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :sortLetter property specifies the initial letter of an entity name to facilitate sort operations."@en ;
+      skos:note "This property is generally computed from a build-time rule."@en ;
+      skos:prefLabel "Sort Letter"@en .
+
+npg:sortNumber
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :sortLetter property specifies the sequence number of an entity to facilitate sort operations."@en ;
+      skos:prefLabel "Sort Number"@en .
+
+npg:status
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :status property specifies a status string for an ontology term."@en ;
+      skos:prefLabel "Status"@en .
+
+npg:subjectPath
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Journal ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :subjectPath property specifies the position of a term within the subjects taxonomy by providing a path with the IDs of its successors."@en ;
+      skos:prefLabel "Subject Path"@en .
+
+npg:test
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :test property specifies a general string test property."@en ;
+      skos:prefLabel "Test"@en .
+
+npg:timestamp
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :timestamp property specifies a generic timestamp for an object."@en ;
+      skos:prefLabel "Timestamp"@en .
+
+npg:title
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :title property specifies a title to the main body content of a publication as a string."@en ;
+      skos:prefLabel "Title"@en .
+
+npg:titleXml
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :titleXml property specifies a title to the main body content of a publication as an XML string."@en ;
+      skos:prefLabel "Title (XML)"@en .
+
+npg:treeDepth
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Type ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:integer ;
+      skos:definition "The :treeDepth property specifies the depth of a term within a taxonomy tree."@en ;
+      skos:note "This property is generally computed by a build-time rule"@en ;
+      skos:prefLabel "Tree Depth"@en .
+
+npg:type
+      a       owl:AnnotationProperty ;
+      rdfs:isDefinedBy npg: ;
+      skos:definition "The :type property specifies the local name of the graph namespace used for instances of a class."@en ;
+      skos:note "This property is used as a surrogate for the class name. There is a one-to-one relation between the class name and its associated graph, e.g. instances of the class :Subject are assigned to the subjects: graph."@en ;
+      skos:prefLabel "Type"@en .
+
+npg:volume
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Journal ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      owl:equivalentProperty
+              bibo:volume ;
+      skos:definition "The :volume property specifies a volume label for a journal."@en ;
+      skos:prefLabel "Volume"@en .
+
+npg:volumeEnd
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :issueEnd property specifies the end volume for a serial publication."@en ;
+      skos:prefLabel "Volume End"@en .
+
+npg:volumeStart
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Serial ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :issueEnd property specifies the start volume for a serial publication."@en ;
+      skos:prefLabel "Volume Start"@en .
+
+npg:webpage
+      a       owl:ObjectProperty ;
+      rdfs:domain npg:Publication ;
+      rdfs:isDefinedBy npg: ;
+      owl:equivalentProperty
+              foaf:page ;
+      skos:definition "The :webpage property relates a publication to a page on the web that describes it."@en ;
+      skos:prefLabel "Web Page"@en .
+
+npg:xmlId
+      a       owl:DatatypeProperty ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range rdfs:Literal ;
+      skos:definition "The :xmlId property specifies an ID assigned to an XML element."@en ;
+      skos:prefLabel "XML ID"@en .
+
+npg:year
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Event ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYear ;
+      skos:definition "The :date property specifies the year date of an event as a string."@en ;
+      skos:prefLabel "Year"@en .
+
+npg:yearMonth
+      a       owl:DatatypeProperty ;
+      rdfs:domain npg:Event ;
+      rdfs:isDefinedBy npg: ;
+      rdfs:range xsd:gYearMonth ;
+      skos:definition "The :date property specifies the year and month date of an event as a string."@en ;
+      skos:prefLabel "YearMonth"@en .
+

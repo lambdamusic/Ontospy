@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 <!DOCTYPE html>
@@ -111,10 +112,59 @@
   <hr/>
 </div>
           <div role="main" class="document">
+=======
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to OntoSPy’s documentation! &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.5.0 alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="#" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+>>>>>>> stg
             
   <div class="section" id="welcome-to-ontospy-s-documentation">
 <h1>Welcome to OntoSPy&#8217;s documentation!<a class="headerlink" href="#welcome-to-ontospy-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.</p>
+<<<<<<< HEAD
 <p>OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base.</p>
 <p>The basic worflow is simple: load an ontology by instantiating the <code class="docutils literal"><span class="pre">Ontology</span></code> class; you get back an object that lets you interrogate the RDFS/OWL schema. That&#8217;s all!</p>
 <p>Ps: the library can be used in standalone mode too.</p>
@@ -126,6 +176,47 @@
 </ul>
 </li>
 </ul>
+=======
+<p><a class="reference external" href="https://pypi.python.org/pypi/ontospy">https://pypi.python.org/pypi/ontospy</a></p>
+<div class="section" id="in-a-nutshell">
+<h2>In a nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h2>
+<p>OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base.</p>
+<p>The basic worflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class; you get back an object that lets you interrogate the RDFS/OWL schema. That&#8217;s all!</p>
+<p>Ps: the library can be used in standalone mode too.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This documentation needs to be updated.</p>
+</div>
+</div>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-web-recommended">Installation: Web (recommended)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#inspecting-a-graph">Inspecting a graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-data-from-multiple-ontologies">Getting data from multiple ontologies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Quick Start - Command Line</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-utility-inspect-an-ontology-quickly">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-catalog-utility-discover-commonly-used-models">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-utility-bootstrap-mappings-between-two-models">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-sketch-utility-sketch-a-turtle-model">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Running the tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tests.html#tests">Tests</a></li>
+</ul>
+</li>
+</ul>
+</div>
+>>>>>>> stg
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -139,6 +230,7 @@
 
 
           </div>
+<<<<<<< HEAD
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
@@ -201,4 +293,64 @@
    
 
 </body>
+=======
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to OntoSPy&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#in-a-nutshell">In a nutshell</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Michele Pasin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+>>>>>>> stg
 </html>
