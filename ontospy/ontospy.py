@@ -39,7 +39,7 @@ def shellPrintOverview(g, opts):
 	
 	if opts['ontoannotations']:
 		for o in ontologies:
-			print "-----------\nOntology Annotations:"
+			print "\nOntology Annotations\n-----------"
 			o.printTriples()
 				
 	if opts['classtaxonomy']:
@@ -83,31 +83,28 @@ def parse_options():
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
-	parser.add_option("-e", "--entities",
-			action="store_true", default=False, dest="entities",
-			help="Print detailed information for all entities in the ontology.")
 
-	parser.add_option("-a", "--ontoannotations",
+	parser.add_option("-a", "--annotations",
 			action="store_true", default=False, dest="ontoannotations",
 			help="Print the ontology annotations/metadata.")
 			
-	parser.add_option("-c", "--classtaxonomy",
+	parser.add_option("-c", "--classes",
 			action="store_true", default=False, dest="classtaxonomy",
 			help="Print the class taxonomy.")
 
-	parser.add_option("-p", "--propertytaxonomy",
+	parser.add_option("-p", "--properties",
 			action="store_true", default=False, dest="propertytaxonomy",
 			help="Print the property taxonomy.")
 
 	parser.add_option("-l", "--labels",
 			action="store_true", default=False, dest="labels",
-			help="Print entities labels (if available) as well as URIs.")
-									
-	opts, args = parser.parse_args()
+			help="Print entities labels as well as URIs (used in conjunction with -c or -p).")
 
-	# if len(args) < 1:
-	#	parser.print_help()
-	#	raise SystemExit, 1
+	parser.add_option("", "--showlocal",
+			action="store_true", default=False, dest="showlocal",
+			help="Prints the ontologies in the local repository.")
+
+	opts, args = parser.parse_args()
 
 	return opts, args
 
@@ -116,34 +113,40 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	# get file location
+	dirname, filename = os.path.split(os.path.abspath(__file__))
+	DEFAULT_SCHEMAS_DIR = dirname + "/data/schemas/"
+	DEFAULT_ONTO = DEFAULT_SCHEMAS_DIR + "pizza.ttl"
+	
 	opts, args = parse_options()
+
+	if opts.showlocal:
+		onlyfiles = [ f for f in os.listdir(DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(DEFAULT_SCHEMAS_DIR,f)) ]
+		for file in onlyfiles:
+			if not file.startswith("."):
+				print os.path.join(DEFAULT_SCHEMAS_DIR,file)
+		raise SystemExit, 1
+
+	if len(args) < 1:
+		print "No argument specified. Use -h for more info."
+		raise SystemExit, 1		
 	
 	print_opts = {
 					'ontoannotations' : opts.ontoannotations, 
-					'entities' : opts.entities, 
 					'classtaxonomy' : opts.classtaxonomy, 
 					'propertytaxonomy' : opts.propertytaxonomy,
 					'labels' : opts.labels,
 				}
 	
-	DEFAULT_ONTO = "data/schemas/pizza.ttl"
-	
 	sTime = time.time()
-	
-	if opts.entities:
-		# @TODO
-		print "Sorry not implemented yet"
-		sys.exit(0)
 
-	else:
+	if args:
+		g = Graph(args[0])
+	else: # 2015-06-24: deprecated via the test in parse_options
+		print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
+		g = Graph(DEFAULT_ONTO)
 	
-		if args:
-			g = Graph(args[0])
-		else:
-			print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
-			g = Graph(DEFAULT_ONTO)
-		
-		shellPrintOverview(g, print_opts)
+	shellPrintOverview(g, print_opts)
 
 
 	# finally:	

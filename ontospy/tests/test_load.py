@@ -9,14 +9,14 @@ python test_simple.py
 
 import unittest, os, sys
 
-import ontospy
+from ontospy import ontospy
 
 
-DATA_FOLDER = "data/schemas/"
+DATA_FOLDER = "ontospy/data/schemas/"
 
 
 # sanity check
-print "-------------------\nOntosPy version: ",  ontospy.VERSION, "\n-------------------"
+print "-------------------\nOntoSPy ",  ontospy.VERSION, "\n-------------------"
 
 
 class TestLoadOntologies(unittest.TestCase):

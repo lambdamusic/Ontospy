@@ -8,23 +8,61 @@ Welcome to OntoSPy's documentation!
 
 OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 
+https://pypi.python.org/pypi/ontospy
+
+
+In a nutshell
+--------------
+
 OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
 
-The basic worflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic worflow is simple: load a graph by instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
 
 Ps: the library can be used in standalone mode too.
 
+.. warning::
+	This documentation is still largely inclomplete. In the meantime, please use the quickstart section for code examples. 
+
+
+Installation
+--------------
+
+``pip install ontospy`` or ``easy_install ontospy``
+
+
+Tests
+---------------------------------
+Go to the installation folder and run `test_load.py`. A selection of ontologies will be loaded and inspected. 
+
+.. code-block:: python
+
+	python ontospy/tests/test_load.py 
+	-------------------
+	OntoSPy  v1.5.0 
+	-------------------
+
+	TEST 1: Loading ontologies from ontospy/data/schemas/ folder.
+	=================
+
+	Loading... > bfo-1.1.owl
+	----------
+	Loaded 429 triples from <ontospy/data/schemas/bfo-1.1.owl>
+	started scanning...
+	----------
+	Ontologies found: 1
+	# etc....
 
 
 
-
-Contents:
+Contents
+--------------
 
 .. toctree::
    :maxdepth: 2
 
-   intro
+   .. intro
    quickstart
+   quickstart_cmdline
    
    
 

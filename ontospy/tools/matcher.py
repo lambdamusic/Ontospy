@@ -48,14 +48,15 @@ PersonalProfileDocument ==~== Term: npg:Document
 """
 
 
-USAGE = "python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl -o ~/output.csv"
+USAGE = "python ontospy/tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl -o ~/output.csv"
 VERSION = 0.2
 
 
-import ontospy, rdflib
-import time, optparse, csv, os
+import rdflib, time, optparse, csv, os
 from difflib import SequenceMatcher
-from libs.util import *
+
+from ontospy import ontospy
+from ontospy.libs.util import *
 
 
 def similar(a, b):

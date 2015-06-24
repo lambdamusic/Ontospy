@@ -47,7 +47,7 @@ class QueryHelper(object):
 	def entityTriples(self, aURI):
 		""" builds all triples for an entity"""
 
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """CONSTRUCT {<%s> ?y ?z }
 				 WHERE {
@@ -149,7 +149,7 @@ class QueryHelper(object):
 		
 
 	def getClassInstances(self, aURI):
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """SELECT DISTINCT ?x
 				 WHERE {
@@ -160,7 +160,7 @@ class QueryHelper(object):
 		return list(qres)
 
 	def getClassInstancesCount(self, aURI):
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """SELECT (COUNT(?x) AS ?count )
 				 WHERE {
@@ -176,7 +176,7 @@ class QueryHelper(object):
 
 				
 	def getClassDirectSupers(self, aURI):
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """SELECT DISTINCT ?x
 				 WHERE {
@@ -191,7 +191,7 @@ class QueryHelper(object):
 		""" 
 		2015-06-03: currenlty not used, inferred from above
 		"""
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """SELECT DISTINCT ?x
 				 WHERE {
@@ -206,7 +206,7 @@ class QueryHelper(object):
 		note: requires SPARQL 1.1 
 		2015-06-04: currenlty not used, inferred from above
 		"""
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		try:
 			qres = self.rdfgraph.query(
 				  """SELECT DISTINCT ?x
@@ -226,7 +226,7 @@ class QueryHelper(object):
 		note: requires SPARQL 1.1	
 		2015-06-04: currenlty not used, inferred from above
 		"""
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		try:
 			qres = self.rdfgraph.query(
 				  """SELECT DISTINCT ?x
@@ -263,7 +263,7 @@ class QueryHelper(object):
 	
 		
 	def getPropDirectSupers(self, aURI):
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
 			  """SELECT DISTINCT ?x
 				 WHERE {
@@ -279,7 +279,7 @@ class QueryHelper(object):
 		note: requires SPARQL 1.1 
 		2015-06-04: currenlty not used, inferred from above
 		"""
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		try:
 			qres = self.rdfgraph.query(
 				  """SELECT DISTINCT ?x
@@ -299,7 +299,7 @@ class QueryHelper(object):
 		note: requires SPARQL 1.1	
 		2015-06-04: currenlty not used, inferred from above
 		"""
-		aURI = str(aURI)
+		aURI = unicode(aURI)
 		try:
 			qres = self.rdfgraph.query(
 				  """SELECT DISTINCT ?x

@@ -276,7 +276,8 @@ def inferURILocalSymbol(aUri):
 		==> ('wgs84_pos', 'http://www.w3.org/2003/01/geo/')
 
 	"""
-	stringa = aUri.__str__()
+	# stringa = aUri.__str__()
+	stringa = unicode(aUri)
 	try:
 		ns = stringa.split("#")[0]
 		name = stringa.split("#")[1]

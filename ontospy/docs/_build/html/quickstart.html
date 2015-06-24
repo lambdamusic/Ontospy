@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Start &mdash; OntoSPy 1.2.3 documentation</title>
+    <title>Quick Start &mdash; OntoSPy 1.5.0 alpha documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.3',
+        VERSION:     '1.5.0 alpha',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.2.3 documentation" href="index.html" />
-    <link rel="prev" title="Introduction" href="intro.html" /> 
+    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="index.html" />
+    <link rel="prev" title="Welcome to OntoSPy’s documentation!" href="index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -34,9 +34,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="intro.html" title="Introduction"
+          <a href="index.html" title="Welcome to OntoSPy’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.2.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,23 +47,11 @@
             
   <div class="section" id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<p>For the ones who have little time</p>
-<div class="section" id="running-the-tests">
-<h2>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h2>
-<p>Make sure you&#8217;re in the ontospy root folder</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="p">]</span><span class="nd">@Tartaruga</span><span class="p">:</span><span class="o">~/</span><span class="n">ontospy</span><span class="o">&gt;</span><span class="n">python</span> <span class="n">tests</span><span class="o">/</span><span class="n">test_simple</span><span class="o">.</span><span class="n">py</span>
-<span class="o">-------------------</span>
-<span class="n">OntosPy</span> <span class="n">version</span><span class="p">:</span>  <span class="o">%</span><span class="n">prog</span> <span class="n">v2</span><span class="o">.</span><span class="mf">0.0</span>
-<span class="o">-------------------</span>
-
-<span class="n">TEST</span> <span class="mi">1</span><span class="p">:</span> <span class="n">Loading</span> <span class="n">ontologies</span> <span class="kn">from</span> <span class="nn">data</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span> <span class="n">folder</span><span class="o">.</span>
-<span class="o">=================</span>
-<span class="o">...</span><span class="n">etc</span><span class="o">......</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="inspect-a-graph">
-<h2>Inspect a graph<a class="headerlink" href="#inspect-a-graph" title="Permalink to this headline">¶</a></h2>
+<p>For the ones who value time.</p>
+<div class="section" id="inspecting-a-graph">
+<h2>Inspecting a graph<a class="headerlink" href="#inspecting-a-graph" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="load-the-graph">
+<h3>Load the graph<a class="headerlink" href="#load-the-graph" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">ontospy2</span>
 <span class="n">INFO</span><span class="p">:</span><span class="n">rdflib</span><span class="p">:</span><span class="n">RDFLib</span> <span class="n">Version</span><span class="p">:</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span>
 
@@ -74,7 +62,7 @@
 </div>
 </div>
 <div class="section" id="get-a-class">
-<h2>Get a class<a class="headerlink" href="#get-a-class" title="Permalink to this headline">¶</a></h2>
+<h3>Get a class<a class="headerlink" href="#get-a-class" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">getClass</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="s">&#39;http://www.w3.org/2000/01/rdf-schema#Resource&#39;</span><span class="p">)</span>
 <span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="o">&lt;</span><span class="n">Class</span> <span class="o">*</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2000</span><span class="o">/</span><span class="mo">01</span><span class="o">/</span><span class="n">rdf</span><span class="o">-</span><span class="n">schema</span><span class="c">#Resource*&gt;</span>
 
@@ -90,7 +78,7 @@
 </div>
 </div>
 <div class="section" id="pretty-print-triples">
-<h2>Pretty Print Triples<a class="headerlink" href="#pretty-print-triples" title="Permalink to this headline">¶</a></h2>
+<h3>Pretty Print Triples<a class="headerlink" href="#pretty-print-triples" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">getClass</span><span class="p">(</span><span class="mi">173</span><span class="p">)</span><span class="o">.</span><span class="n">triplesPrint</span><span class="p">()</span>
    <span class="o">=&gt;</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2003</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="n">sw</span><span class="o">-</span><span class="n">vocab</span><span class="o">-</span><span class="n">status</span><span class="o">/</span><span class="n">ns</span><span class="c">#term_status</span>
       <span class="n">stable</span>
@@ -112,7 +100,7 @@
 </div>
 </div>
 <div class="section" id="serialize-an-entity">
-<h2>Serialize an entity<a class="headerlink" href="#serialize-an-entity" title="Permalink to this headline">¶</a></h2>
+<h3>Serialize an entity<a class="headerlink" href="#serialize-an-entity" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">getClass</span><span class="p">(</span><span class="mi">173</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
 <span class="nd">@prefix</span> <span class="n">ns1</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">purl</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ontology</span><span class="o">/</span><span class="n">mo</span><span class="o">/&gt;</span> <span class="o">.</span>
 <span class="nd">@prefix</span> <span class="n">ns2</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2003</span><span class="o">/</span><span class="mo">06</span><span class="o">/</span><span class="n">sw</span><span class="o">-</span><span class="n">vocab</span><span class="o">-</span><span class="n">status</span><span class="o">/</span><span class="n">ns</span><span class="c">#&gt; .</span>
@@ -132,38 +120,8 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="query-via-sparql">
-<h2>Query via Sparql<a class="headerlink" href="#query-via-sparql" title="Permalink to this headline">¶</a></h2>
-<p>Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">ontospy2</span>
-<span class="n">INFO</span><span class="p">:</span><span class="n">rdflib</span><span class="p">:</span><span class="n">RDFLib</span> <span class="n">Version</span><span class="p">:</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">g</span> <span class="o">=</span> <span class="n">ontospy2</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="s">&quot;data/foaf.rdf&quot;</span><span class="p">)</span>
-<span class="n">Loaded</span> <span class="mi">630</span> <span class="n">triples</span>
-<span class="n">started</span> <span class="n">scanning</span><span class="o">...</span>
-<span class="n">Ontologies</span> <span class="n">found</span><span class="p">:</span> <span class="mi">1</span>
-<span class="n">Classes</span>        <span class="n">found</span><span class="p">:</span> <span class="mi">28</span>
-<span class="n">Properties</span> <span class="n">found</span><span class="p">:</span> <span class="mi">145</span>
-<span class="o">...</span><span class="n">Annotation</span>   <span class="p">:</span> <span class="mi">7</span>
-<span class="o">...</span><span class="n">Datatype</span>     <span class="p">:</span> <span class="mi">27</span>
-<span class="o">...</span><span class="n">Object</span>       <span class="p">:</span> <span class="mi">49</span>
-
-<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">sparql</span><span class="p">(</span><span class="s">&quot;select distinct ?c where {?x a ?c}&quot;</span><span class="p">)</span>
-<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
-<span class="p">[(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#DatatypeProperty&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#ObjectProperty&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2000/01/rdf-schema#Class&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/1999/02/22-rdf-syntax-ns#Property&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#Class&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#InverseFunctionalProperty&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#Ontology&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#AnnotationProperty&#39;</span><span class="p">)),</span>
- <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#FunctionalProperty&#39;</span><span class="p">))]</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="descendands-and-ancestors">
-<h2>Descendands and ancestors<a class="headerlink" href="#descendands-and-ancestors" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="descendands-and-ancestors-for-a-class">
+<h3>Descendands and ancestors for a class<a class="headerlink" href="#descendands-and-ancestors-for-a-class" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="n">c</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">getClass</span><span class="p">(</span><span class="mi">144</span><span class="p">)</span>
 
 <span class="n">In</span> <span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="n">c</span><span class="o">.</span><span class="n">descendants</span><span class="p">()</span>
@@ -180,7 +138,7 @@
 </div>
 </div>
 <div class="section" id="access-a-quick-description-of-a-class-or-property">
-<h2>Access a quick description of a class or property<a class="headerlink" href="#access-a-quick-description-of-a-class-or-property" title="Permalink to this headline">¶</a></h2>
+<h3>Access a quick description of a class or property<a class="headerlink" href="#access-a-quick-description-of-a-class-or-property" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">c</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="n">Parents</span><span class="o">......</span><span class="p">:</span> <span class="mi">1</span>
 <span class="n">Children</span><span class="o">.....</span><span class="p">:</span> <span class="mi">0</span>
@@ -220,52 +178,88 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="include-labels-in-property-tree">
-<h2>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy.py data/schemas/foaf.rdf -c -l
-----------
-Loaded <span class="m">630</span> triples from &lt;data/schemas/foaf.rdf&gt;
-started scanning...
-----------
-Ontologies found: 1
-Classes found...: 15
-Properties found: 67
-Annotation......: 7
-Datatype........: 26
-Object..........: 34
------------
-Metadata:
+</div>
+<div class="section" id="getting-data-from-multiple-ontologies">
+<h2>Getting data from multiple ontologies<a class="headerlink" href="#getting-data-from-multiple-ontologies" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">30</span><span class="p">]:</span> <span class="n">g2</span> <span class="o">=</span> <span class="n">ontospy</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="s">&quot;data/schemas/npgmusic_mix.ttl&quot;</span><span class="p">)</span>
+<span class="o">----------</span>
+<span class="n">Loaded</span> <span class="mi">3225</span> <span class="n">triples</span> <span class="kn">from</span> <span class="o">&lt;</span><span class="n">data</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="n">npgmusic_mix</span><span class="o">.</span><span class="n">ttl</span><span class="o">&gt;</span>
+<span class="n">started</span> <span class="n">scanning</span><span class="o">...</span>
+<span class="o">----------</span>
+<span class="n">Ontologies</span> <span class="n">found</span><span class="p">:</span> <span class="mi">2</span>
+<span class="n">Classes</span> <span class="n">found</span><span class="o">...</span><span class="p">:</span> <span class="mi">109</span>
+<span class="n">Properties</span> <span class="n">found</span><span class="p">:</span> <span class="mi">301</span>
+<span class="n">Annotation</span><span class="o">......</span><span class="p">:</span> <span class="mi">10</span>
+<span class="n">Datatype</span><span class="o">........</span><span class="p">:</span> <span class="mi">107</span>
+<span class="n">Object</span><span class="o">..........</span><span class="p">:</span> <span class="mi">184</span>
 
-http://xmlns.com/foaf/0.1/
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/title
-.... Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> <span class="nv">vocabulary</span>
-<span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-.... http://www.w3.org/2002/07/owl#Ontology
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/description
-.... The Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
-
-Class Taxonomy
-----------
-http://www.w3.org/2000/10/swap/pim/contact#Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing <span class="o">(</span><span class="s2">&quot;Spatial Thing&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-foaf:Agent <span class="o">(</span><span class="s2">&quot;Agent&quot;</span><span class="o">)</span>
-----foaf:Group <span class="o">(</span><span class="s2">&quot;Group&quot;</span><span class="o">)</span>
-----foaf:Organization <span class="o">(</span><span class="s2">&quot;Organization&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-foaf:Document <span class="o">(</span><span class="s2">&quot;Document&quot;</span><span class="o">)</span>
-----foaf:Image <span class="o">(</span><span class="s2">&quot;Image&quot;</span><span class="o">)</span>
-----foaf:PersonalProfileDocument <span class="o">(</span><span class="s2">&quot;PersonalProfileDocument&quot;</span><span class="o">)</span>
-foaf:LabelProperty <span class="o">(</span><span class="s2">&quot;Label Property&quot;</span><span class="o">)</span>
-foaf:OnlineAccount <span class="o">(</span><span class="s2">&quot;Online Account&quot;</span><span class="o">)</span>
-----foaf:OnlineChatAccount <span class="o">(</span><span class="s2">&quot;Online Chat Account&quot;</span><span class="o">)</span>
-----foaf:OnlineEcommerceAccount <span class="o">(</span><span class="s2">&quot;Online E-commerce Account&quot;</span><span class="o">)</span>
-----foaf:OnlineGamingAccount <span class="o">(</span><span class="s2">&quot;Online Gaming Account&quot;</span><span class="o">)</span>
-foaf:Project <span class="o">(</span><span class="s2">&quot;Project&quot;</span><span class="o">)</span>
-----------
-Time:          2.77s
+<span class="n">In</span> <span class="p">[</span><span class="mi">31</span><span class="p">]:</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">g2</span><span class="o">.</span><span class="n">ontologies</span><span class="p">:</span>
+   <span class="o">....</span><span class="p">:</span>     <span class="k">print</span> <span class="n">o</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+   <span class="o">....</span><span class="p">:</span>
+<span class="o">&lt;</span><span class="n">OntoSPy</span><span class="p">:</span> <span class="n">Ontology</span> <span class="nb">object</span> <span class="k">for</span> <span class="n">uri</span> <span class="o">*</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">nature</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">terms</span><span class="o">/*&gt;</span> <span class="mi">49</span>
+<span class="o">&lt;</span><span class="n">OntoSPy</span><span class="p">:</span> <span class="n">Ontology</span> <span class="nb">object</span> <span class="k">for</span> <span class="n">uri</span> <span class="o">*</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">purl</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ontology</span><span class="o">/</span><span class="n">mo</span><span class="o">/*&gt;</span> <span class="mi">54</span>
 </pre></div>
+</div>
+<div class="section" id="querying-a-sparql-endpoint">
+<h3>Querying a SPARQL endpoint<a class="headerlink" href="#querying-a-sparql-endpoint" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">g</span> <span class="o">=</span> <span class="n">ontospy</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="s">&quot;http://data.semanticweb.org/sparql&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">started</span> <span class="n">scanning</span><span class="o">...</span>
+<span class="o">----------</span>
+<span class="n">Ontologies</span> <span class="n">found</span><span class="p">:</span> <span class="mi">20</span>
+<span class="n">Classes</span> <span class="n">found</span><span class="o">...</span><span class="p">:</span> <span class="mi">105</span>
+<span class="n">Properties</span> <span class="n">found</span><span class="p">:</span> <span class="mi">53</span>
+<span class="n">Annotation</span><span class="o">......</span><span class="p">:</span> <span class="mi">5</span>
+<span class="n">Datatype</span><span class="o">........</span><span class="p">:</span> <span class="mi">18</span>
+<span class="n">Object</span><span class="o">..........</span><span class="p">:</span> <span class="mi">30</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">pri</span>
+<span class="n">g</span><span class="o">.</span><span class="n">printClassTree</span>     <span class="n">g</span><span class="o">.</span><span class="n">printPropertyTree</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">printClassTree</span><span class="p">()</span>
+<span class="p">[</span><span class="mi">656</span><span class="p">]</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">swrc</span><span class="o">.</span><span class="n">ontoware</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ontology</span><span class="c">#ResearchTopic</span>
+<span class="p">[</span><span class="mi">657</span><span class="p">]</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2002</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="n">cal</span><span class="o">/</span><span class="n">ical</span><span class="c">#Vcalendar</span>
+<span class="p">[</span><span class="mi">658</span><span class="p">]</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2002</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="n">cal</span><span class="o">/</span><span class="n">ical</span><span class="c">#Vevent</span>
+<span class="p">[</span><span class="mi">608</span><span class="p">]</span> <span class="o">----</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#OrganisedEvent</span>
+<span class="p">[</span><span class="mi">566</span><span class="p">]</span> <span class="o">--------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#AcademicEvent</span>
+<span class="p">[</span><span class="mi">585</span><span class="p">]</span> <span class="o">------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#ConferenceEvent</span>
+<span class="p">[</span><span class="mi">610</span><span class="p">]</span> <span class="o">------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#PanelEvent</span>
+<span class="p">[</span><span class="mi">633</span><span class="p">]</span> <span class="o">------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#SessionEvent</span>
+<span class="p">[</span><span class="mi">590</span><span class="p">]</span> <span class="o">----------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#DemoSession</span>
+<span class="p">[</span><span class="mi">613</span><span class="p">]</span> <span class="o">----------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#PaperSession</span>
+<span class="p">[</span><span class="mi">618</span><span class="p">]</span> <span class="o">----------------</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">semanticweb</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">ns</span><span class="o">/</span><span class="n">swc</span><span class="o">/</span><span class="n">ontology</span><span class="c">#PosterSession</span>
+<span class="c"># etc.....</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="query-via-sparql">
+<h3>Query via Sparql<a class="headerlink" href="#query-via-sparql" title="Permalink to this headline">¶</a></h3>
+<p>Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">ontospy2</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">rdflib</span><span class="p">:</span><span class="n">RDFLib</span> <span class="n">Version</span><span class="p">:</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">g</span> <span class="o">=</span> <span class="n">ontospy2</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="s">&quot;data/foaf.rdf&quot;</span><span class="p">)</span>
+<span class="n">Loaded</span> <span class="mi">630</span> <span class="n">triples</span>
+<span class="n">started</span> <span class="n">scanning</span><span class="o">...</span>
+<span class="n">Ontologies</span> <span class="n">found</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Classes</span>        <span class="n">found</span><span class="p">:</span> <span class="mi">28</span>
+<span class="n">Properties</span> <span class="n">found</span><span class="p">:</span> <span class="mi">145</span>
+<span class="o">...</span><span class="n">Annotation</span>   <span class="p">:</span> <span class="mi">7</span>
+<span class="o">...</span><span class="n">Datatype</span>     <span class="p">:</span> <span class="mi">27</span>
+<span class="o">...</span><span class="n">Object</span>       <span class="p">:</span> <span class="mi">49</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">g</span><span class="o">.</span><span class="n">sparql</span><span class="p">(</span><span class="s">&quot;select distinct ?c where {?x a ?c}&quot;</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+<span class="p">[(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#DatatypeProperty&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#ObjectProperty&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2000/01/rdf-schema#Class&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/1999/02/22-rdf-syntax-ns#Property&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#Class&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#InverseFunctionalProperty&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#Ontology&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#AnnotationProperty&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="n">rdflib</span><span class="o">.</span><span class="n">term</span><span class="o">.</span><span class="n">URIRef</span><span class="p">(</span><span class="s">u&#39;http://www.w3.org/2002/07/owl#FunctionalProperty&#39;</span><span class="p">))]</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -279,22 +273,27 @@ Time:          2.77s
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Quick Start</a><ul>
-<li><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
-<li><a class="reference internal" href="#inspect-a-graph">Inspect a graph</a></li>
+<li><a class="reference internal" href="#inspecting-a-graph">Inspecting a graph</a><ul>
+<li><a class="reference internal" href="#load-the-graph">Load the graph</a></li>
 <li><a class="reference internal" href="#get-a-class">Get a class</a></li>
 <li><a class="reference internal" href="#pretty-print-triples">Pretty Print Triples</a></li>
 <li><a class="reference internal" href="#serialize-an-entity">Serialize an entity</a></li>
-<li><a class="reference internal" href="#query-via-sparql">Query via Sparql</a></li>
-<li><a class="reference internal" href="#descendands-and-ancestors">Descendands and ancestors</a></li>
+<li><a class="reference internal" href="#descendands-and-ancestors-for-a-class">Descendands and ancestors for a class</a></li>
 <li><a class="reference internal" href="#access-a-quick-description-of-a-class-or-property">Access a quick description of a class or property</a></li>
-<li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#getting-data-from-multiple-ontologies">Getting data from multiple ontologies</a><ul>
+<li><a class="reference internal" href="#querying-a-sparql-endpoint">Querying a SPARQL endpoint</a></li>
+<li><a class="reference internal" href="#query-via-sparql">Query via Sparql</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="intro.html"
-                        title="previous chapter">Introduction</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to OntoSPy&#8217;s documentation!</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -326,9 +325,9 @@ Time:          2.77s
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="intro.html" title="Introduction"
+          <a href="index.html" title="Welcome to OntoSPy’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.2.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

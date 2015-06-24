@@ -1,27 +1,15 @@
 Quick Start
 ************************
-For the ones who have little time
-
-
-Running the tests
-++++++++++++++++++++++++++++++++++++++++++++
-Make sure you're in the ontospy root folder 
-
-.. code-block:: python
-
-    [michele.pasin]@Tartaruga:~/ontospy>python tests/test_simple.py 
-    -------------------
-    OntosPy version:  %prog v2.0.0 
-    -------------------
-
-    TEST 1: Loading ontologies from data/schemas/ folder.
-    =================
-    ...etc......
-    
+For the ones who value time.
     
 
-Inspect a graph
-++++++++++++++++++++++++++++++++++++++++++++
+
+
+Inspecting a graph
++++++++++++++++++++++++++++++++
+
+Load the graph
+-------------------------------
 
 .. code-block:: python
 
@@ -35,7 +23,7 @@ Inspect a graph
 
 	
 Get a class
-++++++++++++++++++++++++++++++++++++++++++++
+---------------------------------------------
 
 .. code-block:: python
 
@@ -54,7 +42,7 @@ Get a class
 
 
 Pretty Print Triples
-++++++++++++++++++++++++++++++++++++++++++++
+---------------------------------------------
 
 .. code-block:: python
 
@@ -77,8 +65,9 @@ Pretty Print Triples
           http://www.w3.org/2002/07/owl#Class
 
 
+
 Serialize an entity
-++++++++++++++++++++++++++++++++++++++++++++
+---------------------------------------------
 
 .. code-block:: python
 
@@ -101,43 +90,8 @@ Serialize an entity
 
 
 
-
-Query via Sparql
-++++++++++++++++++++++++++++++++++++++++++++
-
-Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!
-
-.. code-block:: python
-
-    In [1]: import ontospy2
-    INFO:rdflib:RDFLib Version: 4.2.0
-
-    In [2]: g = ontospy2.Graph("data/foaf.rdf")
-    Loaded 630 triples
-    started scanning...
-    Ontologies found: 1
-    Classes	   found: 28
-    Properties found: 145
-    ...Annotation   : 7
-    ...Datatype     : 27
-    ...Object       : 49
-
-    In [3]: g.sparql("select distinct ?c where {?x a ?c}")
-    Out[3]: 
-    [(rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#DatatypeProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#ObjectProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')),
-     (rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#InverseFunctionalProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Ontology')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#AnnotationProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#FunctionalProperty'))]
- 
-
-
-Descendands and ancestors
-++++++++++++++++++++++++++++++++++++++++++++
+Descendands and ancestors for a class
+---------------------------------------------
 
 .. code-block:: python
 
@@ -157,7 +111,7 @@ Descendands and ancestors
 
 
 Access a quick description of a class or property
-++++++++++++++++++++++++++++++++++++++++++++
+---------------------------------------------
 
 .. code-block:: python
 
@@ -200,51 +154,95 @@ Access a quick description of a class or property
 
 
 
-Include labels in property tree
-++++++++++++++++++++++++++++++++++++++++++++
 
-.. code-block:: shell
+Getting data from multiple ontologies
+++++++++++++++++++++++++++++++++++++++++++
 
-    > ontospy.py data/schemas/foaf.rdf -c -l
+.. code-block:: python
+
+    In [30]: g2 = ontospy.Graph("data/schemas/npgmusic_mix.ttl")
     ----------
-    Loaded 630 triples from <data/schemas/foaf.rdf>
+    Loaded 3225 triples from <data/schemas/npgmusic_mix.ttl>
     started scanning...
     ----------
+    Ontologies found: 2
+    Classes found...: 109
+    Properties found: 301
+    Annotation......: 10
+    Datatype........: 107
+    Object..........: 184
+
+    In [31]: for o in g2.ontologies:
+       ....:     print o, len(o.classes)
+       ....:     
+    <OntoSPy: Ontology object for uri *http://ns.nature.com/terms/*> 49
+    <OntoSPy: Ontology object for uri *http://purl.org/ontology/mo/*> 54
+
+
+
+Querying a SPARQL endpoint
+---------------------------------------------
+
+.. code-block:: python
+
+    In [12]: g = ontospy.Graph("http://data.semanticweb.org/sparql", endpoint=True)
+    started scanning...
+    ----------
+    Ontologies found: 20
+    Classes found...: 105
+    Properties found: 53
+    Annotation......: 5
+    Datatype........: 18
+    Object..........: 30
+
+    In [13]: g.pri
+    g.printClassTree     g.printPropertyTree  
+
+    In [13]: g.printClassTree()
+    [656] http://swrc.ontoware.org/ontology#ResearchTopic
+    [657] http://www.w3.org/2002/12/cal/ical#Vcalendar
+    [658] http://www.w3.org/2002/12/cal/ical#Vevent
+    [608] ----http://data.semanticweb.org/ns/swc/ontology#OrganisedEvent
+    [566] --------http://data.semanticweb.org/ns/swc/ontology#AcademicEvent
+    [585] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceEvent
+    [610] ------------http://data.semanticweb.org/ns/swc/ontology#PanelEvent
+    [633] ------------http://data.semanticweb.org/ns/swc/ontology#SessionEvent
+    [590] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoSession
+    [613] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperSession
+    [618] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterSession
+    # etc.....
+
+
+Query via Sparql
+---------------------------------------------
+
+Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!
+
+.. code-block:: python
+
+    In [1]: import ontospy2
+    INFO:rdflib:RDFLib Version: 4.2.0
+
+    In [2]: g = ontospy2.Graph("data/foaf.rdf")
+    Loaded 630 triples
+    started scanning...
     Ontologies found: 1
-    Classes found...: 15
-    Properties found: 67
-    Annotation......: 7
-    Datatype........: 26
-    Object..........: 34
-    -----------
-    Metadata:
+    Classes	   found: 28
+    Properties found: 145
+    ...Annotation   : 7
+    ...Datatype     : 27
+    ...Object       : 49
 
-    http://xmlns.com/foaf/0.1/
-    => http://purl.org/dc/elements/1.1/title
-    .... Friend of a Friend (FOAF) vocabulary
-    => http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-    .... http://www.w3.org/2002/07/owl#Ontology
-    => http://purl.org/dc/elements/1.1/description
-    .... The Friend of a Friend (FOAF) RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
+    In [3]: g.sparql("select distinct ?c where {?x a ?c}")
+    Out[3]: 
+    [(rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#DatatypeProperty')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#ObjectProperty')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')),
+     (rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#InverseFunctionalProperty')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Ontology')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#AnnotationProperty')),
+     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#FunctionalProperty'))]
+ 
 
-    Class Taxonomy
-    ----------
-    http://www.w3.org/2000/10/swap/pim/contact#Person ("Person")
-    ----foaf:Person ("Person")
-    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing ("Spatial Thing")
-    ----foaf:Person ("Person")
-    foaf:Agent ("Agent")
-    ----foaf:Group ("Group")
-    ----foaf:Organization ("Organization")
-    ----foaf:Person ("Person")
-    foaf:Document ("Document")
-    ----foaf:Image ("Image")
-    ----foaf:PersonalProfileDocument ("PersonalProfileDocument")
-    foaf:LabelProperty ("Label Property")
-    foaf:OnlineAccount ("Online Account")
-    ----foaf:OnlineChatAccount ("Online Chat Account")
-    ----foaf:OnlineEcommerceAccount ("Online E-commerce Account")
-    ----foaf:OnlineGamingAccount ("Online Gaming Account")
-    foaf:Project ("Project")
-    ----------
-    Time:	   2.77s

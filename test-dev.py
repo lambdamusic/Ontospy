@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# script used in development for testing
+# dumb script used to speed up testing
 
-import ontospy
+
+from ontospy import ontospy
 import rdflib
 
 
-g = ontospy.Graph("data/schemas/fabio.rdf")
+if False:
+	g = ontospy.Graph("ontospy/data/schemas/fabio.rdf")
+
+	for x in g.classes:
+		print x, x.count()
 
 
-for x in g.classes:
-	print x, x.count()
+ontospy.viewCatalog()
 
 
 # g = ontospy.Graph("http://dbpedia.org/sparql", endpoint=True)

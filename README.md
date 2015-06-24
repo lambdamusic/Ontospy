@@ -2,6 +2,8 @@ OntoSPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
+https://pypi.python.org/pypi/ontospy
+
 
 #### Version: 
 Check the ``ontospy/_version.py`` file
