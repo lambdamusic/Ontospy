@@ -38,7 +38,7 @@ Ps: the library can be used in standalone mode too.
 Examples
 ----------
 
-These are some basic examples that should be enough to get you started. More extensive documentation will (hopefully) be made available soon!
+These are some basic examples that should be enough to get you started. More extensive documentation will be made available soon!
 
 
 ####Inspecting an ontology from the command line
