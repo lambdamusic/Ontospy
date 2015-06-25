@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Settings options &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.5.0 alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="settings-options">
+<span id="settings"></span><h1>Settings options<a class="headerlink" href="#settings-options" title="Permalink to this headline">¶</a></h1>
+<p>DJFacet can be customised by setting a number of predefined variables in your <code class="docutils literal"><span class="pre">settings.py</span></code> file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you do not set this variables explicitly, they&#8217;ll get a default value as specified below (which in most situations will work just fine).</p>
+</div>
+<div class="section" id="djf-specs-module">
+<span id="id1"></span><h2>DJF_SPECS_MODULE<a class="headerlink" href="#djf-specs-module" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">'facetspecs'</span></code>.</p>
+<p>It determines what file name the configuration file has, and where it is located.</p>
+<p>By default, DJFacet expects to find the configuration file (<code class="docutils literal"><span class="pre">facetspecs.py</span></code>) at the root of your django project, that is, where your <code class="docutils literal"><span class="pre">setting.py</span></code> file is. In general, you shouldn&#8217;t need to change this setting.</p>
+</div>
+<div class="section" id="djf-showlogs">
+<span id="id2"></span><h2>DJF_SHOWLOGS<a class="headerlink" href="#djf-showlogs" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>It determines whether the logs DJFacet produces should be printed out in the shell. This is useful in development mode, to see what&#8217;s going on when facets are created and populated.</p>
+</div>
+<div class="section" id="djfacet-count">
+<span id="id3"></span><h2>DJFACET_COUNT<a class="headerlink" href="#djfacet-count" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">True</span></code>.</p>
+<p>It determines whether the count for the  <em>zoom-points</em> in the facets must be calculated, or not.</p>
+<p>If your application has a lot of data (and facets), setting this value to False can be useful for testing, since it will speed up considerably the refresh operation.</p>
+</div>
+<div class="section" id="djf-cache">
+<span id="id4"></span><h2>DJF_CACHE<a class="headerlink" href="#djf-cache" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>It determines whether the Cache is used or not.</p>
+<p>Once the cache is activated, DJFacet will always attempt to refresh the facets using the values stored in the database, instead of calculating them each time. Note that if the system detects unsaved objects, it caches them on-the-fly. Alternatively, you can cache all facets-contents using the appropriate management command (see the <a class="reference internal" href="commands.html#management"><span>Management commands</span></a> section).</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If this parameter is set to True, you must have created the <em>cached Faceted-Manager</em> object using the appropriate management command (see the <a class="reference internal" href="commands.html#management"><span>Management commands</span></a> section).</p>
+</div>
+</div>
+<div class="section" id="djf-ajax">
+<span id="id5"></span><h2>DJF_AJAX<a class="headerlink" href="#djf-ajax" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>It determines whether the user interface should update the facets values asynchronously, or not.</p>
+<p>If set to True, each of the facets in your search interface will become an html <code class="docutils literal"><span class="pre">&lt;div&gt;</span></code> element that can be opened or close. When opened, the back-end is called and its contents are refreshed via ajax.</p>
+</div>
+<div class="section" id="djf-maxres-page">
+<span id="id6"></span><h2>DJF_MAXRES_PAGE<a class="headerlink" href="#djf-maxres-page" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">50</span></code>.</p>
+<p>It determines the max number of results that a faceted search should display. The rest of the results will be paginated accordingly (see the <span class="xref std std-ref">templates</span> section for more details).</p>
+</div>
+<div class="section" id="dj-2columns-innerfacet-removed">
+<span id="dj-2columns-innerfacet"></span><h2>DJ_2COLUMNS_INNERFACET [REMOVED!]<a class="headerlink" href="#dj-2columns-innerfacet-removed" title="Permalink to this headline">¶</a></h2>
+<p>Defaults to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+<p>It determines whether the two-columns html template should be used for rendering the list of terms within a facet (see the <span class="xref std std-ref">templates</span> section for more details).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Settings options</a><ul>
+<li><a class="reference internal" href="#djf-specs-module">DJF_SPECS_MODULE</a></li>
+<li><a class="reference internal" href="#djf-showlogs">DJF_SHOWLOGS</a></li>
+<li><a class="reference internal" href="#djfacet-count">DJFACET_COUNT</a></li>
+<li><a class="reference internal" href="#djf-cache">DJF_CACHE</a></li>
+<li><a class="reference internal" href="#djf-ajax">DJF_AJAX</a></li>
+<li><a class="reference internal" href="#djf-maxres-page">DJF_MAXRES_PAGE</a></li>
+<li><a class="reference internal" href="#dj-2columns-innerfacet-removed">DJ_2COLUMNS_INNERFACET [REMOVED!]</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/settings.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Michele Pasin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
