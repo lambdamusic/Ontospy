@@ -165,6 +165,7 @@
 <h1>Welcome to OntoSPy&#8217;s documentation!<a class="headerlink" href="#welcome-to-ontospy-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.</p>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <p>OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base.</p>
 <p>The basic worflow is simple: load an ontology by instantiating the <code class="docutils literal"><span class="pre">Ontology</span></code> class; you get back an object that lets you interrogate the RDFS/OWL schema. That&#8217;s all!</p>
 <p>Ps: the library can be used in standalone mode too.</p>
@@ -178,15 +179,25 @@
 </ul>
 =======
 <p><a class="reference external" href="https://pypi.python.org/pypi/ontospy">https://pypi.python.org/pypi/ontospy</a></p>
+=======
+>>>>>>> stg
 <div class="section" id="in-a-nutshell">
 <h2>In a nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h2>
 <p>OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base.</p>
+<p>Originally, I developed this in order to get the hang of the Python RDFLib library (note: it was previously called OntoInspector and hosted on BitBucket). RDFLib provides a number of useful primitives for working with RDF graphs; however it lacks an API aimed at interrogating and modifying a graph based on its defined schema - aka the ontology.</p>
 <p>The basic worflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class; you get back an object that lets you interrogate the RDFS/OWL schema. That&#8217;s all!</p>
 <p>Ps: the library can be used in standalone mode too.</p>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">This documentation needs to be updated.</p>
+<p class="last">This documentation is still in draft mode.</p>
 </div>
+</div>
+<div class="section" id="see-also">
+<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Homepage on Pypi: <a class="reference external" href="https://pypi.python.org/pypi/ontospy">https://pypi.python.org/pypi/ontospy</a></li>
+<li>Homepage on Github: <a class="reference external" href="https://github.com/lambdamusic/OntoSPy">https://github.com/lambdamusic/OntoSPy</a></li>
+</ul>
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
@@ -194,8 +205,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installation-web-recommended">Installation: Web (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
@@ -204,10 +215,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Quick Start - Command Line</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-utility-inspect-an-ontology-quickly">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-catalog-utility-discover-commonly-used-models">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-utility-bootstrap-mappings-between-two-models">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-sketch-utility-sketch-a-turtle-model">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-utility">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-catalog-utility">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-utility">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-sketch-utility">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">Running the tests</a><ul>
@@ -302,6 +313,7 @@
   <ul>
 <li><a class="reference internal" href="#">Welcome to OntoSPy&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#in-a-nutshell">In a nutshell</a></li>
+<li><a class="reference internal" href="#see-also">See also</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>
