@@ -10,7 +10,7 @@ Shows a list of ontologies by querying http://prefix.cc/popular/all
 
 """
 
-VERSION = 0.1
+CATALOG_VERSION = 0.1
 USAGE = "ontospy-catalog <options>"
 
 
@@ -18,7 +18,6 @@ import time, optparse, os, rdflib
 
 from ontospy import ontospy
 from ontospy.libs.util import *
-
 
 	
 def viewCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
@@ -56,7 +55,7 @@ def parse_options():
 	
 	"""
 	
-	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
 
 	parser.add_option("-a", "--all",
 			action="store_true", default=False, dest="all",
@@ -80,6 +79,8 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	print "OntoSPy " + ontospy.VERSION
+
 	opts, args = parse_options()
 		
 			
