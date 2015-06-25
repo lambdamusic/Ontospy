@@ -1,12 +1,11 @@
 Quick Start - Python
 ************************
-For the ones who have little time.
+A few examples showing how OntoSPy can be used in Python programs, or interactively using the Python console.
 
 .. warning::
-  This documentation is not up to date.
+  This documentation is still in draft mode. 
 
     
-
 
 Inspecting a graph
 +++++++++++++++++++++++++++++++
@@ -223,10 +222,7 @@ Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!
 
 .. code-block:: python
 
-    In [1]: import ontospy2
-    INFO:rdflib:RDFLib Version: 4.2.0
-
-    In [2]: g = ontospy2.Graph("data/foaf.rdf")
+    In [2]: g = ontospy.Graph("data/foaf.rdf")
     Loaded 630 triples
     started scanning...
     Ontologies found: 1
