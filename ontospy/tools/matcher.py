@@ -48,7 +48,7 @@ PersonalProfileDocument ==~== Term: npg:Document
 """
 
 
-USAGE = "python ontospy/tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl -o ~/output.csv"
+USAGE = "ontospy-match foaf.rdf bibo.owl -o output.csv"
 VERSION = 0.2
 
 
@@ -156,7 +156,7 @@ def main():
 	opts, args = parse_options()
 		
 	if len(args) < 2:
-		printDebug("Please provide two arguments.") 
+		printDebug("Please provide two arguments, or use -h for more options.") 
 		sys.exit(0)
 
 	var = raw_input("Match classes or properties? [c|p, c=default]:")

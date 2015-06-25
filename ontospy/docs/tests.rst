@@ -3,6 +3,9 @@ Running the tests
 
 Currenlty OntoSPy contains a single test, which essentially loads up a number of test ontologies shipped with the package.
 
+.. warning::
+    This documentation is still in draft mode. 
+
 
 Tests
 ---------------------------------
