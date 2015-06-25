@@ -113,6 +113,8 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	print "OntoSPy " + VERSION
+
 	# get file location
 	dirname, filename = os.path.split(os.path.abspath(__file__))
 	DEFAULT_SCHEMAS_DIR = dirname + "/data/schemas/"
