@@ -49,7 +49,7 @@ PersonalProfileDocument ==~== Term: npg:Document
 
 
 USAGE = "ontospy-match foaf.rdf bibo.owl -o output.csv"
-VERSION = 0.2
+MATCHER_VERSION = 0.2
 
 
 import rdflib, time, optparse, csv, os
@@ -133,7 +133,7 @@ def parse_options():
 	
 	"""
 	
-	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
 	
 	parser.add_option("-o", "--outputfile",
 			action="store", type="string", default="", dest="outputfile",
@@ -153,6 +153,7 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	print "OntoSPy " + ontospy.VERSION
 	opts, args = parse_options()
 		
 	if len(args) < 2:
