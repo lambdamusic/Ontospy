@@ -1,18 +1,23 @@
 Quick Start - Command Line
 ************************
-OntoSPy comes with a bunch of executable scripts. If you install OntosPy via one of the suggested methods, an executable is automatically compiled at installation time and added to `usr/local/bin` (on unix-based systems). 
+A few examples of how to use the command line utilities that come with OntoSPy. 
 
-That should be enough to get you going. Currenlty the utility scripts available are 4: 
+Note: if you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (on unix-based systems, or similar on windows). 
 
-``ontospy``, ``ontospy-catalog``,  ``ontospy-match``, ``ontospy-sketch``. 
+Currenlty the utility scripts available are 4: 
+
+- ``ontospy``: load a graph and show schema information.
+- ``ontospy-catalog``: discover commonly used ontologies. 
+- ``ontospy-match``: bootstrap mappings between two models.
+- ``ontospy-sketch``: sketch a turtle model interactively.
 
   
 .. warning::
-  This documentation is not up to date.
+    This documentation is still in draft mode. 
 
 
 
-The ``ontospy`` utility: inspect an ontology quickly
+The ``ontospy`` utility
 +++++++++++++++++++++++++++++++
 
 .....
@@ -69,7 +74,7 @@ Include labels in property tree
 
 
 
-The ``ontospy-catalog`` utility: discover commonly used models 
+The ``ontospy-catalog`` utility
 +++++++++++++++++++++++++++++++
 
 Show a list of ontologies from the web
@@ -117,7 +122,7 @@ Pass an argument to show only ontology that match it:
 
 
 
-The ``ontospy-match`` utility: bootstrap mappings between two models
+The ``ontospy-match`` utility
 +++++++++++++++++++++++++++++++
 
 Match two models (in development)
@@ -169,7 +174,7 @@ Match two models (in development)
 
 
 
-The ``ontospy-sketch`` utility: sketch a turtle model
+The ``ontospy-sketch`` utility
 +++++++++++++++++++++++++++++++
 
 The library includes a little utility called `ontospy-sketch`. 

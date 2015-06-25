@@ -51,15 +51,21 @@
             
   <div class="section" id="quick-start-command-line">
 <h1>Quick Start - Command Line<a class="headerlink" href="#quick-start-command-line" title="Permalink to this headline">¶</a></h1>
-<p>OntoSPy comes with a bunch of executable scripts. If you install OntosPy via one of the suggested methods, an executable is automatically compiled at installation time and added to <cite>usr/local/bin</cite> (on unix-based systems).</p>
-<p>That should be enough to get you going. Currenlty the utility scripts available are 4:</p>
-<p><code class="docutils literal"><span class="pre">ontospy</span></code>, <code class="docutils literal"><span class="pre">ontospy-catalog</span></code>,  <code class="docutils literal"><span class="pre">ontospy-match</span></code>, <code class="docutils literal"><span class="pre">ontospy-sketch</span></code>.</p>
+<p>A few examples of how to use the command line utilities that come with OntoSPy.</p>
+<p>Note: if you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to <cite>usr/local/bin</cite> (on unix-based systems, or similar on windows).</p>
+<p>Currenlty the utility scripts available are 4:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ontospy</span></code>: load a graph and show schema information.</li>
+<li><code class="docutils literal"><span class="pre">ontospy-catalog</span></code>: discover commonly used ontologies.</li>
+<li><code class="docutils literal"><span class="pre">ontospy-match</span></code>: bootstrap mappings between two models.</li>
+<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively.</li>
+</ul>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">This documentation is not up to date.</p>
+<p class="last">This documentation is still in draft mode.</p>
 </div>
-<div class="section" id="the-ontospy-utility-inspect-an-ontology-quickly">
-<h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly<a class="headerlink" href="#the-ontospy-utility-inspect-an-ontology-quickly" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-utility">
+<h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> utility<a class="headerlink" href="#the-ontospy-utility" title="Permalink to this headline">¶</a></h2>
 <hr class="docutils" />
 <div class="section" id="include-labels-in-property-tree">
 <h3>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h3>
@@ -110,8 +116,8 @@ Time:          2.77s
 </div>
 </div>
 </div>
-<div class="section" id="the-ontospy-catalog-utility-discover-commonly-used-models">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models<a class="headerlink" href="#the-ontospy-catalog-utility-discover-commonly-used-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-catalog-utility">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility<a class="headerlink" href="#the-ontospy-catalog-utility" title="Permalink to this headline">¶</a></h2>
 <p>Show a list of ontologies from the web</p>
 <div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py
 Usage: python ontospy/tools/catalog.py
@@ -147,8 +153,8 @@ Time:      10.04s
 </pre></div>
 </div>
 </div>
-<div class="section" id="the-ontospy-match-utility-bootstrap-mappings-between-two-models">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models<a class="headerlink" href="#the-ontospy-match-utility-bootstrap-mappings-between-two-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-match-utility">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility<a class="headerlink" href="#the-ontospy-match-utility" title="Permalink to this headline">¶</a></h2>
 <p>Match two models (in development)</p>
 <div class="highlight-python"><div class="highlight"><pre>ontospy&gt; python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl
 Match classes or properties? [c|p]: c
@@ -194,8 +200,8 @@ Options:
 </pre></div>
 </div>
 </div>
-<div class="section" id="the-ontospy-sketch-utility-sketch-a-turtle-model">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model<a class="headerlink" href="#the-ontospy-sketch-utility-sketch-a-turtle-model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-sketch-utility">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility<a class="headerlink" href="#the-ontospy-sketch-utility" title="Permalink to this headline">¶</a></h2>
 <p>The library includes a little utility called <cite>ontospy-sketch</cite>.</p>
 <p>This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.</p>
 <p>It is meant to be used from the command line and requires you to type in RDF statements using the Turtle serialization.</p>
@@ -312,13 +318,13 @@ In [6]: quit()
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Quick Start - Command Line</a><ul>
-<li><a class="reference internal" href="#the-ontospy-utility-inspect-an-ontology-quickly">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility: inspect an ontology quickly</a><ul>
+<li><a class="reference internal" href="#the-ontospy-utility">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility</a><ul>
 <li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-ontospy-catalog-utility-discover-commonly-used-models">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility: discover commonly used models</a></li>
-<li><a class="reference internal" href="#the-ontospy-match-utility-bootstrap-mappings-between-two-models">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility: bootstrap mappings between two models</a></li>
-<li><a class="reference internal" href="#the-ontospy-sketch-utility-sketch-a-turtle-model">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility: sketch a turtle model</a></li>
+<li><a class="reference internal" href="#the-ontospy-catalog-utility">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility</a></li>
+<li><a class="reference internal" href="#the-ontospy-match-utility">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility</a></li>
+<li><a class="reference internal" href="#the-ontospy-sketch-utility">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility</a></li>
 </ul>
 </li>
 </ul>
