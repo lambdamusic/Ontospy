@@ -11,7 +11,9 @@ OntoSPy allows you to extract all the schema information from an RDFS/OWL ontolo
 
 The basic workflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
 
-For more up to date documentation, please visit https://github.com/lambdamusic/OntoSPy
+See also:
+- documentation: http://ontospy.readthedocs.org/en/latest/
+- source: https://github.com/lambdamusic/OntoSPy
 
 
 Example 
