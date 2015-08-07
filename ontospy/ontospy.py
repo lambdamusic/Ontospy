@@ -53,9 +53,13 @@ def get_picked_ontology(fullpath_localonto):
 		return None
 
 
-def do_pickle_ontology(fullpath):
+def do_pickle_ontology(fullpath, g=None):
+	""" from a valid fullpath, generate the grpah instance and pickle it too
+		note: option to pass a pre-generated graph instance too  
+	"""
 	try:
-		g = Graph(fullpath)
+		if not g:
+			g = Graph(fullpath)
 		pickledpath = fullpath + ".pickle"
 		cPickle.dump(g, open( pickledpath, "wb" ) )
 		print "\n.. cached <%s>" % pickledpath
