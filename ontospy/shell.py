@@ -20,46 +20,49 @@ class Shell(cmd.Cmd):
 	
 	ruler = '-'
 	
+	def emptyline(self):
+		""" override default behaviour of running last command """
+		pass
+		
 	def __init__(self):
 		 """
 		 """
 		 # useful vars
-		 self.LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
-		 self.ontologies = self._get_files()
+		 self.LOCAL = ontospy.ONTOSPY_LOCAL
+		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
 		 cmd.Cmd.__init__(self)
 
+
+	# HELPER METHODS
+	# --------	
+
 	def _get_prompt(self, stringa=""):
+		""" changes the prompt contextually """
 		if stringa:
 			temp = '<%s>: ' % stringa
-			return bcolors.PINK + temp + bcolors.ENDC
+			return bcolors.BLUE + temp + bcolors.ENDC
 		else:
 			return bcolors.BLUE + '<OntoSPy>: ' + bcolors.ENDC
 
-	def _get_files(self):
-		if os.path.exists(self.LOCAL):
-			onlyfiles = [ f for f in os.listdir(self.LOCAL) if os.path.isfile(os.path.join(self.LOCAL,f)) ]
-			return [f for f in onlyfiles if not f.startswith(".")]
-		else:
-			print "No local repository found. Run 'ontospy --setup' first."
-			return []
-
 	def _load_ontology(self, filename):
-		file = self.LOCAL + "/" + filename
-		self.current = file
-		g = ontospy.Graph(file)
-		print "Loaded ", file
+		""" loads an ontology from the local repository 
+			note: if the ontology does not have a cached version, it is created
+		"""
+		fullpath = self.LOCAL + "/" + filename		
+		g = ontospy.get_picked_ontology(fullpath)
+		if not g:
+			g = ontospy.do_pickle_ontology(fullpath)
+		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		print "Loaded ", self.current['fullpath']
 		self.prompt = self._get_prompt(filename)
+
+
+
 
 	# COMMANDS
 	# --------
 	# NOTE: all commands should start with 'do_' and must pass 'line'
-	# eg
-	#
-	# def do_prompt(self, line):
-	#	"Change the interactive prompt"
-	#	self.prompt = line + ': '
-	
 	
 
 	def do_ontologies(self, line):
@@ -91,12 +94,38 @@ class Shell(cmd.Cmd):
 							]
 		return completions
 		
+
+	def do_classes(self, line):
+		"Show classes for current ontology"
+		if not self.current:
+			print "No ontology loaded"
+		else:
+			g = self.current['graph']
+			g.printClassTree(showids=True, labels=False)
+
+
+	def do_properties(self, line):
+		"Show properties for current ontology"
+		if not self.current:
+			print "No ontology loaded"
+		else:
+			g = self.current['graph']
+			g.printPropertyTree(showids=True, labels=False)
 				
+	def do_annotations(self, line):
+		"Show annotations for current ontology"
+		if not self.current:
+			print "No ontology loaded"
+		else:
+			g = self.current['graph']
+			for o in g.ontologies:
+				o.printTriples()
+						
 
 	def do_top(self, line):
 		"Unload any ontology and go back to top level"
 		self.current = None
-		self.prompt = self._get_prompt(qu)
+		self.prompt = self._get_prompt()
 						
 	def do_quit(self, line):
 		"Exit OntoSPy shell"

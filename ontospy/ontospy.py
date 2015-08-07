@@ -16,7 +16,7 @@ More info in the README file.
 """
 
 
-import sys, os, time, optparse, os.path, shutil
+import sys, os, time, optparse, os.path, shutil, cPickle
 
 from libs.graph import Graph, SparqlEndpoint
 from libs.util import bcolors
@@ -24,7 +24,45 @@ from libs.util import bcolors
 from _version import *
 
 
+ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
+# get file location
+_dirname, _filename = os.path.split(os.path.abspath(__file__))
+ONTOSPY_DEFAULT_SCHEMAS_DIR = _dirname + "/data/schemas/"  # comes with installer
 
+
+
+def get_localontologies():
+	"returns a list of file names in the ontologies folder"
+	res = []
+	if os.path.exists(ONTOSPY_LOCAL):
+		for f in os.listdir(ONTOSPY_LOCAL):
+			if os.path.isfile(os.path.join(ONTOSPY_LOCAL,f)):
+				if not f.startswith(".") and not f.endswith(".pickle"):
+					res += [f]
+	else:
+		print "No local repository found. Try --setup first."					
+	return res
+
+
+def get_picked_ontology(fullpath_localonto):
+	""" <fullpath_localonto> eg /Users/michele.pasin/.ontospy/skos.rdf"""
+	pickledfile = fullpath_localonto+".pickle"
+	if os.path.isfile(pickledfile):
+		return cPickle.load(open(pickledfile, "rb"))
+	else:
+		return None
+
+
+def do_pickle_ontology(fullpath):
+	try:
+		g = Graph(fullpath)
+		pickledpath = fullpath + ".pickle"
+		cPickle.dump(g, open( pickledpath, "wb" ) )
+		print "\n.. cached <%s>" % pickledpath
+	except: 
+		g = Graph(fullpath)
+		print "\n.. ERROR caching <%s>" % pickledpath
+	return g
 
 
 
@@ -74,7 +112,7 @@ def parse_options():
 	
 
 	parser.add_option("", "--list",
-			action="store_true", default=False, dest="showlocal",
+			action="store_true", default=False, dest="listlocal",
 			help="List ontologies in the local repository.")
 	
 	parser.add_option("", "--local",
@@ -112,7 +150,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.showlocal and not opts.loadlocal and not opts.web and not opts.setup and len(args) < 1:
+	if not opts.shell and not opts.listlocal and not opts.loadlocal and not opts.web and not opts.setup and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -125,31 +163,18 @@ def main():
 	
 	print "OntoSPy " + VERSION + "\n-----------"
 
-	# get file location
-	dirname, filename = os.path.split(os.path.abspath(__file__))
-	DEFAULT_SCHEMAS_DIR = dirname + "/data/schemas/"
-	DEFAULT_ONTO = DEFAULT_SCHEMAS_DIR + "pizza.ttl"
 	
-	ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
+	# ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 	
 	opts, args = parse_options()
 
-	if opts.showlocal:		
-		if os.path.exists(ONTOSPY_LOCAL):
-			onlyfiles = [ f for f in os.listdir(ONTOSPY_LOCAL) if os.path.isfile(os.path.join(ONTOSPY_LOCAL,f)) ]
-			for file in onlyfiles:
-				if not file.startswith("."):
-					print ONTOSPY_LOCAL + "/" + file
-		else:
-			print "No local repository found. Try --setup first."
-		
-
+	if opts.listlocal:		
+		action_listlocal()
 		raise SystemExit, 1
 
 
-
 	if opts.loadlocal:		
-		args = action_loadLocal(ONTOSPY_LOCAL, args)
+		args = action_loadLocal(args)
 
 
 	if opts.shell:	
@@ -167,7 +192,7 @@ def main():
 
 
 	if opts.setup:
-		action_setupHomeFolder(ONTOSPY_LOCAL, DEFAULT_SCHEMAS_DIR)
+		action_setupHomeFolder()
 		raise SystemExit, 1
 		
 	print_opts = {
@@ -179,11 +204,13 @@ def main():
 	
 	sTime = time.time()
 
+	# load the ontology
 	if args:
-		g = Graph(args[0])
-	# else: # 2015-06-24: deprecated via the test in parse_options
-	#	print "Argument not provided... loading test graph: %s" % DEFAULT_ONTO
-	#	g = Graph(DEFAULT_ONTO)
+		if opts.loadlocal:
+			# check if there's a pickled version
+			g = get_picked_ontology(args[0]) or Graph(args[0])
+		else:
+			g = Graph(args[0])
 	
 		shellPrintOverview(g, print_opts)
 
@@ -199,7 +226,55 @@ def main():
 
 
 
-def action_setupHomeFolder(ONTOSPY_LOCAL, DEFAULT_SCHEMAS_DIR):
+def action_listlocal():
+	""" list all local files """
+	ontologies = get_localontologies()
+	if ontologies:
+		for file in ontologies:
+			print ONTOSPY_LOCAL + "/" + file
+
+
+def action_loadLocal(args):
+	""" tries to match one of the locally stored ontologies - just returns the full path
+		(loading happens in main method)
+	 """
+	ontologies = get_localontologies()
+	if ontologies:
+		if args:
+			success = False
+			for each in ontologies:
+				if args[0] in each:
+					print "==> match: %s" % each
+					args = [ONTOSPY_LOCAL + "/" + each]
+					success = True
+					return args
+			if not success:
+				print "No matching ontology name found."
+				raise SystemExit, 1
+		else:
+			counter = 0
+			for file in ontologies:
+				counter += 1
+				print bcolors.BLUE, "[%d]" % counter,  bcolors.ENDC, file
+			while True:
+				var = raw_input("\nWhich ontology? (q=exit, number=load)\n")
+				if var == 'q':
+					raise SystemExit, 1
+				try:
+					var = int(var)  # it's a string
+				except:
+					var = 0
+				if var in range(1, len(ontologies)+1):
+					args = [ONTOSPY_LOCAL + "/" + ontologies[var-1]]
+					return args
+			
+	else:
+		raise SystemExit, 1
+
+
+
+
+def action_setupHomeFolder():
 	""" creates the ~/.ontospy dir where data will be added """
 	dosetup = True
 	
@@ -216,51 +291,28 @@ def action_setupHomeFolder(ONTOSPY_LOCAL, DEFAULT_SCHEMAS_DIR):
 	if dosetup == True:
 		os.mkdir(ONTOSPY_LOCAL)		
 		# copy schemas in this folder 
-		onlyfiles = [ f for f in os.listdir(DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(DEFAULT_SCHEMAS_DIR,f)) ]
+		onlyfiles = [ f for f in os.listdir(ONTOSPY_DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(ONTOSPY_DEFAULT_SCHEMAS_DIR,f)) ]
 		for file in onlyfiles:
 			if not file.startswith("."):
 				print ".. copied <%s>" % file 
-				shutil.copy(DEFAULT_SCHEMAS_DIR+file, ONTOSPY_LOCAL)
+				shutil.copy(ONTOSPY_DEFAULT_SCHEMAS_DIR+file, ONTOSPY_LOCAL)
+				
+		var = raw_input("=====\nDo caching? This will speed up loading time considerably. (y/n)")
+		if var == "y":
+			ontologies = get_localontologies()
+			for onto in ontologies:
+				fullpath = ONTOSPY_LOCAL + "/" + onto
+				do_pickle_ontology(fullpath)
 
-
-
-def action_loadLocal(ONTOSPY_LOCAL, args):
-	""" 2015-08-04 """
-	if os.path.exists(ONTOSPY_LOCAL):
-		onlyfiles = [ f for f in os.listdir(ONTOSPY_LOCAL) if os.path.isfile(os.path.join(ONTOSPY_LOCAL,f)) ]
-		onlyfiles = [f for f in onlyfiles if not f.startswith(".")]
-		
-		if args:
-			success = False
-			for each in onlyfiles:
-				if args[0] in each:
-					print "==> match: %s" % each
-					args = [ONTOSPY_LOCAL + "/" + each]
-					success = True
-					return args
-			if not success:
-				print "No matching ontology name found."
-				raise SystemExit, 1
+			print "===COMPLETED==="		
+				
 		else:
-			counter = 0
-			for file in onlyfiles:
-				counter += 1
-				print bcolors.BLUE, "[%d]" % counter,  bcolors.ENDC, file
-			while True:
-				var = raw_input("\nWhich ontology? (q=exit, number=load)\n")
-				if var == 'q':
-					raise SystemExit, 1
-				try:
-					var = int(var)  # it's a string
-				except:
-					var = 0
-				if var in range(1, len(onlyfiles)+1):
-					args = [ONTOSPY_LOCAL + "/" + onlyfiles[var-1]]
-					return args
-			
-	else:
-		print "No local repository found. Try --setup first."
-		raise SystemExit, 1
+			var == "n"
+			print var		
+
+
+
+
 
 
 	

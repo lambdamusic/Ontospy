@@ -563,7 +563,7 @@ class Graph(object):
 			printGenericTree(element, 0, showids, labels)		
 
 
-	def printPropertyTree(self, element = None, level=0, showids=True, labels=False):
+	def printPropertyTree(self, element = None, showids=True, labels=False):
 		""" 
 		Print nicely into stdout the property tree of an ontology 
 		
@@ -575,7 +575,7 @@ class Graph(object):
 		
 		if not element:	 # first time
 			for x in self.toplayerProperties:
-				printGenericTree(x, 0, level, showids)
+				printGenericTree(x, 0, showids, labels)
 		
 		else:
 			printGenericTree(element, 0, showids, labels)
