@@ -6,6 +6,7 @@ import rdflib
 from itertools import count
 # http://stackoverflow.com/questions/8628123/counting-instances-of-a-class
 
+from colorama import Fore, Back, Style
 
 class RDF_Entity(object):
 	"""
@@ -48,10 +49,10 @@ class RDF_Entity(object):
 
 	def printTriples(self):
 		""" display triples """
-		printDebug(bcolors.RED + unicode(self.uri) + bcolors.ENDC) 
+		printDebug(Fore.RED + unicode(self.uri) + Fore.RESET) 
 		for x in self.triples:
-			printDebug(bcolors.PINK + "=> " + unicode(x[1])) 
-			printDebug(bcolors.BLUE + ".... " + unicode(x[2]) + bcolors.ENDC) 
+			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
+			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 
 
 	def __buildQname(self, namespaces):
 		""" extracts a qualified name for a uri """
@@ -173,10 +174,14 @@ class Ontology(RDF_Entity):
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()
+		self.printTriples()
+		self.stats()
+
+
+	def stats(self):
+		""" shotcut to pull out useful info for interactive use """
 		printDebug("Classes.....: %d" % len(self.classes))
 		printDebug("Properties..: %d" % len(self.properties))
-		self.printTriples()
-
 
 
 

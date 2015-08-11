@@ -17,7 +17,7 @@ from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
 import sys
-
+from colorama import Fore, Back, Style
 
 
 
@@ -93,17 +93,19 @@ def printGenericTree(element, level=0, showids=True, labels=False):
 	[12]12--
 	"""
 
+	ID_MARGIN = 5
+
 	if showids:
-		_id_ = bcolors.BLUE +	\
-		"[%d]%s" % (element.id, " " * (4  - len(str(element.id)))) +  \
-			bcolors.ENDC
+		_id_ = Fore.BLUE +	\
+		"[%d]%s" % (element.id, " " * (ID_MARGIN  - len(str(element.id)))) +  \
+			Fore.RESET
 	else:
 		_id_ = ""
 	
 	if labels:
 		bestLabel = element.bestLabel(qname_allowed=False)
 		if bestLabel:
-			bestLabel = bcolors.PINK + " (\"%s\")" % bestLabel + bcolors.ENDC
+			bestLabel = Fore.MAGENTA + " (\"%s\")" % bestLabel + Fore.RESET
 	else:
 		bestLabel = ""
 		
