@@ -14,13 +14,14 @@ from colorama import Fore, Back, Style
 
 import ontospy
 from libs.util import *
+from libs.quotes import QUOTES
 
 
 class Shell(cmd.Cmd):
 	"""Simple command processor example."""
 
 	prompt = Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
-	intro = "Ready to go. Type 'help' to get started. Use TAB to explore commands."
+	intro = "Type 'help' to get started. Use TAB to explore commands."
 
 	doc_header = 'Commands'
 	misc_header = 'Miscellaneous'
@@ -36,9 +37,10 @@ class Shell(cmd.Cmd):
 		 """
 		 """
 		 # useful vars
-		 self.LOCAL = ontospy.ONTOSPY_LOCAL
+		 self.LOCAL = ontospy.get_or_create_home_repo() # = ontospy.ONTOSPY_LOCAL
 		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
+		 
 		 cmd.Cmd.__init__(self)
 
 
@@ -82,17 +84,37 @@ class Shell(cmd.Cmd):
 			counter += 1
 			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter,	Fore.RED, file, Style.RESET_ALL				
 
+
 	def _load_ontology(self, filename):
 		""" loads an ontology from the local repository 
 			note: if the ontology does not have a cached version, it is created
 		"""
 		fullpath = self.LOCAL + "/" + filename		
-		g = ontospy.get_picked_ontology(fullpath)
+		g = ontospy.get_pickled_ontology(fullpath)
 		if not g:
-			g = ontospy.do_pickle_ontology(fullpath)
+			g = ontospy.get_pickled_ontology(fullpath)
 		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
 		print "Loaded ", self.current['fullpath']
 		self.prompt = self._get_prompt(filename)
+
+
+	def _selectFromList(self, _list):
+		""" generic method that lets users pick an item from a list via raw_input """
+		if len(_list) == 1: # if by any chance there's no need to select a choice
+			return _list[0]
+		print "%d matching results: " % len(_list)
+		counter = 1
+		for el in _list:
+			print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el.uri
+			counter += 1
+		var = raw_input("Please select one entity: ")
+		try:
+			var = int(var)
+			return _list[var-1]
+		except:
+			print "Selection no valid"
+			return None
+			
 
 
 	def _select_class(self, line):			
@@ -103,11 +125,14 @@ class Shell(cmd.Cmd):
 		out = g.getClass(line)
 		if out:
 			if type(out) == type([]):
-				out[0].describe()
+				choice = self._selectFromList(out)
+				if choice:
+					choice.describe()
 			else:
 				out.describe()
 		else:
 			print "not found"
+
 
 	def _select_property(self, line):			
 		# try to match a class and load it
@@ -117,7 +142,9 @@ class Shell(cmd.Cmd):
 		out = g.getProperty(line)
 		if out:
 			if type(out) == type([]):
-				out[0].describe()
+				choice = self._selectFromList(out)
+				if choice:
+					choice.describe()
 			else:
 				out.describe()
 		else:
@@ -135,8 +162,9 @@ class Shell(cmd.Cmd):
 			out = g.getEntity(line)
 			if out:
 				if type(out) == type([]):
-					print "==> first match: %s" % out[0]
-					out[0].printTriples()
+					choice = self._selectFromList(out)
+					if choice:
+						choice.printTriples()
 				else:
 					out.printTriples()
 			else:
@@ -211,7 +239,7 @@ class Shell(cmd.Cmd):
 		if self.current:
 			print self.current['file']
 		else:
-			print "No ontology loaded. Use the 'load' command"
+			print "No ontology loaded. Use the 'ontology' command"
 
 
 	def do_triples(self, line):
@@ -242,7 +270,7 @@ class Shell(cmd.Cmd):
 			g = self.current['graph']
 			if line == "properties": 
 				g.printPropertyTree(showids=True, labels=False)
-			if not line or line == "classes": 
+			elif not line or line == "classes": 
 				g.printClassTree(showids=True, labels=False)		
 			else:
 				print "Not a valid argument"
@@ -258,6 +286,111 @@ class Shell(cmd.Cmd):
 							]
 		return completions
 
+
+	def do_import(self, line):
+		""" Import an ontology into the local repository. Either from: 
+		\nweb: eg import http://xmlns.com/foaf/spec/index.rdf
+		\nlocal file: eg /home/Desktop/foaf.rdf
+		\nlocal folder: eg /home/Desktop/models/. """ 
+		if not line:
+			print "Please specify a URI or local path to import from"	
+		else:
+			self._import_ontology(line)
+	
+	# SELECT OPERATIONS
+			
+	def do_ontology(self, line):
+		"""Select an ontology""" 
+		
+		if not self.ontologies:
+			print "No ontologies in the local repository. Use the 'import' command. "
+		else:
+			if line:
+				self._select_ontology(line)
+			else:
+				print "Please select an ontology"
+				self._list_ontologies()
+				
+	def do_class(self, line):
+		"""Select a class""" 
+		if line:
+			if not self.current:	
+				print "Please select an ontology first"
+			else:
+				self._select_class(line)
+
+	def do_property(self, line):
+		"""Select a property""" 
+		if line:
+			if not self.current:	
+				print "Please select an ontology first"
+			else:
+				self._select_property(line)
+
+
+
+	def complete_ontology(self, text, line, begidx, endidx):
+		"""completion for select command"""
+		
+		options = self.ontologies[:]
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions						
+			
+	
+	def complete_class(self, text, line, begidx, endidx):
+		"""completion for select command"""
+		
+		if self.current:
+			g = self.current['graph']
+			options = [x.locale for x in g.classes]
+		else:
+			options = []
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions		
+
+
+	def complete_property(self, text, line, begidx, endidx):
+		"""completion for select command"""
+		
+		if self.current:
+			g = self.current['graph']
+			options = [x.locale for x in g.properties]
+		else:
+			options = []
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+
+				
+	def do_annotations(self, line):
+		"Show annotations for current ontology"
+		if not self.current:
+			print "No ontology loaded"
+		else:
+			g = self.current['graph']
+			for o in g.ontologies:
+				o.printTriples()
+	
 		
 
 	def do_delete(self, line):
@@ -286,145 +419,7 @@ class Shell(cmd.Cmd):
 							if f.startswith(text)
 							]
 		return completions
-		
-
-	def do_import(self, line):
-		""" Import an ontology from the web (or local file) into the local repository. """ 
-		if not line:
-			print "Please specify a URI or local path to import from"	
-		else:
-			self._import_ontology(line)
-					
-			
-
-	def do_select_class(self, line):
-		"""Select a class""" 
-		if not self.current:	
-			print "Please select an ontology first"
-		else:
-			# 2: class or property case
-			if line:
-				if len(line.split()) == 1:
-					line = "class " + line
-				arg, val = line.split()[0], line.split()[1]
-				if arg not in ['class', 'property']:
-					print "Valid arguments are 'class' [default] and 'property'"
-				else:
-					if arg == "class":
-						self._select_class(val)
-					elif arg == "property":
-						self._select_property(val)
-
-
-
-	def do_select(self, line):
-		"""Select an object - context aware
-		\nontology: Load one of the ontologies in the local repository. 
-		""" 
-		if not self.current:	
-			# 1: ontology case [only from top level]
-			if not line:
-				print "Please specify the ontology you want to select:"		
-				self._list_ontologies()
-			else:
-				self._select_ontology(line)
-		else:
-			# 2: class or property case
-			if line:
-				if len(line.split()) == 1:
-					line = "class " + line
-				arg, val = line.split()[0], line.split()[1]
-				if arg not in ['class', 'property']:
-					print "Valid arguments are 'class' [default] and 'property'"
-				else:
-					if arg == "class":
-						self._select_class(val)
-					elif arg == "property":
-						self._select_property(val)
-
-
-	def complete_select(self, text, line, begidx, endidx):
-		"""context aware completion for select command"""
-		
-		if False:
-			print "\ntext:", text # text is always the last bit: "select class cito" = cito
-			print "line:", line   # line is the whole line including command
-		
-		if not self.current:
-			options = self.ontologies[:]
-		elif line.strip().startswith("select class"):
-			g = self.current['graph']
-			options = [x.qname for x in g.classes]
-		elif line.strip().startswith("select property"):
-			g = self.current['graph']
-			options = [x.qname for x in g.properties]	
-		else:
-			options = ['class', 'property']
-			
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions						
-				
-
-	#
-	# def do_classes(self, line):
-	# 	"Show classes for current ontology"
-	# 	if not self.current:
-	# 		print "No ontology loaded"
-	# 	else:
-	# 		g = self.current['graph']
-	# 		if not line:
-	# 			g.printClassTree(showids=True, labels=False)
-	# 		else:
-	# 			# try to match a class and load it
-	# 			if line.isdigit():
-	# 				line =	int(line)
-	# 			out = g.getClass(line)
-	# 			if out:
-	# 				if type(out) == type([]):
-	# 					out[0].describe()
-	# 				else:
-	# 					out.describe()
-	# 			else:
-	# 				print "not found"
-	#
-	#
-	# def do_properties(self, line):
-	# 	"Show properties for current ontology"
-	# 	if not self.current:
-	# 		print "No ontology loaded"
-	# 	else:
-	# 		g = self.current['graph']
-	# 		if not line:
-	# 			g.printPropertyTree(showids=True, labels=False)
-	# 		else:
-	# 			# try to match a class and load it
-	# 			if line.isdigit():
-	# 				line =	int(line)
-	# 			out = g.getProperty(line)
-	# 			if out:
-	# 				if type(out) == type([]):
-	# 					out[0].describe()
-	# 				else:
-	# 					out.describe()
-	# 			else:
-	# 				print "not found"
-
-				
-	def do_annotations(self, line):
-		"Show annotations for current ontology"
-		if not self.current:
-			print "No ontology loaded"
-		else:
-			g = self.current['graph']
-			for o in g.ontologies:
-				o.printTriples()
-						
+							
 
 	def do_top(self, line):
 		"Unload any ontology and go back to top level"
@@ -439,7 +434,12 @@ class Shell(cmd.Cmd):
 		"default message when a command is not recognized"
 		foo = ["Wow first time I hear that", "That looks like the wrong command", "Are you sure you mean that? try 'help' for some suggestions"]
 		print(random.choice(foo))
-
+	
+	def do_inspiration(self, line):
+		# _quote = random.choice(QUOTES)
+		print _quote['source']
+		print Style.DIM + unicode(_quote['text'])
+		print Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL
 
 
 if __name__ == '__main__':

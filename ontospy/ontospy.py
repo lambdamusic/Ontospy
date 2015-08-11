@@ -18,6 +18,8 @@ More info in the README file.
 
 import sys, os, time, optparse, os.path, shutil, cPickle
 
+from colorama import Fore, Back, Style
+
 from libs.graph import Graph, SparqlEndpoint
 from libs.util import bcolors
 
@@ -29,6 +31,26 @@ ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTOSPY_DEFAULT_SCHEMAS_DIR = _dirname + "/data/schemas/"  # comes with installer
 
+
+
+def get_or_create_home_repo(reset=False):
+	dosetup = True
+	if os.path.exists(ONTOSPY_LOCAL):
+		dosetup = False
+		print Style.DIM + Fore.BLACK + "Local repository: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+		if reset:
+			var = raw_input("Reset the local repository and all of its contents? (y/n)")
+			if var == "y":
+				shutil.rmtree(ONTOSPY_LOCAL)
+				dosetup = True
+			else:
+				var == "n"
+			print var	
+	if dosetup:
+		os.mkdir(ONTOSPY_LOCAL)		
+		print Fore.GREEN + "Setup successfull: local repository created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+	return ONTOSPY_LOCAL	
+	
 
 
 def get_localontologies():
@@ -44,7 +66,7 @@ def get_localontologies():
 	return res
 
 
-def get_picked_ontology(fullpath_localonto):
+def get_pickled_ontology(fullpath_localonto):
 	""" <fullpath_localonto> eg /Users/michele.pasin/.ontospy/skos.rdf"""
 	pickledfile = fullpath_localonto+".pickle"
 	if os.path.isfile(pickledfile):
@@ -125,7 +147,7 @@ def parse_options():
 
 	parser.add_option("", "--shell",
 			action="store_true", default=False, dest="shell",
-			help="Interact with ontologies via the wonderful ontospy shell.")	
+			help="Interact with ontologies using the wonderful OntoSPy shell.")	
 			
 	parser.add_option("", "--web",
 			action="store_true", default=False, dest="web",
@@ -212,7 +234,7 @@ def main():
 	if args:
 		if opts.loadlocal:
 			# check if there's a pickled version
-			g = get_picked_ontology(args[0]) or Graph(args[0])
+			g = get_pickled_ontology(args[0]) or Graph(args[0])
 		else:
 			g = Graph(args[0])
 	
@@ -278,41 +300,31 @@ def action_loadLocal(args):
 
 
 
-def action_setupHomeFolder():
-	""" creates the ~/.ontospy dir where data will be added """
-	dosetup = True
-	
-	if os.path.exists(ONTOSPY_LOCAL):
-		var = raw_input("Ontospy folder already exists. Reset? (y/n)")
-		if var == "y":
-			shutil.rmtree(ONTOSPY_LOCAL)
-			dosetup = True
-		else:
-			var == "n"
-			dosetup = False
-		print var
-	
-	if dosetup == True:
-		os.mkdir(ONTOSPY_LOCAL)		
-		# copy schemas in this folder 
-		onlyfiles = [ f for f in os.listdir(ONTOSPY_DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(ONTOSPY_DEFAULT_SCHEMAS_DIR,f)) ]
-		for file in onlyfiles:
-			if not file.startswith("."):
-				print ".. copied <%s>" % file 
-				shutil.copy(ONTOSPY_DEFAULT_SCHEMAS_DIR+file, ONTOSPY_LOCAL)
-				
-		var = raw_input("=====\nDo caching? This will speed up loading time considerably. (y/n)")
-		if var == "y":
-			ontologies = get_localontologies()
-			for onto in ontologies:
-				fullpath = ONTOSPY_LOCAL + "/" + onto
-				do_pickle_ontology(fullpath)
 
-			print "===COMPLETED==="		
-				
-		else:
-			var == "n"
-			print var		
+
+def action_setupHomeFolder():
+	""" copy some files into home repo - 2015-08-11: review needed? """
+	
+	create_home_repo()
+	
+	onlyfiles = [ f for f in os.listdir(ONTOSPY_DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(ONTOSPY_DEFAULT_SCHEMAS_DIR,f)) ]
+	for file in onlyfiles:
+		if not file.startswith("."):
+			print ".. copied <%s>" % file 
+			shutil.copy(ONTOSPY_DEFAULT_SCHEMAS_DIR+file, ONTOSPY_LOCAL)
+			
+	var = raw_input("=====\nDo caching? This will speed up loading time considerably. (y/n)")
+	if var == "y":
+		ontologies = get_localontologies()
+		for onto in ontologies:
+			fullpath = ONTOSPY_LOCAL + "/" + onto
+			do_pickle_ontology(fullpath)
+
+		print "===COMPLETED==="		
+			
+	else:
+		var == "n"
+		print var		
 
 
 

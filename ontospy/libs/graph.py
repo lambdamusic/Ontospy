@@ -524,13 +524,21 @@ class Graph(object):
 		if match:
 			if type(match) != type("string"):
 				return []
-			res = []
-			for x in self.classes:
-				if match.lower() in x.uri.lower():
-					res += [x]
-			for x in self.properties:
-				if match.lower() in x.uri.lower():
-					res += [x]		
+			res = []			
+			if ":" in match: # qname 
+				for x in self.classes:
+					if match.lower() in x.qname.lower():
+						res += [x]
+				for x in self.properties:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.classes:
+					if match.lower() in x.uri.lower():
+						res += [x]
+				for x in self.properties:
+					if match.lower() in x.uri.lower():
+						res += [x]	
 			return res
 		else:
 			for x in self.classes:
