@@ -16,7 +16,7 @@ More info in the README file.
 """
 
 
-import sys, os, time, optparse, os.path, shutil, cPickle
+import sys, os, time, optparse, os.path, shutil, cPickle, urllib2
 
 from colorama import Fore, Back, Style
 
@@ -37,7 +37,7 @@ def get_or_create_home_repo(reset=False):
 	dosetup = True
 	if os.path.exists(ONTOSPY_LOCAL):
 		dosetup = False
-		print Style.DIM + Fore.BLACK + "Local repository: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+		print Style.DIM + "Local repository: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 		if reset:
 			var = raw_input("Reset the local repository and all of its contents? (y/n)")
 			if var == "y":
@@ -137,26 +137,26 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
-	parser.add_option("", "--list",
-			action="store_true", default=False, dest="listlocal",
-			help="List ontologies in the local repository.")
-	
 	parser.add_option("", "--local",
-			action="store_true", default=False, dest="loadlocal",
-			help="Load ontologies from the local repository.")		
+			action="store_true", default=False, dest="local",
+			help="List ontologies in the local repository.")	
 
+	parser.add_option("", "--import",
+			action="store_true", default=False, dest="load",
+			help="Imports an ontology from a local file or the web into the repository.") 
+
+	parser.add_option("", "--importfolder",
+			action="store_true", default=False, dest="loadfolder",
+			help="Imports all files within a folder into the local repository.") 
+
+	parser.add_option("", "--web",
+			action="store_true", default=False, dest="web",
+			help="Import a web ontology by selecting it from the ones registered on http://prefix.cc/popular/all.") 
+			
 	parser.add_option("", "--shell",
 			action="store_true", default=False, dest="shell",
 			help="Interact with ontologies using the wonderful OntoSPy shell.")	
-			
-	parser.add_option("", "--web",
-			action="store_true", default=False, dest="web",
-			help="List ontologies registered on http://prefix.cc/popular/all.") 
-
-	parser.add_option("", "--setup",
-			action="store_true", default=False, dest="setup",
-			help="Creates a local repository of ontologies.") 
-						
+				
 	parser.add_option("-a", "",
 			action="store_true", default=False, dest="ontoannotations",
 			help="Print the ontology annotations/metadata.")
@@ -176,7 +176,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.listlocal and not opts.loadlocal and not opts.web and not opts.setup and len(args) < 1:
+	if not opts.shell and not opts.local and not opts.web and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -188,38 +188,42 @@ def main():
 	""" command line script """
 	
 	print "OntoSPy " + VERSION + "\n-----------"
-
 	
 	# ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 	
 	opts, args = parse_options()
 
-	if opts.listlocal:		
+	# list local ontologies
+	if opts.local:		
+		get_or_create_home_repo()
 		action_listlocal()
 		raise SystemExit, 1
 
+	# import an ontology
+	if opts.load:		
+		get_or_create_home_repo()
+		action_import(args[0])
+		raise SystemExit, 1
 
-	if opts.loadlocal:		
-		args = action_loadLocal(args)
+	# import an ontology folder
+	if opts.loadfolder:		
+		get_or_create_home_repo()
+		action_import_folder(args[0])
+		raise SystemExit, 1	
 
-
+	# launch shell
 	if opts.shell:	
+		get_or_create_home_repo()
 		import shell	
 		shell.Shell().cmdloop()
 		raise SystemExit, 1
 		
-		
+	# load web catalog
 	if opts.web:
-		import catalog
-		options = catalog.viewCatalog()
-		for x in options:
-			print x[0], " ==> ", x[1]
+		get_or_create_home_repo()
+		action_webimport()
 		raise SystemExit, 1
 
-
-	if opts.setup:
-		action_setupHomeFolder()
-		raise SystemExit, 1
 		
 	print_opts = {
 					'ontoannotations' : opts.ontoannotations, 
@@ -232,11 +236,7 @@ def main():
 
 	# load the ontology
 	if args:
-		if opts.loadlocal:
-			# check if there's a pickled version
-			g = get_pickled_ontology(args[0]) or Graph(args[0])
-		else:
-			g = Graph(args[0])
+		g = Graph(args[0])
 	
 		shellPrintOverview(g, print_opts)
 
@@ -260,72 +260,100 @@ def action_listlocal():
 			print ONTOSPY_LOCAL + "/" + file
 
 
-def action_loadLocal(args):
-	""" tries to match one of the locally stored ontologies - just returns the full path
-		(loading happens in main method)
-	 """
-	ontologies = get_localontologies()
-	if ontologies:
-		if args:
-			success = False
-			for each in ontologies:
-				if args[0] in each:
-					print "==> match: %s" % each
-					args = [ONTOSPY_LOCAL + "/" + each]
-					success = True
-					return args
-			if not success:
-				print "No matching ontology name found."
-				raise SystemExit, 1
+
+def action_import(location):
+	"""import files into the local repo """
+
+	# 1) extract file from location and save locally
+	fullpath = ""
+	try:
+		if location.startswith("http://"):
+			headers = "Accept: application/rdf+xml"
+			req = urllib2.Request(location, headers)
+			res = urllib2.urlopen(req)
+			final_location = res.geturl()  # after 303 redirects
+			print "Loaded <%s>" % final_location
+			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
+			fullpath = ONTOSPY_LOCAL+ "/" + filename
+
+			file_ = open(fullpath, 'w')
+			file_.write(res.read())
+			file_.close()
+	
 		else:
-			counter = 0
-			for file in ontologies:
-				counter += 1
-				print bcolors.BLUE, "[%d]" % counter,  bcolors.ENDC, file
-			while True:
-				var = raw_input("\nWhich ontology? (q=exit, number=load)\n")
-				if var == 'q':
-					raise SystemExit, 1
-				try:
-					var = int(var)  # it's a string
-				except:
-					var = 0
-				if var in range(1, len(ontologies)+1):
-					args = [ONTOSPY_LOCAL + "/" + ontologies[var-1]]
-					return args
-			
-	else:
-		raise SystemExit, 1
-
-
-
-
-
-
-def action_setupHomeFolder():
-	""" copy some files into home repo - 2015-08-11: review needed? """
+			if os.path.isfile(location):
+				filename = location.split("/")[-1] or location.split("/")[-2]
+				fullpath = ONTOSPY_LOCAL + "/" + filename
+				shutil.copy(location, fullpath)
+			else:
+				raise ValueError('The location specified is not a file.')
+		print "Saved local copy"	
+	except:
+		print "Error retrieving file. Please make sure <%s> is a valid location." % location
+		if os.path.exists(fullpath):
+			os.remove(fullpath)
+		return None
 	
-	create_home_repo()
+	# 2) check if valid RDF and cache it
+	try:
+		print "Loading graph..."
+		g = Graph(fullpath)
+		print "Loaded ", fullpath
+	except:
+		g = None
+		if os.path.exists(fullpath):
+			os.remove(fullpath)
+		print "Error parsing file. Please make sure %s contains valid RDF." % location
 	
-	onlyfiles = [ f for f in os.listdir(ONTOSPY_DEFAULT_SCHEMAS_DIR) if os.path.isfile(os.path.join(ONTOSPY_DEFAULT_SCHEMAS_DIR,f)) ]
-	for file in onlyfiles:
-		if not file.startswith("."):
-			print ".. copied <%s>" % file 
-			shutil.copy(ONTOSPY_DEFAULT_SCHEMAS_DIR+file, ONTOSPY_LOCAL)
-			
-	var = raw_input("=====\nDo caching? This will speed up loading time considerably. (y/n)")
-	if var == "y":
-		ontologies = get_localontologies()
-		for onto in ontologies:
-			fullpath = ONTOSPY_LOCAL + "/" + onto
-			do_pickle_ontology(fullpath)
+	if g:
+		print "Caching..."
+		do_pickle_ontology(fullpath, g) 
 
-		print "===COMPLETED==="		
-			
+	# finally...
+	return g
+	
+
+
+def action_import_folder(location):	
+	""" @todo :"""
+	
+	if os.path.isdir(location):
+		onlyfiles = [ f for f in os.listdir(location) if os.path.isfile(os.path.join(location,f)) ]
+		for file in onlyfiles:
+			if not file.startswith("."):
+				filepath = os.path.join(location,file)
+				print Fore.RED + "\n---------\n" + filepath + "\n---------" + Style.RESET_ALL
+				action_import(filepath)
 	else:
-		var == "n"
-		print var		
+		print "Not a valid directory"
 
+
+
+	
+
+def action_webimport():	
+	""" @todo : just a list of ontos for now"""
+	
+	import catalog
+	options = catalog.viewCatalog()
+	counter = 1
+	for x in options:
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +  x[1], Style.RESET_ALL
+		# print Fore.BLUE + x[0], " ==> ", x[1]
+		counter += 1
+		
+	while True:
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=exit)\n" + Style.RESET_ALL)
+		if var == "q":
+			break
+		else:
+			try:
+				_id = int(var)
+				ontouri = options[_id - 1][1]
+				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				action_import(ontouri)
+			except:
+				continue
 
 
 

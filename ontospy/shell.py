@@ -37,7 +37,7 @@ class Shell(cmd.Cmd):
 		 """
 		 """
 		 # useful vars
-		 self.LOCAL = ontospy.get_or_create_home_repo() # = ontospy.ONTOSPY_LOCAL
+		 self.LOCAL = ontospy.ONTOSPY_LOCAL
 		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
 		 
@@ -436,8 +436,8 @@ class Shell(cmd.Cmd):
 		print(random.choice(foo))
 	
 	def do_inspiration(self, line):
-		# _quote = random.choice(QUOTES)
-		print _quote['source']
+		_quote = random.choice(QUOTES)
+		# print _quote['source']
 		print Style.DIM + unicode(_quote['text'])
 		print Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL
 
