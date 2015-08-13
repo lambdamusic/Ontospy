@@ -4,7 +4,7 @@
 # https://hg.python.org/cpython/file/2.7/Lib/cmd.py
 # http://pymotw.com/2/cmd/
 
-import os, cmd, random, urllib2, shutil
+import os, cmd, random, urllib2, shutil, platform
 from colorama import Fore, Back, Style
 
 # Colorama: https://pypi.python.org/pypi/colorama
@@ -56,7 +56,13 @@ class Shell(cmd.Cmd):
 		else:
 			return Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 
-
+	def _clear_screen(self):
+		""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
+		if platform.system() == "Windows":
+			tmp = os.system('cls') #for window
+		else:
+			tmp = os.system('clear') #for Linux
+		return True
 
 	def _select_ontology(self, line):
 		# if 
@@ -94,7 +100,9 @@ class Shell(cmd.Cmd):
 		if not g:
 			g = ontospy.get_pickled_ontology(fullpath)
 		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		self._clear_screen()
 		print "Loaded ", self.current['fullpath']
+		g.printStats()
 		self.prompt = self._get_prompt(filename)
 
 
@@ -170,56 +178,81 @@ class Shell(cmd.Cmd):
 			else:
 				print "not found"
 
-
-	def _import_ontology(self, location):
-		""" imports an ontology from the web, or from an external file, and adds it to the repo
-			note: create the cached version too
-		"""
-		# 1) extract file from location and save locally
-		fullpath = ""
-		try:
-			if location.startswith("http://"):
-				headers = "Accept: application/rdf+xml"
-				req = urllib2.Request(location, headers)
-				res = urllib2.urlopen(req)
-				final_location = res.geturl()  # after 303 redirects
-				print "Loaded <%s>" % final_location
-				filename = final_location.split("/")[-1] or final_location.split("/")[-2]
-				fullpath = self.LOCAL + "/" + filename
-	
-				file_ = open(fullpath, 'w')
-				file_.write(res.read())
-				file_.close()
-				
+	def _serialize(self, g, line=None):
+		if not line:
+			# show ontology annotations
+			for o in g.ontologies:
+				self._printSerialize(o)
+		else:	
+			if line.isdigit():
+				line =	int(line)
+			out = g.getEntity(line)
+			if out:
+				if type(out) == type([]):
+					choice = self._selectFromList(out)
+					if choice:
+						self._printSerialize(choice)
+				else:
+					self._printSerialize(out)
 			else:
-				filename = location.split("/")[-1] or location.split("/")[-2]
-				fullpath = self.LOCAL + "/" + filename
-				shutil.copy(location, fullpath)
-			print "Saving local copy..."	
-		except:
-			print "Error retrieving file. Please make sure <%s> is a valid location." % location
-			if os.path.exists(fullpath):
-				os.remove(fullpath)
-			return None
-		
-		# 2) check if valid RDF and cache it
-		try:
-			g = ontospy.Graph(fullpath)
-			self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-			print "Loaded ", self.current['fullpath']
-			self.prompt = self._get_prompt(filename)
-		except:
-			g = None
-			if os.path.exists(fullpath):
-				os.remove(fullpath)
-			print "Error parsing file. Please make sure %s contains valid RDF." % location
-		
-		if g:
-			self.ontologies = ontospy.get_localontologies()
-			ontospy.do_pickle_ontology(fullpath, g) 
+				print "not found"
 
-		# finally...
-		return g
+	def _printSerialize(self, entity):
+		"wrapper around main printSerialize function"
+		print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
+		print "-----------"
+		entity.printSerialize()
+
+	#
+	# def _import_ontology(self, location):
+	#	""" imports an ontology from the web, or from an external file, and adds it to the repo
+	#		note: create the cached version too
+	#	"""
+	#	# 1) extract file from location and save locally
+	#	fullpath = ""
+	#	try:
+	#		if location.startswith("http://"):
+	#			headers = "Accept: application/rdf+xml"
+	#			req = urllib2.Request(location, headers)
+	#			res = urllib2.urlopen(req)
+	#			final_location = res.geturl()  # after 303 redirects
+	#			print "Loaded <%s>" % final_location
+	#			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
+	#			fullpath = self.LOCAL + "/" + filename
+	#
+	#			file_ = open(fullpath, 'w')
+	#			file_.write(res.read())
+	#			file_.close()
+	#
+	#		else:
+	#			filename = location.split("/")[-1] or location.split("/")[-2]
+	#			fullpath = self.LOCAL + "/" + filename
+	#			shutil.copy(location, fullpath)
+	#		print "Saving local copy..."
+	#	except:
+	#		print "Error retrieving file. Please make sure <%s> is a valid location." % location
+	#		if os.path.exists(fullpath):
+	#			os.remove(fullpath)
+	#		return None
+	#
+	#	# 2) check if valid RDF and cache it
+	#	try:
+	#		g = ontospy.Graph(fullpath)
+	#		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+	#		print "Loaded ", self.current['fullpath']
+	#		self.prompt = self._get_prompt(filename)
+	#	except:
+	#		g = None
+	#		if os.path.exists(fullpath):
+	#			os.remove(fullpath)
+	#		print "Error parsing file. Please make sure %s contains valid RDF." % location
+	#
+	#	if g:
+	#		self.ontologies = ontospy.get_localontologies()
+	#		ontospy.do_pickle_ontology(fullpath, g)
+	#
+	#	# finally...
+	#	return g
 
 
 
@@ -255,47 +288,55 @@ class Shell(cmd.Cmd):
 		else:
 			print "Please select an ontology first."
 
-	def do_list(self, line):
-		"""List is a context aware command.
-			\nIf no ontology > list ontologies	
-			\nIf ontology > list 'classes' [default] or 'properties'
+
+	def do_serialize(self, line):
+		""" Serialize an entity into an RDF format. 
+		\nValid options are: xml, n3, turtle, nt, pretty-xml, trix @todo
 		""" 
-		if line == "ontologies":
-			self._list_ontologies()
-		elif not self.current:
-			if line:
-				print "Please select an ontology first :"
-			self._list_ontologies()
+		# print "If no ontology > no triples \n if ontology = show annotations \n if entity = show triples"
+		if self.current:
+			g = self.current['graph']			
+			self._serialize(g, line)		
+		else:
+			print "Please select an ontology first."
+
+
+	def do_classes(self, line):
+		if not self.current:
+			print "Please select an ontology first"
 		else: # self.current exists
 			g = self.current['graph']
-			if line == "properties": 
-				g.printPropertyTree(showids=True, labels=False)
-			elif not line or line == "classes": 
-				g.printClassTree(showids=True, labels=False)		
-			else:
-				print "Not a valid argument"
+			g.printClassTree(showids=True, labels=False)			
 
-	def complete_list(self, text, line, begidx, endidx):
-		cmds = ['ontologies', 'classes', 'properties']
-		if not text:
-			completions = cmds
-		else:
-			completions = [ f
-							for f in cmds
-							if f.startswith(text)
-							]
-		return completions
+	def do_properties(self, line):
+		if not self.current:
+			print "Please select an ontology first"
+		else: # self.current exists
+			g = self.current['graph']
+			g.printPropertyTree(showids=True, labels=False)
 
 
-	def do_import(self, line):
-		""" Import an ontology into the local repository. Either from: 
-		\nweb: eg import http://xmlns.com/foaf/spec/index.rdf
-		\nlocal file: eg /home/Desktop/foaf.rdf
-		\nlocal folder: eg /home/Desktop/models/. """ 
-		if not line:
-			print "Please specify a URI or local path to import from"	
-		else:
-			self._import_ontology(line)
+	# def complete_list(self, text, line, begidx, endidx):
+	# 	cmds = ['ontologies', 'classes', 'properties']
+	# 	if not text:
+	# 		completions = cmds
+	# 	else:
+	# 		completions = [ f
+	# 						for f in cmds
+	# 						if f.startswith(text)
+	# 						]
+	# 	return completions
+
+	#
+	# def do_import(self, line):
+	#	""" Import an ontology into the local repository. Either from:
+	#	\nweb: eg import http://xmlns.com/foaf/spec/index.rdf
+	#	\nlocal file: eg /home/Desktop/foaf.rdf
+	#	\nlocal folder: eg /home/Desktop/models/. """
+	#	if not line:
+	#		print "Please specify a URI or local path to import from"
+	#	else:
+	#		self._import_ontology(line)
 	
 	# SELECT OPERATIONS
 			
@@ -313,19 +354,21 @@ class Shell(cmd.Cmd):
 				
 	def do_class(self, line):
 		"""Select a class""" 
-		if line:
-			if not self.current:	
-				print "Please select an ontology first"
-			else:
-				self._select_class(line)
+		if not self.current:	
+			print "Please select an ontology first"
+		elif line:
+			self._select_class(line)
+		else:
+			print "Enter a class name or number, or use <tab> to autocomplete"
 
 	def do_property(self, line):
 		"""Select a property""" 
-		if line:
-			if not self.current:	
-				print "Please select an ontology first"
-			else:
-				self._select_property(line)
+		if not self.current:	
+			print "Please select an ontology first"
+		elif line:
+			self._select_property(line)
+		else:
+			print "Enter a class name or number, or use <tab> to autocomplete"
 
 
 

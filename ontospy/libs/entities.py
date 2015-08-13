@@ -37,6 +37,7 @@ class RDF_Entity(object):
 		# self.siblings = []
 		
 	def serialize(self, format="turtle"):
+		""" xml, n3, turtle, nt, pretty-xml, trix are built in"""
 		if self.triples:
 			if not self.rdfgraph:
 				self._buildGraph()
@@ -49,7 +50,7 @@ class RDF_Entity(object):
 
 	def printTriples(self):
 		""" display triples """
-		printDebug(Fore.RED + unicode(self.uri) + Fore.RESET) 
+		printDebug(Fore.RED + Style.BRIGHT + unicode(self.uri) + Style.RESET_ALL) 
 		for x in self.triples:
 			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
 			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 
@@ -223,9 +224,10 @@ class OntoClass(RDF_Entity):
 		else:
 			return 0
 
-	def describe(self):
+
+	def printStats(self):
 		""" shotcut to pull out useful info for interactive use """
-		# self.printGenericTree()
+		printDebug("----------------")
 		printDebug("Parents......: %d" % len(self.parents()))
 		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
@@ -233,13 +235,16 @@ class OntoClass(RDF_Entity):
 		printDebug("Domain of....: %d" % len(self.domain_of))
 		printDebug("Range of.....: %d" % len(self.range_of))
 		printDebug("Instances....: %d" % self.count())
-		self.printTriples()
-
+		printDebug("----------------")
 			
 	def printGenericTree(self):
 		printGenericTree(self)
 
-
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
+		self.printTriples()
+		self.printStats()
+		# self.printGenericTree()
 
 
 
@@ -272,20 +277,26 @@ class OntoProperty(RDF_Entity):
 		return "<Property *%s*>" % ( self.uri)
 
 	
-	def printPropertyTree(self):
+	def printGenericTree(self):
 		printGenericTree(self)
 
-
-	def describe(self):
+		
+	def printStats(self):
 		""" shotcut to pull out useful info for interactive use """
-		# self.printGenericTree()
+		printDebug("----------------")
 		printDebug("Parents......: %d" % len(self.parents()))
 		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
 		printDebug("Descendants..: %d" % len(self.descendants()))
 		printDebug("Has Domain...: %d" % len(self.domains))
-		printDebug("Has Range....: %d" % len(self.ranges))		
+		printDebug("Has Range....: %d" % len(self.ranges))
+		printDebug("----------------")
 		
+
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
 		self.printTriples()
+		self.printStats()
+		# self.printGenericTree()
 			
 			

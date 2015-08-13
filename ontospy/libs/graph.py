@@ -222,10 +222,17 @@ class Graph(object):
 			
 		
 
+	def printStats(self):
+		""" shotcut to pull out useful info for interactive use """
+		printDebug("----------------")
+		printDebug("Ontologies......: %d" % len(self.ontologies))
+		printDebug("Classes.........: %d" % len(self.classes))
+		printDebug("Properties......: %d" % len(self.properties))
+		printDebug("..annotation....: %d" % len(self.annotationProperties))
+		printDebug("..datatype......: %d" % len(self.datatypeProperties))
+		printDebug("..object........: %d" % len(self.objectProperties))
+		printDebug("----------------")
 
-
-
-	
 	
 	def __extractOntologies(self, exclude_BNodes = False, return_string=False):
 		"""
