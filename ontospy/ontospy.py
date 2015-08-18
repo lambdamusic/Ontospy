@@ -30,7 +30,7 @@ ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 # get file location
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTOSPY_DEFAULT_SCHEMAS_DIR = _dirname + "/data/schemas/"  # comes with installer
-
+ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
 
 
 def get_or_create_home_repo(reset=False):
@@ -137,25 +137,21 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
-	parser.add_option("", "--local",
-			action="store_true", default=False, dest="local",
-			help="List ontologies in the local repository.")	
+	parser.add_option("", "--repo",
+			action="store_true", default=False, dest="repo",
+			help="List ontologies in the local repository")	
 
 	parser.add_option("", "--import",
-			action="store_true", default=False, dest="load",
-			help="Imports an ontology from a local file or the web into the repository.") 
-
-	parser.add_option("", "--importfolder",
-			action="store_true", default=False, dest="loadfolder",
-			help="Imports all files within a folder into the local repository.") 
+			action="store_true", default=False, dest="_import",
+			help="Imports file/folder/url into the local repository") 
 
 	parser.add_option("", "--web",
 			action="store_true", default=False, dest="web",
-			help="Import a web ontology by selecting it from the ones registered on http://prefix.cc/popular/all.") 
+			help="List and import schemas registered on http://prefix.cc/") 
 			
 	parser.add_option("", "--shell",
 			action="store_true", default=False, dest="shell",
-			help="Interact with ontologies using the wonderful OntoSPy shell.")	
+			help="Interactive explorer of the ontologies in the local repository")	
 				
 	parser.add_option("-a", "",
 			action="store_true", default=False, dest="ontoannotations",
@@ -176,7 +172,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.local and not opts.web and len(args) < 1:
+	if not opts.shell and not opts.repo and not opts.web and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -194,22 +190,20 @@ def main():
 	opts, args = parse_options()
 
 	# list local ontologies
-	if opts.local:		
+	if opts.repo:		
 		get_or_create_home_repo()
 		action_listlocal()
 		raise SystemExit, 1
 
 	# import an ontology
-	if opts.load:		
-		get_or_create_home_repo()
-		action_import(args[0])
+	if opts._import:		
+		get_or_create_home_repo()		
+		_location = args[0]
+		if os.path.isdir(_location):
+			action_import_folder(_location)
+		else:
+			action_import(_location)
 		raise SystemExit, 1
-
-	# import an ontology folder
-	if opts.loadfolder:		
-		get_or_create_home_repo()
-		action_import_folder(args[0])
-		raise SystemExit, 1	
 
 	# launch shell
 	if opts.shell:	

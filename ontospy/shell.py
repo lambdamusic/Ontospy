@@ -35,11 +35,14 @@ class Shell(cmd.Cmd):
 		
 	def __init__(self):
 		 """
+		 self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		 self.currentEntity = {'entity' : entity, 'type' : 'class' } [?]
 		 """
 		 # useful vars
 		 self.LOCAL = ontospy.ONTOSPY_LOCAL
 		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
+		 self.currentEntity = None
 		 
 		 cmd.Cmd.__init__(self)
 
@@ -47,10 +50,16 @@ class Shell(cmd.Cmd):
 	# HELPER METHODS
 	# --------	
 
-	def _get_prompt(self, stringa=""):
+	def _get_prompt(self, onto="", entity=""):
 		""" changes the prompt contextually """
-		if stringa:
-			temp1 = Fore.RED + '%s' % stringa 
+		if entity:
+			onto = self.current['file']
+			temp1_1 = Fore.RED + Style.NORMAL + '%s: ' % truncate(onto, 20)
+			temp1_2 = Fore.RED + Style.BRIGHT + '%s' % entity
+			temp2 = '<OntoSPy: %s>: ' % (temp1_1 + temp1_2)
+			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+		elif onto:
+			temp1 = Fore.RED + '%s' % onto 
 			temp2 = '<OntoSPy: %s>: ' % temp1
 			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		else:
@@ -63,6 +72,7 @@ class Shell(cmd.Cmd):
 		else:
 			tmp = os.system('clear') #for Linux
 		return True
+
 
 	def _select_ontology(self, line):
 		# if 
@@ -100,7 +110,9 @@ class Shell(cmd.Cmd):
 		if not g:
 			g = ontospy.get_pickled_ontology(fullpath)
 		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		self.currentEntity = None
 		self._clear_screen()
+		playSound(ontospy.ONTOSPY_SOUNDS)  # new..
 		print "Loaded ", self.current['fullpath']
 		g.printStats()
 		self.prompt = self._get_prompt(filename)
@@ -115,7 +127,8 @@ class Shell(cmd.Cmd):
 		for el in _list:
 			print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el.uri
 			counter += 1
-		var = raw_input("Please select one entity: ")
+		print "--------------"
+		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one entity: " + Style.RESET_ALL)
 		try:
 			var = int(var)
 			return _list[var-1]
@@ -135,9 +148,13 @@ class Shell(cmd.Cmd):
 			if type(out) == type([]):
 				choice = self._selectFromList(out)
 				if choice:
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}				
 					choice.describe()
 			else:
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}				
 				out.describe()
+			if self.currentEntity:
+				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		else:
 			print "not found"
 
@@ -152,18 +169,25 @@ class Shell(cmd.Cmd):
 			if type(out) == type([]):
 				choice = self._selectFromList(out)
 				if choice:
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}	
 					choice.describe()
 			else:
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}	
 				out.describe()
+			if self.currentEntity:
+				self.prompt = self._get_prompt(entity=self.currentEntity['name'])	
 		else:
 			print "not found"
 			
 			
 	def _triples(self, g, line=None):
 		if not line:
-			# show ontology annotations
-			for o in g.ontologies:
-				o.printTriples()
+			if self.currentEntity:
+				self.currentEntity['object'].printTriples()
+			else:
+				# show ontology annotations
+				for o in g.ontologies:
+					o.printTriples()
 		else:	
 			if line.isdigit():
 				line =	int(line)
@@ -180,9 +204,13 @@ class Shell(cmd.Cmd):
 
 	def _serialize(self, g, line=None):
 		if not line:
-			# show ontology annotations
-			for o in g.ontologies:
-				self._printSerialize(o)
+			if self.currentEntity:
+				self.currentEntity['object'].printSerialize()
+			else:
+				# show ontology annotations
+				for o in g.ontologies:
+					o.printSerialize()
+					# self._printSerialize(o)
 		else:	
 			if line.isdigit():
 				line =	int(line)
@@ -191,70 +219,25 @@ class Shell(cmd.Cmd):
 				if type(out) == type([]):
 					choice = self._selectFromList(out)
 					if choice:
-						self._printSerialize(choice)
+						choice.printSerialize()
+						# self._printSerialize(choice)
 				else:
-					self._printSerialize(out)
+					out.printSerialize()
+					# self._printSerialize(out)
 			else:
 				print "not found"
 
-	def _printSerialize(self, entity):
-		"wrapper around main printSerialize function"
-		print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
-		print "-----------"
-		entity.printSerialize()
-
 	#
-	# def _import_ontology(self, location):
-	#	""" imports an ontology from the web, or from an external file, and adds it to the repo
-	#		note: create the cached version too
-	#	"""
-	#	# 1) extract file from location and save locally
-	#	fullpath = ""
-	#	try:
-	#		if location.startswith("http://"):
-	#			headers = "Accept: application/rdf+xml"
-	#			req = urllib2.Request(location, headers)
-	#			res = urllib2.urlopen(req)
-	#			final_location = res.geturl()  # after 303 redirects
-	#			print "Loaded <%s>" % final_location
-	#			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
-	#			fullpath = self.LOCAL + "/" + filename
+	# def _printSerialize(self, entity):
+	# 	"wrapper around main printSerialize function"
+	# 	print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
+	# 	print "-----------"
+	# 	entity.printSerialize()
 	#
-	#			file_ = open(fullpath, 'w')
-	#			file_.write(res.read())
-	#			file_.close()
-	#
-	#		else:
-	#			filename = location.split("/")[-1] or location.split("/")[-2]
-	#			fullpath = self.LOCAL + "/" + filename
-	#			shutil.copy(location, fullpath)
-	#		print "Saving local copy..."
-	#	except:
-	#		print "Error retrieving file. Please make sure <%s> is a valid location." % location
-	#		if os.path.exists(fullpath):
-	#			os.remove(fullpath)
-	#		return None
-	#
-	#	# 2) check if valid RDF and cache it
-	#	try:
-	#		g = ontospy.Graph(fullpath)
-	#		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-	#		print "Loaded ", self.current['fullpath']
-	#		self.prompt = self._get_prompt(filename)
-	#	except:
-	#		g = None
-	#		if os.path.exists(fullpath):
-	#			os.remove(fullpath)
-	#		print "Error parsing file. Please make sure %s contains valid RDF." % location
-	#
-	#	if g:
-	#		self.ontologies = ontospy.get_localontologies()
-	#		ontospy.do_pickle_ontology(fullpath, g)
-	#
-	#	# finally...
-	#	return g
-
-
+		
+		
+		
+		
 
 	# COMMANDS
 	# --------
@@ -274,6 +257,13 @@ class Shell(cmd.Cmd):
 		else:
 			print "No ontology loaded. Use the 'ontology' command"
 
+	def do_currentEntity(self, line):
+		""" List the entity currently loaded""" 
+		 # {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		if self.currentEntity:
+			print self.currentEntity['name']
+		else:
+			print "No entity loaded. Use the 'class' or 'property' command"
 
 	def do_triples(self, line):
 		""" Triples is a context aware command.
@@ -301,44 +291,17 @@ class Shell(cmd.Cmd):
 			print "Please select an ontology first."
 
 
-	def do_classes(self, line):
+	def do_tree(self, line):
+		"""Shows the subsumtion tree of an ontology.\nOptions: [classes | properties]\nDefault: classes"""
 		if not self.current:
 			print "Please select an ontology first"
-		else: # self.current exists
-			g = self.current['graph']
-			g.printClassTree(showids=True, labels=False)			
-
-	def do_properties(self, line):
-		if not self.current:
-			print "Please select an ontology first"
-		else: # self.current exists
+		elif line and line == "properties":
 			g = self.current['graph']
 			g.printPropertyTree(showids=True, labels=False)
-
-
-	# def complete_list(self, text, line, begidx, endidx):
-	# 	cmds = ['ontologies', 'classes', 'properties']
-	# 	if not text:
-	# 		completions = cmds
-	# 	else:
-	# 		completions = [ f
-	# 						for f in cmds
-	# 						if f.startswith(text)
-	# 						]
-	# 	return completions
-
-	#
-	# def do_import(self, line):
-	#	""" Import an ontology into the local repository. Either from:
-	#	\nweb: eg import http://xmlns.com/foaf/spec/index.rdf
-	#	\nlocal file: eg /home/Desktop/foaf.rdf
-	#	\nlocal folder: eg /home/Desktop/models/. """
-	#	if not line:
-	#		print "Please specify a URI or local path to import from"
-	#	else:
-	#		self._import_ontology(line)
-	
-	# SELECT OPERATIONS
+		else: # self.current exists
+			g = self.current['graph']
+			g.printClassTree(showids=True, labels=False)	
+						
 			
 	def do_ontology(self, line):
 		"""Select an ontology""" 
@@ -359,7 +322,7 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_class(line)
 		else:
-			print "Enter a class name or number, or use <tab> to autocomplete"
+			print "Enter a class name or number, or type 'class <tab>' for suggestions"
 
 	def do_property(self, line):
 		"""Select a property""" 
@@ -368,10 +331,25 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_property(line)
 		else:
-			print "Enter a class name or number, or use <tab> to autocomplete"
+			print "Enter a class name or number, or type 'property <tab>' for suggestions"
 
 
 
+	def complete_tree(self, text, line, begidx, endidx):
+		"""completion for tree command"""
+		
+		options = ['classes', 'properties']
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+		
+		
 	def complete_ontology(self, text, line, begidx, endidx):
 		"""completion for select command"""
 		
@@ -466,8 +444,12 @@ class Shell(cmd.Cmd):
 
 	def do_top(self, line):
 		"Unload any ontology and go back to top level"
-		self.current = None
-		self.prompt = self._get_prompt()
+		if self.currentEntity:
+			self.currentEntity = None
+			self.prompt = self._get_prompt(self.current['file'])
+		else:
+			self.current = None
+			self.prompt = self._get_prompt()
 						
 	def do_quit(self, line):
 		"Exit OntoSPy shell"
