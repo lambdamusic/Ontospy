@@ -50,16 +50,16 @@ class Shell(cmd.Cmd):
 	# HELPER METHODS
 	# --------	
 
-	def _get_prompt(self, onto="", entity=""):
+	def _get_prompt(self, onto="", entity="", default_entity_color=Fore.BLUE):
 		""" changes the prompt contextually """
 		if entity:
 			onto = self.current['file']
-			temp1_1 = Fore.RED + Style.NORMAL + '%s: ' % truncate(onto, 20)
-			temp1_2 = Fore.RED + Style.BRIGHT + '%s' % entity
+			temp1_1 = default_entity_color + Style.NORMAL + '%s: ' % truncate(onto, 20)
+			temp1_2 = default_entity_color + Style.BRIGHT + '%s' % entity
 			temp2 = '<OntoSPy: %s>: ' % (temp1_1 + temp1_2)
 			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		elif onto:
-			temp1 = Fore.RED + '%s' % onto 
+			temp1 = default_entity_color + '%s' % onto 
 			temp2 = '<OntoSPy: %s>: ' % temp1
 			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		else:
@@ -101,6 +101,29 @@ class Shell(cmd.Cmd):
 			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter,	Fore.RED, file, Style.RESET_ALL				
 
 
+
+	def _print_entity_intro(self, g=None, entity=None):
+		"""after a selection, prints on screen basic info about onto or entity, plus change prompt """
+		if entity:
+			# self._clear_screen()
+			print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
+			print Style.DIM + entity.bestDescription() + Style.RESET_ALL
+			entity.printStats()
+			self.prompt = self._get_prompt(entity=self.currentEntity['name'])
+		elif g:
+			self._clear_screen()
+			playSound(ontospy.ONTOSPY_SOUNDS)  # new..
+			print "Loaded ", self.current['fullpath']
+			g.printStats()
+			for o in g.ontologies:
+				print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
+				print Style.DIM + o.bestDescription() + Style.RESET_ALL	
+			
+			self.prompt = self._get_prompt(self.current['file'])
+			
+			
+		
+
 	def _load_ontology(self, filename):
 		""" loads an ontology from the local repository 
 			note: if the ontology does not have a cached version, it is created
@@ -108,14 +131,10 @@ class Shell(cmd.Cmd):
 		fullpath = self.LOCAL + "/" + filename		
 		g = ontospy.get_pickled_ontology(fullpath)
 		if not g:
-			g = ontospy.get_pickled_ontology(fullpath)
+			g = ontospy.do_pickle_ontology(fullpath)
 		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
 		self.currentEntity = None
-		self._clear_screen()
-		playSound(ontospy.ONTOSPY_SOUNDS)  # new..
-		print "Loaded ", self.current['fullpath']
-		g.printStats()
-		self.prompt = self._get_prompt(filename)
+		self._print_entity_intro(g)
 
 
 	def _selectFromList(self, _list):
@@ -149,12 +168,13 @@ class Shell(cmd.Cmd):
 				choice = self._selectFromList(out)
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}				
-					choice.describe()
 			else:
 				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}				
-				out.describe()
+			# ..finally:
 			if self.currentEntity:
-				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
+				self._print_entity_intro(entity=self.currentEntity['object'])
+				
+				# self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		else:
 			print "not found"
 
@@ -170,12 +190,13 @@ class Shell(cmd.Cmd):
 				choice = self._selectFromList(out)
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}	
-					choice.describe()
+
 			else:
 				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}	
-				out.describe()
+			
+			# ..finally:
 			if self.currentEntity:
-				self.prompt = self._get_prompt(entity=self.currentEntity['name'])	
+				self._print_entity_intro(entity=self.currentEntity['object'])	
 		else:
 			print "not found"
 			
