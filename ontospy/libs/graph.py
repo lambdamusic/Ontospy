@@ -140,7 +140,9 @@ class Graph(object):
 
 
 	def serialize(self, rdf_format="turtle"):
-		""" Shortcut that outputs the graph """
+		""" Shortcut that outputs the graph 
+		Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
+		"""
 		return self.rdfgraph.serialize(format=rdf_format)
 			
 	

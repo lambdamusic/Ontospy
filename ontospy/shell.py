@@ -179,65 +179,7 @@ class Shell(cmd.Cmd):
 		else:
 			print "not found"
 			
-			
-	def _triples(self, g, line=None):
-		if not line:
-			if self.currentEntity:
-				self.currentEntity['object'].printTriples()
-			else:
-				# show ontology annotations
-				for o in g.ontologies:
-					o.printTriples()
-		else:	
-			if line.isdigit():
-				line =	int(line)
-			out = g.getEntity(line)
-			if out:
-				if type(out) == type([]):
-					choice = self._selectFromList(out)
-					if choice:
-						choice.printTriples()
-				else:
-					out.printTriples()
-			else:
-				print "not found"
-
-	def _serialize(self, g, line=None):
-		if not line:
-			if self.currentEntity:
-				self.currentEntity['object'].printSerialize()
-			else:
-				# show ontology annotations
-				for o in g.ontologies:
-					o.printSerialize()
-					# self._printSerialize(o)
-		else:	
-			if line.isdigit():
-				line =	int(line)
-			out = g.getEntity(line)
-			if out:
-				if type(out) == type([]):
-					choice = self._selectFromList(out)
-					if choice:
-						choice.printSerialize()
-						# self._printSerialize(choice)
-				else:
-					out.printSerialize()
-					# self._printSerialize(out)
-			else:
-				print "not found"
-
-	#
-	# def _printSerialize(self, entity):
-	# 	"wrapper around main printSerialize function"
-	# 	print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
-	# 	print "-----------"
-	# 	entity.printSerialize()
-	#
-		
-		
-		
-		
+	
 
 	# COMMANDS
 	# --------
@@ -265,32 +207,37 @@ class Shell(cmd.Cmd):
 		else:
 			print "No entity loaded. Use the 'class' or 'property' command"
 
+
+
 	def do_triples(self, line):
-		""" Triples is a context aware command.
-			If no ontology > no triples \n
-			if ontology = show annotations \n
-			if entity = show triples 
-		""" 
+		"""Print out the triples that have the current entity as subject""" 
 		# print "If no ontology > no triples \n if ontology = show annotations \n if entity = show triples"
-		if self.current:
-			g = self.current['graph']			
-			self._triples(g, line)		
+		if self.currentEntity:
+			self.currentEntity['object'].printTriples()
+		elif self.current:
+			g = self.current['graph']		
+			for o in g.ontologies:
+				o.printTriples()		
 		else:
 			print "Please select an ontology first."
-
-
+			
+			
 	def do_serialize(self, line):
-		""" Serialize an entity into an RDF format. 
-		\nValid options are: xml, n3, turtle, nt, pretty-xml, trix @todo
+		"""Serialize current entity into an RDF format.\nValid options: xml | n3 | turtle | nt | pretty-xml
 		""" 
 		# print "If no ontology > no triples \n if ontology = show annotations \n if entity = show triples"
-		if self.current:
-			g = self.current['graph']			
-			self._serialize(g, line)		
+		if line not in ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']:
+			line = "turtle"
+		if self.currentEntity:
+			self.currentEntity['object'].printSerialize(line)
+		elif self.current:
+			g = self.current['graph']		
+			for o in g.ontologies:
+				o.printSerialize(line)		
 		else:
 			print "Please select an ontology first."
-
-
+	
+				
 	def do_tree(self, line):
 		"""Shows the subsumtion tree of an ontology.\nOptions: [classes | properties]\nDefault: classes"""
 		if not self.current:
@@ -348,7 +295,22 @@ class Shell(cmd.Cmd):
 							if f.startswith(text)
 							]
 		return completions	
+
+
+	def complete_serialize(self, text, line, begidx, endidx):
+		"""completion for tree command"""
 		
+		options = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+				
 		
 	def complete_ontology(self, text, line, begidx, endidx):
 		"""completion for select command"""
