@@ -281,11 +281,11 @@ class Graph(object):
 			pass
 			# printDebug("No owl:Ontologies found")
 			
-		#finally		
+		#finally... add all annotations/triples		
 		self.ontologies = out
-		# add all annotations/triples
 		for onto in self.ontologies:
 			onto.triples = self.queryHelper.entityTriples(onto.uri)
+			onto._buildGraph() # force construction of mini graph
 		
 
 

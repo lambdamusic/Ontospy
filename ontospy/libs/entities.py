@@ -54,6 +54,7 @@ class RDF_Entity(object):
 		for x in self.triples:
 			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
 			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 
+		print ""
 
 	def __buildQname(self, namespaces):
 		""" extracts a qualified name for a uri """
@@ -144,7 +145,22 @@ class RDF_Entity(object):
 				else:
 					return ""
 
-				
+
+	def bestDescription(self, prefLanguage="en"):
+		"""
+		facility for extrating the best available description for an entity
+
+		..This checks RFDS.label, SKOS.prefLabel and finally the qname local component
+		"""
+
+		test_preds = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description, rdflib.namespace.DC.description, rdflib.namespace.SKOS.definition ]
+		
+		for pred in test_preds:
+			test = self.getValuesForProperty(pred)
+			if test:
+				return firstEnglishStringInList(test)
+		return ""
+
 
 
 class Ontology(RDF_Entity):
@@ -202,7 +218,7 @@ class OntoClass(RDF_Entity):
 		self.domain_of = []
 		self.range_of = []
 		self.ontology = None
-		self.queryHelper = None  # the original graph the class derives from
+		self.queryHelper = None	 # the original graph the class derives from
 		
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
