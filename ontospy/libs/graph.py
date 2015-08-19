@@ -59,8 +59,11 @@ class Graph(object):
 		self.objectProperties = []
 		self.datatypeProperties = []
 		
+		self.skosConcepts = []
+		
 		self.toplayer = []
 		self.toplayerProperties = []
+		self.toplayerSkosConcepts = []
 		
 		# keep track of the rdf source		
 		self.IS_ENDPOINT = False
@@ -208,19 +211,23 @@ class Graph(object):
 		self.__extractNamespaces()
 		
 		self.__extractOntologies()
-		printDebug("Ontologies found: %d" % len(self.ontologies))
+		printDebug("Ontologies found...: %d" % len(self.ontologies))
 						
 		self.__extractClasses()
-		printDebug("Classes found...: %d" % len(self.classes))
+		printDebug("Classes found......: %d" % len(self.classes))
 		
 		self.__extractProperties()
-		printDebug("Properties found: %d" % len(self.properties))
-		printDebug("Annotation......: %d" % len(self.annotationProperties))
-		printDebug("Datatype........: %d" % len(self.datatypeProperties))
-		printDebug("Object..........: %d" % len(self.objectProperties))
-		
-		self.__computeTopLayer()
+		printDebug("Properties found...: %d" % len(self.properties))
+		printDebug("Annotation.........: %d" % len(self.annotationProperties))
+		printDebug("Datatype...........: %d" % len(self.datatypeProperties))
+		printDebug("Object.............: %d" % len(self.objectProperties))
 
+		self.__extractSkosConcepts()
+		printDebug("SKOS Concepts......: %d" % len(self.skosConcepts))
+				
+		self.__computeTopLayer()
+		
+		printDebug("----------")
 			
 		
 
@@ -233,6 +240,7 @@ class Graph(object):
 		printDebug("..annotation....: %d" % len(self.annotationProperties))
 		printDebug("..datatype......: %d" % len(self.datatypeProperties))
 		printDebug("..object........: %d" % len(self.objectProperties))
+		printDebug("Concepts(SKOS)..: %d" % len(self.skosConcepts))
 		printDebug("----------------")
 
 	
@@ -424,6 +432,51 @@ class Graph(object):
 					if aProp not in superprop.children():
 						 superprop._children.append(aProp)
 		
+	
+	
+	def __extractSkosConcepts(self):
+		""" 
+		2015-08-19: first draft
+		"""
+		self.skosConcepts = [] # @todo: keep adding? 
+		
+		qres = self.queryHelper.getSKOSInstances()
+
+		for candidate in qres:
+			
+			test_existing_cl = self.getSkosConcept(uri=candidate[0])
+			if not test_existing_cl:
+				# create it
+				self.skosConcepts += [OntoSkosConcept(candidate[0], None, self.namespaces)]
+			else:
+				pass
+	
+		#add more data
+		for aConcept in self.skosConcepts:
+			
+			aConcept.triples = self.queryHelper.entityTriples(aConcept.uri)
+			aConcept._buildGraph() # force construction of mini graph
+			
+			aConcept.queryHelper = self.queryHelper
+			
+			# attach to an ontology 
+			for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
+				onto = self.getOntology(str(uri))
+				if onto:
+					onto.skosConcepts += [aConcept]
+					aConcept.ontology = onto
+					
+			# add direct Supers				
+			directSupers = self.queryHelper.getSKOSDirectSupers(aConcept.uri)
+			
+			for x in directSupers:
+				superclass = self.getSkosConcept(uri=x[0])
+				if superclass: 
+					aConcept._parents.append(superclass)
+					
+					# add inverse relationships (= direct subs for superclass)
+					if aConcept not in superclass.children():
+						 superclass._children.append(aConcept)	
 					
 					
 
@@ -509,6 +562,44 @@ class Graph(object):
 			return res
 		else:
 			for x in self.properties:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			return None
+
+
+	def getSkosConcept(self, id=None, uri=None, match=None):
+		""" 
+		get the saved skos concept with given ID or via other methods...
+		
+		Note: it tries to guess what is being passed as above		
+		"""
+		
+		if not id and not uri and not match:
+			return None
+			
+		if type(id) == type("string"):
+			uri = id
+			id = None
+			if not uri.startswith("http://"):
+				match = uri
+				uri = None
+		if match:
+			if type(match) != type("string"):
+				return []
+			res = []
+			if ":" in match: # qname 
+				for x in self.skosConcepts:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.skosConcepts:
+					if match.lower() in x.uri.lower():
+						res += [x]
+			return res
+		else:
+			for x in self.skosConcepts:
 				if id and x.id == id:
 					return x
 				if uri and x.uri.lower() == uri.lower():
@@ -610,7 +701,14 @@ class Graph(object):
 			if not c.parents():
 				exit += [c]
 		self.toplayerProperties = exit # sorted(exit, key=lambda x: x.id) # doesnt work
-		
+
+		# skos 
+		exit = []
+		for c in self.skosConcepts:
+			if not c.parents():
+				exit += [c]
+		self.toplayerSkosConcepts = exit # sorted(exit, key=lambda x: x.id) # doesnt work
+				
 
 	def printClassTree(self, element = None, showids=True, labels=False):
 		""" 
@@ -647,7 +745,25 @@ class Graph(object):
 		else:
 			printGenericTree(element, 0, showids, labels)
 			
-			
+
+	def printSkosTree(self, element = None, showids=True, labels=False):
+		""" 
+		Print nicely into stdout the SKOS tree of an ontology 
+		
+		Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+		[123]1--
+		[1]123--
+		[12]12--
+		"""
+		
+		if not element:	 # first time
+			for x in self.toplayerSkosConcepts:
+				printGenericTree(x, 0, showids, labels)
+		
+		else:
+			printGenericTree(element, 0, showids, labels)
+						
+
 
 	###########
 

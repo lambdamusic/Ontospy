@@ -65,6 +65,12 @@ class QueryHelper(object):
 	#			 }
 	#			 """)
 	#	return list(qres)		 
+	
+	
+	# ..................	
+	# RDF/OWL CLASSES 
+	# ..................
+	
 		
 		
 	def getAllClasses(self):
@@ -241,6 +247,11 @@ class QueryHelper(object):
 		return list(qres)	
 	
 	
+	# ..................	
+	# RDF PROPERTIES 
+	# ..................
+	
+	
 	# NOTE this kinf of query could be expanded to classes too!!! 
 	def getAllProperties(self):
 		qres = self.rdfgraph.query(
@@ -312,4 +323,53 @@ class QueryHelper(object):
 			printDebug("... warning: the 'getPropAllSubs' query failed (maybe missing SPARQL 1.1 support?)")
 			qres = []
 		return list(qres)
+
 		
+	# ..................	
+	# SKOS	: 2015-08-19
+	# ..................
+	
+	def getSKOSInstances(self):
+		qres = self.rdfgraph.query(
+			  """SELECT DISTINCT ?x
+				 WHERE {
+					 { ?x rdf:type skos:Concept }  
+					 FILTER (!isBlank(?x))
+				 } ORDER BY ?x	  
+				 """)
+		return list(qres)
+		
+		
+	def getSKOSDirectSupers(self, aURI):
+		aURI = unicode(aURI)
+		qres = self.rdfgraph.query(
+			  """SELECT DISTINCT ?x
+				 WHERE {
+						 { 
+							 { <%s> skos:broader ?x }
+							 UNION 
+							 { ?x skos:narrower <%s> }
+						 }	
+					 FILTER (!isBlank(?x))
+				 } ORDER BY ?x	  
+				 """ % (aURI, aURI))
+		return list(qres)
+
+
+	def getSKOSDirectSubs(self, aURI):
+		""" 
+		2015-08-19: currenlty not used, inferred from above
+		"""
+		aURI = unicode(aURI)
+		qres = self.rdfgraph.query(
+			  """SELECT DISTINCT ?x
+				 WHERE {
+						 { 
+							 { ?x skos:broader <%s> }
+							 UNION 
+							 { <%s> skos:narrower ?s }
+						 }
+					 FILTER (!isBlank(?x))
+				 }	 
+				 """ % (aURI, aURI))
+		return list(qres)

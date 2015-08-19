@@ -21,7 +21,7 @@ import sys, os, time, optparse, os.path, shutil, cPickle, urllib2
 from colorama import Fore, Back, Style
 
 from libs.graph import Graph, SparqlEndpoint
-from libs.util import bcolors
+from libs.util import bcolors, pprinttable
 
 from _version import *
 
@@ -102,25 +102,41 @@ def do_pickle_ontology(fullpath, g=None):
 
 def shellPrintOverview(g, opts):
 	ontologies = g.ontologies
-	
-	
-	if not opts['ontoannotations'] and not opts['propertytaxonomy']:
-		opts['classtaxonomy'] = True # default
-	
-	if opts['classtaxonomy']:
-		print "\nClass Taxonomy\n" + "-" * 10 
-		g.printClassTree(showids=False, labels=opts['labels'])
-		
+				
 	if opts['ontoannotations']:
 		for o in ontologies:
-			print "\nOntology Annotations\n-----------"
+			print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
 			o.printTriples()
-	
-	if opts['propertytaxonomy']:
-		print "\nProperty Taxonomy\n" + "-" * 10 
+
+	elif opts['classtaxonomy']:
+		print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+		g.printClassTree(showids=False, labels=opts['labels'])
+			
+	elif opts['propertytaxonomy']:
+		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL
 		g.printPropertyTree(showids=False, labels=opts['labels'])
 
-
+	elif opts['skostaxonomy']:
+		print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10 + Style.RESET_ALL
+		g.printSkosTree(showids=False, labels=opts['labels'])
+	
+	else:
+		# default: print anything available	
+		if g.classes:
+			print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+			g.printClassTree(showids=False, labels=opts['labels'])
+		if g.properties:
+			print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+			g.printPropertyTree(showids=False, labels=opts['labels'])
+		if g.skosConcepts:
+			print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+			g.printSkosTree(showids=False, labels=opts['labels'])
+			
+		
+		
+		#
+		# if not opts['ontoannotations'] and not opts['propertytaxonomy']:
+		# 	opts['classtaxonomy'] = True # default
 
 
 def parse_options():
@@ -165,9 +181,13 @@ def parse_options():
 			action="store_true", default=False, dest="propertytaxonomy",
 			help="Print the property taxonomy.")
 
+	parser.add_option("-s", "",
+			action="store_true", default=False, dest="skostaxonomy",
+			help="Print the SKOS taxonomy.")
+			
 	parser.add_option("-l", "",
 			action="store_true", default=False, dest="labels",
-			help="Print entities labels as well as URIs (used with -c or -p).")
+			help="Print entities labels as well as URIs (used with -c or -p or -s).")
 
 			
 	opts, args = parser.parse_args()
@@ -183,7 +203,8 @@ def parse_options():
 def main():
 	""" command line script """
 	
-	print "OntoSPy " + VERSION + "\n-----------"
+	print "OntoSPy " + VERSION
+	get_or_create_home_repo()
 	
 	# ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 	
@@ -223,6 +244,7 @@ def main():
 					'ontoannotations' : opts.ontoannotations, 
 					'classtaxonomy' : opts.classtaxonomy, 
 					'propertytaxonomy' : opts.propertytaxonomy,
+					'skostaxonomy' : opts.skostaxonomy,
 					'labels' : opts.labels,
 				}
 	
@@ -239,8 +261,7 @@ def main():
 	# print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
-	print "-" * 10 
-	print "Time:	   %0.2fs" %  tTime
+	print "\n", Style.DIM + "Time:	   %0.2fs" %  tTime + Style.RESET_ALL
 
 
 
@@ -250,9 +271,15 @@ def action_listlocal():
 	""" list all local files """
 	ontologies = get_localontologies()
 	if ontologies:
+		print ""
+		temp = []
+		from collections import namedtuple
+		Row = namedtuple('Row',['File','Added','Cached'])		
 		for file in ontologies:
-			print ONTOSPY_LOCAL + "/" + file
-
+			name = ONTOSPY_LOCAL + "/" + file
+			temp += [Row(name,"n/a","n/a")]
+		pprinttable(temp)
+		print ""
 
 
 def action_import(location):

@@ -186,6 +186,7 @@ class Ontology(RDF_Entity):
 		# self.annotationProperties = []
 		# self.objectProperties = []
 		# self.datatypeProperties = []
+		self.skosConcepts = [] 
 
 
 	def describe(self):
@@ -315,4 +316,64 @@ class OntoProperty(RDF_Entity):
 		self.printStats()
 		# self.printGenericTree()
 			
+
+
+
+
+
+class OntoSkosConcept(RDF_Entity):
+	"""
+	Python representation of a generic SKOS concept within an ontology. 
+	@todo: complete methods..
+	
+	"""
+
+	def __init__(self, uri, rdftype=None, namespaces=None):
+		"""
+		...
+		"""
+		super(OntoSkosConcept, self).__init__(uri, rdftype, namespaces)
+
+		self.instance_of = []
+		self.ontology = None
+		self.queryHelper = None	 # the original graph the class derives from
+		
+	def __repr__(self):
+		return "<SKOS Concept *%s*>" % ( self.uri)
+
+
+
+	def printStats(self):
+		""" shotcut to pull out useful info for interactive use """
+		printDebug("----------------")
+		printDebug("Parents......: %d" % len(self.parents()))
+		printDebug("Children.....: %d" % len(self.children()))
+		printDebug("Ancestors....: %d" % len(self.ancestors()))
+		printDebug("Descendants..: %d" % len(self.descendants()))
+		printDebug("----------------")
+
+	def printGenericTree(self):
+		printGenericTree(self)
+
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
+		self.printTriples()
+		self.printStats()
+		self.printGenericTree()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			
