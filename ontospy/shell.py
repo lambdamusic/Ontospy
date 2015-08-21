@@ -40,6 +40,7 @@ class Shell(cmd.Cmd):
 		 """
 		 # useful vars
 		 self.LOCAL = ontospy.ONTOSPY_LOCAL
+		 self.LOCAL_MODELS = ontospy.ONTOSPY_LOCAL_MODELS
 		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
 		 self.currentEntity = None
@@ -74,77 +75,44 @@ class Shell(cmd.Cmd):
 		return True
 
 
-	def _select_ontology(self, line):
-		# if 
-		try:
-			var = int(line)	 # it's a string
-			if var in range(1, len(self.ontologies)+1):
-				self._load_ontology(self.ontologies[var-1])
-		except:
-			if line in self.ontologies:
-				self._load_ontology(line)
-			else:
-				success = False
-				for each in self.ontologies:
-					if line in each:
-						print "==> match: %s" % each
-						self._load_ontology(each)
-						success = True
-						break
-				if not success:		
-					print "not found"
-					
-	def _list_ontologies(self):
-		counter = 0
-		for file in self.ontologies:
-			counter += 1
-			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter,	Fore.RED, file, Style.RESET_ALL				
 
-
-
-	def _print_entity_intro(self, g=None, entity=None):
+	def _print_entity_intro(self, g=None, entity=None, first_time=True):
 		"""after a selection, prints on screen basic info about onto or entity, plus change prompt """
 		if entity:
 			# self._clear_screen()
 			print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
 			print Style.DIM + entity.bestDescription() + Style.RESET_ALL
 			entity.printStats()
-			self.prompt = self._get_prompt(entity=self.currentEntity['name'])
+			if first_time:
+				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		elif g:
-			self._clear_screen()
-			playSound(ontospy.ONTOSPY_SOUNDS)  # new..
-			print "Loaded ", self.current['fullpath']
+			if first_time:
+				self._clear_screen()
+				playSound(ontospy.ONTOSPY_SOUNDS)  # new..
+				print "Loaded ", self.current['fullpath']
 			g.printStats()
 			for o in g.ontologies:
 				print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
-				print Style.DIM + o.bestDescription() + Style.RESET_ALL	
-			
-			self.prompt = self._get_prompt(self.current['file'])
-			
-			
-		
+				print Style.DIM + o.bestDescription() + Style.RESET_ALL
+			if first_time:
+				self.prompt = self._get_prompt(self.current['file'])
 
-	def _load_ontology(self, filename):
-		""" loads an ontology from the local repository 
-			note: if the ontology does not have a cached version, it is created
-		"""
-		fullpath = self.LOCAL + "/" + filename		
-		g = ontospy.get_pickled_ontology(fullpath)
-		if not g:
-			g = ontospy.do_pickle_ontology(fullpath)
-		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-		self.currentEntity = None
-		self._print_entity_intro(g)
 
 
 	def _selectFromList(self, _list):
-		""" generic method that lets users pick an item from a list via raw_input """
+		"""
+		Generic method that lets users pick an item from a list via raw_input
+		Note: the list items need to be OntoSPy entities.
+		"""
 		if len(_list) == 1: # if by any chance there's no need to select a choice
 			return _list[0]
 		print "%d matching results: " % len(_list)
 		counter = 1
 		for el in _list:
-			print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el.uri
+			if hasattr(el, 'uri'):
+				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el.uri
+			else:
+				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el
 			counter += 1
 		print "--------------"
 		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one entity: " + Style.RESET_ALL)
@@ -152,9 +120,52 @@ class Shell(cmd.Cmd):
 			var = int(var)
 			return _list[var-1]
 		except:
-			print "Selection no valid"
+			print "Selection not valid"
 			return None
-			
+
+
+
+	# MAIN METHODS
+	# --------
+
+
+	def _list_ontologies(self):
+		counter = 0
+		for file in self.ontologies:
+			counter += 1
+			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter,	Fore.RED, file, Style.RESET_ALL
+
+
+
+	def _select_ontology(self, line):
+		# if
+		try:
+			var = int(line)	 # it's a string
+			if var in range(1, len(self.ontologies)+1):
+				self._load_ontology(self.ontologies[var-1])
+		except ValueError:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out)
+			if choice:
+				self._load_ontology(choice)
+
+
+
+	def _load_ontology(self, filename):
+		""" loads an ontology from the local repository 
+			note: if the ontology does not have a cached version, it is created
+		"""
+		fullpath = self.LOCAL_MODELS + "/" + filename
+		g = ontospy.get_pickled_ontology(filename)
+		if not g:
+			g = ontospy.do_pickle_ontology(filename)
+		self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+		self.currentEntity = None
+		self._print_entity_intro(g)
+
 
 
 	def _select_class(self, line):			
@@ -200,16 +211,33 @@ class Shell(cmd.Cmd):
 		else:
 			print "not found"
 			
-	
+
+	def _select_concept(self, line):
+		# try to match a class and load it
+		g = self.current['graph']
+		if line.isdigit():
+			line =	int(line)
+		out = g.getSkosConcept(line)
+		if out:
+			if type(out) == type([]):
+				choice = self._selectFromList(out)
+				if choice:
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}
+			else:
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}
+			# ..finally:
+			if self.currentEntity:
+				self._print_entity_intro(entity=self.currentEntity['object'])
+
+		else:
+			print "not found"
+
+
+
 
 	# COMMANDS
 	# --------
 	# NOTE: all commands should start with 'do_' and must pass 'line'
-
-
-	# def do_ontologies(self, line):
-	#	""" List the available ontologies in the local repository. """
-	#	self._list_ontologies()
 
 		
 	def do_current(self, line):
@@ -266,6 +294,9 @@ class Shell(cmd.Cmd):
 		elif line and line == "properties":
 			g = self.current['graph']
 			g.printPropertyTree(showids=True, labels=False)
+		elif line and line == "concepts":
+			g = self.current['graph']
+			g.printSkosTree(showids=True, labels=False)
 		else: # self.current exists
 			g = self.current['graph']
 			g.printClassTree(showids=True, labels=False)	
@@ -290,7 +321,7 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_class(line)
 		else:
-			print "Enter a class name or number, or type 'class <tab>' for suggestions"
+			print "Enter a class name or number, or type 'class <space><tab>' for suggestions"
 
 	def do_property(self, line):
 		"""Select a property""" 
@@ -299,14 +330,93 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_property(line)
 		else:
-			print "Enter a class name or number, or type 'property <tab>' for suggestions"
+			print "Enter a class name or number, or type 'property <space><tab>' for suggestions"
 
+	def do_concept(self, line):
+		"""Select a SKOS concept"""
+		if not self.current:
+			print "Please select an ontology first"
+		elif line:
+			self._select_concept(line)
+		else:
+			print "Enter a SKOS concept name or number, or type 'concept <space><tab>' for suggestions"
+
+	def do_annotations(self, line):
+		"Show annotations for current ontology"
+		if not self.current:
+			print "No ontology loaded"
+		else:
+			g = self.current['graph']
+			for o in g.ontologies:
+				o.printTriples()
+
+	def do_summary(self, line):
+		"Print a summary of the currently active entity"
+		if self.currentEntity:
+			self._print_entity_intro(entity=self.currentEntity['object'], first_time=False)
+		elif self.current:
+			self._print_entity_intro(g=self.current['graph'], first_time=False)
+		else:
+			print "Please select an ontology first"
+
+
+
+
+	def do_delete(self, line):
+		""" Delete an ontology from the local repository. """
+		if not line:
+			print "Please specify an ontology name"
+		else:
+			fullpath = self.LOCAL_MODELS + "/" + line
+			if os.path.exists(fullpath):
+				var = raw_input("Are you sure? (y/n)")
+				if var == "y":
+					os.remove(fullpath)
+					# @todo: do this operation in /cache...
+					if os.path.exists(fullpath + ".pickle"):
+						os.remove(fullpath + ".pickle")
+					self.ontologies = ontospy.get_localontologies()
+					print "Deleted %s" % fullpath
+			else:
+				print "Not found"
+
+
+	def do_top(self, line):
+		"Unload any ontology and go back to top level"
+		if self.currentEntity:
+			self.currentEntity = None
+			self.prompt = self._get_prompt(self.current['file'])
+		else:
+			self.current = None
+			self.prompt = self._get_prompt()
+
+	def do_quit(self, line):
+		"Exit OntoSPy shell"
+		return True
+
+
+	def do_inspiration(self, line):
+		_quote = random.choice(QUOTES)
+		# print _quote['source']
+		print Style.DIM + unicode(_quote['text'])
+		print Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL
+
+
+	def default(self, line):
+		"default message when a command is not recognized"
+		foo = ["Wow first time I hear that", "That looks like the wrong command", "Are you sure you mean that? try 'help' for some suggestions"]
+		print(random.choice(foo))
+
+
+
+	# AUTOCOMPLETE METHODS
+	# --------
 
 
 	def complete_tree(self, text, line, begidx, endidx):
 		"""completion for tree command"""
 		
-		options = ['classes', 'properties']
+		options = ['classes', 'properties', 'concepts']
 
 		if not text:
 			completions = options
@@ -385,34 +495,26 @@ class Shell(cmd.Cmd):
 							]
 		return completions	
 
-				
-	def do_annotations(self, line):
-		"Show annotations for current ontology"
-		if not self.current:
-			print "No ontology loaded"
-		else:
-			g = self.current['graph']
-			for o in g.ontologies:
-				o.printTriples()
-	
-		
 
-	def do_delete(self, line):
-		""" Delete an ontology from the local repository. """ 
-		if not line:
-			print "Please specify an ontology name" 
+
+	def complete_concept(self, text, line, begidx, endidx):
+		"""completion for select command"""
+
+		if self.current:
+			g = self.current['graph']
+			options = [x.locale for x in g.skosConcepts]
 		else:
-			fullpath = self.LOCAL + "/" + line
-			if os.path.exists(fullpath):
-				var = raw_input("Are you sure? (y/n)")
-				if var == "y":
-					os.remove(fullpath)
-					if os.path.exists(fullpath + ".pickle"):
-						os.remove(fullpath + ".pickle")
-					self.ontologies = ontospy.get_localontologies()
-					print "Deleted %s" % fullpath
-			else:
-				print "Not found"
+			options = []
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions
+				
 
 	def complete_delete(self, text, line, begidx, endidx):
 		if not text:
@@ -424,30 +526,6 @@ class Shell(cmd.Cmd):
 							]
 		return completions
 							
-
-	def do_top(self, line):
-		"Unload any ontology and go back to top level"
-		if self.currentEntity:
-			self.currentEntity = None
-			self.prompt = self._get_prompt(self.current['file'])
-		else:
-			self.current = None
-			self.prompt = self._get_prompt()
-						
-	def do_quit(self, line):
-		"Exit OntoSPy shell"
-		return True
-		
-	def default(self, line):
-		"default message when a command is not recognized"
-		foo = ["Wow first time I hear that", "That looks like the wrong command", "Are you sure you mean that? try 'help' for some suggestions"]
-		print(random.choice(foo))
-	
-	def do_inspiration(self, line):
-		_quote = random.choice(QUOTES)
-		# print _quote['source']
-		print Style.DIM + unicode(_quote['text'])
-		print Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL
 
 
 if __name__ == '__main__':
