@@ -38,18 +38,19 @@ ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
 
 
 def get_or_create_home_repo(reset=False):
+	"""Check to make sure we never operate with a non existing local repo """
 	dosetup = True
 	if os.path.exists(ONTOSPY_LOCAL):
 		dosetup = False
 		print Style.DIM + "Local repository: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 		if reset:
-			var = raw_input("Reset the local repository and all of its contents? (y/n)")
+			var = raw_input("Reset the local repository and all of its contents? (y/n) ")
 			if var == "y":
 				shutil.rmtree(ONTOSPY_LOCAL)
 				dosetup = True
 			else:
 				var == "n"
-			print var	
+
 	if dosetup:
 		os.mkdir(ONTOSPY_LOCAL)
 		os.mkdir(ONTOSPY_LOCAL_MODELS)
@@ -68,7 +69,7 @@ def get_localontologies():
 				if not f.startswith(".") and not f.endswith(".pickle"):
 					res += [f]
 	else:
-		print "No local repository found. Try --setup first."					
+		print "No local repository found. Use the --reset command"					
 	return res
 
 
@@ -82,8 +83,9 @@ def get_pickled_ontology(filename):
 
 
 def do_pickle_ontology(filename, g=None):
-	""" from a valid filename, generate the graph instance and pickle it too
-		note: option to pass a pre-generated graph instance too  
+	""" 
+	from a valid filename, generate the graph instance and pickle it too
+	note: option to pass a pre-generated graph instance too  
 	"""
 	try:
 		if not g:
@@ -100,6 +102,9 @@ def do_pickle_ontology(filename, g=None):
 
 
 
+def action_reset():
+	"""just a wrapper.. possibly to be extended in the future"""
+	get_or_create_home_repo(reset=True)
 
 
 def action_cache():
@@ -152,6 +157,8 @@ def action_listlocal():
 			temp += [Row(str(counter),name,last_modified_date,cached)]
 		pprinttable(temp)
 		print ""
+	else:
+		print "No files in the local repository. Use the --import command."
 
 
 def action_import(location):
@@ -317,6 +324,11 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
+			
+	parser.add_option("", "--shell",
+			action="store_true", default=False, dest="shell",
+			help="Interactive explorer of the ontologies in the local repository")	
+			
 	parser.add_option("", "--repo",
 			action="store_true", default=False, dest="repo",
 			help="List ontologies in the local repository")	
@@ -328,15 +340,15 @@ def parse_options():
 	parser.add_option("", "--web",
 			action="store_true", default=False, dest="web",
 			help="List and import schemas registered on http://prefix.cc/") 
-			
-	parser.add_option("", "--shell",
-			action="store_true", default=False, dest="shell",
-			help="Interactive explorer of the ontologies in the local repository")	
 
 	parser.add_option("", "--cache",
 			action="store_true", default=False, dest="cache",
 			help="Rebuild the cache for the local repository")
 
+	parser.add_option("", "--reset",
+			action="store_true", default=False, dest="reset",
+			help="Resets the local repository by removing all existing files")
+			
 	parser.add_option("-a", "",
 			action="store_true", default=False, dest="ontoannotations",
 			help="Print the ontology annotations/metadata.")
@@ -360,7 +372,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.repo and not opts.cache and not opts.web and len(args) < 1:
+	if not opts.shell and not opts.reset and not opts.repo and not opts.cache and not opts.web and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -376,39 +388,51 @@ def main():
 	""" command line script """
 	
 	print "OntoSPy " + VERSION
-	get_or_create_home_repo()
-	
-	# ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
-	
 	opts, args = parse_options()
+	
+	# reset local stuff
+	if opts.reset:
+		action_reset()
+		raise SystemExit, 1
+
 
 	# list local ontologies
 	if opts.repo:
+		get_or_create_home_repo()
 		action_listlocal()
 		raise SystemExit, 1
 
+		
 	# cache local ontologies
 	if opts.cache:
+		get_or_create_home_repo()
 		action_cache()
 		raise SystemExit, 1
 
 	# import an ontology
 	if opts._import:
+		get_or_create_home_repo()
 		_location = args[0]
 		if os.path.isdir(_location):
 			action_import_folder(_location)
 		else:
 			action_import(_location)
+		action_listlocal()	
 		raise SystemExit, 1
 
 	# launch shell
 	if opts.shell:
-		import shell	
+		import shell
+		shell.Shell()._clear_screen()
+		print Style.BRIGHT + "** OntoSPy Interactive Documentation Environment " + VERSION + " **" +\
+			Style.RESET_ALL
+		get_or_create_home_repo()
 		shell.Shell().cmdloop()
 		raise SystemExit, 1
 		
 	# load web catalog
 	if opts.web:
+		get_or_create_home_repo()
 		action_webimport()
 		raise SystemExit, 1
 
@@ -420,7 +444,8 @@ def main():
 					'skostaxonomy' : opts.skostaxonomy,
 					'labels' : opts.labels,
 				}
-	
+
+	get_or_create_home_repo()  # for all other cases
 	sTime = time.time()
 
 	# load the ontology

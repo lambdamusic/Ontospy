@@ -85,7 +85,7 @@ class Graph(object):
 	
 	def __loadRDF(self, source, text, endpoint, rdf_format):
 		"""
-		After a graph has been loaded successfully, set up all params
+		Determine what kind of graph we have and load it accordingly
 		"""
 		
 		# LOAD THE GRAPH
@@ -101,13 +101,19 @@ class Graph(object):
 			self.rdfgraph = rdflib.ConjunctiveGraph(store=SPARQLStore(source))			
 			self.graphuri = source	# default uri is www location
 
-				
+
 		else:
 
 			if type(source) == type("string"):
-				self.IS_URL = True				
 				if source.startswith("www."): #support for lazy people
 					source = "http://%s" % str(source)
+				if source.startswith("http://"):
+					self.IS_URL = True
+					headers = "Accept: application/rdf+xml"
+					req = urllib2.Request(source, headers)
+					res = urllib2.urlopen(req)
+					source = res.geturl()  # after 303 redirects
+
 				self.graphuri = source	# default uri is www location
 				rdf_format = rdf_format or guess_fileformat(source)
 
@@ -133,7 +139,9 @@ class Graph(object):
 				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
 			# set up the query helper too
 			self.queryHelper = QueryHelper(self.rdfgraph)	
-			
+
+
+
 		
 		except:
 			printDebug("\nError Parsing Graph (assuming RDF serialization was *%s*)\n" % (rdf_format))	 
