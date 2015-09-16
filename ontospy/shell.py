@@ -57,6 +57,22 @@ class Shell(cmd.Cmd):
 			onto = self.current['file']
 			temp1_1 = default_entity_color + Style.NORMAL + '%s: ' % truncate(onto, 20)
 			temp1_2 = default_entity_color + Style.BRIGHT + '%s' % entity
+			temp2 = '<%s>: ' % (temp1_1 + temp1_2)
+			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+		elif onto:
+			temp1 = default_entity_color + '%s' % onto 
+			temp2 = '<%s>: ' % temp1
+			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+		else:
+			return Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+			
+			
+	def _OLD__get_prompt(self, onto="", entity="", default_entity_color=Fore.BLUE):
+		""" changes the prompt contextually """
+		if entity:
+			onto = self.current['file']
+			temp1_1 = default_entity_color + Style.NORMAL + '%s: ' % truncate(onto, 20)
+			temp1_2 = default_entity_color + Style.BRIGHT + '%s' % entity
 			temp2 = '<OntoSPy: %s>: ' % (temp1_1 + temp1_2)
 			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		elif onto:
@@ -115,7 +131,7 @@ class Shell(cmd.Cmd):
 				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el
 			counter += 1
 		print "--------------"
-		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one entity: " + Style.RESET_ALL)
+		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one option by entering its number: " + Style.RESET_ALL)
 		try:
 			var = int(var)
 			return _list[var-1]
@@ -129,6 +145,7 @@ class Shell(cmd.Cmd):
 	# --------
 
 
+	# 2015-09-16:deprecated
 	def _list_ontologies(self):
 		counter = 0
 		for file in self.ontologies:
@@ -240,7 +257,7 @@ class Shell(cmd.Cmd):
 	# NOTE: all commands should start with 'do_' and must pass 'line'
 
 		
-	def do_current(self, line):
+	def do_currentOntology(self, line):
 		""" List the ontology currently loaded""" 
 		 # {'file' : filename, 'fullpath' : fullpath, 'graph': g}
 		if self.current:
@@ -249,7 +266,7 @@ class Shell(cmd.Cmd):
 			print "No ontology loaded. Use the 'ontology' command"
 
 	def do_currentEntity(self, line):
-		""" List the entity currently loaded""" 
+		""" List the entity (class, property or concept) currently loaded""" 
 		 # {'file' : filename, 'fullpath' : fullpath, 'graph': g}
 		if self.currentEntity:
 			print self.currentEntity['name']
@@ -303,16 +320,12 @@ class Shell(cmd.Cmd):
 						
 			
 	def do_ontology(self, line):
-		"""Select an ontology""" 
-		
+		"""Select an ontology""" 		
 		if not self.ontologies:
-			print "No ontologies in the local repository. Use the 'import' command. "
+			print "No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. "
 		else:
-			if line:
-				self._select_ontology(line)
-			else:
-				print "Please select an ontology"
-				self._list_ontologies()
+			self._select_ontology(line)
+
 				
 	def do_class(self, line):
 		"""Select a class""" 
@@ -321,7 +334,12 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_class(line)
 		else:
-			print "Enter a class name or number, or type 'class <space><tab>' for suggestions"
+			g = self.current['graph']
+			if g.classes:
+				g.printClassTree(showids=True, labels=False)
+				print "Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions"
+			else:
+				print "No classes available."
 
 	def do_property(self, line):
 		"""Select a property""" 
@@ -330,7 +348,12 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_property(line)
 		else:
-			print "Enter a class name or number, or type 'property <space><tab>' for suggestions"
+			g = self.current['graph']
+			if g.properties:
+				g.printPropertyTree(showids=True, labels=False)
+				print "Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions"
+			else:
+				print "No properties available."
 
 	def do_concept(self, line):
 		"""Select a SKOS concept"""
@@ -339,7 +362,12 @@ class Shell(cmd.Cmd):
 		elif line:
 			self._select_concept(line)
 		else:
-			print "Enter a SKOS concept name or number, or type 'concept <space><tab>' for suggestions"
+			g = self.current['graph']
+			if g.skosConcepts:
+				g.printSkosTree(showids=True, labels=False)
+				print "Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions"
+			else:
+				print "No skos concepts available."	
 
 	def do_annotations(self, line):
 		"Show annotations for current ontology"
@@ -381,8 +409,8 @@ class Shell(cmd.Cmd):
 				print "Not found"
 
 
-	def do_top(self, line):
-		"Unload any ontology and go back to top level"
+	def do_up(self, line):
+		"Go up one level. From entity => ontology; from ontology => ontospy top level."
 		if self.currentEntity:
 			self.currentEntity = None
 			self.prompt = self._get_prompt(self.current['file'])
@@ -395,7 +423,7 @@ class Shell(cmd.Cmd):
 		return True
 
 
-	def do_inspiration(self, line):
+	def do_zen(self, line):
 		_quote = random.choice(QUOTES)
 		# print _quote['source']
 		print Style.DIM + unicode(_quote['text'])
