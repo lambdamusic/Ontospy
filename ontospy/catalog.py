@@ -43,7 +43,6 @@ def viewCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 
 
 
-
 def parse_options():
 	"""
 	parse_options() -> opts, args
