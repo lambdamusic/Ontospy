@@ -36,7 +36,8 @@ class Shell(cmd.Cmd):
 	def __init__(self):
 		 """
 		 self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-		 self.currentEntity = {'entity' : entity, 'type' : 'class' } [?]
+		 self.currentEntity = {'name' : obj.locale or obj.uri, 'object' : obj, 'type' : 'class'} 
+																		# or 'property' or 'concept'
 		 """
 		 # useful vars
 		 self.LOCAL = ontospy.ONTOSPY_LOCAL
@@ -65,22 +66,20 @@ class Shell(cmd.Cmd):
 			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		else:
 			return Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
-			
-			
-	def _OLD__get_prompt(self, onto="", entity="", default_entity_color=Fore.BLUE):
-		""" changes the prompt contextually """
-		if entity:
-			onto = self.current['file']
-			temp1_1 = default_entity_color + Style.NORMAL + '%s: ' % truncate(onto, 20)
-			temp1_2 = default_entity_color + Style.BRIGHT + '%s' % entity
-			temp2 = '<OntoSPy: %s>: ' % (temp1_1 + temp1_2)
-			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
-		elif onto:
-			temp1 = default_entity_color + '%s' % onto 
-			temp2 = '<OntoSPy: %s>: ' % temp1
-			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+	
+	
+	def _print(self, ms, style="TIP"):
+		""" abstraction for managing color printing """
+		styles1 = {'IMPORTANT' : Style.BRIGHT, 'TIP': Style.DIM, 'DEFAULT' : Style.DIM }
+		
+		if style == "IMPORTANT":
+			print styles1['IMPORTANT'] + ms + Style.RESET_ALL	
+		if style == "TIP":
+			print styles1['TIP'] + ms + Style.RESET_ALL		
 		else:
-			return Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+			print styles1['DEFAULT'] + ms + Style.RESET_ALL
+
+
 
 	def _clear_screen(self):
 		""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
@@ -105,7 +104,7 @@ class Shell(cmd.Cmd):
 			if first_time:
 				self._clear_screen()
 				playSound(ontospy.ONTOSPY_SOUNDS)  # new..
-				print "Loaded ", self.current['fullpath']
+				self._print("Loaded " + self.current['fullpath'], 'TIP')
 			g.printStats()
 			for o in g.ontologies:
 				print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
@@ -115,14 +114,18 @@ class Shell(cmd.Cmd):
 
 
 
-	def _selectFromList(self, _list):
+	def _selectFromList(self, _list, using_pattern=True):
 		"""
 		Generic method that lets users pick an item from a list via raw_input
+		*using_pattern* flag to know if we're showing all choices or not
 		Note: the list items need to be OntoSPy entities.
 		"""
 		if len(_list) == 1: # if by any chance there's no need to select a choice
 			return _list[0]
-		print "%d matching results: " % len(_list)
+		if using_pattern:
+			self._print("%d matching results: " % len(_list), "TIP")
+		else:
+			self._print("%d results in total: " % len(_list), "TIP")
 		counter = 1
 		for el in _list:
 			if hasattr(el, 'uri'):
@@ -130,7 +133,7 @@ class Shell(cmd.Cmd):
 			else:
 				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el
 			counter += 1
-		print "--------------"
+		self._print("--------------")
 		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one option by entering its number: " + Style.RESET_ALL)
 		try:
 			var = int(var)
@@ -165,9 +168,18 @@ class Shell(cmd.Cmd):
 			for each in self.ontologies:
 				if line in each:
 					out += [each]
-			choice = self._selectFromList(out)
+			choice = self._selectFromList(out, line)
 			if choice:
 				self._load_ontology(choice)
+
+
+	def _next_ontology(self, currentfile):
+		"""Dynamically retrieves the next ontology in the list"""
+		try:
+			idx = self.ontologies.index(currentfile)
+			return self.ontologies[idx+1]
+		except:
+			return self.ontologies[0]
 
 
 
@@ -184,9 +196,10 @@ class Shell(cmd.Cmd):
 		self._print_entity_intro(g)
 
 
+			
 
 	def _select_class(self, line):			
-		# try to match a class and load it
+		# try to match a class and load it	
 		g = self.current['graph']
 		if line.isdigit():
 			line =	int(line)
@@ -195,9 +208,9 @@ class Shell(cmd.Cmd):
 			if type(out) == type([]):
 				choice = self._selectFromList(out)
 				if choice:
-					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}				
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'class'}				
 			else:
-				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}				
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'class'}				
 			# ..finally:
 			if self.currentEntity:
 				self._print_entity_intro(entity=self.currentEntity['object'])
@@ -217,10 +230,10 @@ class Shell(cmd.Cmd):
 			if type(out) == type([]):
 				choice = self._selectFromList(out)
 				if choice:
-					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}	
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'property'} 
 
 			else:
-				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}	
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'property'}	
 			
 			# ..finally:
 			if self.currentEntity:
@@ -239,9 +252,9 @@ class Shell(cmd.Cmd):
 			if type(out) == type([]):
 				choice = self._selectFromList(out)
 				if choice:
-					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice}
+					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'concept'}
 			else:
-				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out}
+				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'concept'}
 			# ..finally:
 			if self.currentEntity:
 				self._print_entity_intro(entity=self.currentEntity['object'])
@@ -303,6 +316,7 @@ class Shell(cmd.Cmd):
 		else:
 			print "Please select an ontology first."
 	
+  
 				
 	def do_tree(self, line):
 		"""Shows the subsumtion tree of an ontology.\nOptions: [classes | properties]\nDefault: classes"""
@@ -320,7 +334,7 @@ class Shell(cmd.Cmd):
 						
 			
 	def do_ontology(self, line):
-		"""Select an ontology""" 		
+		"""Select an ontology"""		
 		if not self.ontologies:
 			print "No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. "
 		else:
@@ -337,9 +351,9 @@ class Shell(cmd.Cmd):
 			g = self.current['graph']
 			if g.classes:
 				g.printClassTree(showids=True, labels=False)
-				print "Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions"
+				self._print("Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions")
 			else:
-				print "No classes available."
+				self._print("No classes available.")
 
 	def do_property(self, line):
 		"""Select a property""" 
@@ -351,9 +365,9 @@ class Shell(cmd.Cmd):
 			g = self.current['graph']
 			if g.properties:
 				g.printPropertyTree(showids=True, labels=False)
-				print "Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions"
+				self._print("Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions")
 			else:
-				print "No properties available."
+				self._print("No properties available.")
 
 	def do_concept(self, line):
 		"""Select a SKOS concept"""
@@ -365,9 +379,9 @@ class Shell(cmd.Cmd):
 			g = self.current['graph']
 			if g.skosConcepts:
 				g.printSkosTree(showids=True, labels=False)
-				print "Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions"
+				self._print("Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions")
 			else:
-				print "No skos concepts available."	
+				self._print("No skos concepts available.") 
 
 	def do_annotations(self, line):
 		"Show annotations for current ontology"
@@ -388,6 +402,29 @@ class Shell(cmd.Cmd):
 			print "Please select an ontology first"
 
 
+	
+	def do_next(self, line):
+		if not self.current:
+			print "Please select an ontology first"
+		elif self.currentEntity:
+			g = self.current['graph']
+			if self.currentEntity['type'] == 'class':
+				nextentity = g.nextClass(self.currentEntity['object'].uri)
+				self._select_class(str(nextentity.uri))
+			elif self.currentEntity['type'] == 'property':
+				nextentity = g.nextProperty(self.currentEntity['object'].uri)
+				self._select_property(str(nextentity.uri))
+			elif self.currentEntity['type'] == 'concept':
+				nextentity = g.nextConcept(self.currentEntity['object'].uri)
+				self._select_concept(str(nextentity.uri))
+			else:
+				print "Not implemented" 
+		else:
+			if len(self.ontologies) > 1:
+				nextonto = self._next_ontology()
+				self._load_ontology(nextonto)
+			else:
+				self._print("Only one ontology available in repository.")	 
 
 
 	def do_delete(self, line):

@@ -256,9 +256,9 @@ class Graph(object):
 		"""
 		returns Ontology class instances
 		
-        [ a owl:Ontology ;
-            vann:preferredNamespacePrefix "bsym" ;
-            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
+		[ a owl:Ontology ;
+			vann:preferredNamespacePrefix "bsym" ;
+			vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
 			
 			
 				
@@ -693,7 +693,44 @@ class Graph(object):
 					return x
 			return None
 			
-								
+	
+	def nextClass(self, classuri):
+		"""Returns the next class in the list of classes. If it's the last one, returns the first one."""
+		if classuri == self.classes[-1].uri:
+			return self.classes[0]
+		flag = False
+		for x in self.classes:
+			if flag == True:
+				return x
+			if x.uri == classuri:
+				flag = True
+		return None
+
+
+	def nextProperty(self, propuri):
+		"""Returns the next property in the list of properties. If it's the last one, returns the first one."""
+		if propuri == self.properties[-1].uri:
+			return self.properties[0]
+		flag = False
+		for x in self.properties:
+			if flag == True:
+				return x
+			if x.uri == propuri:
+				flag = True
+		return None
+	
+	def nextConcept(self, concepturi):
+		"""Returns the next skos concept in the list of concepts. If it's the last one, returns the first one."""
+		if concepturi == self.skosConcepts[-1].uri:
+			return self.skosConcepts[0]
+		flag = False
+		for x in self.skosConcepts:
+			if flag == True:
+				return x
+			if x.uri == concepturi:
+				flag = True
+		return None
+			
 
 	def __computeTopLayer(self):
 

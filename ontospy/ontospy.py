@@ -61,7 +61,7 @@ def get_or_create_home_repo(reset=False):
 
 
 def get_localontologies():
-	"returns a list of file names in the ontologies folder"
+	"returns a list of file names in the ontologies folder (not the full path)"
 	res = []
 	if os.path.exists(ONTOSPY_LOCAL_MODELS):
 		for f in os.listdir(ONTOSPY_LOCAL_MODELS):
@@ -424,7 +424,7 @@ def main():
 	if opts.shell:
 		import shell
 		shell.Shell()._clear_screen()
-		print Style.BRIGHT + "** OntoSPy Interactive Documentation Environment " + VERSION + " **" +\
+		print Style.BRIGHT + "** OntoSPy Interactive Ontology Documentation Environment " + VERSION + " **" +\
 			Style.RESET_ALL
 		get_or_create_home_repo()
 		shell.Shell().cmdloop()
