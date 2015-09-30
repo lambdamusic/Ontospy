@@ -50,7 +50,7 @@ class RDF_Entity(object):
 
 	def printTriples(self):
 		""" display triples """
-		printDebug(Fore.RED + Style.BRIGHT + unicode(self.uri) + Style.RESET_ALL) 
+		printDebug(Style.BRIGHT + unicode(self.uri) + Style.RESET_ALL) 
 		for x in self.triples:
 			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
 			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 

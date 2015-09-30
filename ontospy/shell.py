@@ -609,5 +609,26 @@ class Shell(cmd.Cmd):
 							
 
 
-if __name__ == '__main__':
+
+
+	
+def main():
+	""" command line script """
+	
+	print "OntoSPy " + ontospy.VERSION
+	
+	Shell()._clear_screen()
+	print Style.BRIGHT + "** OntoSPy Interactive Ontology Documentation Environment " + ontospy.VERSION + " **" + Style.RESET_ALL
+	ontospy.get_or_create_home_repo()
 	Shell().cmdloop()
+	raise SystemExit, 1
+		
+		
+
+if __name__ == '__main__':
+	import sys
+	try:
+		main()
+		sys.exit(0)
+	except KeyboardInterrupt, e: # Ctrl-C
+		raise e
