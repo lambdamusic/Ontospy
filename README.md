@@ -2,17 +2,19 @@ OntoSPy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
-https://pypi.python.org/pypi/ontospy
-
 
 #### Version: 
-Check the ``ontospy/_version.py`` file
+1.6 (Oct 2016)
+
+Check the ``ontospy/_version.py`` file for more details.
 
 
 ####Installation:
-Manual: download this packages and type ``python setup.py install`` 
+Manual: 
+download this package and type ``python setup.py install`` 
 
-Web: get it from the Python Package Index: 
+Web: 
+get it from the Python Package Index: 
 ``easy_install ontospy``
 or
 ``pip install ontospy``
@@ -26,9 +28,9 @@ or
 Description
 =======
 
-OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
+OntoSPy allows you to extract all the schema information from an RDFS/OWL or SKOS schema, inspect it and use it query a corresponding knowledge base. 
 
-The basic workflow is simple: load a graph instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic workflow is simple: load a graph instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDF schema. That's all!
 
 The library can be used in standalone mode too.
 
@@ -37,12 +39,15 @@ Documentation
 ---------------
 http://ontospy.readthedocs.org/en/latest/
 
+See also: https://pypi.python.org/pypi/ontospy
+
+
 
 
 Examples
 ----------
 
-These are some basic examples that should be enough to get you started. More extensive documentation will be made available soon!
+These are some basic examples that should be enough to get you started. 
 
 
 ####Inspecting an ontology from the command line
@@ -187,113 +192,3 @@ More options are available; use `-h` to list them all:
 	=> http://www.w3.org/2000/01/rdf-schema#comment
 	.... A personal profile RDF document.
 
-
-
-#### Creating a Turtle sketch @check
-
-The library includes a little utility called `sketch.py`. 
-
-This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.
-
-It is meant to be used from the command line (tip: make this file executable: `chmod +x sketch.py`) and requires you to type in RDF statements using the Turtle serialization. 
-
-*Note*: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to `usr/local/bin` (on unix-based systems). You can run it by typing `sketchonto`. 
-
-	[lambdamusic]@here:~/code/python>sketch.py 
-	Good morning. Ready to Turtle away. Type docs() for help.
-	In [1]: docs()
-
-	====Sketch v 0.2====
-
-	add()  ==> add statements to the graph
-	...........SHORTCUTS:
-	...........'class' = owl:Class
-	...........'sub' = rdfs:subClassOf
-	...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
-
-	show() ==> shows the graph. Can take an OPTIONAL argument for the format.
-	...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot']
-
-	clear()	 ==> clears the graph
-	...........all triples are removed
-
-	omnigraffle() ==> creates a dot file and opens it with omnigraffle
-	...........First you must set Omingraffle as your system default app for dot files!
-
-	quit() ==> exit
-
-	====Have fun!====
-
-
-	In [2]: add()
-	Multi-line input. Enter ### when finished.
-	:person a class
-	:mike a :person
-	:person sub :agent
-	:organization sub :agent
-	:worksIn rdfs:domain :person
-	:worksIn rdfs:range :organization
-	:mike :worksIn :DamageInc
-	:DamageInc a :organization
-
-	In [3]: show()
-	@prefix : <http://this.sketch#> .
-	@prefix bibo: <http://purl.org/ontology/bibo/> .
-	@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-	@prefix npg: <http://ns.nature.com/terms/> .
-	@prefix npgg: <http://ns.nature.com/graphs/> .
-	@prefix npgx: <http://ns.nature.com/extensions/> .
-	@prefix owl: <http://www.w3.org/2002/07/owl#> .
-	@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-	@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-	@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-	@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-	@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-	:mike a :person ;
-	    :worksIn :DamageInc .
-
-	:worksIn rdfs:domain :person ;
-	    rdfs:range :organization .
-
-	:DamageInc a :organization .
-
-	:organization rdfs:subClassOf :agent .
-
-	:person a owl:Class ;
-	    rdfs:subClassOf :agent .
-
-
-
-	In [4]: show("xml")
-	<?xml version="1.0" encoding="UTF-8"?>
-	<rdf:RDF
-	   xmlns="http://this.sketch#"
-	   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-	>
-	  <rdf:Description rdf:about="http://this.sketch#mike">
-	    <rdf:type rdf:resource="http://this.sketch#person"/>
-	    <worksIn rdf:resource="http://this.sketch#DamageInc"/>
-	  </rdf:Description>
-	  <rdf:Description rdf:about="http://this.sketch#organization">
-	    <rdfs:subClassOf rdf:resource="http://this.sketch#agent"/>
-	  </rdf:Description>
-	  <rdf:Description rdf:about="http://this.sketch#DamageInc">
-	    <rdf:type rdf:resource="http://this.sketch#organization"/>
-	  </rdf:Description>
-	  <rdf:Description rdf:about="http://this.sketch#person">
-	    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-	    <rdfs:subClassOf rdf:resource="http://this.sketch#agent"/>
-	  </rdf:Description>
-	  <rdf:Description rdf:about="http://this.sketch#worksIn">
-	    <rdfs:domain rdf:resource="http://this.sketch#person"/>
-	    <rdfs:range rdf:resource="http://this.sketch#organization"/>
-	  </rdf:Description>
-	</rdf:RDF>
-
-	In [5]: omnigraffle()
-	### saves a dot file and tries to open it with your default editor
-	### if you're on a mac and have omnigraffle - that could be the one!
-
-	In [6]: quit()

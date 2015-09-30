@@ -7,13 +7,22 @@ RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 Description
 ------------
 
-OntoSPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
+OntoSPy allows you to extract all the schema information from an RDFS/OWL or SKOS schema, inspect it and use it query a corresponding knowledge base. 
 
-The basic workflow is simple: load an ontology by instantiating the ``Ontology`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic workflow is simple: load a graph instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDF schema. That's all!
+
+The library can be used in standalone mode too.
 
 See also:
 - documentation: http://ontospy.readthedocs.org/en/latest/
 - source: https://github.com/lambdamusic/OntoSPy
+
+
+Version 
+---------------------------------------------------
+1.6 (Oct 2016)
+
+Check the ``ontospy/_version.py`` file for more details.
 
 
 Example 

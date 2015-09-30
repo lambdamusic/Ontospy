@@ -115,7 +115,8 @@ setup(
         'console_scripts': [
             'ontospy-sketch=ontospy.tools.sketch:main', 
             'ontospy-match=ontospy.tools.matcher:main', 
-            'ontospy-catalog=ontospy.tools.catalog:main', 
+            'ontospy-catalog=ontospy.catalog:main', 
+            'ontospy-shell=ontospy.shell:main', 
             'ontospy=ontospy.ontospy:main'
         ],
     },
