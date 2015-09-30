@@ -48,8 +48,8 @@ PersonalProfileDocument ==~== Term: npg:Document
 """
 
 
-USAGE = "python ontospy/tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl -o ~/output.csv"
-VERSION = 0.2
+USAGE = "ontospy-match foaf.rdf bibo.owl -o output.csv"
+MATCHER_VERSION = 0.2
 
 
 import rdflib, time, optparse, csv, os
@@ -133,7 +133,7 @@ def parse_options():
 	
 	"""
 	
-	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
 	
 	parser.add_option("-o", "--outputfile",
 			action="store", type="string", default="", dest="outputfile",
@@ -153,10 +153,11 @@ def parse_options():
 def main():
 	""" command line script """
 	
+	print "OntoSPy " + ontospy.VERSION
 	opts, args = parse_options()
 		
 	if len(args) < 2:
-		printDebug("Please provide two arguments.") 
+		printDebug("Please provide two arguments, or use -h for more options.") 
 		sys.exit(0)
 
 	var = raw_input("Match classes or properties? [c|p, c=default]:")

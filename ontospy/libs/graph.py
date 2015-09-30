@@ -59,8 +59,11 @@ class Graph(object):
 		self.objectProperties = []
 		self.datatypeProperties = []
 		
+		self.skosConcepts = []
+		
 		self.toplayer = []
 		self.toplayerProperties = []
+		self.toplayerSkosConcepts = []
 		
 		# keep track of the rdf source		
 		self.IS_ENDPOINT = False
@@ -82,7 +85,7 @@ class Graph(object):
 	
 	def __loadRDF(self, source, text, endpoint, rdf_format):
 		"""
-		After a graph has been loaded successfully, set up all params
+		Determine what kind of graph we have and load it accordingly
 		"""
 		
 		# LOAD THE GRAPH
@@ -98,13 +101,19 @@ class Graph(object):
 			self.rdfgraph = rdflib.ConjunctiveGraph(store=SPARQLStore(source))			
 			self.graphuri = source	# default uri is www location
 
-				
+
 		else:
 
 			if type(source) == type("string"):
-				self.IS_URL = True				
 				if source.startswith("www."): #support for lazy people
 					source = "http://%s" % str(source)
+				if source.startswith("http://"):
+					self.IS_URL = True
+					headers = "Accept: application/rdf+xml"
+					req = urllib2.Request(source, headers)
+					res = urllib2.urlopen(req)
+					source = res.geturl()  # after 303 redirects
+
 				self.graphuri = source	# default uri is www location
 				rdf_format = rdf_format or guess_fileformat(source)
 
@@ -130,7 +139,9 @@ class Graph(object):
 				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
 			# set up the query helper too
 			self.queryHelper = QueryHelper(self.rdfgraph)	
-			
+
+
+
 		
 		except:
 			printDebug("\nError Parsing Graph (assuming RDF serialization was *%s*)\n" % (rdf_format))	 
@@ -140,7 +151,9 @@ class Graph(object):
 
 
 	def serialize(self, rdf_format="turtle"):
-		""" Shortcut that outputs the graph """
+		""" Shortcut that outputs the graph 
+		Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
+		"""
 		return self.rdfgraph.serialize(format=rdf_format)
 			
 	
@@ -206,34 +219,46 @@ class Graph(object):
 		self.__extractNamespaces()
 		
 		self.__extractOntologies()
-		printDebug("Ontologies found: %d" % len(self.ontologies))
+		printDebug("Ontologies found...: %d" % len(self.ontologies))
 						
 		self.__extractClasses()
-		printDebug("Classes found...: %d" % len(self.classes))
+		printDebug("Classes found......: %d" % len(self.classes))
 		
 		self.__extractProperties()
-		printDebug("Properties found: %d" % len(self.properties))
-		printDebug("Annotation......: %d" % len(self.annotationProperties))
-		printDebug("Datatype........: %d" % len(self.datatypeProperties))
-		printDebug("Object..........: %d" % len(self.objectProperties))
-		
-		self.__computeTopLayer()
+		printDebug("Properties found...: %d" % len(self.properties))
+		printDebug("Annotation.........: %d" % len(self.annotationProperties))
+		printDebug("Datatype...........: %d" % len(self.datatypeProperties))
+		printDebug("Object.............: %d" % len(self.objectProperties))
 
+		self.__extractSkosConcepts()
+		printDebug("SKOS Concepts......: %d" % len(self.skosConcepts))
+				
+		self.__computeTopLayer()
+		
+		printDebug("----------")
 			
 		
 
+	def printStats(self):
+		""" shotcut to pull out useful info for interactive use """
+		printDebug("----------------")
+		printDebug("Ontologies......: %d" % len(self.ontologies))
+		printDebug("Classes.........: %d" % len(self.classes))
+		printDebug("Properties......: %d" % len(self.properties))
+		printDebug("..annotation....: %d" % len(self.annotationProperties))
+		printDebug("..datatype......: %d" % len(self.datatypeProperties))
+		printDebug("..object........: %d" % len(self.objectProperties))
+		printDebug("Concepts(SKOS)..: %d" % len(self.skosConcepts))
+		printDebug("----------------")
 
-
-
-	
 	
 	def __extractOntologies(self, exclude_BNodes = False, return_string=False):
 		"""
 		returns Ontology class instances
 		
-        [ a owl:Ontology ;
-            vann:preferredNamespacePrefix "bsym" ;
-            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
+		[ a owl:Ontology ;
+			vann:preferredNamespacePrefix "bsym" ;
+			vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
 			
 			
 				
@@ -272,11 +297,11 @@ class Graph(object):
 			pass
 			# printDebug("No owl:Ontologies found")
 			
-		#finally		
+		#finally... add all annotations/triples		
 		self.ontologies = out
-		# add all annotations/triples
 		for onto in self.ontologies:
 			onto.triples = self.queryHelper.entityTriples(onto.uri)
+			onto._buildGraph() # force construction of mini graph
 		
 
 
@@ -415,6 +440,51 @@ class Graph(object):
 					if aProp not in superprop.children():
 						 superprop._children.append(aProp)
 		
+	
+	
+	def __extractSkosConcepts(self):
+		""" 
+		2015-08-19: first draft
+		"""
+		self.skosConcepts = [] # @todo: keep adding? 
+		
+		qres = self.queryHelper.getSKOSInstances()
+
+		for candidate in qres:
+			
+			test_existing_cl = self.getSkosConcept(uri=candidate[0])
+			if not test_existing_cl:
+				# create it
+				self.skosConcepts += [OntoSkosConcept(candidate[0], None, self.namespaces)]
+			else:
+				pass
+	
+		#add more data
+		for aConcept in self.skosConcepts:
+			
+			aConcept.triples = self.queryHelper.entityTriples(aConcept.uri)
+			aConcept._buildGraph() # force construction of mini graph
+			
+			aConcept.queryHelper = self.queryHelper
+			
+			# attach to an ontology 
+			for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
+				onto = self.getOntology(str(uri))
+				if onto:
+					onto.skosConcepts += [aConcept]
+					aConcept.ontology = onto
+					
+			# add direct Supers				
+			directSupers = self.queryHelper.getSKOSDirectSupers(aConcept.uri)
+			
+			for x in directSupers:
+				superclass = self.getSkosConcept(uri=x[0])
+				if superclass: 
+					aConcept._parents.append(superclass)
+					
+					# add inverse relationships (= direct subs for superclass)
+					if aConcept not in superclass.children():
+						 superclass._children.append(aConcept)	
 					
 					
 
@@ -451,9 +521,14 @@ class Graph(object):
 			if type(match) != type("string"):
 				return []
 			res = []
-			for x in self.classes:
-				if match.lower() in x.uri.lower():
-					res += [x]
+			if ":" in match: # qname 
+				for x in self.classes:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.classes:
+					if match.lower() in x.uri.lower():
+						res += [x]
 			return res
 		else:
 			for x in self.classes:
@@ -484,9 +559,14 @@ class Graph(object):
 			if type(match) != type("string"):
 				return []
 			res = []
-			for x in self.properties:
-				if match.lower() in x.uri.lower():
-					res += [x]
+			if ":" in match: # qname 
+				for x in self.properties:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.properties:
+					if match.lower() in x.uri.lower():
+						res += [x]
 			return res
 		else:
 			for x in self.properties:
@@ -495,7 +575,93 @@ class Graph(object):
 				if uri and x.uri.lower() == uri.lower():
 					return x
 			return None
+
+
+	def getSkosConcept(self, id=None, uri=None, match=None):
+		""" 
+		get the saved skos concept with given ID or via other methods...
+		
+		Note: it tries to guess what is being passed as above		
+		"""
+		
+		if not id and not uri and not match:
+			return None
 			
+		if type(id) == type("string"):
+			uri = id
+			id = None
+			if not uri.startswith("http://"):
+				match = uri
+				uri = None
+		if match:
+			if type(match) != type("string"):
+				return []
+			res = []
+			if ":" in match: # qname 
+				for x in self.skosConcepts:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.skosConcepts:
+					if match.lower() in x.uri.lower():
+						res += [x]
+			return res
+		else:
+			for x in self.skosConcepts:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			return None
+
+
+	def getEntity(self, id=None, uri=None, match=None):
+		""" 
+		get a generic entity with given ID or via other methods...
+		"""
+		
+		if not id and not uri and not match:
+			return None
+			
+		if type(id) == type("string"):
+			uri = id
+			id = None
+			if not uri.startswith("http://"):
+				match = uri
+				uri = None
+		if match:
+			if type(match) != type("string"):
+				return []
+			res = []			
+			if ":" in match: # qname 
+				for x in self.classes:
+					if match.lower() in x.qname.lower():
+						res += [x]
+				for x in self.properties:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.classes:
+					if match.lower() in x.uri.lower():
+						res += [x]
+				for x in self.properties:
+					if match.lower() in x.uri.lower():
+						res += [x]	
+			return res
+		else:
+			for x in self.classes:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			for x in self.properties:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			return None
+			
+						
 
 	def getOntology(self, id=None, uri=None, match=None):
 		""" 
@@ -527,7 +693,44 @@ class Graph(object):
 					return x
 			return None
 			
-								
+	
+	def nextClass(self, classuri):
+		"""Returns the next class in the list of classes. If it's the last one, returns the first one."""
+		if classuri == self.classes[-1].uri:
+			return self.classes[0]
+		flag = False
+		for x in self.classes:
+			if flag == True:
+				return x
+			if x.uri == classuri:
+				flag = True
+		return None
+
+
+	def nextProperty(self, propuri):
+		"""Returns the next property in the list of properties. If it's the last one, returns the first one."""
+		if propuri == self.properties[-1].uri:
+			return self.properties[0]
+		flag = False
+		for x in self.properties:
+			if flag == True:
+				return x
+			if x.uri == propuri:
+				flag = True
+		return None
+	
+	def nextConcept(self, concepturi):
+		"""Returns the next skos concept in the list of concepts. If it's the last one, returns the first one."""
+		if concepturi == self.skosConcepts[-1].uri:
+			return self.skosConcepts[0]
+		flag = False
+		for x in self.skosConcepts:
+			if flag == True:
+				return x
+			if x.uri == concepturi:
+				flag = True
+		return None
+			
 
 	def __computeTopLayer(self):
 
@@ -543,7 +746,14 @@ class Graph(object):
 			if not c.parents():
 				exit += [c]
 		self.toplayerProperties = exit # sorted(exit, key=lambda x: x.id) # doesnt work
-		
+
+		# skos 
+		exit = []
+		for c in self.skosConcepts:
+			if not c.parents():
+				exit += [c]
+		self.toplayerSkosConcepts = exit # sorted(exit, key=lambda x: x.id) # doesnt work
+				
 
 	def printClassTree(self, element = None, showids=True, labels=False):
 		""" 
@@ -563,7 +773,7 @@ class Graph(object):
 			printGenericTree(element, 0, showids, labels)		
 
 
-	def printPropertyTree(self, element = None, level=0, showids=True, labels=False):
+	def printPropertyTree(self, element = None, showids=True, labels=False):
 		""" 
 		Print nicely into stdout the property tree of an ontology 
 		
@@ -575,12 +785,30 @@ class Graph(object):
 		
 		if not element:	 # first time
 			for x in self.toplayerProperties:
-				printGenericTree(x, 0, level, showids)
+				printGenericTree(x, 0, showids, labels)
 		
 		else:
 			printGenericTree(element, 0, showids, labels)
 			
-			
+
+	def printSkosTree(self, element = None, showids=True, labels=False):
+		""" 
+		Print nicely into stdout the SKOS tree of an ontology 
+		
+		Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+		[123]1--
+		[1]123--
+		[12]12--
+		"""
+		
+		if not element:	 # first time
+			for x in self.toplayerSkosConcepts:
+				printGenericTree(x, 0, showids, labels)
+		
+		else:
+			printGenericTree(element, 0, showids, labels)
+						
+
 
 	###########
 

@@ -13,7 +13,6 @@ else:
 	
 
 
-
 # setup.py proper begins here
 
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
@@ -93,7 +92,7 @@ setup(
     extras_require = {
         # 'dev': ['check-manifest'],
         # 'test': ['coverage'],
-    },
+nnnnnnnny    },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these

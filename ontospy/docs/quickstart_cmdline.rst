@@ -20,7 +20,10 @@ Currenlty the utility scripts available are 4:
 The ``ontospy`` utility
 +++++++++++++++++++++++++++++++
 
-.....
+>python ontospy.py http://xmlns.com/foaf/spec/
+
+# resolves redirects and prints info
+
 
 Include labels in property tree
 ---------------------------------------------

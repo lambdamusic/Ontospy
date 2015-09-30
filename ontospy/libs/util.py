@@ -16,8 +16,8 @@ from rdflib import RDFS, RDF, BNode
 from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
-import sys
-
+import sys, os, subprocess, random 
+from colorama import Fore, Back, Style
 
 
 
@@ -46,6 +46,19 @@ def printDebug(s):
 		pass
 
 
+
+
+
+def playSound(folder, name=""):
+	""" as easy as that """								
+	try:
+		if not name:
+			onlyfiles = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder,f)) ]
+			name = random.choice(onlyfiles)
+		subprocess.call(["afplay", folder+name])
+		# subprocess.call(["say", "%d started, batch %d" % (adate, batch)])
+	except:
+		pass
 
 
 def inferMainPropertyType(uriref):
@@ -93,17 +106,19 @@ def printGenericTree(element, level=0, showids=True, labels=False):
 	[12]12--
 	"""
 
+	ID_MARGIN = 5
+
 	if showids:
-		_id_ = bcolors.BLUE +	\
-		"[%d]%s" % (element.id, " " * (4  - len(str(element.id)))) +  \
-			bcolors.ENDC
+		_id_ = Fore.BLUE +	\
+		"[%d]%s" % (element.id, " " * (ID_MARGIN  - len(str(element.id)))) +  \
+			Fore.RESET
 	else:
 		_id_ = ""
 	
 	if labels:
 		bestLabel = element.bestLabel(qname_allowed=False)
 		if bestLabel:
-			bestLabel = bcolors.PINK + " (\"%s\")" % bestLabel + bcolors.ENDC
+			bestLabel = Fore.MAGENTA + " (\"%s\")" % bestLabel + Fore.RESET
 	else:
 		bestLabel = ""
 		
@@ -132,6 +147,13 @@ def firstStringInList(literalEntities, prefLanguage="en"):
 
 def firstEnglishStringInList(literalEntities,): 
 	return firstStringInList(literalEntities, "en")
+
+
+
+def truncate(data, l=20):
+	"truncate a string"
+	info = (data[:l] + '..') if len(data) > l else data
+	return info
 
 
 

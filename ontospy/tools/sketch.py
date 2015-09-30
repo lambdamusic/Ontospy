@@ -8,8 +8,6 @@ Copyright (c) 2014 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 Use the interpreter interactively to create a turtle RDF model.  
 
-Note: this script does not rely on OntoSPy. 
-
 ++ Tip: make this file executable: chmod +x sketch.py ++ 
 
 """
@@ -22,6 +20,8 @@ import logging
 import rdflib	 # so we have it available as a namespace
 from rdflib import exceptions, URIRef, RDFS, RDF, BNode, OWL
 from rdflib.namespace import Namespace, NamespaceManager
+
+from ontospy import ontospy
 
 # http://stackoverflow.com/questions/17393664/no-handlers-could-be-found-for-logger-rdflib-term
 logging.basicConfig()
@@ -194,6 +194,8 @@ def main(argv=None):
 
 	"""
 	
+	print "OntoSPy " + ontospy.VERSION
+
 	if argv:
 		print "Argument passing not implemented yet"
 		if False:

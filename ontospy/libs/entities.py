@@ -6,6 +6,7 @@ import rdflib
 from itertools import count
 # http://stackoverflow.com/questions/8628123/counting-instances-of-a-class
 
+from colorama import Fore, Back, Style
 
 class RDF_Entity(object):
 	"""
@@ -36,6 +37,7 @@ class RDF_Entity(object):
 		# self.siblings = []
 		
 	def serialize(self, format="turtle"):
+		""" xml, n3, turtle, nt, pretty-xml, trix are built in"""
 		if self.triples:
 			if not self.rdfgraph:
 				self._buildGraph()
@@ -44,14 +46,15 @@ class RDF_Entity(object):
 			return None 
 
 	def printSerialize(self, format="turtle"):
-		printDebug(self.serialize(format))
+		printDebug("\n" + self.serialize(format))
 
 	def printTriples(self):
 		""" display triples """
-		printDebug(bcolors.RED + unicode(self.uri) + bcolors.ENDC) 
+		printDebug(Fore.RED + Style.BRIGHT + unicode(self.uri) + Style.RESET_ALL) 
 		for x in self.triples:
-			printDebug(bcolors.PINK + "=> " + unicode(x[1])) 
-			printDebug(bcolors.BLUE + ".... " + unicode(x[2]) + bcolors.ENDC) 
+			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
+			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 
+		print ""
 
 	def __buildQname(self, namespaces):
 		""" extracts a qualified name for a uri """
@@ -142,7 +145,22 @@ class RDF_Entity(object):
 				else:
 					return ""
 
-				
+
+	def bestDescription(self, prefLanguage="en"):
+		"""
+		facility for extrating the best available description for an entity
+
+		..This checks RFDS.label, SKOS.prefLabel and finally the qname local component
+		"""
+
+		test_preds = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description, rdflib.namespace.DC.description, rdflib.namespace.SKOS.definition ]
+		
+		for pred in test_preds:
+			test = self.getValuesForProperty(pred)
+			if test:
+				return firstEnglishStringInList(test)
+		return ""
+
 
 
 class Ontology(RDF_Entity):
@@ -168,15 +186,20 @@ class Ontology(RDF_Entity):
 		# self.annotationProperties = []
 		# self.objectProperties = []
 		# self.datatypeProperties = []
+		self.skosConcepts = [] 
 
 
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()
+		self.printTriples()
+		self.stats()
+
+
+	def stats(self):
+		""" shotcut to pull out useful info for interactive use """
 		printDebug("Classes.....: %d" % len(self.classes))
 		printDebug("Properties..: %d" % len(self.properties))
-		self.printTriples()
-
 
 
 
@@ -196,7 +219,7 @@ class OntoClass(RDF_Entity):
 		self.domain_of = []
 		self.range_of = []
 		self.ontology = None
-		self.queryHelper = None  # the original graph the class derives from
+		self.queryHelper = None	 # the original graph the class derives from
 		
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
@@ -218,9 +241,10 @@ class OntoClass(RDF_Entity):
 		else:
 			return 0
 
-	def describe(self):
+
+	def printStats(self):
 		""" shotcut to pull out useful info for interactive use """
-		# self.printGenericTree()
+		printDebug("----------------")
 		printDebug("Parents......: %d" % len(self.parents()))
 		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
@@ -228,13 +252,16 @@ class OntoClass(RDF_Entity):
 		printDebug("Domain of....: %d" % len(self.domain_of))
 		printDebug("Range of.....: %d" % len(self.range_of))
 		printDebug("Instances....: %d" % self.count())
-		self.printTriples()
-
+		printDebug("----------------")
 			
 	def printGenericTree(self):
 		printGenericTree(self)
 
-
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
+		self.printTriples()
+		self.printStats()
+		# self.printGenericTree()
 
 
 
@@ -267,20 +294,86 @@ class OntoProperty(RDF_Entity):
 		return "<Property *%s*>" % ( self.uri)
 
 	
-	def printPropertyTree(self):
+	def printGenericTree(self):
 		printGenericTree(self)
 
-
-	def describe(self):
+		
+	def printStats(self):
 		""" shotcut to pull out useful info for interactive use """
-		# self.printGenericTree()
+		printDebug("----------------")
 		printDebug("Parents......: %d" % len(self.parents()))
 		printDebug("Children.....: %d" % len(self.children()))
 		printDebug("Ancestors....: %d" % len(self.ancestors()))
 		printDebug("Descendants..: %d" % len(self.descendants()))
 		printDebug("Has Domain...: %d" % len(self.domains))
-		printDebug("Has Range....: %d" % len(self.ranges))		
+		printDebug("Has Range....: %d" % len(self.ranges))
+		printDebug("----------------")
 		
+
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
 		self.printTriples()
+		self.printStats()
+		# self.printGenericTree()
 			
+
+
+
+
+
+class OntoSkosConcept(RDF_Entity):
+	"""
+	Python representation of a generic SKOS concept within an ontology. 
+	@todo: complete methods..
+	
+	"""
+
+	def __init__(self, uri, rdftype=None, namespaces=None):
+		"""
+		...
+		"""
+		super(OntoSkosConcept, self).__init__(uri, rdftype, namespaces)
+
+		self.instance_of = []
+		self.ontology = None
+		self.queryHelper = None	 # the original graph the class derives from
+		
+	def __repr__(self):
+		return "<SKOS Concept *%s*>" % ( self.uri)
+
+
+
+	def printStats(self):
+		""" shotcut to pull out useful info for interactive use """
+		printDebug("----------------")
+		printDebug("Parents......: %d" % len(self.parents()))
+		printDebug("Children.....: %d" % len(self.children()))
+		printDebug("Ancestors....: %d" % len(self.ancestors()))
+		printDebug("Descendants..: %d" % len(self.descendants()))
+		printDebug("----------------")
+
+	def printGenericTree(self):
+		printGenericTree(self)
+
+	def describe(self):
+		""" shotcut to pull out useful info for interactive use """
+		self.printTriples()
+		self.printStats()
+		self.printGenericTree()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			
