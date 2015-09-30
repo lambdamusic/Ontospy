@@ -20,7 +20,8 @@ from libs.quotes import QUOTES
 class Shell(cmd.Cmd):
 	"""Simple command processor example."""
 
-	prompt = Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+	DEFAULT_COL = Fore.RED
+	prompt = DEFAULT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 	intro = "Type 'help' to get started. Use TAB to explore commands."
 
 	doc_header = 'Commands'
@@ -52,30 +53,39 @@ class Shell(cmd.Cmd):
 	# HELPER METHODS
 	# --------	
 
-	def _get_prompt(self, onto="", entity="", default_entity_color=Fore.BLUE):
+	def _get_prompt(self, onto="", entity="", default=DEFAULT_COL):
 		""" changes the prompt contextually """
 		if entity:
 			onto = self.current['file']
-			temp1_1 = default_entity_color + Style.NORMAL + '%s: ' % truncate(onto, 20)
-			temp1_2 = default_entity_color + Style.BRIGHT + '%s' % entity
+			temp1_1 = default + Style.NORMAL + '%s: ' % truncate(onto, 20)
+			temp1_2 = default + Style.BRIGHT + '%s' % entity
 			temp2 = '<%s>: ' % (temp1_1 + temp1_2)
-			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+			return default + Style.BRIGHT + temp2 + Style.RESET_ALL
 		elif onto:
-			temp1 = default_entity_color + '%s' % onto 
+			temp1 = default + '%s' % onto 
 			temp2 = '<%s>: ' % temp1
-			return Fore.BLUE + Style.BRIGHT + temp2 + Style.RESET_ALL
+			return default + Style.BRIGHT + temp2 + Style.RESET_ALL
 		else:
-			return Fore.BLUE + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+			return default + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 	
 	
 	def _print(self, ms, style="TIP"):
 		""" abstraction for managing color printing """
-		styles1 = {'IMPORTANT' : Style.BRIGHT, 'TIP': Style.DIM, 'DEFAULT' : Style.DIM }
+		styles1 = {'IMPORTANT' : Style.BRIGHT, 
+					'TIP': Style.DIM, 
+					'URI' : Style.BRIGHT,  
+					'TEXT' : Fore.GREEN, 
+					'DEFAULT' : Style.DIM ,
+					}
 		
 		if style == "IMPORTANT":
 			print styles1['IMPORTANT'] + ms + Style.RESET_ALL	
-		if style == "TIP":
+		elif style == "TIP":
 			print styles1['TIP'] + ms + Style.RESET_ALL		
+		elif style=="URI":
+			print styles1['URI'] + ms + Style.RESET_ALL
+		elif style=="TEXT":
+			print styles1['TEXT'] + ms + Style.RESET_ALL	
 		else:
 			print styles1['DEFAULT'] + ms + Style.RESET_ALL
 
@@ -95,8 +105,10 @@ class Shell(cmd.Cmd):
 		"""after a selection, prints on screen basic info about onto or entity, plus change prompt """
 		if entity:
 			# self._clear_screen()
-			print Fore.RED + Style.BRIGHT + entity.uri + Style.RESET_ALL
-			print Style.DIM + entity.bestDescription() + Style.RESET_ALL
+			self._print(entity.uri, "URI")
+			self._print(entity.bestDescription(), "TEXT")
+			# print Style.BRIGHT + entity.uri + Style.RESET_ALL
+			# print Style.DIM + entity.bestDescription() + Style.RESET_ALL
 			entity.printStats()
 			if first_time:
 				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
@@ -107,8 +119,10 @@ class Shell(cmd.Cmd):
 				self._print("Loaded " + self.current['fullpath'], 'TIP')
 			g.printStats()
 			for o in g.ontologies:
-				print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
-				print Style.DIM + o.bestDescription() + Style.RESET_ALL
+				self._print(o.uri, "URI")
+				self._print(o.bestDescription(), "TEXT")
+				# print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
+				# print Style.DIM + o.bestDescription() + Style.RESET_ALL
 			if first_time:
 				self.prompt = self._get_prompt(self.current['file'])
 
@@ -134,12 +148,14 @@ class Shell(cmd.Cmd):
 				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el
 			counter += 1
 		self._print("--------------")
-		var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one option by entering its number: " + Style.RESET_ALL)
+		self._print("Please select one option by entering its number: ")
+		var = raw_input()
+		# var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one option by entering its number: " + Style.RESET_ALL)
 		try:
 			var = int(var)
 			return _list[var-1]
 		except:
-			print "Selection not valid"
+			self._print("Selection not valid")
 			return None
 
 

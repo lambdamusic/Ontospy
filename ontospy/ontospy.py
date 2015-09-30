@@ -82,20 +82,47 @@ def get_pickled_ontology(filename):
 		return None
 
 
+
+# def do_pickle_ontology(filename, g=None):
+#	  """
+#	  from a valid filename, generate the graph instance and pickle it too
+#	  note: option to pass a pre-generated graph instance too
+#	  """
+#	  if not g:
+#		  g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
+#	  pickledpath =	 ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+#	  cPickle.dump(g, open( pickledpath, "wb" ) )
+#	  print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
+#	  return g
+	
+	
 def do_pickle_ontology(filename, g=None):
 	""" 
 	from a valid filename, generate the graph instance and pickle it too
-	note: option to pass a pre-generated graph instance too  
+	note: option to pass a pre-generated graph instance too	 
+	2015-09-17: added code to increase recursion limit if cPickle fails
+		see http://stackoverflow.com/questions/2134706/hitting-maximum-recursion-depth-using-pythons-pickle-cpickle
 	"""
-	try:
-		if not g:
-			g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
-		pickledpath =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	pickledpath =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	if not g:
+		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)	
+	
+	try:				
 		cPickle.dump(g, open( pickledpath, "wb" ) )
 		print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
-	except: 
-		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
+	except Exception,e: 
 		print Style.BRIGHT + "\n.. ERROR caching <%s>" % filename + Style.RESET_ALL
+		print str(e)
+		print Style.DIM + "\n.. attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL
+ 
+		try:
+			sys.setrecursionlimit(sys.getrecursionlimit()*10)
+			cPickle.dump(g, open( pickledpath, "wb" ) )
+			print Style.BRIGHT + ".. SUCCESSFULLY cached <%s>" % pickledpath + Style.RESET_ALL
+		except Exception,e: 
+			print Style.BRIGHT + "\n.. ERROR caching <%s>... aborting..." % filename + Style.RESET_ALL
+			print str(e)	
+		sys.setrecursionlimit(sys.getrecursionlimit()/10)
 	return g
 
 
@@ -148,9 +175,9 @@ def action_listlocal():
 			counter += 1
 			name = file
 			try:
-   				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
+				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
 			except OSError:
-  				mtime = 0
+				mtime = 0
 			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
 
 			cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
@@ -238,7 +265,7 @@ def action_webimport():
 	options = catalog.viewCatalog()
 	counter = 1
 	for x in options:
-		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +  x[1], Style.RESET_ALL
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
 		# print Fore.BLUE + x[0], " ==> ", x[1]
 		counter += 1
 
@@ -284,7 +311,7 @@ def shellPrintOverview(g, opts):
 		g.printClassTree(showids=False, labels=opts['labels'])
 			
 	elif opts['propertytaxonomy']:
-		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 		g.printPropertyTree(showids=False, labels=opts['labels'])
 
 	elif opts['skostaxonomy']:
@@ -292,22 +319,22 @@ def shellPrintOverview(g, opts):
 		g.printSkosTree(showids=False, labels=opts['labels'])
 	
 	else:
-		# default: print anything available	
+		# default: print anything available 
 		if g.classes:
 			print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
 			g.printClassTree(showids=False, labels=opts['labels'])
 		if g.properties:
-			print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+			print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 			g.printPropertyTree(showids=False, labels=opts['labels'])
 		if g.skosConcepts:
-			print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+			print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 			g.printSkosTree(showids=False, labels=opts['labels'])
 			
 		
 		
 		#
 		# if not opts['ontoannotations'] and not opts['propertytaxonomy']:
-		# 	opts['classtaxonomy'] = True # default
+		#	opts['classtaxonomy'] = True # default
 
 
 def parse_options():
@@ -331,7 +358,7 @@ def parse_options():
 			
 	parser.add_option("", "--repo",
 			action="store_true", default=False, dest="repo",
-			help="List ontologies in the local repository")	
+			help="List ontologies in the local repository") 
 
 	parser.add_option("", "--import",
 			action="store_true", default=False, dest="_import",
