@@ -3,15 +3,16 @@
 # encoding: utf-8
 
 """
-RDF MODELS ONLINECATALOG
+UTILITY TO GET A LIST OF RDF MODELS FROM PREFIX.CC
+
 Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 Shows a list of ontologies by querying http://prefix.cc/popular/all
 
 """
 
-CATALOG_VERSION = 0.1
-USAGE = "ontospy-catalog <options>"
+MODULE_VERSION = 0.2
+USAGE = "ontospy-web <options>"
 
 
 import time, optparse, os, rdflib

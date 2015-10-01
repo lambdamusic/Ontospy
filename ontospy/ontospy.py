@@ -21,7 +21,7 @@ from colorama import Fore, Back, Style
 
 from .libs.graph import Graph, SparqlEndpoint
 from .libs.util import bcolors, pprinttable
-from .tools	import catalog
+from .tools	import web
 from ._version import *
 
 
@@ -76,24 +76,15 @@ def get_pickled_ontology(filename):
 	""" try to retrieve a cached ontology """
 	pickledfile =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if os.path.isfile(pickledfile):
-		return cPickle.load(open(pickledfile, "rb"))
+		try:
+			return cPickle.load(open(pickledfile, "rb"))
+		except:
+			print Style.DIM + "** WARNING: Cache is out of date ** ...recreating it... " + Style.RESET_ALL
+			return None
 	else:
 		return None
 
 
-
-# def do_pickle_ontology(filename, g=None):
-#	  """
-#	  from a valid filename, generate the graph instance and pickle it too
-#	  note: option to pass a pre-generated graph instance too
-#	  """
-#	  if not g:
-#		  g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
-#	  pickledpath =	 ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
-#	  cPickle.dump(g, open( pickledpath, "wb" ) )
-#	  print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
-#	  return g
-	
 	
 def do_pickle_ontology(filename, g=None):
 	""" 
@@ -260,7 +251,7 @@ def action_import_folder(location):
 def action_webimport():
 	"""List models from web catalog (prefix.cc) and ask which one to import"""
 
-	options = catalog.getCatalog()
+	options = web.getCatalog()
 	counter = 1
 	for x in options:
 		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
@@ -484,7 +475,7 @@ def main():
 	# print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
-	print "\n", Style.DIM + "Time:	   %0.2fs" %  tTime + Style.RESET_ALL
+	print Style.DIM + "\n----------\n" + "Time:	   %0.2fs" %  tTime + Style.RESET_ALL
 
 
 
