@@ -20,7 +20,7 @@ import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
 from colorama import Fore, Back, Style
 
 from .libs.graph import Graph, SparqlEndpoint
-from .libs.util import bcolors, pprinttable
+from .libs.util import bcolors, pprinttable, printDebug
 from .tools	import web
 from ._version import *
 
@@ -403,7 +403,7 @@ def parse_options():
 def main():
 	""" command line script """
 	
-	print "OntoSPy " + VERSION
+	printDebug("OntoSPy " + VERSION, "comment")
 	opts, args = parse_options()
 	
 	# reset local stuff
@@ -436,15 +436,17 @@ def main():
 		action_listlocal()	
 		raise SystemExit, 1
 
+
 	# launch shell
 	if opts.shell:
-		import shell
-		shell.Shell()._clear_screen()
-		print Style.BRIGHT + "** OntoSPy Interactive Ontology Documentation Environment " + VERSION + " **" +\
+		from .tools.shell import Shell
+		Shell()._clear_screen()
+		print Style.BRIGHT + "** OntoSPy Shell -- Interactive Ontology Documentation Environment " + VERSION + " **" +\
 			Style.RESET_ALL
 		get_or_create_home_repo()
-		shell.Shell().cmdloop()
+		Shell().cmdloop()
 		raise SystemExit, 1
+
 		
 	# load web catalog
 	if opts.web:
@@ -475,7 +477,7 @@ def main():
 	# print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
-	print Style.DIM + "\n----------\n" + "Time:	   %0.2fs" %  tTime + Style.RESET_ALL
+	printDebug("\n----------\n" + "Time:	   %0.2fs" %  tTime, "comment")
 
 
 

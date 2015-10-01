@@ -111,7 +111,6 @@ class Graph(object):
 					self.IS_URL = True
 					# headers = "Accept: application/rdf+xml"
 					headers = {'Accept': "application/rdf+xml"}
-					# headers = "Accept: application/rdf+xml"
 					req = urllib2.Request(source, headers=headers)
 					res = urllib2.urlopen(req)
 					source = res.geturl()  # after 303 redirects

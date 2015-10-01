@@ -116,7 +116,7 @@ setup(
             'ontospy-sketch=ontospy.tools.sketch:main', 
             'ontospy-match=ontospy.tools.matcher:main', 
             'ontospy-web=ontospy.tools.web:main', 
-            'ontospy-shell=ontospy.shell:main', 
+            'ontospy-shell=ontospy.tools.shell:main', 
             'ontospy=ontospy.ontospy:main'
         ],
     },

@@ -12,9 +12,9 @@ from colorama import Fore, Back, Style
 # Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 # Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
-from . import ontospy
-from .libs.util import *
-from .libs.quotes import QUOTES
+from .. import ontospy
+from ..libs.util import *
+from ..libs.quotes import QUOTES
 
 
 class Shell(cmd.Cmd):
