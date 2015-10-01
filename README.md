@@ -28,11 +28,13 @@ or
 Description
 =======
 
-OntoSPy allows you to extract all the schema information from an RDFS/OWL or SKOS schema, inspect it and use it query a corresponding knowledge base. 
+OntoSPy allows you to extract all the schema information from an RDFS/OWL or SKOS vocabulary (aka an 'ontology') and navigate it using an interactive text-based interface. 
+
+OntoSPy is a lightweight command line tool for inspecting and understanding semantic web schemas without having to load a full-blown ontology editor like Protege. It offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore - although the Python library could be easily extended to do that). 
 
 The basic workflow is simple: load a graph instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDF schema. That's all!
 
-The library can be used in standalone mode too.
+The library can be used in standalone mode too, via the `ontospy-shell` command.
 
 
 Documentation
