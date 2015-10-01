@@ -159,11 +159,11 @@ def action_listlocal():
 		print ""
 		temp = []
 		from collections import namedtuple
-		Row = namedtuple('Row',['N','File','Added','Cached'])
+		Row = namedtuple('Row',['N','Added','Cached', 'File'])
 		counter = 0
 		for file in ontologies:
 			counter += 1
-			name = file
+			name = Style.BRIGHT + file + Style.RESET_ALL
 			try:
 				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
 			except OSError:
@@ -171,7 +171,7 @@ def action_listlocal():
 			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
 
 			cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
-			temp += [Row(str(counter),name,last_modified_date,cached)]
+			temp += [Row(str(counter),last_modified_date,cached, name)]
 		pprinttable(temp)
 		print ""
 	else:
