@@ -39,7 +39,11 @@ class bcolors:
 
 
 
-def printDebug(s):
+def printDebug(s, style=None):
+	if style == "comment":
+		s = Style.DIM + s + Style.RESET_ALL
+	elif style == "important":
+		s = Style.BRIGHT + s + Style.RESET_ALL		
 	try:
 		print >> sys.stderr, s
 	except: 
