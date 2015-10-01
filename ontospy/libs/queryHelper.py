@@ -10,8 +10,9 @@ Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 """
 
 
-
 import rdflib
+
+
 DEFAULT_LANGUAGE = "en"
 
 

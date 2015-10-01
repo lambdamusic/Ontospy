@@ -17,13 +17,12 @@ More info in the README file.
 
 
 import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
-
 from colorama import Fore, Back, Style
 
-from libs.graph import Graph, SparqlEndpoint
-from libs.util import bcolors, pprinttable
-
-from _version import *
+from .libs.graph import Graph, SparqlEndpoint
+from .libs.util import bcolors, pprinttable, printDebug
+from .tools	import web
+from ._version import *
 
 
 # local repository constants
@@ -77,24 +76,15 @@ def get_pickled_ontology(filename):
 	""" try to retrieve a cached ontology """
 	pickledfile =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if os.path.isfile(pickledfile):
-		return cPickle.load(open(pickledfile, "rb"))
+		try:
+			return cPickle.load(open(pickledfile, "rb"))
+		except:
+			print Style.DIM + "** WARNING: Cache is out of date ** ...recreating it... " + Style.RESET_ALL
+			return None
 	else:
 		return None
 
 
-
-# def do_pickle_ontology(filename, g=None):
-#	  """
-#	  from a valid filename, generate the graph instance and pickle it too
-#	  note: option to pass a pre-generated graph instance too
-#	  """
-#	  if not g:
-#		  g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
-#	  pickledpath =	 ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
-#	  cPickle.dump(g, open( pickledpath, "wb" ) )
-#	  print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
-#	  return g
-	
 	
 def do_pickle_ontology(filename, g=None):
 	""" 
@@ -169,11 +159,11 @@ def action_listlocal():
 		print ""
 		temp = []
 		from collections import namedtuple
-		Row = namedtuple('Row',['N','File','Added','Cached'])
+		Row = namedtuple('Row',['N','Added','Cached', 'File'])
 		counter = 0
 		for file in ontologies:
 			counter += 1
-			name = file
+			name = Style.BRIGHT + file + Style.RESET_ALL
 			try:
 				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
 			except OSError:
@@ -181,7 +171,7 @@ def action_listlocal():
 			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
 
 			cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
-			temp += [Row(str(counter),name,last_modified_date,cached)]
+			temp += [Row(str(counter),last_modified_date,cached, name)]
 		pprinttable(temp)
 		print ""
 	else:
@@ -261,8 +251,7 @@ def action_import_folder(location):
 def action_webimport():
 	"""List models from web catalog (prefix.cc) and ask which one to import"""
 
-	import catalog
-	options = catalog.viewCatalog()
+	options = web.getCatalog()
 	counter = 1
 	for x in options:
 		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
@@ -414,7 +403,7 @@ def parse_options():
 def main():
 	""" command line script """
 	
-	print "OntoSPy " + VERSION
+	printDebug("OntoSPy " + VERSION, "comment")
 	opts, args = parse_options()
 	
 	# reset local stuff
@@ -447,15 +436,17 @@ def main():
 		action_listlocal()	
 		raise SystemExit, 1
 
+
 	# launch shell
 	if opts.shell:
-		import shell
-		shell.Shell()._clear_screen()
-		print Style.BRIGHT + "** OntoSPy Interactive Ontology Documentation Environment " + VERSION + " **" +\
+		from .tools.shell import Shell
+		Shell()._clear_screen()
+		print Style.BRIGHT + "** OntoSPy Shell -- Interactive Ontology Documentation Environment " + VERSION + " **" +\
 			Style.RESET_ALL
 		get_or_create_home_repo()
-		shell.Shell().cmdloop()
+		Shell().cmdloop()
 		raise SystemExit, 1
+
 		
 	# load web catalog
 	if opts.web:
@@ -486,7 +477,7 @@ def main():
 	# print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
-	print "\n", Style.DIM + "Time:	   %0.2fs" %  tTime + Style.RESET_ALL
+	printDebug("\n----------\n" + "Time:	   %0.2fs" %  tTime, "comment")
 
 
 

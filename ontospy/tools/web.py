@@ -3,31 +3,36 @@
 # encoding: utf-8
 
 """
-RDF MODELS ONLINECATALOG
+UTILITY TO GET A LIST OF RDF MODELS FROM PREFIX.CC
+
 Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 Shows a list of ontologies by querying http://prefix.cc/popular/all
 
 """
 
-CATALOG_VERSION = 0.1
-USAGE = "ontospy-catalog <options>"
+MODULE_VERSION = 0.2
+USAGE = "ontospy-web <options>"
 
 
 import time, optparse, os, rdflib
 
-import ontospy
-from libs.util import *
 
-	
-def viewCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
+from ..libs.graph import Graph
+from ..libs.util import *
+
+
+
+def getCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 	""" 
 	extracts a list of ontology URIs from http://prefix.cc/popular/all
+	
+	>query: a query string to match 
+	
 	"""
 
-	printDebug("----------\nReading source...")
-	
-	g = ontospy.Graph(source)
+	printDebug("----------\nReading source...")	
+	g = Graph(source)
 	
 	out = []
 	for x in g.ontologies:
@@ -40,6 +45,17 @@ def viewCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 	printDebug("----------\n%d results found." % len(out))
 	
 	return out			
+
+
+	
+def printCatalog(_list):
+	""" 
+	prints out to terminal
+	"""
+	for x in _list:
+		print x[0], " ==> ", x[1]			
+
+
 
 
 
@@ -81,14 +97,12 @@ def main():
 	print "OntoSPy " + ontospy.VERSION
 
 	opts, args = parse_options()
-		
-			
+					
 	sTime = time.time()
 				
-	options = viewCatalog(query=opts.query)
-	
-	for x in options:
-		print x[0], " ==> ", x[1]
+	_list = getCatalog(query=opts.query)
+	printCatalog(_list)
+
 	
 	# finally:	
 	# print some stats.... 
@@ -104,6 +118,7 @@ def main():
 	
 if __name__ == '__main__':
 	import sys
+	from .. import ontospy
 	try:
 		main()
 		sys.exit(0)
