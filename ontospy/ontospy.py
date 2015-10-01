@@ -17,13 +17,12 @@ More info in the README file.
 
 
 import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
-
 from colorama import Fore, Back, Style
 
-from libs.graph import Graph, SparqlEndpoint
-from libs.util import bcolors, pprinttable
-
-from _version import *
+from .libs.graph import Graph, SparqlEndpoint
+from .libs.util import bcolors, pprinttable
+from .tools	import catalog
+from ._version import *
 
 
 # local repository constants
@@ -261,8 +260,7 @@ def action_import_folder(location):
 def action_webimport():
 	"""List models from web catalog (prefix.cc) and ask which one to import"""
 
-	import catalog
-	options = catalog.viewCatalog()
+	options = catalog.getCatalog()
 	counter = 1
 	for x in options:
 		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL

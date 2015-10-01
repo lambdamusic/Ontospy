@@ -9,7 +9,7 @@ python test_remoteload.py
 
 import unittest, os, sys
 
-from ontospy import ontospy
+from .. import ontospy
 
 
 ENDPOINTS = [

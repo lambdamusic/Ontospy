@@ -16,12 +16,12 @@ Use the interpreter interactively to create a turtle RDF model.
 
 import sys, os, urllib2
 import logging
-
 import rdflib	 # so we have it available as a namespace
 from rdflib import exceptions, URIRef, RDFS, RDF, BNode, OWL
 from rdflib.namespace import Namespace, NamespaceManager
 
-from ontospy import ontospy
+
+from .. import ontospy
 
 # http://stackoverflow.com/questions/17393664/no-handlers-could-be-found-for-logger-rdflib-term
 logging.basicConfig()

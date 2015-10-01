@@ -17,13 +17,13 @@ More info in the README file.
 
 
 import sys, os, urllib2, time, optparse
-
 import rdflib
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
-from util import *
-from entities import *
-from queryHelper import QueryHelper
+
+from .util import *
+from .entities import *
+from .queryHelper import QueryHelper
 
 
 class Graph(object):

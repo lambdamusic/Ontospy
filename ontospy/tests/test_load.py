@@ -9,7 +9,7 @@ python test_simple.py
 
 import unittest, os, sys
 
-from ontospy import ontospy
+from .. import ontospy
 
 
 DATA_FOLDER = "ontospy/data/schemas/"

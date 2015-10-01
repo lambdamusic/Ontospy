@@ -1,12 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from util import *
 import rdflib
 from itertools import count
 # http://stackoverflow.com/questions/8628123/counting-instances-of-a-class
-
 from colorama import Fore, Back, Style
+
+
+from .util import *
+
 
 class RDF_Entity(object):
 	"""
