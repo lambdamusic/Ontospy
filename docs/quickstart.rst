@@ -7,241 +7,174 @@ A few examples showing how OntoSPy can be used in Python programs, or interactiv
 
     
 
-Inspecting a graph
+Loading and querying the FOAF vocabulary
 +++++++++++++++++++++++++++++++
-
-Load the graph
--------------------------------
 
 .. code-block:: python
 
 	In [1]: import ontospy
 	INFO:rdflib:RDFLib Version: 4.2.0
 
-	In [2]: g = ontospy2.Graph("npgcore_latest.ttl")
-	Loaded 3478 triples
-	Ontologies found: 1
-    
+	In [2]: g = ontospy.Graph("http://xmlns.com/foaf/0.1/")
+	----------
+	Loaded 631 triples from <http://xmlns.com/foaf/0.1/>
+	started scanning...
+	----------
+	Ontologies found...: 1
+	Classes found......: 14
+	Properties found...: 67
+	Annotation.........: 7
+	Datatype...........: 26
+	Object.............: 34
+	SKOS Concepts......: 0
+	----------
 
-	
-Get a class
----------------------------------------------
+	In [3]: g.classes
+	Out[3]: 
+	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
+	 <Class *http://xmlns.com/foaf/0.1/Document*>,
+	 <Class *http://xmlns.com/foaf/0.1/Group*>,
+	 <Class *http://xmlns.com/foaf/0.1/Image*>,
+	 <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+	 <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+	 <Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
+	 <Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
+	 <Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
+	 <Class *http://xmlns.com/foaf/0.1/Organization*>,
+	 <Class *http://xmlns.com/foaf/0.1/Person*>,
+	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
+	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
-.. code-block:: python
+	In [4]: g.properties
+	Out[4]: 
+	[<Property *http://xmlns.com/foaf/0.1/account*>,
+	 <Property *http://xmlns.com/foaf/0.1/accountName*>,
+	 <Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
+	 <Property *http://xmlns.com/foaf/0.1/age*>,
+	 <Property *http://xmlns.com/foaf/0.1/aimChatID*>,
+	 <Property *http://xmlns.com/foaf/0.1/based_near*>,
+	 <Property *http://xmlns.com/foaf/0.1/birthday*>,
+	 <Property *http://xmlns.com/foaf/0.1/currentProject*>,
+	 <Property *http://xmlns.com/foaf/0.1/depiction*>,
+	 <Property *http://xmlns.com/foaf/0.1/depicts*>,
+	 <Property *http://xmlns.com/foaf/0.1/dnaChecksum*>,
+	 <Property *http://xmlns.com/foaf/0.1/familyName*>,
+	 <Property *http://xmlns.com/foaf/0.1/family_name*>,
+	 <Property *http://xmlns.com/foaf/0.1/firstName*>,
+	 <Property *http://xmlns.com/foaf/0.1/focus*>,
+	 <Property *http://xmlns.com/foaf/0.1/fundedBy*>,
+	 <Property *http://xmlns.com/foaf/0.1/geekcode*>,
+	 <Property *http://xmlns.com/foaf/0.1/gender*>,
+	 <Property *http://xmlns.com/foaf/0.1/givenName*>,
+	 <Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
+	 <Property *http://xmlns.com/foaf/0.1/homepage*>,
+	 <Property *http://xmlns.com/foaf/0.1/icqChatID*>,
+	 <Property *http://xmlns.com/foaf/0.1/img*>,
+	 <Property *http://xmlns.com/foaf/0.1/interest*>,
+	 <Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
+	 <Property *http://xmlns.com/foaf/0.1/jabberID*>,
+	 <Property *http://xmlns.com/foaf/0.1/knows*>,
+	 <Property *http://xmlns.com/foaf/0.1/lastName*>,
+	 <Property *http://xmlns.com/foaf/0.1/logo*>,
+	 <Property *http://xmlns.com/foaf/0.1/made*>,
+	 <Property *http://xmlns.com/foaf/0.1/maker*>,
+	 <Property *http://xmlns.com/foaf/0.1/mbox*>,
+	 <Property *http://xmlns.com/foaf/0.1/mbox_sha1sum*>,
+	 <Property *http://xmlns.com/foaf/0.1/member*>,
+	 <Property *http://xmlns.com/foaf/0.1/membershipClass*>,
+	 <Property *http://xmlns.com/foaf/0.1/msnChatID*>,
+	 <Property *http://xmlns.com/foaf/0.1/myersBriggs*>,
+	 <Property *http://xmlns.com/foaf/0.1/name*>,
+	 <Property *http://xmlns.com/foaf/0.1/nick*>,
+	 <Property *http://xmlns.com/foaf/0.1/openid*>,
+	 <Property *http://xmlns.com/foaf/0.1/page*>,
+	 <Property *http://xmlns.com/foaf/0.1/pastProject*>,
+	 <Property *http://xmlns.com/foaf/0.1/phone*>,
+	 <Property *http://xmlns.com/foaf/0.1/plan*>,
+	 <Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
+	 <Property *http://xmlns.com/foaf/0.1/publications*>,
+	 <Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
+	 <Property *http://xmlns.com/foaf/0.1/sha1*>,
+	 <Property *http://xmlns.com/foaf/0.1/skypeID*>,
+	 <Property *http://xmlns.com/foaf/0.1/status*>,
+	 <Property *http://xmlns.com/foaf/0.1/surname*>,
+	 <Property *http://xmlns.com/foaf/0.1/theme*>,
+	 <Property *http://xmlns.com/foaf/0.1/thumbnail*>,
+	 <Property *http://xmlns.com/foaf/0.1/tipjar*>,
+	 <Property *http://xmlns.com/foaf/0.1/title*>,
+	 <Property *http://xmlns.com/foaf/0.1/topic*>,
+	 <Property *http://xmlns.com/foaf/0.1/topic_interest*>,
+	 <Property *http://xmlns.com/foaf/0.1/weblog*>,
+	 <Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
+	 <Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>,
+	 <Property *http://xmlns.com/foaf/0.1/yahooChatID*>,
+	 <Property *http://purl.org/dc/elements/1.1/date*>,
+	 <Property *http://purl.org/dc/elements/1.1/description*>,
+	 <Property *http://purl.org/dc/elements/1.1/title*>,
+	 <Property *http://www.w3.org/2003/06/sw-vocab-status/ns#term_status*>,
+	 <Property *http://xmlns.com/wot/0.1/assurance*>,
+	 <Property *http://xmlns.com/wot/0.1/src_assurance*>]
 
-    In [1]: g.getClass(uri='http://www.w3.org/2000/01/rdf-schema#Resource')
-    Out[1]: <Class *http://www.w3.org/2000/01/rdf-schema#Resource*>
-
-    In [2]: g.getClass(10)
-    Out[2]: <Class *http://purl.org/ontology/bibo/AcademicArticle*>	
-
-    In [3]: g.getClass(match="person")
-    Out[3]: 
-    [<Class *http://purl.org/ontology/bibo/PersonalCommunicationDocument*>,
-     <Class *http://purl.org/ontology/bibo/PersonalCommunication*>,
-     <Class *http://xmlns.com/foaf/0.1/Person*>]
-
-
-
-Pretty Print Triples
----------------------------------------------
-
-.. code-block:: python
-
-    In [8]: g.getClass(173).triplesPrint()
-       => http://www.w3.org/2003/06/sw-vocab-status/ns#term_status
-          stable
-       => http://www.w3.org/2000/01/rdf-schema#label
-          solo music artist
-       => http://purl.org/ontology/mo/level
-          1
-       => http://www.w3.org/2000/01/rdf-schema#subClassOf
-          http://purl.org/ontology/mo/MusicArtist
-       => http://www.w3.org/2000/01/rdf-schema#subClassOf
-          http://xmlns.com/foaf/0.1/Person
-       => http://www.w3.org/2000/01/rdf-schema#isDefinedBy
-          http://purl.org/ontology/mo/
-       => http://www.w3.org/2000/01/rdf-schema#comment
-          Single person whose musical creative work shows sensitivity and imagination.
-       => http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-          http://www.w3.org/2002/07/owl#Class
-
-
-
-Serialize an entity
----------------------------------------------
-
-.. code-block:: python
-
-    In [9]: print g.getClass(173).serialize()
-    @prefix ns1: <http://purl.org/ontology/mo/> .
-    @prefix ns2: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
-    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-    ns1:SoloMusicArtist a <http://www.w3.org/2002/07/owl#Class> ;
-        rdfs:label "solo music artist" ;
-        ns1:level "1" ;
-        rdfs:comment "Single person whose musical creative work shows sensitivity and imagination." ;
-        rdfs:isDefinedBy ns1: ;
-        rdfs:subClassOf ns1:MusicArtist,
-            <http://xmlns.com/foaf/0.1/Person> ;
-        ns2:term_status "stable" .
-
-
-
-Descendands and ancestors for a class
----------------------------------------------
-
-.. code-block:: python
-
-    In [8]: c = g.getClass(144)
-
-    In [10]: c.descendants()
-    Out[10]: []
-
-    In [11]: c.ancestors()
-    Out[11]: 
-    [<Class *http://ns.nature.com/terms/Contributor*>,
-     <Class *http://ns.nature.com/terms/DocumentComponent*>,
-     <Class *http://ns.nature.com/terms/Publication*>,
-     <Class *http://ns.nature.com/terms/AbstractEntity*>,
-     <Class *http://ns.nature.com/terms/Thing*>]
-
-
-
-Access a quick description of a class or property
----------------------------------------------
-
-.. code-block:: python
-
-    In [13]: c.describe()
-    Parents......: 1
-    Children.....: 0
-    Ancestors....: 5
-    Descendants..: 0
-    Domain of....: 0
-    Range of.....: 1
-    http://ns.nature.com/terms/ExternalContributor
-    => http://www.w3.org/2004/02/skos/core#historyNote
-    .... [skos:definition - 2014-12-15] A document component detailing a contributor (personal or corporate) to an external work.
-    => http://ns.nature.com/terms/graphLabel
-    .... npgg:external-contributors
-    => http://www.w3.org/2000/01/rdf-schema#isDefinedBy
-    .... http://ns.nature.com/terms/
-    => http://www.w3.org/2000/01/rdf-schema#label
-    .... Term: npg:ExternalContributor
-    => http://ns.nature.com/terms/isTerm
-    .... true
-    => http://www.w3.org/2004/02/skos/core#prefLabel
-    .... External Contributor
-    => http://www.w3.org/2004/02/skos/core#definition
-    .... The :ExternalContributor class represents a contributor from an article which is externally published. The :ExternalContributor class subclasses the :Contributor class.
-    => http://ns.nature.com/terms/namespace
-    .... http://ns.nature.com/external-contributors/
-    => http://ns.nature.com/terms/type
-    .... external-contributors
-    => http://ns.nature.com/terms/label
-    .... external-contributors
-    => http://ns.nature.com/terms/isVocabulary
-    .... false
-    => http://ns.nature.com/terms/hasGraph
-    .... http://ns.nature.com/graphs/external-contributors
-    => http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-    .... http://www.w3.org/2002/07/owl#Class
-    => http://www.w3.org/2000/01/rdf-schema#subClassOf
-    .... http://ns.nature.com/terms/Contributor
+	In [5]: g.printClassTree()
+	[1]    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+	[12]   ----_file_:Person
+	[2]    _file_:Agent
+	[4]    ----_file_:Group
+	[11]   ----_file_:Organization
+	[12]   ----_file_:Person
+	[3]    _file_:Document
+	[5]    ----_file_:Image
+	[13]   ----_file_:PersonalProfileDocument
+	[6]    _file_:LabelProperty
+	[7]    _file_:OnlineAccount
+	[8]    ----_file_:OnlineChatAccount
+	[9]    ----_file_:OnlineEcommerceAccount
+	[10]   ----_file_:OnlineGamingAccount
+	[14]   _file_:Project
 
 
+	In [6]: g.toplayer
+	Out[6]: 
+	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
+	 <Class *http://xmlns.com/foaf/0.1/Document*>,
+	 <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+	 <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
+	In [7]: g.getClass("document")
+	Out[7]: 
+	[<Class *http://xmlns.com/foaf/0.1/Document*>,
+	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 
-Getting data from multiple ontologies
-++++++++++++++++++++++++++++++++++++++++++
+	In [8]: d = _[0]
 
-.. code-block:: python
+	In [9]: print(d.serialize())
+	@prefix ns1: <http://www.w3.org/2002/07/owl#> .
+	@prefix ns2: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+	@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+	@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+	@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+	@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-    In [30]: g2 = ontospy.Graph("data/schemas/npgmusic_mix.ttl")
-    ----------
-    Loaded 3225 triples from <data/schemas/npgmusic_mix.ttl>
-    started scanning...
-    ----------
-    Ontologies found: 2
-    Classes found...: 109
-    Properties found: 301
-    Annotation......: 10
-    Datatype........: 107
-    Object..........: 184
-
-    In [31]: for o in g2.ontologies:
-       ....:     print o, len(o.classes)
-       ....:     
-    <OntoSPy: Ontology object for uri *http://ns.nature.com/terms/*> 49
-    <OntoSPy: Ontology object for uri *http://purl.org/ontology/mo/*> 54
+	<http://xmlns.com/foaf/0.1/Document> a rdfs:Class,
+	        ns1:Class ;
+	    rdfs:label "Document" ;
+	    rdfs:comment "A document." ;
+	    rdfs:isDefinedBy <http://xmlns.com/foaf/0.1/> ;
+	    ns1:disjointWith <http://xmlns.com/foaf/0.1/Organization>,
+	        <http://xmlns.com/foaf/0.1/Project> ;
+	    ns1:equivalentClass <http://schema.org/CreativeWork> ;
+	    ns2:term_status "stable" .
 
 
 
-Querying a SPARQL endpoint
----------------------------------------------
+	In [10]: d.parents()
+	Out[10]: []
 
-.. code-block:: python
-
-    In [12]: g = ontospy.Graph("http://data.semanticweb.org/sparql", endpoint=True)
-    started scanning...
-    ----------
-    Ontologies found: 20
-    Classes found...: 105
-    Properties found: 53
-    Annotation......: 5
-    Datatype........: 18
-    Object..........: 30
-
-    In [13]: g.pri
-    g.printClassTree     g.printPropertyTree  
-
-    In [13]: g.printClassTree()
-    [656] http://swrc.ontoware.org/ontology#ResearchTopic
-    [657] http://www.w3.org/2002/12/cal/ical#Vcalendar
-    [658] http://www.w3.org/2002/12/cal/ical#Vevent
-    [608] ----http://data.semanticweb.org/ns/swc/ontology#OrganisedEvent
-    [566] --------http://data.semanticweb.org/ns/swc/ontology#AcademicEvent
-    [585] ------------http://data.semanticweb.org/ns/swc/ontology#ConferenceEvent
-    [610] ------------http://data.semanticweb.org/ns/swc/ontology#PanelEvent
-    [633] ------------http://data.semanticweb.org/ns/swc/ontology#SessionEvent
-    [590] ----------------http://data.semanticweb.org/ns/swc/ontology#DemoSession
-    [613] ----------------http://data.semanticweb.org/ns/swc/ontology#PaperSession
-    [618] ----------------http://data.semanticweb.org/ns/swc/ontology#PosterSession
-    # etc.....
-
-
-Query via Sparql
----------------------------------------------
-
-Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!
-
-.. code-block:: python
-
-    In [2]: g = ontospy.Graph("data/foaf.rdf")
-    Loaded 630 triples
-    started scanning...
-    Ontologies found: 1
-    Classes	   found: 28
-    Properties found: 145
-    ...Annotation   : 7
-    ...Datatype     : 27
-    ...Object       : 49
-
-    In [3]: g.sparql("select distinct ?c where {?x a ?c}")
-    Out[3]: 
-    [(rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#DatatypeProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#ObjectProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')),
-     (rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#InverseFunctionalProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Ontology')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#AnnotationProperty')),
-     (rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#FunctionalProperty'))]
- 
+	In [11]: d.children()
+	Out[11]: 
+	[<Class *http://xmlns.com/foaf/0.1/Image*>,
+	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 

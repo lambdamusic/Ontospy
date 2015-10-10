@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Quick Start - Command Line &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    <title>Command Line Tools &mdash; OntoSPy 1.6.2 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.0 alpha',
+        VERSION:     '1.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="index.html" />
-    <link rel="next" title="Running the tests" href="tests.html" />
+    <link rel="top" title="OntoSPy 1.6.2 documentation" href="index.html" />
     <link rel="prev" title="Quick Start - Python" href="quickstart.html" /> 
   </head>
   <body role="document">
@@ -35,12 +34,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tests.html" title="Running the tests"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
           <a href="quickstart.html" title="Quick Start - Python"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -49,26 +45,56 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="quick-start-command-line">
-<h1>Quick Start - Command Line<a class="headerlink" href="#quick-start-command-line" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="command-line-tools">
+<h1>Command Line Tools<a class="headerlink" href="#command-line-tools" title="Permalink to this headline">¶</a></h1>
 <p>A few examples of how to use the command line utilities that come with OntoSPy.</p>
-<p>Note: if you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to <cite>usr/local/bin</cite> (on unix-based systems, or similar on windows).</p>
-<p>Currenlty the utility scripts available are 4:</p>
+<p>Currently these are the utility scripts available:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ontospy</span></code>: load a graph and show schema information.</li>
-<li><code class="docutils literal"><span class="pre">ontospy-catalog</span></code>: discover commonly used ontologies.</li>
-<li><code class="docutils literal"><span class="pre">ontospy-match</span></code>: bootstrap mappings between two models.</li>
-<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively.</li>
+<li><code class="docutils literal"><span class="pre">ontospy</span></code>: load a graph and show schema information</li>
+<li><code class="docutils literal"><span class="pre">ontospy-shell</span></code>: launch the interactive ontospy shell</li>
+<li><code class="docutils literal"><span class="pre">ontospy-web</span></code>: discover commonly used ontologies listed on prefix.cc</li>
+<li><code class="docutils literal"><span class="pre">ontospy-match</span></code>: bootstrap mappings between two vocabularies</li>
+<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively</li>
 </ul>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This documentation is still in draft mode.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to <cite>usr/local/bin</cite> (on unix-based systems, or similar on windows).</p>
 </div>
-<div class="section" id="the-ontospy-utility">
-<h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> utility<a class="headerlink" href="#the-ontospy-utility" title="Permalink to this headline">¶</a></h2>
-<hr class="docutils" />
-<div class="section" id="include-labels-in-property-tree">
-<h3>Include labels in property tree<a class="headerlink" href="#include-labels-in-property-tree" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="the-ontospy-command">
+<h1>The <code class="docutils literal"><span class="pre">ontospy</span></code> command<a class="headerlink" href="#the-ontospy-command" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-shell"><div class="highlight"><pre>&gt;python ontospy.py http://xmlns.com/foaf/spec/
+
+<span class="c"># prints info about foaf resolving redirects etc..</span>
+<span class="c"># etc..</span>
+</pre></div>
+</div>
+<div class="section" id="getting-help">
+<h2>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy -h
+OntoSPy v1.6.1
+Usage: ontospy &lt;ontology-file-or-uri&gt; [options]
+
+Options:
+  --version   show program&#39;s version number and exit
+  -h, --help  show this help message and exit
+  --shell     Interactive explorer of the ontologies in the local repository
+  --repo      List ontologies in the local repository
+  --import    Imports file/folder/url into the local repository
+  --cache     Rebuild the cache for the local repository
+  --reset     Resets the local repository by removing all existing files
+  -a          Print the ontology annotations/metadata.
+  -c          Print the class taxonomy.
+  -p          Print the property taxonomy.
+  -s          Print the SKOS taxonomy.
+  -l          Print entities labels as well as URIs (used with -c or -p or
+              -s).
+</pre></div>
+</div>
+</div>
+<div class="section" id="print-options">
+<h2>Print options<a class="headerlink" href="#print-options" title="Permalink to this headline">¶</a></h2>
+<p>E.g. print only the class tree and show rdfs:labels</p>
 <div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy foaf.rdf -c -l
 ----------
 Loaded <span class="m">630</span> triples from &lt;foaf.rdf&gt;
@@ -116,11 +142,109 @@ Time:          2.77s
 </div>
 </div>
 </div>
-<div class="section" id="the-ontospy-catalog-utility">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility<a class="headerlink" href="#the-ontospy-catalog-utility" title="Permalink to this headline">¶</a></h2>
-<p>Show a list of ontologies from the web</p>
-<div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py
-Usage: python ontospy/tools/catalog.py
+<div class="section" id="the-ontospy-shell-command">
+<h1>The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command<a class="headerlink" href="#the-ontospy-shell-command" title="Permalink to this headline">¶</a></h1>
+<p>The shell is an interactive environment that lets you import, load and inspect vocabularies.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">ontospy</span><span class="o">-</span><span class="n">shell</span>
+
+<span class="o">**</span> <span class="n">OntoSPy</span> <span class="n">Interactive</span> <span class="n">Ontology</span> <span class="n">Documentation</span> <span class="n">Environment</span> <span class="n">v1</span><span class="o">.</span><span class="mf">6.1</span> <span class="o">**</span>
+<span class="n">Local</span> <span class="n">repository</span><span class="p">:</span> <span class="o">&lt;/</span><span class="n">Users</span><span class="o">/</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="o">/.</span><span class="n">ontospy</span><span class="o">&gt;</span>
+<span class="n">Type</span> <span class="s">&#39;help&#39;</span> <span class="n">to</span> <span class="n">get</span> <span class="n">started</span><span class="o">.</span> <span class="n">Use</span> <span class="n">TAB</span> <span class="n">to</span> <span class="n">explore</span> <span class="n">commands</span><span class="o">.</span>
+<span class="o">&lt;</span><span class="n">OntoSPy</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">help</span>
+
+<span class="n">Commands</span>
+<span class="o">--------</span>
+<span class="n">annotations</span>  <span class="n">currentEntity</span>    <span class="n">help</span>      <span class="n">quit</span>       <span class="n">tree</span>
+<span class="k">class</span>        <span class="nc">currentOntology</span>  <span class="n">ontology</span>  <span class="n">serialize</span>  <span class="n">triples</span>
+<span class="n">concept</span>      <span class="n">delete</span>           <span class="nb">property</span>  <span class="n">summary</span>    <span class="n">up</span>
+<span class="nb">next</span>         <span class="n">zen</span>
+
+<span class="o">&lt;</span><span class="n">OntoSPy</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">ontology</span>
+<span class="mi">30</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">total</span><span class="p">:</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span>   <span class="mi">7</span><span class="n">habits_centeredness</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span>   <span class="mi">7</span><span class="n">habits_main_schema</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span>   <span class="n">bfo</span><span class="o">-</span><span class="mf">1.1</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span>   <span class="n">bibo</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span>   <span class="n">blogs</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span>   <span class="n">cito</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span>   <span class="n">core</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">]</span>   <span class="n">fabio</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">9</span><span class="p">]</span>   <span class="n">fea</span>
+<span class="p">[</span><span class="mi">10</span><span class="p">]</span>   <span class="n">foaf</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">11</span><span class="p">]</span>   <span class="n">frbr</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">12</span><span class="p">]</span>   <span class="n">goodrelations</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">13</span><span class="p">]</span>   <span class="n">mini_philosophy</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">14</span><span class="p">]</span>   <span class="n">musicontology</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">15</span><span class="p">]</span>   <span class="n">npg</span><span class="o">-</span><span class="n">article</span><span class="o">-</span><span class="n">types</span><span class="o">-</span><span class="n">ontology</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">16</span><span class="p">]</span>   <span class="n">npg</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">ontology</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">17</span><span class="p">]</span>   <span class="n">oan</span>
+<span class="p">[</span><span class="mi">18</span><span class="p">]</span>   <span class="n">philosophy</span><span class="o">-</span><span class="mf">2006.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">19</span><span class="p">]</span>   <span class="n">philosophy</span><span class="o">-</span><span class="mf">2007.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">20</span><span class="p">]</span>   <span class="n">philosurfical_2010</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">21</span><span class="p">]</span>   <span class="n">pizza</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">22</span><span class="p">]</span>   <span class="n">semanticbible</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">23</span><span class="p">]</span>   <span class="n">skos</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">24</span><span class="p">]</span>   <span class="n">sql</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">25</span><span class="p">]</span>   <span class="n">subjects</span><span class="o">.</span><span class="n">ttl</span>
+<span class="p">[</span><span class="mi">26</span><span class="p">]</span>   <span class="n">time</span><span class="o">.</span><span class="n">owl</span>
+<span class="p">[</span><span class="mi">27</span><span class="p">]</span>   <span class="n">vann</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">28</span><span class="p">]</span>   <span class="n">vcard</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">29</span><span class="p">]</span>   <span class="n">void</span><span class="o">.</span><span class="n">rdf</span>
+<span class="p">[</span><span class="mi">30</span><span class="p">]</span>   <span class="n">whisky</span><span class="o">.</span><span class="n">rdf</span>
+<span class="o">--------------</span>
+<span class="n">Please</span> <span class="n">select</span> <span class="n">one</span> <span class="n">option</span> <span class="n">by</span> <span class="n">entering</span> <span class="n">its</span> <span class="n">number</span><span class="p">:</span>
+<span class="mi">24</span>
+<span class="n">Loaded</span> <span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="o">/.</span><span class="n">ontospy</span><span class="o">/</span><span class="n">models</span><span class="o">/</span><span class="n">sql</span><span class="o">.</span><span class="n">rdf</span>
+<span class="o">----------------</span>
+<span class="n">Ontologies</span><span class="o">......</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Classes</span><span class="o">.........</span><span class="p">:</span> <span class="mi">104</span>
+<span class="n">Properties</span><span class="o">......</span><span class="p">:</span> <span class="mi">11</span>
+<span class="o">..</span><span class="n">annotation</span><span class="o">....</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">..</span><span class="n">datatype</span><span class="o">......</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">..</span><span class="n">object</span><span class="o">........</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Concepts</span><span class="p">(</span><span class="n">SKOS</span><span class="p">)</span><span class="o">..</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">----------------</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#</span>
+<span class="n">A</span> <span class="n">vocabulary</span> <span class="n">that</span> <span class="n">allows</span> <span class="n">SQL</span> <span class="n">code</span> <span class="n">abstract</span> <span class="n">syntax</span> <span class="n">trees</span> <span class="n">to</span> <span class="n">be</span> <span class="n">published</span> <span class="ow">in</span> <span class="n">RDF</span><span class="o">.</span>
+<span class="o">&lt;</span><span class="n">sql</span><span class="o">.</span><span class="n">rdf</span><span class="o">&gt;</span><span class="p">:</span> <span class="k">class</span> <span class="nc">predicate</span>
+<span class="mi">2</span> <span class="n">matching</span> <span class="n">results</span><span class="p">:</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span>   <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#JoinPredicate</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span>   <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#Predicate</span>
+<span class="o">--------------</span>
+<span class="n">Please</span> <span class="n">select</span> <span class="n">one</span> <span class="n">option</span> <span class="n">by</span> <span class="n">entering</span> <span class="n">its</span> <span class="n">number</span><span class="p">:</span>
+<span class="mi">2</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#Predicate</span>
+<span class="n">Represents</span> <span class="n">a</span> <span class="n">collection</span> <span class="n">of</span> <span class="n">one</span> <span class="ow">or</span> <span class="n">more</span> <span class="n">expressions</span> <span class="ow">or</span> <span class="n">subqueries</span><span class="p">,</span> <span class="n">that</span> <span class="n">may</span> <span class="n">be</span> <span class="n">combined</span> <span class="k">with</span> <span class="n">logical</span> <span class="n">operators</span><span class="p">,</span> <span class="ow">and</span> <span class="n">when</span> <span class="n">evaluated</span> <span class="n">returns</span> <span class="n">one</span> <span class="n">of</span> <span class="n">the</span> <span class="n">TRUE</span> <span class="o">/</span> <span class="n">FALSE</span> <span class="o">/</span> <span class="n">UNKNOWN</span> <span class="n">truth</span> <span class="n">values</span><span class="o">.</span>
+<span class="o">----------------</span>
+<span class="n">Parents</span><span class="o">......</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Children</span><span class="o">.....</span><span class="p">:</span> <span class="mi">6</span>
+<span class="n">Ancestors</span><span class="o">....</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">Descendants</span><span class="o">..</span><span class="p">:</span> <span class="mi">12</span>
+<span class="n">Domain</span> <span class="n">of</span><span class="o">....</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Range</span> <span class="n">of</span><span class="o">.....</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Instances</span><span class="o">....</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">----------------</span>
+<span class="o">&lt;</span><span class="n">sql</span><span class="o">.</span><span class="n">rdf</span><span class="p">:</span> <span class="n">Predicate</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">serialize</span>
+
+<span class="nd">@prefix</span> <span class="n">rdf</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">1999</span><span class="o">/</span><span class="mo">02</span><span class="o">/</span><span class="mi">22</span><span class="o">-</span><span class="n">rdf</span><span class="o">-</span><span class="n">syntax</span><span class="o">-</span><span class="n">ns</span><span class="c">#&gt; .</span>
+<span class="nd">@prefix</span> <span class="n">rdfs</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2000</span><span class="o">/</span><span class="mo">01</span><span class="o">/</span><span class="n">rdf</span><span class="o">-</span><span class="n">schema</span><span class="c">#&gt; .</span>
+<span class="nd">@prefix</span> <span class="n">xml</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">XML</span><span class="o">/</span><span class="mi">1998</span><span class="o">/</span><span class="n">namespace</span><span class="o">&gt;</span> <span class="o">.</span>
+<span class="nd">@prefix</span> <span class="n">xsd</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">w3</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mi">2001</span><span class="o">/</span><span class="n">XMLSchema</span><span class="c">#&gt; .</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#Predicate&gt; a rdfs:Class ;</span>
+    <span class="n">rdfs</span><span class="p">:</span><span class="n">label</span> <span class="s">&quot;Predicate&quot;</span><span class="nd">@en</span> <span class="p">;</span>
+    <span class="n">rdfs</span><span class="p">:</span><span class="n">comment</span> <span class="s">&quot;Represents a collection of one or more expressions or subqueries, that may be combined with logical operators, and when evaluated returns one of the TRUE / FALSE / UNKNOWN truth values.&quot;</span><span class="nd">@en</span> <span class="p">;</span>
+    <span class="n">rdfs</span><span class="p">:</span><span class="n">isDefinedBy</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#&gt; ;</span>
+    <span class="n">rdfs</span><span class="p">:</span><span class="n">subClassOf</span> <span class="o">&lt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ns</span><span class="o">.</span><span class="n">inria</span><span class="o">.</span><span class="n">fr</span><span class="o">/</span><span class="n">ast</span><span class="o">/</span><span class="n">sql</span><span class="c">#ASTNode&gt; .</span>
+
+<span class="c"># etc......</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-ontospy-web-command">
+<h1>The <code class="docutils literal"><span class="pre">ontospy-web</span></code> command<a class="headerlink" href="#the-ontospy-web-command" title="Permalink to this headline">¶</a></h1>
+<p>Show a list of vocabularies registered on <a class="reference external" href="http://prefix.cc">http://prefix.cc</a></p>
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy-web -h
 
 Options:
   --version   show program&#39;s version number and exit
@@ -130,7 +254,7 @@ Options:
 </pre></div>
 </div>
 <p>Pass an argument to show only ontology that match it:</p>
-<div class="highlight-shell"><div class="highlight"><pre>python tools/catalog.py -q agent
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy-web -q agent
 ----------
 Reading source...
 ----------
@@ -153,10 +277,23 @@ Time:      10.04s
 </pre></div>
 </div>
 </div>
-<div class="section" id="the-ontospy-match-utility">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility<a class="headerlink" href="#the-ontospy-match-utility" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-ontospy-match-command">
+<h1>The <code class="docutils literal"><span class="pre">ontospy-match</span></code> command<a class="headerlink" href="#the-ontospy-match-command" title="Permalink to this headline">¶</a></h1>
 <p>Match two models (in development)</p>
-<div class="highlight-python"><div class="highlight"><pre>ontospy&gt; python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl
+<div class="highlight-python"><div class="highlight"><pre>&gt; ontospy-match -h
+Usage:
+
+Options:
+  --version             show program&#39;s version number and exit
+  -h, --help            show this help message and exit
+  -o OUTPUTFILE, --outputfile=OUTPUTFILE
+                        The name of the output csv file.
+  -v, --verbose         Verbose mode: prints results on screen too.
+
+
+
+
+&gt; ontospy-match data/schemas/foaf.rdf data/schemas/bibo.owl
 Match classes or properties? [c|p]: c
 ----------
 Loaded 630 triples from &lt;data/schemas/foaf.rdf&gt;
@@ -185,127 +322,7 @@ Now matching...
 Time:          7.14s
 
 # results are saved by default in same folder
-
-&gt; python tools/matcher.py -h
-Usage:
-
-Options:
-  --version             show program&#39;s version number and exit
-  -h, --help            show this help message and exit
-  -o OUTPUTFILE, --outputfile=OUTPUTFILE
-                        The name of the output csv file.
-  -c CONFIDENCE, --confidence=CONFIDENCE
-                        @TODO 0.1-0.9 degree of confidence for similarity
-                        matching.
 </pre></div>
-</div>
-</div>
-<div class="section" id="the-ontospy-sketch-utility">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility<a class="headerlink" href="#the-ontospy-sketch-utility" title="Permalink to this headline">¶</a></h2>
-<p>The library includes a little utility called <cite>ontospy-sketch</cite>.</p>
-<p>This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.</p>
-<p>It is meant to be used from the command line and requires you to type in RDF statements using the Turtle serialization.</p>
-<p><em>Note</em>: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to <cite>usr/local/bin</cite> (on unix-based systems). You can run it by typing <cite>sketchonto</cite>.</p>
-<div class="highlight-python"><div class="highlight"><pre>&gt; ontospy-sketch
-Good morning. Ready to Turtle away. Type docs() for help.
-In [1]: docs()
-
-====Sketch v 0.2====
-
-add()  ==&gt; add statements to the graph
-...........SHORTCUTS:
-...........&#39;class&#39; = owl:Class
-...........&#39;sub&#39; = rdfs:subClassOf
-...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
-
-show() ==&gt; shows the graph. Can take an OPTIONAL argument for the format.
-...........eg one of[&#39;xml&#39;, &#39;n3&#39;, &#39;turtle&#39;, &#39;nt&#39;, &#39;pretty-xml&#39;, dot&#39;]
-
-clear()  ==&gt; clears the graph
-...........all triples are removed
-
-omnigraffle() ==&gt; creates a dot file and opens it with omnigraffle
-...........First you must set Omingraffle as your system default app for dot files!
-
-quit() ==&gt; exit
-
-====Have fun!====
-
-
-In [2]: add()
-Multi-line input. Enter ### when finished.
-:person a class
-:mike a :person
-:person sub :agent
-:organization sub :agent
-:worksIn rdfs:domain :person
-:worksIn rdfs:range :organization
-:mike :worksIn :DamageInc
-:DamageInc a :organization
-
-In [3]: show()
-@prefix : &lt;http://this.sketch#&gt; .
-@prefix bibo: &lt;http://purl.org/ontology/bibo/&gt; .
-@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
-@prefix npg: &lt;http://ns.nature.com/terms/&gt; .
-@prefix npgg: &lt;http://ns.nature.com/graphs/&gt; .
-@prefix npgx: &lt;http://ns.nature.com/extensions/&gt; .
-@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
-@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
-@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
-@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
-@prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-:mike a :person ;
-    :worksIn :DamageInc .
-
-:worksIn rdfs:domain :person ;
-    rdfs:range :organization .
-
-:DamageInc a :organization .
-
-:organization rdfs:subClassOf :agent .
-
-:person a owl:Class ;
-    rdfs:subClassOf :agent .
-
-
-
-In [4]: show(&quot;xml&quot;)
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;rdf:RDF
-   xmlns=&quot;http://this.sketch#&quot;
-   xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;
-   xmlns:rdfs=&quot;http://www.w3.org/2000/01/rdf-schema#&quot;
-&gt;
-  &lt;rdf:Description rdf:about=&quot;http://this.sketch#mike&quot;&gt;
-    &lt;rdf:type rdf:resource=&quot;http://this.sketch#person&quot;/&gt;
-    &lt;worksIn rdf:resource=&quot;http://this.sketch#DamageInc&quot;/&gt;
-  &lt;/rdf:Description&gt;
-  &lt;rdf:Description rdf:about=&quot;http://this.sketch#organization&quot;&gt;
-    &lt;rdfs:subClassOf rdf:resource=&quot;http://this.sketch#agent&quot;/&gt;
-  &lt;/rdf:Description&gt;
-  &lt;rdf:Description rdf:about=&quot;http://this.sketch#DamageInc&quot;&gt;
-    &lt;rdf:type rdf:resource=&quot;http://this.sketch#organization&quot;/&gt;
-  &lt;/rdf:Description&gt;
-  &lt;rdf:Description rdf:about=&quot;http://this.sketch#person&quot;&gt;
-    &lt;rdf:type rdf:resource=&quot;http://www.w3.org/2002/07/owl#Class&quot;/&gt;
-    &lt;rdfs:subClassOf rdf:resource=&quot;http://this.sketch#agent&quot;/&gt;
-  &lt;/rdf:Description&gt;
-  &lt;rdf:Description rdf:about=&quot;http://this.sketch#worksIn&quot;&gt;
-    &lt;rdfs:domain rdf:resource=&quot;http://this.sketch#person&quot;/&gt;
-    &lt;rdfs:range rdf:resource=&quot;http://this.sketch#organization&quot;/&gt;
-  &lt;/rdf:Description&gt;
-&lt;/rdf:RDF&gt;
-
-In [5]: omnigraffle()
-### saves a dot file and tries to open it with your default editor
-### if you&#39;re on a mac and have omnigraffle - that could be the one!
-
-In [6]: quit()
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -317,24 +334,20 @@ In [6]: quit()
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Quick Start - Command Line</a><ul>
-<li><a class="reference internal" href="#the-ontospy-utility">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility</a><ul>
-<li><a class="reference internal" href="#include-labels-in-property-tree">Include labels in property tree</a></li>
+<li><a class="reference internal" href="#">Command Line Tools</a></li>
+<li><a class="reference internal" href="#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a><ul>
+<li><a class="reference internal" href="#getting-help">Getting help</a></li>
+<li><a class="reference internal" href="#print-options">Print options</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-ontospy-catalog-utility">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility</a></li>
-<li><a class="reference internal" href="#the-ontospy-match-utility">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility</a></li>
-<li><a class="reference internal" href="#the-ontospy-sketch-utility">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#the-ontospy-shell-command">The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command</a></li>
+<li><a class="reference internal" href="#the-ontospy-web-command">The <code class="docutils literal"><span class="pre">ontospy-web</span></code> command</a></li>
+<li><a class="reference internal" href="#the-ontospy-match-command">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> command</a></li>
 </ul>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="quickstart.html"
                         title="previous chapter">Quick Start - Python</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="tests.html"
-                        title="next chapter">Running the tests</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -366,12 +379,9 @@ In [6]: quit()
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="tests.html" title="Running the tests"
-             >next</a> |</li>
-        <li class="right" >
           <a href="quickstart.html" title="Quick Start - Python"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -21,7 +21,7 @@ from colorama import Fore, Back, Style
 
 from .libs.graph import Graph, SparqlEndpoint
 from .libs.util import bcolors, pprinttable, printDebug
-from .tools	import web
+
 from ._version import *
 
 
@@ -248,35 +248,6 @@ def action_import_folder(location):
 
 
 
-def action_webimport():
-	"""List models from web catalog (prefix.cc) and ask which one to import"""
-
-	options = web.getCatalog()
-	counter = 1
-	for x in options:
-		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
-		# print Fore.BLUE + x[0], " ==> ", x[1]
-		counter += 1
-
-	while True:
-		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=exit)\n" + Style.RESET_ALL)
-		if var == "q":
-			break
-		else:
-			try:
-				_id = int(var)
-				ontouri = options[_id - 1][1]
-				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
-				action_import(ontouri)
-			except:
-				continue
-
-
-
-
-
-
-
 
 ##################
 # 
@@ -345,17 +316,13 @@ def parse_options():
 			action="store_true", default=False, dest="shell",
 			help="Interactive explorer of the ontologies in the local repository")	
 			
-	parser.add_option("", "--repo",
-			action="store_true", default=False, dest="repo",
-			help="List ontologies in the local repository") 
-
 	parser.add_option("", "--import",
 			action="store_true", default=False, dest="_import",
 			help="Imports file/folder/url into the local repository") 
 
-	parser.add_option("", "--web",
-			action="store_true", default=False, dest="web",
-			help="List and import schemas registered on http://prefix.cc/") 
+	parser.add_option("", "--repo",
+			action="store_true", default=False, dest="repo",
+			help="List ontologies in the local repository") 
 
 	parser.add_option("", "--cache",
 			action="store_true", default=False, dest="cache",
@@ -388,7 +355,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.reset and not opts.repo and not opts.cache and not opts.web and len(args) < 1:
+	if not opts.shell and not opts.reset and not opts.repo and not opts.cache and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -445,13 +412,6 @@ def main():
 			Style.RESET_ALL
 		get_or_create_home_repo()
 		Shell().cmdloop()
-		raise SystemExit, 1
-
-		
-	# load web catalog
-	if opts.web:
-		get_or_create_home_repo()
-		action_webimport()
 		raise SystemExit, 1
 
 		

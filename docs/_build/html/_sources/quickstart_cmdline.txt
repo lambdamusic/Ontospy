@@ -1,29 +1,62 @@
-Quick Start - Command Line
+Command Line Tools
 ************************
 A few examples of how to use the command line utilities that come with OntoSPy. 
 
-Note: if you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (on unix-based systems, or similar on windows). 
+Currently these are the utility scripts available: 
 
-Currenlty the utility scripts available are 4: 
-
-- ``ontospy``: load a graph and show schema information.
-- ``ontospy-catalog``: discover commonly used ontologies. 
-- ``ontospy-match``: bootstrap mappings between two models.
-- ``ontospy-sketch``: sketch a turtle model interactively.
-
-  
-.. warning::
-    This documentation is still in draft mode. 
+- ``ontospy``: load a graph and show schema information
+- ``ontospy-shell``: launch the interactive ontospy shell  
+- ``ontospy-web``: discover commonly used ontologies listed on prefix.cc 
+- ``ontospy-match``: bootstrap mappings between two vocabularies
+- ``ontospy-sketch``: sketch a turtle model interactively
 
 
+.. note::
+    If you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (on unix-based systems, or similar on windows). 
+    
 
-The ``ontospy`` utility
-+++++++++++++++++++++++++++++++
 
-.....
 
-Include labels in property tree
+The ``ontospy`` command
+*******************
+
+.. code-block:: shell
+
+    >python ontospy.py http://xmlns.com/foaf/spec/
+
+    # prints info about foaf resolving redirects etc..
+    # etc..
+
+
+Getting help
 ---------------------------------------------
+
+.. code-block:: shell
+
+	> ontospy -h
+	OntoSPy v1.6.1
+	Usage: ontospy <ontology-file-or-uri> [options]
+
+	Options:
+	  --version   show program's version number and exit
+	  -h, --help  show this help message and exit
+	  --shell     Interactive explorer of the ontologies in the local repository
+	  --repo      List ontologies in the local repository
+	  --import    Imports file/folder/url into the local repository
+	  --cache     Rebuild the cache for the local repository
+	  --reset     Resets the local repository by removing all existing files
+	  -a          Print the ontology annotations/metadata.
+	  -c          Print the class taxonomy.
+	  -p          Print the property taxonomy.
+	  -s          Print the SKOS taxonomy.
+	  -l          Print entities labels as well as URIs (used with -c or -p or
+	              -s).
+                  
+                  
+
+Print options  
+---------------------------------------------
+E.g. print only the class tree and show rdfs:labels 
 
 .. code-block:: shell
 
@@ -73,17 +106,118 @@ Include labels in property tree
 
 
 
+The ``ontospy-shell`` command
+*******************
+The shell is an interactive environment that lets you import, load and inspect vocabularies. 
 
-The ``ontospy-catalog`` utility
-+++++++++++++++++++++++++++++++
+.. code-block:: python
 
-Show a list of ontologies from the web
+    > ontospy-shell
+    
+    ** OntoSPy Interactive Ontology Documentation Environment v1.6.1 **
+    Local repository: </Users/michele.pasin/.ontospy>
+    Type 'help' to get started. Use TAB to explore commands.
+    <OntoSPy>: help
+
+    Commands
+    --------
+    annotations  currentEntity    help      quit       tree   
+    class        currentOntology  ontology  serialize  triples
+    concept      delete           property  summary    up     
+    next         zen            
+
+    <OntoSPy>: ontology
+    30 results in total: 
+    [1]   7habits_centeredness.ttl
+    [2]   7habits_main_schema.ttl
+    [3]   bfo-1.1.owl
+    [4]   bibo.owl
+    [5]   blogs.ttl
+    [6]   cito.rdf
+    [7]   core
+    [8]   fabio.rdf
+    [9]   fea
+    [10]   foaf.rdf
+    [11]   frbr.rdf
+    [12]   goodrelations.rdf
+    [13]   mini_philosophy.owl
+    [14]   musicontology.rdf
+    [15]   npg-article-types-ontology.ttl
+    [16]   npg-core-ontology.ttl
+    [17]   oan
+    [18]   philosophy-2006.owl
+    [19]   philosophy-2007.owl
+    [20]   philosurfical_2010.owl
+    [21]   pizza.ttl
+    [22]   semanticbible.owl
+    [23]   skos.rdf
+    [24]   sql.rdf
+    [25]   subjects.ttl
+    [26]   time.owl
+    [27]   vann.rdf
+    [28]   vcard.rdf
+    [29]   void.rdf
+    [30]   whisky.rdf
+    --------------
+    Please select one option by entering its number: 
+    24
+    Loaded /Users/michele.pasin/.ontospy/models/sql.rdf
+    ----------------
+    Ontologies......: 1
+    Classes.........: 104
+    Properties......: 11
+    ..annotation....: 0
+    ..datatype......: 0
+    ..object........: 0
+    Concepts(SKOS)..: 0
+    ----------------
+    http://ns.inria.fr/ast/sql#
+    A vocabulary that allows SQL code abstract syntax trees to be published in RDF.
+    <sql.rdf>: class predicate
+    2 matching results: 
+    [1]   http://ns.inria.fr/ast/sql#JoinPredicate
+    [2]   http://ns.inria.fr/ast/sql#Predicate
+    --------------
+    Please select one option by entering its number: 
+    2
+    http://ns.inria.fr/ast/sql#Predicate
+    Represents a collection of one or more expressions or subqueries, that may be combined with logical operators, and when evaluated returns one of the TRUE / FALSE / UNKNOWN truth values.
+    ----------------
+    Parents......: 1
+    Children.....: 6
+    Ancestors....: 1
+    Descendants..: 12
+    Domain of....: 0
+    Range of.....: 0
+    Instances....: 0
+    ----------------
+    <sql.rdf: Predicate>: serialize
+
+    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix xml: <http://www.w3.org/XML/1998/namespace> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+    <http://ns.inria.fr/ast/sql#Predicate> a rdfs:Class ;
+        rdfs:label "Predicate"@en ;
+        rdfs:comment "Represents a collection of one or more expressions or subqueries, that may be combined with logical operators, and when evaluated returns one of the TRUE / FALSE / UNKNOWN truth values."@en ;
+        rdfs:isDefinedBy <http://ns.inria.fr/ast/sql#> ;
+        rdfs:subClassOf <http://ns.inria.fr/ast/sql#ASTNode> .
+
+    # etc......
+    
+
+
+
+The ``ontospy-web`` command
+*******************
+
+Show a list of vocabularies registered on http://prefix.cc
 
 
 .. code-block:: shell
 
-    python tools/catalog.py
-    Usage: python ontospy/tools/catalog.py
+    > ontospy-web -h
 
     Options:
       --version   show program's version number and exit
@@ -96,7 +230,7 @@ Pass an argument to show only ontology that match it:
 
 .. code-block:: shell
 
-    python tools/catalog.py -q agent
+    > ontospy-web -q agent
     ----------
     Reading source...
     ----------
@@ -122,14 +256,27 @@ Pass an argument to show only ontology that match it:
 
 
 
-The ``ontospy-match`` utility
-+++++++++++++++++++++++++++++++
+The ``ontospy-match`` command
+*******************
 
 Match two models (in development)
 
 .. code-block:: python
 
-    ontospy> python tools/matcher.py data/schemas/foaf.rdf data/schemas/bibo.owl 
+    > ontospy-match -h
+    Usage: 
+
+    Options:
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -o OUTPUTFILE, --outputfile=OUTPUTFILE
+                            The name of the output csv file.
+      -v, --verbose         Verbose mode: prints results on screen too.
+
+                            
+
+    
+    > ontospy-match data/schemas/foaf.rdf data/schemas/bibo.owl 
     Match classes or properties? [c|p]: c
     ----------
     Loaded 630 triples from <data/schemas/foaf.rdf>
@@ -159,133 +306,6 @@ Match two models (in development)
 
     # results are saved by default in same folder
     
-    > python tools/matcher.py -h
-    Usage: 
-
-    Options:
-      --version             show program's version number and exit
-      -h, --help            show this help message and exit
-      -o OUTPUTFILE, --outputfile=OUTPUTFILE
-                            The name of the output csv file.
-      -c CONFIDENCE, --confidence=CONFIDENCE
-                            @TODO 0.1-0.9 degree of confidence for similarity
-                            matching.
-                            
-
-
-
-The ``ontospy-sketch`` utility
-+++++++++++++++++++++++++++++++
-
-The library includes a little utility called `ontospy-sketch`. 
-
-This is a (still rather rudimentary) interactive environment aimed at facilitating the initial development of RDF models.
-
-It is meant to be used from the command line and requires you to type in RDF statements using the Turtle serialization. 
-
-*Note*: if you install ontosPy using easy_install or pip, an  executable is automatically created and added to `usr/local/bin` (on unix-based systems). You can run it by typing `sketchonto`. 
-
-.. code-block:: python
-
-    > ontospy-sketch
-    Good morning. Ready to Turtle away. Type docs() for help.
-    In [1]: docs()
-
-    ====Sketch v 0.2====
-
-    add()  ==> add statements to the graph
-    ...........SHORTCUTS:
-    ...........'class' = owl:Class
-    ...........'sub' = rdfs:subClassOf
-    ...........TURTLE SYNTAX:  http://www.w3.org/TR/turtle/
-
-    show() ==> shows the graph. Can take an OPTIONAL argument for the format.
-    ...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot']
-
-    clear()  ==> clears the graph
-    ...........all triples are removed
-
-    omnigraffle() ==> creates a dot file and opens it with omnigraffle
-    ...........First you must set Omingraffle as your system default app for dot files!
-
-    quit() ==> exit
-
-    ====Have fun!====
-
-
-    In [2]: add()
-    Multi-line input. Enter ### when finished.
-    :person a class
-    :mike a :person
-    :person sub :agent
-    :organization sub :agent
-    :worksIn rdfs:domain :person
-    :worksIn rdfs:range :organization
-    :mike :worksIn :DamageInc
-    :DamageInc a :organization
-
-    In [3]: show()
-    @prefix : <http://this.sketch#> .
-    @prefix bibo: <http://purl.org/ontology/bibo/> .
-    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-    @prefix npg: <http://ns.nature.com/terms/> .
-    @prefix npgg: <http://ns.nature.com/graphs/> .
-    @prefix npgx: <http://ns.nature.com/extensions/> .
-    @prefix owl: <http://www.w3.org/2002/07/owl#> .
-    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-    @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-    :mike a :person ;
-        :worksIn :DamageInc .
-
-    :worksIn rdfs:domain :person ;
-        rdfs:range :organization .
-
-    :DamageInc a :organization .
-
-    :organization rdfs:subClassOf :agent .
-
-    :person a owl:Class ;
-        rdfs:subClassOf :agent .
-
-
-
-    In [4]: show("xml")
-    <?xml version="1.0" encoding="UTF-8"?>
-    <rdf:RDF
-       xmlns="http://this.sketch#"
-       xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-       xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-    >
-      <rdf:Description rdf:about="http://this.sketch#mike">
-        <rdf:type rdf:resource="http://this.sketch#person"/>
-        <worksIn rdf:resource="http://this.sketch#DamageInc"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="http://this.sketch#organization">
-        <rdfs:subClassOf rdf:resource="http://this.sketch#agent"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="http://this.sketch#DamageInc">
-        <rdf:type rdf:resource="http://this.sketch#organization"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="http://this.sketch#person">
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
-        <rdfs:subClassOf rdf:resource="http://this.sketch#agent"/>
-      </rdf:Description>
-      <rdf:Description rdf:about="http://this.sketch#worksIn">
-        <rdfs:domain rdf:resource="http://this.sketch#person"/>
-        <rdfs:range rdf:resource="http://this.sketch#organization"/>
-      </rdf:Description>
-    </rdf:RDF>
-
-    In [5]: omnigraffle()
-    ### saves a dot file and tries to open it with your default editor
-    ### if you're on a mac and have omnigraffle - that could be the one!
-
-    In [6]: quit()
-
 
 
 

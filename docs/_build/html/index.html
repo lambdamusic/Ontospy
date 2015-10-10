@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to OntoSPy’s documentation! &mdash; OntoSPy 1.5.0 alpha documentation</title>
+    <title>Welcome to OntoSPy’s documentation! &mdash; OntoSPy 1.6.2 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.0 alpha',
+        VERSION:     '1.6.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.5.0 alpha documentation" href="#" />
+    <link rel="top" title="OntoSPy 1.6.2 documentation" href="#" />
     <link rel="next" title="Installation" href="installation.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -47,16 +47,16 @@
             
   <div class="section" id="welcome-to-ontospy-s-documentation">
 <h1>Welcome to OntoSPy&#8217;s documentation!<a class="headerlink" href="#welcome-to-ontospy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.</p>
+<p>OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies encoded using one of the W3C Semantic Web standards.</p>
 <div class="section" id="in-a-nutshell">
 <h2>In a nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h2>
-<p>OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base.</p>
-<p>Originally, I developed this in order to get the hang of the Python RDFLib library (note: it was previously called OntoInspector and hosted on BitBucket). RDFLib provides a number of useful primitives for working with RDF graphs; however it lacks an API aimed at interrogating and modifying a graph based on its defined schema - aka the ontology.</p>
-<p>The basic worflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class; you get back an object that lets you interrogate the RDFS/OWL schema. That&#8217;s all!</p>
-<p>Ps: the library can be used in standalone mode too.</p>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This documentation is still in draft mode.</p>
+<p>OntoSPy is a lightweight Python library and command line tool for inspecting and navigating vocabularies encoded using W3C Semantic Web standards (aka ontologies).</p>
+<p>In a nutshell: if you have a bunch of RDF schemas you regularly need to interrogate, but don&#8217;t want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you.</p>
+<p>The basic workflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class with a file containing RDFS/OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That&#8217;s all!</p>
+<p>The same functionalities are accessible also via the command line by using the  <cite>ontospy</cite> application. This includes also an interactive environment (<cite>ontospy &#8211;shell</cite>) that allows to import ontologies into a local repository so that they can be quickly opened for inspection later on.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that.</p>
 </div>
 </div>
 <div class="section" id="see-also">
@@ -77,21 +77,18 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#inspecting-a-graph">Inspecting a graph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#getting-data-from-multiple-ontologies">Getting data from multiple ontologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#loading-and-querying-the-foaf-vocabulary">Loading and querying the FOAF vocabulary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Quick Start - Command Line</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-utility">The <code class="docutils literal"><span class="pre">ontospy</span></code> utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-catalog-utility">The <code class="docutils literal"><span class="pre">ontospy-catalog</span></code> utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-utility">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-sketch-utility">The <code class="docutils literal"><span class="pre">ontospy-sketch</span></code> utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#getting-help">Getting help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#print-options">Print options</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tests.html">Running the tests</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tests.html#tests">Tests</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-shell-command">The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-web-command">The <code class="docutils literal"><span class="pre">ontospy-web</span></code> command</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-match-command">The <code class="docutils literal"><span class="pre">ontospy-match</span></code> command</a></li>
 </ul>
 </div>
 </div>
@@ -158,7 +155,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.5.0 alpha documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.6.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

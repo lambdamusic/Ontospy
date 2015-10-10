@@ -11,13 +11,13 @@ Shows a list of ontologies by querying http://prefix.cc/popular/all
 
 """
 
-MODULE_VERSION = 0.2
+MODULE_VERSION = 0.3
 USAGE = "ontospy-web <options>"
 
 
-import time, optparse, os, rdflib
+import time, optparse, os, rdflib, sys
 
-
+from .. import ontospy 
 from ..libs.graph import Graph
 from ..libs.util import *
 
@@ -50,10 +50,40 @@ def getCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 	
 def printCatalog(_list):
 	""" 
-	prints out to terminal
+	prints out to terminal -- 2015-10-10: deprecated
 	"""
 	for x in _list:
 		print x[0], " ==> ", x[1]			
+
+
+
+
+def action_webimport(options):
+	"""
+	List models from web catalog (prefix.cc) and ask which one to import
+	2015-10-10: originally part of main ontospy; now standalone only 
+	"""
+
+	# options = web.getCatalog()
+	counter = 1
+	for x in options:
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
+		# print Fore.BLUE + x[0], " ==> ", x[1]
+		counter += 1
+
+	while True:
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=exit)\n" + Style.RESET_ALL)
+		if var == "q":
+			break
+		else:
+			try:
+				_id = int(var)
+				ontouri = options[_id - 1][1]
+				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				ontospy.action_import(ontouri)
+			except:
+				continue
+
 
 
 
@@ -95,13 +125,15 @@ def main():
 	""" command line script """
 	
 	print "OntoSPy " + ontospy.VERSION
-
+	
+	ontospy.get_or_create_home_repo() 
+	
 	opts, args = parse_options()
 					
 	sTime = time.time()
 				
 	_list = getCatalog(query=opts.query)
-	printCatalog(_list)
+	action_webimport(_list)
 
 	
 	# finally:	
@@ -117,8 +149,8 @@ def main():
 				
 	
 if __name__ == '__main__':
-	import sys
-	from .. import ontospy
+	
+	# from .. import ontospy
 	try:
 		main()
 		sys.exit(0)

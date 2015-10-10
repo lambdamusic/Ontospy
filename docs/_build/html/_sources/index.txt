@@ -6,23 +6,26 @@
 Welcome to OntoSPy's documentation!
 ===================================
 
-OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
+OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies encoded using one of the W3C Semantic Web standards.
 
 
 In a nutshell
 --------------
 
-OntosPy allows you to extract all the schema information from an RDFS/OWL ontology, inspect it and use it query a corresponding knowledge base. 
+OntoSPy is a lightweight Python library and command line tool for inspecting and navigating vocabularies encoded using W3C Semantic Web standards (aka ontologies). 
 
-Originally, I developed this in order to get the hang of the Python RDFLib library (note: it was previously called OntoInspector and hosted on BitBucket). RDFLib provides a number of useful primitives for working with RDF graphs; however it lacks an API aimed at interrogating and modifying a graph based on its defined schema - aka the ontology.
+In a nutshell: if you have a bunch of RDF schemas you regularly need to interrogate, but don't want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you. 
 
-The basic worflow is simple: load a graph by instantiating the ``Graph`` class; you get back an object that lets you interrogate the RDFS/OWL schema. That's all!
+The basic workflow is simple: load a graph by instantiating the ``Graph`` class with a file containing RDFS/OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
 
-Ps: the library can be used in standalone mode too.
+The same functionalities are accessible also via the command line by using the  `ontospy` application. This includes also an interactive environment (`ontospy --shell`) that allows to import ontologies into a local repository so that they can be quickly opened for inspection later on.  
 
-.. warning::
-	This documentation is still in draft mode. 
-
+.. note::
+	OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that. 
+    
+.. .. warning::
+..     This documentation is still in draft mode.
+..
 
 See also
 --------------

@@ -1,12 +1,6 @@
 Installation
 ===================================
 
-
-.. warning::
-	This documentation is still in draft mode. 
-
-
-
 Prerequisites
 --------------
 - Python (untested on v3)
@@ -17,7 +11,10 @@ Prerequisites
 
 Installation: Web (recommended)
 --------------
-Get it from the CheeseShop via your preferred method:
+Install `setuptools 
+<https://pypi.python.org/pypi/setuptools>`_ or `pip <https://pip.pypa.io/en/stable/installing/>`_.
+
+Then install OntoSPy from the Python Package Index: 
 
 ``easy_install ontospy``
 
