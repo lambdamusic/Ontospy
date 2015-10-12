@@ -55,24 +55,28 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Python (untested on v3)</li>
-<li><a class="reference external" href="http://www.rdflib.net/">http://www.rdflib.net/</a> (tested on versions 2.4 and 3.0).</li>
+<li>A python package manager: <a href="#id1"><span class="problematic" id="id2">`</span></a>setuptools</li>
 </ul>
+<p>&lt;<a class="reference external" href="https://pypi.python.org/pypi/setuptools">https://pypi.python.org/pypi/setuptools</a>&gt;`_ or <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a>.</p>
 </div>
 <div class="section" id="installation-web-recommended">
 <h2>Installation: Web (recommended)<a class="headerlink" href="#installation-web-recommended" title="Permalink to this headline">¶</a></h2>
-<p>Install <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a> or <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a>.</p>
-<p>Then install OntoSPy from the Python Package Index:</p>
+<p>Once you have a package manager installed, get OntoSPy from the Python Package Index:</p>
 <p><code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">ontospy</span></code></p>
 <p>Or:</p>
 <p><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span></code></p>
-<p>The python library and all of its command line executables will be installed.</p>
+<p>The python library, its dependencies and all of its command-line executables will be installed.</p>
 </div>
 <div class="section" id="installation-manual">
 <h2>Installation: Manual<a class="headerlink" href="#installation-manual" title="Permalink to this headline">¶</a></h2>
-<p>Get the source code from the GitHub repository:</p>
-<p><code class="docutils literal"><span class="pre">https://github.com/lambdamusic/ontosPy</span></code></p>
-<p>Then run:</p>
+<p>Get the source code from the <a class="reference external" href="https://github.com/lambdamusic/ontosPy">GitHub repository</a> , then run:</p>
 <p><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></p>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>OntoSPy couldn&#8217;t exist without the following libraries.
+- <a class="reference external" href="http://www.rdflib.net/">rdflib</a>  (tested on versions 2.4 and 3.0)
+- colorama</p>
 </div>
 </div>
 
@@ -88,6 +92,7 @@
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li><a class="reference internal" href="#installation-web-recommended">Installation: Web (recommended)</a></li>
 <li><a class="reference internal" href="#installation-manual">Installation: Manual</a></li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
 </li>
 </ul>

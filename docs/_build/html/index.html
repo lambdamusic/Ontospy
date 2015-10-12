@@ -47,24 +47,39 @@
             
   <div class="section" id="welcome-to-ontospy-s-documentation">
 <h1>Welcome to OntoSPy&#8217;s documentation!<a class="headerlink" href="#welcome-to-ontospy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies encoded using one of the W3C Semantic Web standards.</p>
+<p>OntoSPy is an RDFLIb-based Python toolkit for inspecting RDF vocabularies.</p>
+<ul class="simple">
+<li>Pypi: <a class="reference external" href="https://pypi.python.org/pypi/ontospy">https://pypi.python.org/pypi/ontospy</a></li>
+<li>Github: <a class="reference external" href="https://github.com/lambdamusic/OntoSPy">https://github.com/lambdamusic/OntoSPy</a></li>
+</ul>
 <div class="section" id="in-a-nutshell">
 <h2>In a nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h2>
 <p>OntoSPy is a lightweight Python library and command line tool for inspecting and navigating vocabularies encoded using W3C Semantic Web standards (aka ontologies).</p>
-<p>In a nutshell: if you have a bunch of RDF schemas you regularly need to interrogate, but don&#8217;t want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you.</p>
-<p>The basic workflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class with a file containing RDFS/OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That&#8217;s all!</p>
-<p>The same functionalities are accessible also via the command line by using the  <cite>ontospy</cite> application. This includes also an interactive environment (<cite>ontospy &#8211;shell</cite>) that allows to import ontologies into a local repository so that they can be quickly opened for inspection later on.</p>
+<p>The basic workflow is simple: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That&#8217;s all!</p>
+</div>
+<div class="section" id="is-ontospy-for-me">
+<h2>Is OntoSPy for me?<a class="headerlink" href="#is-ontospy-for-me" title="Permalink to this headline">¶</a></h2>
+<p>If you have a bunch of RDF vocabularies you regularly need to interrogate, but don&#8217;t want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you.</p>
+<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy foaf.rdf  <span class="c"># tells you all there is to know about the foaf vocabulary</span>
+----------
+Loaded <span class="m">630</span> triples from &lt;foaf.rdf&gt;
+started scanning...
+----------
+Ontologies found: 1
+Classes found...: 15
+Properties found: 67
+Annotation......: 7
+Datatype........: 26
+Object..........: 34
+-----------
+<span class="c"># ..etc..</span>
+</pre></div>
+</div>
+<p>The same functionalities are accessible also via a handy command line application. This consists of an interactive environment (<cite>ontospy &#8211;shell</cite>) that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that.</p>
 </div>
-</div>
-<div class="section" id="see-also">
-<h2>See also<a class="headerlink" href="#see-also" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Homepage on Pypi: <a class="reference external" href="https://pypi.python.org/pypi/ontospy">https://pypi.python.org/pypi/ontospy</a></li>
-<li>Homepage on Github: <a class="reference external" href="https://github.com/lambdamusic/OntoSPy">https://github.com/lambdamusic/OntoSPy</a></li>
-</ul>
 </div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
@@ -74,6 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installation-web-recommended">Installation: Web (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
@@ -112,7 +128,7 @@
   <ul>
 <li><a class="reference internal" href="#">Welcome to OntoSPy&#8217;s documentation!</a><ul>
 <li><a class="reference internal" href="#in-a-nutshell">In a nutshell</a></li>
-<li><a class="reference internal" href="#see-also">See also</a></li>
+<li><a class="reference internal" href="#is-ontospy-for-me">Is OntoSPy for me?</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 </ul>
 </li>

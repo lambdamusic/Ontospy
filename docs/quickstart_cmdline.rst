@@ -13,6 +13,10 @@ Currently these are the utility scripts available:
 
 .. note::
     If you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (on unix-based systems, or similar on windows). 
+
+.. warning::
+    This documentation is still in draft mode.
+
     
 
 
@@ -22,7 +26,7 @@ The ``ontospy`` command
 
 .. code-block:: shell
 
-    >python ontospy.py http://xmlns.com/foaf/spec/
+    >ontospy http://xmlns.com/foaf/spec/
 
     # prints info about foaf resolving redirects etc..
     # etc..

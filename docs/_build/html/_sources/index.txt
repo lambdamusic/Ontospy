@@ -6,7 +6,11 @@
 Welcome to OntoSPy's documentation!
 ===================================
 
-OntoSPy is an RDFLIb-based Python toolkit for inspecting ontologies encoded using one of the W3C Semantic Web standards.
+OntoSPy is an RDFLIb-based Python toolkit for inspecting RDF vocabularies.
+
+- Pypi: https://pypi.python.org/pypi/ontospy 
+
+- Github: https://github.com/lambdamusic/OntoSPy
 
 
 In a nutshell
@@ -14,25 +18,37 @@ In a nutshell
 
 OntoSPy is a lightweight Python library and command line tool for inspecting and navigating vocabularies encoded using W3C Semantic Web standards (aka ontologies). 
 
-In a nutshell: if you have a bunch of RDF schemas you regularly need to interrogate, but don't want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you. 
-
-The basic workflow is simple: load a graph by instantiating the ``Graph`` class with a file containing RDFS/OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
-
-The same functionalities are accessible also via the command line by using the  `ontospy` application. This includes also an interactive environment (`ontospy --shell`) that allows to import ontologies into a local repository so that they can be quickly opened for inspection later on.  
-
-.. note::
-	OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that. 
+The basic workflow is simple: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
     
 .. .. warning::
 ..     This documentation is still in draft mode.
 ..
 
-See also
+
+Is OntoSPy for me? 
 --------------
 
-- Homepage on Pypi: https://pypi.python.org/pypi/ontospy 
+If you have a bunch of RDF vocabularies you regularly need to interrogate, but don't want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you. 
 
-- Homepage on Github: https://github.com/lambdamusic/OntoSPy
+.. code-block:: shell
+
+    > ontospy foaf.rdf  # tells you all there is to know about the foaf vocabulary
+    ----------
+    Loaded 630 triples from <foaf.rdf>
+    started scanning...
+    ----------
+    Ontologies found: 1
+    Classes found...: 15
+    Properties found: 67
+    Annotation......: 7
+    Datatype........: 26
+    Object..........: 34
+    -----------
+    # ..etc.. 
+    
+The same functionalities are accessible also via a handy command line application. This consists of an interactive environment (`ontospy --shell`) that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.  
+
+.. note:: OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that.
 
 
 Contents
