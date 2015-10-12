@@ -178,6 +178,8 @@ def action_listlocal():
 		print "No files in the local repository. Use the --import command."
 
 
+
+
 def action_import(location):
 	"""import files into the local repo """
 
@@ -185,8 +187,8 @@ def action_import(location):
 	fullpath = ""
 	try:
 		if location.startswith("http://"):
-			headers = "Accept: application/rdf+xml"
-			req = urllib2.Request(location, headers)
+			headers = {'Accept': "application/rdf+xml"}
+			req = urllib2.Request(location, headers=headers)
 			res = urllib2.urlopen(req)
 			final_location = res.geturl()  # after 303 redirects
 			print "Loaded <%s>" % final_location
@@ -196,7 +198,6 @@ def action_import(location):
 			file_ = open(fullpath, 'w')
 			file_.write(res.read())
 			file_.close()
-
 		else:
 			if os.path.isfile(location):
 				filename = location.split("/")[-1] or location.split("/")[-2]
@@ -240,9 +241,10 @@ def action_import_folder(location):
 			if not file.startswith("."):
 				filepath = os.path.join(location,file)
 				print Fore.RED + "\n---------\n" + filepath + "\n---------" + Style.RESET_ALL
-				action_import(filepath)
+				return action_import(filepath)
 	else:
 		print "Not a valid directory"
+		return None
 
 
 
@@ -397,10 +399,11 @@ def main():
 		get_or_create_home_repo()
 		_location = args[0]
 		if os.path.isdir(_location):
-			action_import_folder(_location)
+			res = action_import_folder(_location)
 		else:
-			action_import(_location)
-		action_listlocal()	
+			res = action_import(_location)
+		if res: 
+			action_listlocal()	
 		raise SystemExit, 1
 
 

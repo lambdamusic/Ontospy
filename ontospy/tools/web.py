@@ -82,6 +82,7 @@ def action_webimport(options):
 				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
 				ontospy.action_import(ontouri)
 			except:
+				print "Error retrieving file. Import failed."
 				continue
 
 
