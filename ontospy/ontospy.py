@@ -28,11 +28,11 @@ from ._version import *
 # local repository constants
 ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 ONTOSPY_LOCAL_MODELS = ONTOSPY_LOCAL + "/models"
-ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/cache"
+ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
+ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.index/cache/"
 
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
-ONTOSPY_DEFAULT_SCHEMAS_DIR = _dirname + "/data/schemas/"  # comes with installer
 ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
 
 
@@ -50,11 +50,15 @@ def get_or_create_home_repo(reset=False):
 			else:
 				var == "n"
 
-	if dosetup:
+	if dosetup or not(os.path.exists(ONTOSPY_LOCAL)):
 		os.mkdir(ONTOSPY_LOCAL)
+	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_MODELS)):	
 		os.mkdir(ONTOSPY_LOCAL_MODELS)
+	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)):	
 		os.mkdir(ONTOSPY_LOCAL_CACHE)
-		print Fore.GREEN + "Setup successfull: local repository created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):	
+		os.mkdir(ONTOSPY_LOCAL_VIZ)	
+	print Fore.GREEN + "Setup successfull: local repository created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 	return ONTOSPY_LOCAL	
 	
 
