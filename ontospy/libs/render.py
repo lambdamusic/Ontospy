@@ -8,7 +8,7 @@ from .util import *
 
 def ontologyHtmlTree(graph, element = None):
 	""" 
-	Builds an html tree representation based on the internal tree-dictionary representation
+	Builds an html tree representation 
 
 	NOTE: Copy and modify this function if you need some different type of html..
 

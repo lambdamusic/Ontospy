@@ -142,7 +142,7 @@ def main():
 	eTime = time.time()
 	tTime = eTime - sTime
 	printDebug("-" * 10) 
-	printDebug("Time:	   %0.2fs" %  tTime)
+	printDebug("Time:	   %0.2fs" %  tTime, "comment")
 
 
 
