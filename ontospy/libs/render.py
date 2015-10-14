@@ -3,17 +3,64 @@
 
 
 
+from .. import ontospy 
 from .util import *
 
+try:
+	# https://docs.djangoproject.com/en/dev/ref/templates/api/
+	from django.conf import settings
+	from django.template import Context, Template
+	settings.configure()	
+except:
+	raise Exception("Cannot find the django library.")
+	
+	
+
+
+def djangoTemplate(graph):
+	""" 
+	From an RDF file this outputs a nicely formatted html table. 
+	NOTE: Customized for the nature.com/ontologies portal.
+	2015-10-14: imported for testing...
+	"""
+	
+	o = graph.ontologies[0]
+	
+	# ontotemplate = open("template.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "template1.html", "r")
+	
+	t = Template(ontotemplate.read())
+
+	metadata = []
+	if o.annotations:
+		for a in o.annotations:
+			if type(a[1]) == rdflib.term.Literal:
+				metadata += [(a[0], "\"%s\"" % a[1])]
+			else:
+				metadata += [(a[0], a[1])]
+			
+	c = Context({	
+					"metadata": metadata,
+					"classes": graph.classes,
+					"objproperties": graph.objectProperties,
+					"dataproperties": graph.datatypeProperties,
+					"annotationproperties": graph.annotationProperties,
+					"instances": []
+				})
+	
+	rnd = t.render(c) 
+
+	return rnd
+	
+	
+	
+	
 
 def ontologyHtmlTree(graph, element = None):
 	""" 
-	Builds an html tree representation 
-
-	NOTE: Copy and modify this function if you need some different type of html..
+	outputs a recursive html tree representation 
 
 	EG:
-
 	<ul id="example" class="filetree">
 			<li><span class="folder">Folder 2</span>
 					<ul>

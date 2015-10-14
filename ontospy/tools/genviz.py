@@ -16,7 +16,8 @@ def generateViz(location):
 	# g = ontospy.Graph(ontospy.ONTOSPY_LOCAL_MODELS + "/foaf.rdf")
 	g = ontospy.Graph(location)
 
-	contents = render.ontologyHtmlTree(g)
+	# contents = render.ontologyHtmlTree(g)
+	contents = render.djangoTemplate(g)
 
 	filename = ontospy.ONTOSPY_LOCAL_VIZ + "/test.html"
 

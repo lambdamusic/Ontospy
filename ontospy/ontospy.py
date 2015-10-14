@@ -34,6 +34,7 @@ ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.index/cache/"
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
+ONTOSPY_LOCAL_TEMPLATES = _dirname + "/data/templates/"
 
 
 def get_or_create_home_repo(reset=False):
