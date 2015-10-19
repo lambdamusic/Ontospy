@@ -7,7 +7,7 @@ from ..libs.util import *
 from ..libs import render
 
 MODULE_VERSION = 0.1
-USAGE = "python -m ontospy.tools.callviz <uri>"
+USAGE = "ontospy-doc <uri>"
 
 
 

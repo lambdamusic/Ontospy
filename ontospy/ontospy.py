@@ -42,9 +42,9 @@ def get_or_create_home_repo(reset=False):
 	dosetup = True
 	if os.path.exists(ONTOSPY_LOCAL):
 		dosetup = False
-		print Style.DIM + "Local repository: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+		print Style.DIM + "Local library: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 		if reset:
-			var = raw_input("Reset the local repository and all of its contents? (y/n) ")
+			var = raw_input("Reset the local library and all of its contents? (y/n) ")
 			if var == "y":
 				shutil.rmtree(ONTOSPY_LOCAL)
 				dosetup = True
@@ -60,7 +60,7 @@ def get_or_create_home_repo(reset=False):
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):	
 		os.mkdir(ONTOSPY_LOCAL_VIZ)	
 	if dosetup:
-		print Fore.GREEN + "Setup successfull: local repository created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+		print Fore.GREEN + "Setup successfull: local library created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 	return ONTOSPY_LOCAL	
 	
 
@@ -74,7 +74,7 @@ def get_localontologies():
 				if not f.startswith(".") and not f.endswith(".pickle"):
 					res += [f]
 	else:
-		print "No local repository found. Use the --reset command"					
+		print "No local library found. Use the --reset command"					
 	return res
 
 
@@ -132,11 +132,11 @@ def action_reset():
 
 def action_cache():
 	print """The existing cache will be erased and recreated."""
-	print """This operation may take several minutes, depending on how many files exist in your local repository."""
+	print """This operation may take several minutes, depending on how many files exist in your local library."""
 	var = raw_input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
 	if var == "y":
 		repo_contents = get_localontologies()
-		print Style.BRIGHT + "\n=====\n%d ontologies available in the local repository\n=====" % len(repo_contents) + Style.RESET_ALL
+		print Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL
 		for onto in repo_contents:
 			fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
 			try:
@@ -159,13 +159,17 @@ def action_cache():
 
 
 def action_listlocal():
-	""" list all local files """
+	""" 
+	list all local files 
+	2015-10-18: removed 'cached' from report
+	"""
 	ontologies = get_localontologies()
 	if ontologies:
 		print ""
 		temp = []
 		from collections import namedtuple
-		Row = namedtuple('Row',['N','Added','Cached', 'File'])
+		Row = namedtuple('Row',['N','Added', 'File'])
+		# Row = namedtuple('Row',['N','Added','Cached', 'File'])
 		counter = 0
 		for file in ontologies:
 			counter += 1
@@ -176,12 +180,12 @@ def action_listlocal():
 				mtime = 0
 			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
 
-			cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
-			temp += [Row(str(counter),last_modified_date,cached, name)]
+			# cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
+			temp += [Row(str(counter),last_modified_date, name)]
 		pprinttable(temp)
 		print ""
 	else:
-		print "No files in the local repository. Use the --import command."
+		print "No files in the local library. Use the --import command."
 
 
 
@@ -322,23 +326,23 @@ def parse_options():
 			
 	parser.add_option("", "--shell",
 			action="store_true", default=False, dest="shell",
-			help="Interactive explorer of the ontologies in the local repository")	
+			help="Interactive explorer of the ontologies in the local library")	
 			
 	parser.add_option("", "--import",
 			action="store_true", default=False, dest="_import",
-			help="Imports file/folder/url into the local repository") 
+			help="Imports file/folder/url into the local library") 
 
-	parser.add_option("", "--repo",
-			action="store_true", default=False, dest="repo",
-			help="List ontologies in the local repository") 
+	parser.add_option("", "--lib",
+			action="store_true", default=False, dest="lib",
+			help="List ontologies in the local library") 
 
 	parser.add_option("", "--cache",
 			action="store_true", default=False, dest="cache",
-			help="Rebuild the cache for the local repository")
+			help="Rebuild the cache for the local library")
 
 	parser.add_option("", "--reset",
 			action="store_true", default=False, dest="reset",
-			help="Resets the local repository by removing all existing files")
+			help="Resets the local library by removing all existing files")
 			
 	parser.add_option("-a", "",
 			action="store_true", default=False, dest="ontoannotations",
@@ -363,7 +367,7 @@ def parse_options():
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.reset and not opts.repo and not opts.cache and len(args) < 1:
+	if not opts.shell and not opts.reset and not opts.lib and not opts.cache and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -388,7 +392,7 @@ def main():
 
 
 	# list local ontologies
-	if opts.repo:
+	if opts.lib:
 		get_or_create_home_repo()
 		action_listlocal()
 		raise SystemExit, 1

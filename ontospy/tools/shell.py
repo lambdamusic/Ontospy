@@ -101,21 +101,24 @@ class Shell(cmd.Cmd):
 
 
 
-	def _print_entity_intro(self, g=None, entity=None, first_time=True):
-		"""after a selection, prints on screen basic info about onto or entity, plus change prompt """
+	def _print_entity_intro(self, g=None, entity=None, first_time=True, stats=False):
+		"""after a selection, prints on screen basic info about onto or entity, plus change prompt 
+		2015-10-18: removed the sound
+		"""
 		if entity:
 			# self._clear_screen()
 			self._print(entity.uri, "URI")
 			self._print(entity.bestDescription(), "TEXT")
 			# print Style.BRIGHT + entity.uri + Style.RESET_ALL
 			# print Style.DIM + entity.bestDescription() + Style.RESET_ALL
-			entity.printStats()
+			if stats:
+				entity.printStats()
 			if first_time:
 				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		elif g:
 			if first_time:
 				self._clear_screen()
-				playSound(ontospy.ONTOSPY_SOUNDS)  # new..
+				# playSound(ontospy.ONTOSPY_SOUNDS)  # new..
 				self._print("Loaded " + self.current['fullpath'], 'TIP')
 			g.printStats()
 			for o in g.ontologies:
@@ -411,9 +414,9 @@ class Shell(cmd.Cmd):
 	def do_summary(self, line):
 		"Print a summary of the currently active entity"
 		if self.currentEntity:
-			self._print_entity_intro(entity=self.currentEntity['object'], first_time=False)
+			self._print_entity_intro(entity=self.currentEntity['object'], first_time=False, stats=True)
 		elif self.current:
-			self._print_entity_intro(g=self.current['graph'], first_time=False)
+			self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
 		else:
 			print "Please select an ontology first"
 

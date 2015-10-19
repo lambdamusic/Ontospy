@@ -14,6 +14,14 @@ class RDF_Entity(object):
 	"""
 	Pythonic representation of an RDF resource - normally not instantiated but used for 
 	inheritance purposes 
+	
+	<triples> : a structure like this:
+	[(rdflib.term.URIRef(u'http://xmlns.com/foaf/0.1/OnlineChatAccount'),
+	  rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#comment'),
+	  rdflib.term.Literal(u'An online chat account.')),
+	 (rdflib.term.URIRef(u'http://xmlns.com/foaf/0.1/OnlineChatAccount'),
+	  rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#subClassOf')]
+	
 	"""
 	
 	_ids = count(0)
@@ -180,7 +188,6 @@ class Ontology(RDF_Entity):
 		"""
 		super(Ontology, self).__init__(uri, rdftype, namespaces)	
 		# self.uri = uri # rdflib.Uriref
-		self.annotations = self.triples
 		self.prefix = prefPrefix
 
 		self.classes = []			
@@ -190,7 +197,10 @@ class Ontology(RDF_Entity):
 		# self.datatypeProperties = []
 		self.skosConcepts = [] 
 
-
+	def annotations(self):
+		""" wrapper - could be expanded later """
+		return self.triples
+		
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()

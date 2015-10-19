@@ -11,7 +11,7 @@ Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 
 import rdflib
-
+from .util import *
 
 DEFAULT_LANGUAGE = "en"
 
@@ -22,6 +22,12 @@ DEFAULT_LANGUAGE = "en"
 class QueryHelper(object):
 	"""
 	A bunch of RDF queries 
+	
+	2015-10-1: note - the sparql query returns always a 
+	rdflib.plugins.sparql.processor.SPARQLResult instance; the list method 
+	transforms it into a list of tuples/triples results
+	eg: 
+	[(rdflib.term.URIRef(u'http://www.w3.org/2006/time'))]
 	"""
 	
 		
@@ -46,7 +52,12 @@ class QueryHelper(object):
 
 
 	def entityTriples(self, aURI):
-		""" builds all triples for an entity"""
+		""" Builds all triples for an entity
+		Note: if a triple object is a blank node (=a nested definition) 
+		we try to extract all relevant data recursively (does not work with 
+		sparql endpoins)
+		2015-10-18: updated
+		"""
 
 		aURI = unicode(aURI)
 		qres = self.rdfgraph.query(
@@ -55,8 +66,28 @@ class QueryHelper(object):
 					 { <%s> ?y ?z } 
 				 }	 
 				 """ % (aURI, aURI ))
-		return list(qres)
+		lres = list(qres)
 		
+		def recurse(triples_list):
+			""" uses the rdflib <triples> method to pull out all blank nodes info"""
+			out = []
+			for tripl in triples_list:			
+				if isBlankNode(tripl[2]):
+					# print "blank node", str(tripl[2])
+					temp = [x for x in self.rdfgraph.triples((tripl[2], None, None))]
+					out += temp + recurse(temp)
+				else:
+					pass
+			return out
+		
+		try:
+			return lres + recurse(lres)
+		except:
+			printDebug("Error extracting blank nodes info", "important")
+			return lres
+		
+
+
 	# def _getAllClassesTEST(self):
 	#	qres = self.rdfgraph.query(
 	#		  """SELECT DISTINCT ?x

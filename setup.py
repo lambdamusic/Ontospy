@@ -85,7 +85,7 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
-    install_requires=['rdflib', 'colorama'],
+    install_requires=['rdflib', 'colorama', 'django'],
 
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
@@ -99,7 +99,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['data/schemas/*.*', 'data/moreschemas/*.*', 'data/templates/*.*'],
+         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/w3c/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -117,6 +117,7 @@ setup(
             'ontospy-match=ontospy.tools.matcher:main', 
             'ontospy-web=ontospy.tools.web:main', 
             'ontospy-shell=ontospy.tools.shell:main', 
+            'ontospy-doc=ontospy.tools.genviz:main', 
             'ontospy=ontospy.ontospy:main'
         ],
     },

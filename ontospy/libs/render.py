@@ -17,6 +17,20 @@ except:
 	
 
 
+def _safe_str(u, errors="replace"):
+    """Safely print the given string.
+    
+    If you want to see the code points for unprintable characters then you
+    can use `errors="xmlcharrefreplace"`.
+	http://code.activestate.com/recipes/576602-safe-print/
+    """
+    s = u.encode(sys.stdout.encoding or "utf-8", errors)
+    return s
+	
+	
+	
+	
+
 def djangoTemplate(graph):
 	""" 
 	From an RDF file this outputs a nicely formatted html table. 
@@ -24,23 +38,19 @@ def djangoTemplate(graph):
 	2015-10-14: imported for testing...
 	"""
 	
-	o = graph.ontologies[0]
+	try:
+		ontology = graph.ontologies[0]
+	except:
+		ontology = None
 	
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "template1.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "w3c/index.html", "r")
 	
 	t = Template(ontotemplate.read())
 
-	metadata = []
-	if o.annotations:
-		for a in o.annotations:
-			if type(a[1]) == rdflib.term.Literal:
-				metadata += [(a[0], "\"%s\"" % a[1])]
-			else:
-				metadata += [(a[0], a[1])]
-			
+	
 	c = Context({	
-					"metadata": metadata,
+					"ontology": ontology,
 					"classes": graph.classes,
 					"objproperties": graph.objectProperties,
 					"dataproperties": graph.datatypeProperties,
@@ -50,7 +60,7 @@ def djangoTemplate(graph):
 	
 	rnd = t.render(c) 
 
-	return rnd
+	return _safe_str(rnd)
 	
 	
 	
