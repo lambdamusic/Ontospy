@@ -39,7 +39,7 @@ class Graph(object):
 	
 	"""
 
-	def __init__(self, source, text=False, endpoint=False, rdf_format=None):
+	def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True):
 		"""
 		Load the graph in memory, then setup all necessary attributes.
 		"""
@@ -72,9 +72,9 @@ class Graph(object):
 		self.IS_TEXT = False
 		
 		# finally		
-		self.__loadRDF(source, text, endpoint, rdf_format)
+		self.__loadRDF(source, text, endpoint, rdf_format, verbose)
 		# extract entities into
-		self._scan()
+		self._scan(verbose=verbose)
 
 	
 	def __repr__(self):
@@ -83,7 +83,7 @@ class Graph(object):
 
 
 	
-	def __loadRDF(self, source, text, endpoint, rdf_format):
+	def __loadRDF(self, source, text, endpoint, rdf_format, verbose):
 		"""
 		Determine what kind of graph we have and load it accordingly
 		"""
@@ -201,7 +201,7 @@ class Graph(object):
 	# === main method === #	 
 	# ------------
 	
-	def _scan(self, source=None, text=False, endpoint=False, rdf_format=None):
+	def _scan(self, source=None, text=False, endpoint=False, rdf_format=None, verbose=True):
 		""" 
 		scan a source of RDF triples 
 		build all the objects to deal with the ontology/ies pythonically
@@ -215,28 +215,28 @@ class Graph(object):
 		if source: # add triples dynamically
 			self.__loadRDF(source, text, endpoint, rdf_format)
 		
-		printDebug("started scanning...\n----------")
+		if verbose: printDebug("started scanning...\n----------", "comment")
 					
 		self.__extractNamespaces()
 		
 		self.__extractOntologies()
-		printDebug("Ontologies found...: %d" % len(self.ontologies))
+		if verbose: printDebug("Ontologies found...: %d" % len(self.ontologies), "comment")
 						
 		self.__extractClasses()
-		printDebug("Classes found......: %d" % len(self.classes))
+		if verbose: printDebug("Classes found......: %d" % len(self.classes), "comment")
 		
 		self.__extractProperties()
-		printDebug("Properties found...: %d" % len(self.properties))
-		printDebug("Annotation.........: %d" % len(self.annotationProperties))
-		printDebug("Datatype...........: %d" % len(self.datatypeProperties))
-		printDebug("Object.............: %d" % len(self.objectProperties))
+		if verbose: printDebug("Properties found...: %d" % len(self.properties), "comment")
+		if verbose: printDebug("Annotation.........: %d" % len(self.annotationProperties), "comment")
+		if verbose: printDebug("Datatype...........: %d" % len(self.datatypeProperties), "comment")
+		if verbose: printDebug("Object.............: %d" % len(self.objectProperties), "comment")
 
 		self.__extractSkosConcepts()
-		printDebug("SKOS Concepts......: %d" % len(self.skosConcepts))
+		if verbose: printDebug("SKOS Concepts......: %d" % len(self.skosConcepts), "comment")
 				
 		self.__computeTopLayer()
 		
-		printDebug("----------")
+		if verbose: printDebug("----------", "comment")
 			
 		
 
