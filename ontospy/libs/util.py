@@ -623,3 +623,52 @@ def pprinttable(rows):
 
 
 
+
+
+def save_anonymous_gist(title, files):
+	"""
+	October 21, 2015
+	title = the gist title
+	files = {
+	    'spam.txt' : {
+	        'content': 'What... is the air-speed velocity of an unladen swallow?'
+	        }
+			# ..etc...
+	    }
+		
+	works also in blocks eg from
+	https://gist.github.com/anonymous/b839e3a4d596b215296f
+	to
+	http://bl.ocks.org/anonymous/b839e3a4d596b215296f	
+	
+	So we return 3 different urls
+	
+	"""
+	
+	try:
+		from github3 import create_gist
+	except:
+		print "github3 library not found (pip install github3)"
+		raise SystemExit, 1
+
+	gist = create_gist(title, files)
+	
+	urls = {
+		'gist' : gist.html_url, 
+		'blocks' : "http://bl.ocks.org/anonymous/" + gist.html_url.split("/")[-1],
+		'blocks_fullwin' : "http://bl.ocks.org/anonymous/raw/" + gist.html_url.split("/")[-1]
+	}
+	
+	return urls
+
+
+
+
+	
+
+
+
+
+
+
+

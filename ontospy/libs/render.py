@@ -33,9 +33,10 @@ def _safe_str(u, errors="replace"):
 
 def djangoTemplate(graph):
 	""" 
-	From an RDF file this outputs a nicely formatted html table. 
-	NOTE: Customized for the nature.com/ontologies portal.
-	2015-10-14: imported for testing...
+	From a graph instance outputs a nicely formatted html documentation file. 
+	2015-10-21: mainly used with w3c template
+	
+	output = string
 	"""
 	
 	try:
@@ -55,6 +56,7 @@ def djangoTemplate(graph):
 					"objproperties": graph.objectProperties,
 					"dataproperties": graph.datatypeProperties,
 					"annotationproperties": graph.annotationProperties,
+					"skosConcepts": graph.skosConcepts,
 					"instances": []
 				})
 	
@@ -64,10 +66,13 @@ def djangoTemplate(graph):
 	
 	
 	
+
+
 	
 
 def ontologyHtmlTree(graph, element = None):
 	""" 
+	2015-10-21: not used
 	outputs a recursive html tree representation 
 
 	EG:

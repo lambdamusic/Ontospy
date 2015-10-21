@@ -175,7 +175,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
     margin-bottom: 0.6em;
   }
   */
-  dt, dd { margin-top: 0; margin-bottom: 0 } /* opera 3.50 */
+  dt, dd { margin-top: 10px; margin-bottom: 0 } /* opera 3.50 */
   dt { font-weight: bold }
 
   pre, code { font-family: monospace } /* navigator 4 requires this */
@@ -197,6 +197,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
   .implementation {
   	background: aliceblue;
 	padding: 10px;
+	margin-top: 5px;
   }	
 
 
@@ -226,6 +227,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 		{% if objproperties %}<li><a href="#objproperties">Object Properties</a></li>{% endif %}
 		{% if dataproperties %}<li><a href="#dataproperties">Datatype properties</a></li>{% endif %}
 		{% if annotationproperties %}<li><a href="#annotationproperties">Annotation properties</a></li>{% endif %}
+		{% if skosConcepts %}<li><a href="#skosconcepts">SKOS Concepts</a></li>{% endif %}
 		
 		{# {% if instances %}<li><a href="#instances">Instances</a></li>{% endif %} #}
 		
@@ -262,27 +264,30 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 	
 	{% if classes %}
 		<p>
-		Classes:&nbsp;
+		<strong>Classes:</strong>&nbsp;
 			{% for each in classes  %}<span><a href="#{{each.qname}}">{{each.qname}}</a></span> | {% endfor %}
 		</p>	
 	{% endif %}	
 	
 	{% if objproperties %}
 		<p>
-		Object Properties:&nbsp;{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
+		<strong>Object Properties:</strong>&nbsp;{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
 	{% endif %}
 	
 	{% if dataproperties %}
 		<p>
-		Datatype Properties:&nbsp;{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
+		<strong>Datatype Properties:</strong>&nbsp;{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
 	{% endif %}
 	
 	{% if annotationproperties %}
 		<p>
-		Annotation Properties:&nbsp;{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
+		<strong>Annotation Properties:</strong>&nbsp;{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>	
 	{% endif %}
 	
-	
+	{% if skosConcepts %}
+		<p>
+		<strong>SKOS Concepts:</strong>&nbsp;{% for each in skosConcepts  %}<a href="#{{each.qname}}">{{each.qname}}</a> | {% endfor %}</p>
+	{% endif %}
 	
 	
 	
@@ -296,11 +301,19 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 			{% for each in classes  %}
 		
 				<h3>Class: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small><a href="#a-z">a-z</a></small>
+					<small>&nbsp;&nbsp;<a href="#a-z">a-z</a></small>
 				</h3>
 		
 				<p>{{each.bestDescription}}</p>
 		
+				{% if each.parents %}
+					<p><b>Is Subclass Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.children %}
+					<p><b>Has SubClass:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
 				<b>Implementation:</b>
 				<div class="implementation">
 					<code>{{each.serialize|linebreaks}}</code>
@@ -322,11 +335,27 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 			{% for each in objproperties  %}
 		
 				<h3>Object Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small><a href="#a-z">a-z</a></small>
+					<small>&nbsp;&nbsp;<a href="#a-z">a-z</a></small>
 				</h3>
 		
 				<p>{{each.bestDescription}}</p>
 		
+				{% if each.parents %}
+					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.children %}
+					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.domains %}
+					<p><b>Domain:</b> {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.ranges %}
+					<p><b>Range:</b> {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
 				<b>Implementation:</b>
 				<div class="implementation">
 					<code>{{each.serialize|linebreaks}}</code>
@@ -352,11 +381,27 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 			{% for each in dataproperties  %}
 		
 				<h3>Datatype Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small><a href="#a-z">a-z</a></small>
+					<small>&nbsp;&nbsp;<a href="#a-z">a-z</a></small>
 				</h3>
 		
 				<p>{{each.bestDescription}}</p>
 		
+				{% if each.parents %}
+					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.children %}
+					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.domains %}
+					<p><b>Domain:</b> {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.ranges %}
+					<p><b>Range:</b> {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
 				<b>Implementation:</b>
 				<div class="implementation">
 					<code>{{each.serialize|linebreaks}}</code>
@@ -382,11 +427,27 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 			{% for each in annotationproperties  %}
 		
 				<h3>Annotation Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small><a href="#a-z">a-z</a></small>
+					<small>&nbsp;&nbsp;<a href="#a-z">a-z</a></small>
 				</h3>
 		
 				<p>{{each.bestDescription}}</p>
 		
+				{% if each.parents %}
+					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.children %}
+					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.domains %}
+					<p><b>Domain:</b> {% for s in each.domains %}<a href="#{{s.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.ranges %}
+					<p><b>Range:</b> {% for s in each.ranges %}<a href="#{{s.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
 				Implementation:
 				<div class="implementation">
 					<code>{{each.serialize|linebreaks}}</code>
@@ -397,7 +458,44 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 		
 	{% endif %}
 	
+
+
+
+	{# SKOS CONCEPTS SECTION #}
 	
+	
+	{% if skosConcepts %}
+		<hr>
+		<h1 ><a  name="skosconcepts">SKOS Concepts</a></h1>
+	
+			{% for each in skosConcepts  %}
+		
+				<h3>Concept: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z">a-z</a></small>
+				</h3>
+		
+				<p>{{each.bestDescription}}</p>
+				
+				{% if each.parents %}
+					<p><b>Is SubConcept of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				{% if each.children %}
+					<p><b>Has SubConcept:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+				
+				<b>Implementation:</b>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+		
+				<br /><br />
+			{% endfor %}
+		
+	{% endif %}
+	
+	
+		
 	
 	
 	

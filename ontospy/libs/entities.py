@@ -199,7 +199,7 @@ class Ontology(RDF_Entity):
 
 	def annotations(self):
 		""" wrapper - could be expanded later """
-		return self.triples
+		return sorted(self.triples)
 		
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """

@@ -44,7 +44,7 @@ def get_or_create_home_repo(reset=False):
 		dosetup = False
 		print Style.DIM + "Local library: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
 		if reset:
-			var = raw_input("Reset the local library and all of its contents? (y/n) ")
+			var = raw_input("Delete the local library and all of its contents? (y/n) ")
 			if var == "y":
 				shutil.rmtree(ONTOSPY_LOCAL)
 				dosetup = True
@@ -125,7 +125,7 @@ def do_pickle_ontology(filename, g=None):
 
 
 
-def action_reset():
+def action_erase():
 	"""just a wrapper.. possibly to be extended in the future"""
 	get_or_create_home_repo(reset=True)
 
@@ -326,48 +326,48 @@ def parse_options():
 			
 	parser.add_option("", "--shell",
 			action="store_true", default=False, dest="shell",
-			help="Interactive explorer of the ontologies in the local library")	
+			help="Launch interactive mode.")	
 			
 	parser.add_option("", "--import",
 			action="store_true", default=False, dest="_import",
-			help="Imports file/folder/url into the local library") 
+			help="Import file/folder/url into the local library.") 
 
 	parser.add_option("", "--lib",
 			action="store_true", default=False, dest="lib",
-			help="List ontologies in the local library") 
+			help="List ontologies in the local library.") 
 
 	parser.add_option("", "--cache",
 			action="store_true", default=False, dest="cache",
-			help="Rebuild the cache for the local library")
+			help="Create a faster cache for the local libraryse	 (recommended)")
 
-	parser.add_option("", "--reset",
-			action="store_true", default=False, dest="reset",
-			help="Resets the local library by removing all existing files")
+	parser.add_option("", "--erase",
+			action="store_true", default=False, dest="erase",
+			help="Erase the local library by removing all existing files")
 			
 	parser.add_option("-a", "",
 			action="store_true", default=False, dest="ontoannotations",
-			help="Print the ontology annotations/metadata.")
+			help="Show the ontology annotations/metadata.")
 			
 	parser.add_option("-c", "",
 			action="store_true", default=False, dest="classtaxonomy",
-			help="Print the class taxonomy.")
+			help="Show the class taxonomy.")
 
 	parser.add_option("-p", "",
 			action="store_true", default=False, dest="propertytaxonomy",
-			help="Print the property taxonomy.")
+			help="Show the property taxonomy.")
 
 	parser.add_option("-s", "",
 			action="store_true", default=False, dest="skostaxonomy",
-			help="Print the SKOS taxonomy.")
+			help="Show the SKOS taxonomy.")
 			
 	parser.add_option("-l", "",
 			action="store_true", default=False, dest="labels",
-			help="Print entities labels as well as URIs (used with -c or -p or -s).")
+			help="Show entities labels as well as URIs (used with -c or -p or -s).")
 
 			
 	opts, args = parser.parse_args()
 
-	if not opts.shell and not opts.reset and not opts.lib and not opts.cache and len(args) < 1:
+	if not opts.shell and not opts.erase and not opts.lib and not opts.cache and len(args) < 1:
 		parser.print_help()
 		sys.exit(0)
 		
@@ -386,8 +386,8 @@ def main():
 	opts, args = parse_options()
 	
 	# reset local stuff
-	if opts.reset:
-		action_reset()
+	if opts.erase:
+		action_erase()
 		raise SystemExit, 1
 
 

@@ -115,9 +115,9 @@ setup(
         'console_scripts': [
             'ontospy-sketch=ontospy.tools.sketch:main', 
             'ontospy-match=ontospy.tools.matcher:main', 
-            'ontospy-web=ontospy.tools.web:main', 
+            'ontospy-searchweb=ontospy.tools.web:main', 
             'ontospy-shell=ontospy.tools.shell:main', 
-            'ontospy-doc=ontospy.tools.genviz:main', 
+            'ontospy-docs=ontospy.tools.docs:main', 
             'ontospy=ontospy.ontospy:main'
         ],
     },

@@ -5,6 +5,7 @@ A few examples of how to use the command line utilities that come with OntoSPy.
 Currently these are the utility scripts available: 
 
 - ``ontospy``: load a graph and show schema information
+- ``ontospy-docs``: generates html documentation  
 - ``ontospy-shell``: launch the interactive ontospy shell  
 - ``ontospy-web``: discover commonly used ontologies listed on prefix.cc 
 - ``ontospy-match``: bootstrap mappings between two vocabularies
@@ -107,6 +108,28 @@ E.g. print only the class tree and show rdfs:labels
     foaf:Project ("Project")
     ----------
     Time:	   2.77s
+
+
+The ``ontospy-docs`` command
+*******************
+This utility allows to generate html documentation for any ontology. 
+
+.. code-block:: python
+    > ontospy-docs 
+    OntoSPy v1.6.2.2
+    Local library: </Users/michele.pasin/.ontospy>
+    Usage: ontospy-doc <uri>
+
+    Options:
+      --version      show program's version number and exit
+      -h, --help     show this help message and exit
+      -l, --library  Select an ontology from local library.
+      -g, --gist     Save output as a Github Gist.
+
+Just pass it a URI, or use the -l option to load one of the models previously saved in the local library. 
+
+The -g option allows to save the documentation file as a github gist. 
+
 
 
 

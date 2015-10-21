@@ -402,6 +402,30 @@ class Shell(cmd.Cmd):
 			else:
 				self._print("No skos concepts available.") 
 
+	def do_parents(self, line):
+		"""Show the parents (superclass or superproperty) of an entity"""
+		if self.currentEntity:
+			for x in self.currentEntity['object'].parents():
+				print x.qname
+		else:
+			self._print("Please select an entity first.") 
+
+	def do_children(self, line):
+		"""Show the children (subclass or subproperty) of an entity"""
+		if self.currentEntity:
+			for x in self.currentEntity['object'].children():
+				print x.qname
+		else:
+			self._print("Please select an entity first.") 
+			
+	def do_toplayer(self, line):
+		"""Show the toplayer (classes) of the ontology"""
+		if not self.current:
+			self._print("Please select an ontology first")
+		else:
+			for x in self.current['graph'].toplayer:
+				print x.qname
+			
 	def do_annotations(self, line):
 		"Show annotations for current ontology"
 		if not self.current:
@@ -419,8 +443,6 @@ class Shell(cmd.Cmd):
 			self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
 		else:
 			print "Please select an ontology first"
-
-
 	
 	def do_next(self, line):
 		if not self.current:
@@ -480,6 +502,7 @@ class Shell(cmd.Cmd):
 
 
 	def do_zen(self, line):
+		"""Inspiring quotes for the working ontologist"""
 		_quote = random.choice(QUOTES)
 		# print _quote['source']
 		print Style.DIM + unicode(_quote['text'])
