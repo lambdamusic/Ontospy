@@ -20,7 +20,7 @@ import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
 from colorama import Fore, Back, Style
 
 from .libs.graph import Graph, SparqlEndpoint
-from .libs.util import bcolors, pprinttable, printDebug
+from .libs.util import bcolors, pprinttable, printDebug, _clear_screen
 
 from ._version import *
 
@@ -125,67 +125,33 @@ def do_pickle_ontology(filename, g=None):
 
 
 
-def action_erase():
-	"""just a wrapper.. possibly to be extended in the future"""
-	get_or_create_home_repo(reset=True)
-
-
-def action_cache():
-	print """The existing cache will be erased and recreated."""
-	print """This operation may take several minutes, depending on how many files exist in your local library."""
-	var = raw_input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
-	if var == "y":
-		repo_contents = get_localontologies()
-		print Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL
-		for onto in repo_contents:
-			fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
+def actionSelectFromLocal():
+	" select a file from the local repo "
+	
+	options = get_localontologies()
+	
+	counter = 1
+	printDebug("------------------", 'comment')
+	for x in options:
+		print Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL
+		# print Fore.BLUE + x[0], " ==> ", x[1]
+		counter += 1
+	
+	
+	while True:
+		var = raw_input(Style.DIM + "------------------\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
+		if var == "q":
+			return None
+		else:
 			try:
-				print Fore.RED + "\n=====\n" + onto + Style.RESET_ALL
-				print "Loading graph..."
-				g = Graph(fullpath)
-				print "Loaded ", fullpath
+				_id = int(var)
+				ontouri = options[_id - 1]
+				printDebug("You selected:", "comment")
+				print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				return ontouri
 			except:
-				g = None
-				print "Error parsing file. Please make sure %s contains valid RDF." % fullpath
-
-			if g:
-				print "Caching..."
-				do_pickle_ontology(onto, g)
-
-		print Style.BRIGHT + "===Completed===" + Style.RESET_ALL
-
-	else:
-		print "Goodbye"
-
-
-def action_listlocal():
-	""" 
-	list all local files 
-	2015-10-18: removed 'cached' from report
-	"""
-	ontologies = get_localontologies()
-	if ontologies:
-		print ""
-		temp = []
-		from collections import namedtuple
-		Row = namedtuple('Row',['N','Added', 'File'])
-		# Row = namedtuple('Row',['N','Added','Cached', 'File'])
-		counter = 0
-		for file in ontologies:
-			counter += 1
-			name = Style.BRIGHT + file + Style.RESET_ALL
-			try:
-				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
-			except OSError:
-				mtime = 0
-			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
-
-			# cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
-			temp += [Row(str(counter),last_modified_date, name)]
-		pprinttable(temp)
-		print ""
-	else:
-		print "No files in the local library. Use the --import command."
+				print "Error retrieving ontology. Please select a valid number."
+				continue
 
 
 
@@ -292,6 +258,9 @@ def shellPrintOverview(g, opts):
 	
 	else:
 		# default: print anything available 
+		for o in ontologies:
+			print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
+			o.printTriples()
 		if g.classes:
 			print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
 			g.printClassTree(showids=False, labels=opts['labels'])
@@ -302,11 +271,9 @@ def shellPrintOverview(g, opts):
 			print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 			g.printSkosTree(showids=False, labels=opts['labels'])
 			
-		
-		
-		#
-		# if not opts['ontoannotations'] and not opts['propertytaxonomy']:
-		#	opts['classtaxonomy'] = True # default
+
+
+
 
 
 def parse_options():
@@ -323,54 +290,46 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
-			
-	parser.add_option("", "--shell",
-			action="store_true", default=False, dest="shell",
-			help="Launch interactive mode.")	
-			
-	parser.add_option("", "--import",
+	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
-			help="Import file/folder/url into the local library.") 
+			help="Import a file/folder/url into the local library.") 
 
-	parser.add_option("", "--lib",
+	parser.add_option("-l", "--library",
 			action="store_true", default=False, dest="lib",
-			help="List ontologies in the local library.") 
-
-	parser.add_option("", "--cache",
-			action="store_true", default=False, dest="cache",
-			help="Create a faster cache for the local libraryse	 (recommended)")
-
-	parser.add_option("", "--erase",
-			action="store_true", default=False, dest="erase",
-			help="Erase the local library by removing all existing files")
+			help="Select ontologies saved in the local library.") 
 			
-	parser.add_option("-a", "",
+	parser.add_option("-o", "",
 			action="store_true", default=False, dest="ontoannotations",
-			help="Show the ontology annotations/metadata.")
+			help="Show only the ontology annotations/metadata.")
 			
 	parser.add_option("-c", "",
 			action="store_true", default=False, dest="classtaxonomy",
-			help="Show the class taxonomy.")
+			help="Show only the class taxonomy.")
 
 	parser.add_option("-p", "",
 			action="store_true", default=False, dest="propertytaxonomy",
-			help="Show the property taxonomy.")
+			help="Show only the property taxonomy.")
 
-	parser.add_option("-s", "",
+	parser.add_option("-k", "",
 			action="store_true", default=False, dest="skostaxonomy",
-			help="Show the SKOS taxonomy.")
+			help="Show only the SKOS taxonomy.")
 			
-	parser.add_option("-l", "",
+	parser.add_option("-a", "",
 			action="store_true", default=False, dest="labels",
-			help="Show entities labels as well as URIs (used with -c or -p or -s).")
+			help="Show entities labels as well as URIs (used with -c or -p or -k).")
 
 			
 	opts, args = parser.parse_args()
-
-	if not opts.shell and not opts.erase and not opts.lib and not opts.cache and len(args) < 1:
+	
+	if opts._import and not args:
+		printDebug("Please specify a file/folder/url to import into local library.", 'important')
+		sys.exit(0)
+				
+	# not opts.shell and not opts.erase and not opts.cache and 
+	if not opts.lib and not args:
 		parser.print_help()
 		sys.exit(0)
-		
+			
 	return opts, args
 
 
@@ -385,49 +344,6 @@ def main():
 	printDebug("OntoSPy " + VERSION, "comment")
 	opts, args = parse_options()
 	
-	# reset local stuff
-	if opts.erase:
-		action_erase()
-		raise SystemExit, 1
-
-
-	# list local ontologies
-	if opts.lib:
-		get_or_create_home_repo()
-		action_listlocal()
-		raise SystemExit, 1
-
-		
-	# cache local ontologies
-	if opts.cache:
-		get_or_create_home_repo()
-		action_cache()
-		raise SystemExit, 1
-
-	# import an ontology
-	if opts._import:
-		get_or_create_home_repo()
-		_location = args[0]
-		if os.path.isdir(_location):
-			res = action_import_folder(_location)
-		else:
-			res = action_import(_location)
-		if res: 
-			action_listlocal()	
-		raise SystemExit, 1
-
-
-	# launch shell
-	if opts.shell:
-		from .tools.shell import Shell
-		Shell()._clear_screen()
-		print Style.BRIGHT + "** OntoSPy Shell -- Interactive Ontology Documentation Environment " + VERSION + " **" +\
-			Style.RESET_ALL
-		get_or_create_home_repo()
-		Shell().cmdloop()
-		raise SystemExit, 1
-
-		
 	print_opts = {
 					'ontoannotations' : opts.ontoannotations, 
 					'classtaxonomy' : opts.classtaxonomy, 
@@ -436,15 +352,43 @@ def main():
 					'labels' : opts.labels,
 				}
 
-	get_or_create_home_repo()  # for all other cases
+	# select a model from the local ontologies
+	if opts.lib:
+		get_or_create_home_repo()
+		filename = actionSelectFromLocal()
+		if filename:
+			g = get_pickled_ontology(filename)
+			if not g:
+				g = do_pickle_ontology(filename)	
+			shellPrintOverview(g, print_opts)		
+			printDebug("\n----------\n" + "Completed (note: you can explore this model interactively using the `ontospy-shell`)", "comment")	
+		raise SystemExit, 1	
+
+
+
+	# import an ontology
+	# note: method duplicated in .ontospy and .tools.manager
+	if opts._import:
+		get_or_create_home_repo()
+		_location = args[0]
+		if os.path.isdir(_location):
+			res = action_import_folder(_location)
+		else:
+			res = action_import(_location)
+		if res: 
+			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
+		raise SystemExit, 1
+
+		
+	# for all other cases...
+
+	get_or_create_home_repo()  
 	sTime = time.time()
 
-	# load the ontology
+	# load the ontology when a uri is passed manually
 	if args:
-		g = Graph(args[0])
-	
+		g = Graph(args[0])	
 		shellPrintOverview(g, print_opts)
-
 
 	# finally:	
 	# print some stats.... 

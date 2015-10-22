@@ -16,9 +16,8 @@ from rdflib import RDFS, RDF, BNode
 from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
-import sys, os, subprocess, random 
+import sys, os, subprocess, random, platform 
 from colorama import Fore, Back, Style
-
 
 
 class bcolors:
@@ -666,9 +665,12 @@ def save_anonymous_gist(title, files):
 
 	
 
-
-
-
-
+def _clear_screen():
+	""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
+	if platform.system() == "Windows":
+		tmp = os.system('cls') #for window
+	else:
+		tmp = os.system('clear') #for Linux
+	return True
 
 

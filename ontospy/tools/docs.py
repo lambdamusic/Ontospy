@@ -94,33 +94,6 @@ def parse_options():
 
 
 
-def actionSelectFromLocal():
-	" select a file from the local repo "
-	
-	options = ontospy.get_localontologies()
-	
-	counter = 1
-	printDebug("------------------", 'comment')
-	for x in options:
-		print Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL
-		# print Fore.BLUE + x[0], " ==> ", x[1]
-		counter += 1
-	
-	
-	while True:
-		var = raw_input(Style.BRIGHT + "=====\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
-		if var == "q":
-			return None
-		else:
-			try:
-				_id = int(var)
-				ontouri = options[_id - 1]
-				print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
-				return ontouri
-			except:
-				print "Error retrieving ontology. Please select a valid number."
-				continue
-
 	
 def main():
 	""" command line script """
@@ -133,7 +106,7 @@ def main():
 					
 	# list local ontologies and select one for documentation
 	if opts.lib:
-		ontouri = actionSelectFromLocal()
+		ontouri = ontospy.actionSelectFromLocal()
 		if ontouri:	
 			contents = generateViz(ontouri, islocal=True)
 			
