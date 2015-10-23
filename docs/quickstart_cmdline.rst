@@ -141,7 +141,7 @@ The shell is an interactive environment that lets you import, load and inspect v
 
     > ontospy-shell
     
-    ** OntoSPy Interactive Ontology Documentation Environment v1.6.1 **
+    ** OntoSPy Interactive Ontology Browser v1.6.1 **
     Local repository: </Users/michele.pasin/.ontospy>
     Type 'help' to get started. Use TAB to explore commands.
     <OntoSPy>: help

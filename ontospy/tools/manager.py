@@ -30,6 +30,8 @@ def action_listlocal():
 	2015-10-18: removed 'cached' from report
 	"""
 	ontologies = ontospy.get_localontologies()
+	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
+
 	if ontologies:
 		print ""
 		temp = []
@@ -41,7 +43,7 @@ def action_listlocal():
 			counter += 1
 			name = Style.BRIGHT + file + Style.RESET_ALL
 			try:
-				mtime = os.path.getmtime(ontospy.ONTOSPY_LOCAL_MODELS + "/" + file)
+				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
 			except OSError:
 				mtime = 0
 			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
@@ -67,12 +69,14 @@ def action_erase():
 def action_cache():
 	print """The existing cache will be erased and recreated."""
 	print """This operation may take several minutes, depending on how many files exist in your local library."""
+	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
+	
 	var = raw_input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
 	if var == "y":
 		repo_contents = ontospy.get_localontologies()
 		print Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL
 		for onto in repo_contents:
-			fullpath = ontospy.ONTOSPY_LOCAL_MODELS + "/" + onto
+			fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
 			try:
 				print Fore.RED + "\n=====\n" + onto + Style.RESET_ALL
 				print "Loading graph..."
@@ -148,7 +152,7 @@ def main():
 	""" command line script """
 	
 	print "OntoSPy " + ontospy.VERSION
-	
+	ontospy.get_or_create_home_repo()
 	 
 	
 	
@@ -160,15 +164,13 @@ def main():
 		raise SystemExit, 1
 	
 	# select a model from the local ontologies
-	if opts.list:
-		ontospy.get_or_create_home_repo()
+	if opts.list:		
 		action_listlocal()
 		raise SystemExit, 1 
 	
 	# cache local ontologies
 	if opts.cache:
 		sTime = time.time()
-		ontospy.get_or_create_home_repo()
 		action_cache()
 		# finally: print some stats....
 		eTime = time.time()
@@ -181,7 +183,6 @@ def main():
 	# import an ontology
 	# note: method duplicated in .ontospy and .tools.manager
 	if opts._import:
-		ontospy.get_or_create_home_repo()
 		_location = args[0]
 		if os.path.isdir(_location):
 			res = ontospy.action_import_folder(_location)

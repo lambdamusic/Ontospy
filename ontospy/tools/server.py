@@ -89,11 +89,13 @@ def main():
 	# boilerplate
 	print "OntoSPy " + ontospy.VERSION
 	ontospy.get_or_create_home_repo() 
+	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
+	
 	opts, args = parse_options()					
 	sTime = time.time()
 	
 	# switch dir and start server				
-	startServer(port=DEFAULT_PORT, location=ontospy.ONTOSPY_LOCAL)
+	startServer(port=DEFAULT_PORT, location=ONTOSPY_LOCAL_MODELS)
 
 	# finally:	
 	# print some stats.... 

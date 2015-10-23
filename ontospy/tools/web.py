@@ -125,8 +125,7 @@ def parse_options():
 def main():
 	""" command line script """
 	
-	print "OntoSPy " + ontospy.VERSION
-	
+	print "OntoSPy " + ontospy.VERSION	
 	ontospy.get_or_create_home_repo() 
 	
 	opts, args = parse_options()

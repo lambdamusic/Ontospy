@@ -42,7 +42,7 @@ class Shell(cmd.Cmd):
 		 """
 		 # useful vars
 		 self.LOCAL = ontospy.ONTOSPY_LOCAL
-		 self.LOCAL_MODELS = ontospy.ONTOSPY_LOCAL_MODELS
+		 self.LOCAL_MODELS = ontospy.get_home_location()
 		 self.ontologies = ontospy.get_localontologies()
 		 self.current = None
 		 self.currentEntity = None
@@ -192,8 +192,9 @@ class Shell(cmd.Cmd):
 				self._load_ontology(choice)
 
 
-	def _next_ontology(self, currentfile):
+	def _next_ontology(self):
 		"""Dynamically retrieves the next ontology in the list"""
+		currentfile = self.current['file']
 		try:
 			idx = self.ontologies.index(currentfile)
 			return self.ontologies[idx+1]
@@ -445,6 +446,7 @@ class Shell(cmd.Cmd):
 			print "Please select an ontology first"
 	
 	def do_next(self, line):
+		"""Jump to the next entities (ontology, class or property) depending on context"""
 		if not self.current:
 			print "Please select an ontology first"
 		elif self.currentEntity:
@@ -644,7 +646,7 @@ def main():
 	print "OntoSPy " + ontospy.VERSION
 	
 	Shell()._clear_screen()
-	print Style.BRIGHT + "** OntoSPy Interactive Ontology Documentation Environment " + ontospy.VERSION + " **" + Style.RESET_ALL
+	print Style.BRIGHT + "** OntoSPy Interactive Ontology Browser " + ontospy.VERSION + " **" + Style.RESET_ALL
 	ontospy.get_or_create_home_repo()
 	Shell().cmdloop()
 	raise SystemExit, 1

@@ -18,6 +18,7 @@ More info in the README file.
 
 import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
 from colorama import Fore, Back, Style
+from ConfigParser import SafeConfigParser
 
 from .libs.graph import Graph, SparqlEndpoint
 from .libs.util import bcolors, pprinttable, printDebug, _clear_screen
@@ -25,24 +26,30 @@ from .libs.util import bcolors, pprinttable, printDebug, _clear_screen
 from ._version import *
 
 
-# local repository constants
-ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
-ONTOSPY_LOCAL_MODELS = ONTOSPY_LOCAL + "/models"
-ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
-ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.index/cache/"
-
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
 ONTOSPY_LOCAL_TEMPLATES = _dirname + "/data/templates/"
 
 
+# local repository constants
+ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
+ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
+ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/"
+
+ONTOSPY_LIBRARY_DEFAULT = os.path.join(os.path.expanduser('~'), 'ontospy-library')
+
+
+
+
 def get_or_create_home_repo(reset=False):
-	"""Check to make sure we never operate with a non existing local repo """
+	"""
+	Check to make sure we never operate with a non-existing local repo 
+	"""
 	dosetup = True
 	if os.path.exists(ONTOSPY_LOCAL):
 		dosetup = False
-		print Style.DIM + "Local library: <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
+		
 		if reset:
 			var = raw_input("Delete the local library and all of its contents? (y/n) ")
 			if var == "y":
@@ -53,21 +60,93 @@ def get_or_create_home_repo(reset=False):
 
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL)):
 		os.mkdir(ONTOSPY_LOCAL)
-	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_MODELS)):	
-		os.mkdir(ONTOSPY_LOCAL_MODELS)
-	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)):	
+	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)): 
 		os.mkdir(ONTOSPY_LOCAL_CACHE)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):	
-		os.mkdir(ONTOSPY_LOCAL_VIZ)	
-	if dosetup:
-		print Fore.GREEN + "Setup successfull: local library created at <%s>" % ONTOSPY_LOCAL + Style.RESET_ALL
-	return ONTOSPY_LOCAL	
+		os.mkdir(ONTOSPY_LOCAL_VIZ) 
 	
+	LIBRARY_HOME = get_home_location() # from init file, or default
+	if not(os.path.exists(LIBRARY_HOME)):
+		os.mkdir(LIBRARY_HOME)
+
+	if dosetup:		
+		print Fore.GREEN + "Setup successfull: local library created at <%s>" % LIBRARY_HOME + Style.RESET_ALL
+	else:
+		print Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL
+	
+	return True	
+	
+
+
+
+
+
+def _askLocation():
+	"""
+	gets a dir name for the library location
+	> fails if dir does not exist
+	"""
+	while True:
+		var = raw_input("------------------\nPlease type in an existing folder path e.g. 'Users/john/ontologies' : (q=exit)\n")
+		if var == "q":
+			return None
+		else:
+			try:
+				if os.path.isdir(var):			
+					printDebug("-----------\nThanks.", "comment")
+				else:
+					raise
+				break
+			except:
+				printDebug("The location does not exist. Please select a valid directory.", "important")
+				continue
+
+	return var
+
+
+
+def set_home_location(path = ONTOSPY_LIBRARY_DEFAULT, asknew=False):
+	"""Sets the folder that contains models for the local library """
+	config = SafeConfigParser()
+	config_filename = ONTOSPY_LOCAL + '/config.ini'
+	config.read(config_filename)
+	if not config.has_section('models'):
+		config.add_section('models')
+
+	if asknew:
+		path = _askLocation()
+	
+	if path:	
+		config.set('models', 'dir', path)
+		with open(config_filename, 'w') as f:
+			# note: this does not remove previously saved settings 
+			config.write(f)
+	
+	return path
+
+
+def get_home_location():
+	"""Gets the path of the folder for the local library"""
+	config = SafeConfigParser()
+	config_filename = ONTOSPY_LOCAL + '/config.ini'
+	config.read(config_filename)
+	try:
+		return config.get('models', 'dir')
+	except:
+		return set_home_location()
+
+
+
+
+
+
+
 
 
 def get_localontologies():
 	"returns a list of file names in the ontologies folder (not the full path)"
 	res = []
+	ONTOSPY_LOCAL_MODELS = get_home_location()
 	if os.path.exists(ONTOSPY_LOCAL_MODELS):
 		for f in os.listdir(ONTOSPY_LOCAL_MODELS):
 			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS,f)):
@@ -99,6 +178,7 @@ def do_pickle_ontology(filename, g=None):
 	2015-09-17: added code to increase recursion limit if cPickle fails
 		see http://stackoverflow.com/questions/2134706/hitting-maximum-recursion-depth-using-pythons-pickle-cpickle
 	"""
+	ONTOSPY_LOCAL_MODELS = get_home_location()
 	pickledpath =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if not g:
 		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)	
@@ -132,26 +212,29 @@ def actionSelectFromLocal():
 	
 	counter = 1
 	printDebug("------------------", 'comment')
-	for x in options:
-		print Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL
-		# print Fore.BLUE + x[0], " ==> ", x[1]
-		counter += 1
+	if not options:
+		printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
+	else:
+		for x in options:
+			print Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL
+			# print Fore.BLUE + x[0], " ==> ", x[1]
+			counter += 1
 	
 	
-	while True:
-		var = raw_input(Style.DIM + "------------------\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
-		if var == "q":
-			return None
-		else:
-			try:
-				_id = int(var)
-				ontouri = options[_id - 1]
-				printDebug("You selected:", "comment")
-				print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
-				return ontouri
-			except:
-				print "Error retrieving ontology. Please select a valid number."
-				continue
+		while True:
+			var = raw_input(Style.DIM + "------------------\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
+			if var == "q":
+				return None
+			else:
+				try:
+					_id = int(var)
+					ontouri = options[_id - 1]
+					printDebug("You selected:", "comment")
+					print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+					return ontouri
+				except:
+					print "Error retrieving ontology. Please select a valid number."
+					continue
 
 
 
@@ -160,6 +243,7 @@ def action_import(location):
 	"""import files into the local repo """
 
 	# 1) extract file from location and save locally
+	ONTOSPY_LOCAL_MODELS = get_home_location()
 	fullpath = ""
 	try:
 		if location.startswith("http://"):
@@ -290,6 +374,10 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
+	parser.add_option("-s", "--setup",
+			action="store_true", default=False, dest="_setup",
+			help="Setup local library location.") 
+			
 	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
 			help="Import a file/folder/url into the local library.") 
@@ -322,11 +410,11 @@ def parse_options():
 	opts, args = parser.parse_args()
 	
 	if opts._import and not args:
-		printDebug("Please specify a file/folder/url to import into local library.", 'important')
+		printDebug("Please specify a file/folder/url to import into local library.")
 		sys.exit(0)
 				
 	# not opts.shell and not opts.erase and not opts.cache and 
-	if not opts.lib and not args:
+	if not opts._setup and not opts.lib and not args:
 		parser.print_help()
 		sys.exit(0)
 			
@@ -342,6 +430,8 @@ def main():
 	""" command line script """
 	
 	printDebug("OntoSPy " + VERSION, "comment")
+	get_or_create_home_repo()
+	
 	opts, args = parse_options()
 	
 	print_opts = {
@@ -352,9 +442,14 @@ def main():
 					'labels' : opts.labels,
 				}
 
+
+	if opts._setup:
+		set_home_location(asknew=True)
+		raise SystemExit, 1
+
+
 	# select a model from the local ontologies
 	if opts.lib:
-		get_or_create_home_repo()
 		filename = actionSelectFromLocal()
 		if filename:
 			g = get_pickled_ontology(filename)
@@ -362,27 +457,25 @@ def main():
 				g = do_pickle_ontology(filename)	
 			shellPrintOverview(g, print_opts)		
 			printDebug("\n----------\n" + "Completed (note: you can explore this model interactively using the `ontospy-shell`)", "comment")	
-		raise SystemExit, 1	
+		raise SystemExit, 1 
 
 
 
 	# import an ontology
 	# note: method duplicated in .ontospy and .tools.manager
 	if opts._import:
-		get_or_create_home_repo()
 		_location = args[0]
 		if os.path.isdir(_location):
 			res = action_import_folder(_location)
 		else:
 			res = action_import(_location)
 		if res: 
-			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
+			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
 		raise SystemExit, 1
 
 		
 	# for all other cases...
 
-	get_or_create_home_repo()  
 	sTime = time.time()
 
 	# load the ontology when a uri is passed manually

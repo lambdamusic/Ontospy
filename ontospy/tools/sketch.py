@@ -195,7 +195,8 @@ def main(argv=None):
 	"""
 	
 	print "OntoSPy " + ontospy.VERSION
-
+	ontospy.get_or_create_home_repo()
+	
 	if argv:
 		print "Argument passing not implemented yet"
 		if False:
