@@ -144,16 +144,18 @@ class Shell(cmd.Cmd):
 		else:
 			self._print("%d results in total: " % len(_list), "TIP")
 		counter = 1
+		_temp = []
 		for el in _list:
 			if hasattr(el, 'uri'):
-				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el.uri
+				_temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el.uri)]
 			else:
-				print Fore.BLUE + Style.BRIGHT + "[%d] " % counter, Style.RESET_ALL, el
+				_temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el)]
 			counter += 1
+		pprint2columns(_temp)
+		
 		self._print("--------------")
 		self._print("Please select one option by entering its number: ")
 		var = raw_input()
-		# var = raw_input(Fore.BLUE + Style.BRIGHT + "Please select one option by entering its number: " + Style.RESET_ALL)
 		try:
 			var = int(var)
 			return _list[var-1]

@@ -38,11 +38,15 @@ class bcolors:
 
 
 
+
+
 def printDebug(s, style=None):
 	if style == "comment":
 		s = Style.DIM + s + Style.RESET_ALL
 	elif style == "important":
-		s = Style.BRIGHT + s + Style.RESET_ALL		
+		s = Style.BRIGHT + s + Style.RESET_ALL
+	elif style == "normal":
+		s = Style.RESET_ALL + s + Style.RESET_ALL			
 	try:
 		print >> sys.stderr, s
 	except: 
@@ -567,6 +571,27 @@ def remove_duplicates(seq, idfun=None):
 		result.append(item)
 	return result
 
+
+
+
+def pprint2columns(llist, max_length=60):
+	"""
+	llist = a list of strings 
+	max_length = if a word is longer than that, for single col display
+	
+	> prints a list in two columns, taking care of alignment too
+	"""
+	col_width = max(len(word) for word in llist) + 2  # padding	
+
+	if col_width > max_length:
+		for el in llist:
+			print el
+	else:
+		column1 = llist[:len(llist)/2]
+		column2 = llist[len(llist)/2:]	
+		for c1, c2 in zip(column1, column2):
+			space = " " * (col_width - len(c1))
+			print "%s%s%s" % (c1, space, c2)
 
 
 

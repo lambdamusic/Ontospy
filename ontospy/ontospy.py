@@ -21,7 +21,7 @@ from colorama import Fore, Back, Style
 from ConfigParser import SafeConfigParser
 
 from .libs.graph import Graph, SparqlEndpoint
-from .libs.util import bcolors, pprinttable, printDebug, _clear_screen
+from .libs.util import bcolors, pprinttable, printDebug, _clear_screen, pprint2columns
 
 from ._version import *
 
@@ -74,7 +74,7 @@ def get_or_create_home_repo(reset=False):
 	else:
 		print Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL
 	
-	return True	
+	return True 
 	
 
 
@@ -98,7 +98,7 @@ def _askLocation():
 					raise
 				break
 			except:
-				printDebug("The location does not exist. Please select a valid directory.", "important")
+				printDebug("The location does not exist. Please enter a valid directory.", "important")
 				continue
 
 	return var
@@ -185,7 +185,7 @@ def do_pickle_ontology(filename, g=None):
 	
 	try:				
 		cPickle.dump(g, open( pickledpath, "wb" ) )
-		print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
+		# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
 	except Exception,e: 
 		print Style.BRIGHT + "\n.. ERROR caching <%s>" % filename + Style.RESET_ALL
 		print str(e)
@@ -203,8 +203,6 @@ def do_pickle_ontology(filename, g=None):
 
 
 
-
-
 def actionSelectFromLocal():
 	" select a file from the local repo "
 	
@@ -215,11 +213,14 @@ def actionSelectFromLocal():
 	if not options:
 		printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
 	else:
+		data = []
 		for x in options:
-			print Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL
+			data += [ Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL]
 			# print Fore.BLUE + x[0], " ==> ", x[1]
 			counter += 1
-	
+		
+		# from util.
+		pprint2columns(data)
 	
 		while True:
 			var = raw_input(Style.DIM + "------------------\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
@@ -233,7 +234,7 @@ def actionSelectFromLocal():
 					print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
 					return ontouri
 				except:
-					print "Error retrieving ontology. Please select a valid number."
+					print "Please enter a valid number."
 					continue
 
 
@@ -246,12 +247,14 @@ def action_import(location):
 	ONTOSPY_LOCAL_MODELS = get_home_location()
 	fullpath = ""
 	try:
+		if location.startswith("www."): #support for lazy people
+			location = "http://%s" % str(location)
 		if location.startswith("http://"):
 			headers = {'Accept': "application/rdf+xml"}
 			req = urllib2.Request(location, headers=headers)
 			res = urllib2.urlopen(req)
 			final_location = res.geturl()  # after 303 redirects
-			print "Loaded <%s>" % final_location
+			print "Saving data from <%s>" % final_location
 			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
 			fullpath = ONTOSPY_LOCAL_MODELS + "/" + filename
 
@@ -265,7 +268,7 @@ def action_import(location):
 				shutil.copy(location, fullpath)
 			else:
 				raise ValueError('The location specified is not a file.')
-		print "Saved local copy"
+		# print "Saved local copy"
 	except:
 		print "Error retrieving file. Please make sure <%s> is a valid location." % location
 		if os.path.exists(fullpath):
@@ -274,9 +277,9 @@ def action_import(location):
 
 	# 2) check if valid RDF and cache it
 	try:
-		print "Loading graph..."
+		# print "Loading graph..."
 		g = Graph(fullpath)
-		print "Loaded ", fullpath
+		# print "Loaded ", fullpath
 	except:
 		g = None
 		if os.path.exists(fullpath):
@@ -284,7 +287,7 @@ def action_import(location):
 		print "Error parsing file. Please make sure %s contains valid RDF." % location
 
 	if g:
-		print "Caching..."
+		printDebug("Caching...", "normal")
 		do_pickle_ontology(filename, g)
 
 	# finally...
@@ -456,7 +459,7 @@ def main():
 			if not g:
 				g = do_pickle_ontology(filename)	
 			shellPrintOverview(g, print_opts)		
-			printDebug("\n----------\n" + "Completed (note: you can explore this model interactively using the `ontospy-shell`)", "comment")	
+			printDebug("----------\n" + "Completed (note: you can explore this model interactively using the `ontospy-shell`)", "comment")	
 		raise SystemExit, 1 
 
 
@@ -470,7 +473,7 @@ def main():
 		else:
 			res = action_import(_location)
 		if res: 
-			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
+			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
 		raise SystemExit, 1
 
 		

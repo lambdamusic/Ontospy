@@ -4,8 +4,7 @@ Installation
 Prerequisites
 --------------
 - Python (untested on v3)
-- A python package manager: `setuptools 
-<https://pypi.python.org/pypi/setuptools>`_ or `pip <https://pip.pypa.io/en/stable/installing/>`_.
+- A python package manager: `setuptools <https://pypi.python.org/pypi/setuptools>`_ or `pip <https://pip.pypa.io/en/stable/installing/>`_.
 
 
 Installation: Web (recommended)

@@ -8,9 +8,8 @@ Welcome to OntoSPy's documentation!
 
 OntoSPy is an RDFLIb-based Python toolkit for inspecting RDF vocabularies.
 
-- Pypi: https://pypi.python.org/pypi/ontospy 
-
-- Github: https://github.com/lambdamusic/OntoSPy
+.. warning::
+    This documentation is still in draft mode.
 
 
 In a nutshell
@@ -19,16 +18,28 @@ In a nutshell
 OntoSPy is a lightweight Python library and command line tool for inspecting and navigating vocabularies encoded using W3C Semantic Web standards (aka ontologies). 
 
 The basic workflow is simple: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
-    
-.. .. warning::
-..     This documentation is still in draft mode.
-..
+
+The same functionalities are accessible also via a handy command line application. This consists of an interactive environment (`ontospy --shell`) that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.     
+
+.. note:: OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that.
+
 
 
 Is OntoSPy for me? 
 --------------
 
-If you have a bunch of RDF vocabularies you regularly need to interrogate, but don't want to use a full-blown ontology editor like Protege, then OntoSPy might be good for you. 
+Here are some common usage scenarios:
+
+- You have a bunch of RDF vocabularies you regularly need to interrogate, but you'd rather use the command line than a full-blown ontology editor like Protege.
+
+- You want to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization. 
+
+- You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary. 
+
+
+
+Quick example
+--------------
 
 .. code-block:: shell
 
@@ -46,9 +57,17 @@ If you have a bunch of RDF vocabularies you regularly need to interrogate, but d
     -----------
     # ..etc.. 
     
-The same functionalities are accessible also via a handy command line application. This consists of an interactive environment (`ontospy --shell`) that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.  
 
-.. note:: OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a corresponding knowledge base (eg a triplestore) although the library could be easily extended to do that.
+
+See also
+--------------
+
+- Homepage: http://www.michelepasin.org/projects/ontospy
+
+- Github: https://github.com/lambdamusic/OntoSPy
+
+- CheeseShop: https://pypi.python.org/pypi/ontospy 
+
 
 
 Contents

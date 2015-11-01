@@ -11,23 +11,40 @@ USAGE = "ontospy-doc <uri>"
 
 
 
-def generateViz(location, islocal=False):
-	""" main method 
-	<islocal> = use a local model, hence make use of cache too
+
+# manually edited
+RENDER_OPTIONS = [
+	(1, "Basic HTML"), 
+	(2, "Expandable tree (class hierarchy)"), 
+	(3, "Expandable tree (property hierarchy)"), 
+	(4, "Expandable tree (skos hierarchy)"), 
+]
+
+
+
+
+
+def _askVisualization():
 	"""
-	
-	if islocal:
-		g = ontospy.get_pickled_ontology(location)
-		if not g:
-			g = ontospy.do_pickle_ontology(location)	
-	else:
-		g = ontospy.Graph(location)
+	ask user which viz output to use
+	"""
+	while True:
+		text = "Please select an output format: (q=exit)\n"
+		for viz in RENDER_OPTIONS:
+			text += "%d) %s\n" % (viz[0], viz[1])
+		var = raw_input(text)
+		if var == "q":
+			return None
+		else:
+			try:
+				n = int(var)
+				test = RENDER_OPTIONS[n-1]  #throw exception if number wrong
+				return n
+			except:
+				printDebug("Invalid selection. Please try again.", "important")
+				continue
 
-	# contents = render.ontologyHtmlTree(g)
-	contents = render.djangoTemplate(g)
 
-	return contents
-	
 
 def saveVizLocally(contents, filename = "index.html"):
 	filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename 
@@ -54,6 +71,31 @@ def saveVizGithub(contents):
 	    }
 	urls = save_anonymous_gist(title, files)
 	return urls
+
+
+
+
+
+
+def generateViz(graph, visualization):
+	""" 
+	<visualization>: an integer mapped to the elements of RENDER_OPTIONS
+	"""
+	
+	if visualization == 1:
+		contents = render.htmlBasicTemplate(graph)
+	
+	elif visualization == 2:
+		contents = render.interactiveD3Tree(graph)
+	
+	elif visualization == 3:
+		contents = render.interactiveD3Tree(graph, "properties")
+	
+	elif visualization == 4:
+		contents = render.interactiveD3Tree(graph, "skos")	
+		
+	return contents
+	
 
 
 
@@ -100,23 +142,41 @@ def main():
 	eTime = time.time()
 	print "OntoSPy " + ontospy.VERSION
 	
-	ontospy.get_or_create_home_repo() 
-	
+	ontospy.get_or_create_home_repo() 	
 	opts, args = parse_options()
 					
-	# list local ontologies and select one for documentation
+	# select from local ontologies:
 	if opts.lib:
 		ontouri = ontospy.actionSelectFromLocal()
 		if ontouri:	
-			contents = generateViz(ontouri, islocal=True)
-			
+			islocal = True		
 		else:	
 			raise SystemExit, 1
 	else:
 		ontouri = args[0]
-		contents = generateViz(ontouri)
+		islocal = False
 
-	# save file locally or on github
+	
+	# select a visualization
+	viztype = _askVisualization()
+	if not viztype:
+		raise SystemExit, 1
+	
+	
+	# get ontospy graph
+	if islocal:
+		g = ontospy.get_pickled_ontology(ontouri)
+		if not g:
+			g = ontospy.do_pickle_ontology(ontouri)	
+	else:
+		g = ontospy.Graph(ontouri)
+	
+	
+	# viz dispatcher
+	contents = generateViz(g, viztype)
+
+	
+	# once viz contents are generated, save file locally or on github
 	if opts.gist:
 		urls = saveVizGithub(contents)
 		printDebug("Documentation saved on github", "comment")
@@ -127,13 +187,12 @@ def main():
 	else:
 		url = saveVizLocally(contents)
 		printDebug("Documentation generated", "comment")
-	
+
+	# open browser	
 	webbrowser.open(url)
 
-
-	sTime = time.time()				
-	# finally:	
-	# print some stats.... 
+	# finally: print some stats.... 
+	sTime = time.time()					
 	tTime = eTime - sTime
 	printDebug("Time:	   %0.2fs" %  tTime, "comment")
 
