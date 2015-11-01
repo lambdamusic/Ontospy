@@ -23,7 +23,6 @@ from ..libs.util import *
 
 
 
-
 def action_listlocal():
 	""" 
 	list all local files 
@@ -101,6 +100,65 @@ def action_cache():
 
 
 
+def getPrefixCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
+	""" 
+	extracts a list of ontology URIs from http://prefix.cc/popular/all
+	
+	>query: a query string to match 
+	
+	"""
+
+	printDebug("----------\nReading source...")	
+	g = Graph(source)
+	
+	out = []
+	for x in g.ontologies:
+		if query:
+			if query in unicode(x.prefix) or query in unicode(x.uri):
+				out += [(unicode(x.prefix), unicode(x.uri))]
+		else:
+			out += [(unicode(x.prefix), unicode(x.uri))]
+		
+	printDebug("----------\n%d results found." % len(out))
+	
+	return out			
+
+
+
+
+def action_webimport(options):
+	"""
+	List models from web catalog (prefix.cc) and ask which one to import
+	2015-10-10: originally part of main ontospy; now standalone only 
+	"""
+
+	# options = web.getCatalog()
+	counter = 1
+	for x in options:
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
+		# print Fore.BLUE + x[0], " ==> ", x[1]
+		counter += 1
+
+	while True:
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=exit)\n" + Style.RESET_ALL)
+		if var == "q":
+			break
+		else:
+			try:
+				_id = int(var)
+				ontouri = options[_id - 1][1]
+				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				ontospy.action_import(ontouri)
+			except:
+				print "Error retrieving file. Import failed."
+				continue
+
+
+
+
+
+
+
 
 def parse_options():
 	"""
@@ -120,10 +178,18 @@ def parse_options():
 	parser.add_option("-l", "--list",
 			action="store_true", default=False, dest="list",
 			help="Select ontologies saved in the local library.") 
-			
+
+	parser.add_option("-u", "--update",
+			action="store_true", default=False, dest="_setup",
+			help="Update local library location.") 
+
+	parser.add_option("-d", "--delete",
+			action="store_true", default=False, dest="_delete",
+			help="[@todo] Delete ontologies from the local library.") 
+						
 	parser.add_option("-c", "--cache",
 			action="store_true", default=False, dest="cache",
-			help="Rebuild the cache for the local library (recommended)")
+			help="Force caching of the local library (for faster loading)")
 			
 	parser.add_option("-e", "--erase",
 			action="store_true", default=False, dest="erase",
@@ -132,14 +198,22 @@ def parse_options():
 	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
 			help="Import a file/folder/url into the local library.") 
-						
+
+	parser.add_option("-w", "--importweb",
+			action="store_true", default=False, dest="_web",
+			help="Import vocabularies registered on http://prefix.cc/popular.") 
+	
+	# parser.add_option("-q", "",
+	# 		action="store", type="string", default="", dest="query",
+	# 		help="A query string used to match the catalog entries.")
+									
 	opts, args = parser.parse_args()
 
 	if opts._import and not args:
 		printDebug("Please specify a file/folder/url to import into local library.", 'important')
 		sys.exit(0)
 		
-	if not opts.list and not opts.cache and not opts.erase and not opts._import:
+	if not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._import and not opts._web:
 		parser.print_help()
 		sys.exit(0)
 
@@ -153,11 +227,14 @@ def main():
 	
 	print "OntoSPy " + ontospy.VERSION
 	ontospy.get_or_create_home_repo()
-	 
-	
-	
+		 
 	opts, args = parse_options()
 
+	# move local lib
+	if opts._setup:
+		ontospy.set_home_location(asknew=True)
+		raise SystemExit, 1
+		
 	# reset local stuff
 	if opts.erase:
 		action_erase()
@@ -191,6 +268,12 @@ def main():
 		if res: 
 			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
 		raise SystemExit, 1
+			
+			
+	if opts._web:
+		# _list = getPrefixCatalog(query=opts.query) # 2015-11-01: no query for now
+		_list = getPrefixCatalog(query="")
+		action_webimport(_list)		
 				
 	
 if __name__ == '__main__':

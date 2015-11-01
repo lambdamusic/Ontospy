@@ -87,7 +87,7 @@ def _askLocation():
 	> fails if dir does not exist
 	"""
 	while True:
-		var = raw_input("------------------\nPlease type in an existing folder path e.g. 'Users/john/ontologies' : (q=exit)\n")
+		var = raw_input("------------------\nPlease type in an existing folder path e.g. '/Users/john/tmp' : (q=exit)\n")
 		if var == "q":
 			return None
 		else:
@@ -106,7 +106,11 @@ def _askLocation():
 
 
 def set_home_location(path = ONTOSPY_LIBRARY_DEFAULT, asknew=False):
-	"""Sets the folder that contains models for the local library """
+	"""
+	Sets the folder that contains models for the local library 
+	@todo: add options to move things over etc..
+	note: this is called from 'manager' 
+	"""
 	config = SafeConfigParser()
 	config_filename = ONTOSPY_LOCAL + '/config.ini'
 	config.read(config_filename)
@@ -377,9 +381,6 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 	
 
-	parser.add_option("-s", "--setup",
-			action="store_true", default=False, dest="_setup",
-			help="Setup local library location.") 
 			
 	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
@@ -417,7 +418,7 @@ def parse_options():
 		sys.exit(0)
 				
 	# not opts.shell and not opts.erase and not opts.cache and 
-	if not opts._setup and not opts.lib and not args:
+	if not opts.lib and not args:
 		parser.print_help()
 		sys.exit(0)
 			
@@ -445,10 +446,6 @@ def main():
 					'labels' : opts.labels,
 				}
 
-
-	if opts._setup:
-		set_home_location(asknew=True)
-		raise SystemExit, 1
 
 
 	# select a model from the local ontologies

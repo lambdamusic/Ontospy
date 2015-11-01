@@ -99,7 +99,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/w3c/*.*'],
+         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/w3c/*.*', 'data/templates/d3tree/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -114,8 +114,6 @@ setup(
     entry_points={
         'console_scripts': [
             'ontospy-sketch=ontospy.tools.sketch:main', 
-            'ontospy-match=ontospy.tools.matcher:main', 
-            'ontospy-searchweb=ontospy.tools.web:main', 
             'ontospy-shell=ontospy.tools.shell:main', 
             'ontospy-manager=ontospy.tools.manager:main', 
             'ontospy-docs=ontospy.tools.docs:main', 

@@ -15,9 +15,9 @@ USAGE = "ontospy-doc <uri>"
 # manually edited
 RENDER_OPTIONS = [
 	(1, "Basic HTML"), 
-	(2, "Expandable tree (class hierarchy)"), 
-	(3, "Expandable tree (property hierarchy)"), 
-	(4, "Expandable tree (skos hierarchy)"), 
+	(2, "Expandable tree (class hierarchy) [experimental]"), 
+	(3, "Expandable tree (property hierarchy) [experimental]"), 
+	(4, "Expandable tree (skos hierarchy) [experimental]"), 
 ]
 
 
