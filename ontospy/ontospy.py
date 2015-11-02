@@ -37,7 +37,8 @@ ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/"
 
-ONTOSPY_LIBRARY_DEFAULT = os.path.join(os.path.expanduser('~'), 'ontospy-library')
+ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models"
+# ONTOSPY_LIBRARY_DEFAULT = os.path.join(os.path.expanduser('~'), 'ontospy-library')
 
 
 
@@ -64,11 +65,17 @@ def get_or_create_home_repo(reset=False):
 		os.mkdir(ONTOSPY_LOCAL_CACHE)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):	
 		os.mkdir(ONTOSPY_LOCAL_VIZ) 
-	
+	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)):	
+		os.mkdir(ONTOSPY_LIBRARY_DEFAULT)
+		
 	LIBRARY_HOME = get_home_location() # from init file, or default
-	if not(os.path.exists(LIBRARY_HOME)):
-		os.mkdir(LIBRARY_HOME)
 
+	# check that the local library folder exists, otherwiese prompt user to create it
+	if not(os.path.exists(LIBRARY_HOME)):
+		printDebug("Warning: the local library at '%s' has been deleted or is not accessible anymore." % LIBRARY_HOME, "important")
+		printDebug("Please reset the local library by running 'ontospy-manager -u <a-valid-path>'", "comment")
+		raise SystemExit, 1
+		
 	if dosetup:		
 		print Fore.GREEN + "Setup successfull: local library created at <%s>" % LIBRARY_HOME + Style.RESET_ALL
 	else:
@@ -81,54 +88,6 @@ def get_or_create_home_repo(reset=False):
 
 
 
-def _askLocation():
-	"""
-	gets a dir name for the library location
-	> fails if dir does not exist
-	"""
-	while True:
-		var = raw_input("------------------\nPlease type in an existing folder path e.g. '/Users/john/tmp' : (q=exit)\n")
-		if var == "q":
-			return None
-		else:
-			try:
-				if os.path.isdir(var):			
-					printDebug("-----------\nThanks.", "comment")
-				else:
-					raise
-				break
-			except:
-				printDebug("The location does not exist. Please enter a valid directory.", "important")
-				continue
-
-	return var
-
-
-
-def set_home_location(path = ONTOSPY_LIBRARY_DEFAULT, asknew=False):
-	"""
-	Sets the folder that contains models for the local library 
-	@todo: add options to move things over etc..
-	note: this is called from 'manager' 
-	"""
-	config = SafeConfigParser()
-	config_filename = ONTOSPY_LOCAL + '/config.ini'
-	config.read(config_filename)
-	if not config.has_section('models'):
-		config.add_section('models')
-
-	if asknew:
-		path = _askLocation()
-	
-	if path:	
-		config.set('models', 'dir', path)
-		with open(config_filename, 'w') as f:
-			# note: this does not remove previously saved settings 
-			config.write(f)
-	
-	return path
-
-
 def get_home_location():
 	"""Gets the path of the folder for the local library"""
 	config = SafeConfigParser()
@@ -137,13 +96,14 @@ def get_home_location():
 	try:
 		return config.get('models', 'dir')
 	except:
-		return set_home_location()
-
-
-
-
-
-
+		# FIRST TIME, create it
+		config.add_section('models')		
+		config.set('models', 'dir', ONTOSPY_LIBRARY_DEFAULT)
+		with open(config_filename, 'w') as f:
+			# note: this does not remove previously saved settings 
+			config.write(f)
+		
+		return ONTOSPY_LIBRARY_DEFAULT
 
 
 

@@ -14,11 +14,45 @@ USAGE = "ontospy-manager <options>"
 
 
 import time, optparse, os, rdflib, sys, datetime
+from ConfigParser import SafeConfigParser
 
 from .. import ontospy 
 from ..libs.graph import Graph
 from ..libs.util import *
 
+
+
+
+
+
+def action_update_library_location(_location):
+	"""
+	Sets the folder that contains models for the local library 
+	@todo: add options to move things over etc..
+	note: this is called from 'manager' 
+	"""
+	
+	# if not(os.path.exists(_location)):
+	# 	os.mkdir(_location)
+	# 	printDebug("Creating new folder..", "comment")
+	
+	printDebug("Old location: '%s'" % ontospy.get_home_location(), "comment")
+	
+	if os.path.isdir(_location):
+		
+		config = SafeConfigParser()
+		config_filename = ontospy.ONTOSPY_LOCAL + '/config.ini'
+		config.read(config_filename)
+		if not config.has_section('models'):
+			config.add_section('models')
+		
+		config.set('models', 'dir', _location)
+		with open(config_filename, 'w') as f:			
+			config.write(f) # note: this does not remove previously saved settings 
+		
+		return _location
+	else:
+		return None
 
 
 
@@ -212,7 +246,11 @@ def parse_options():
 	if opts._import and not args:
 		printDebug("Please specify a file/folder/url to import into local library.", 'important')
 		sys.exit(0)
-		
+
+	if opts._setup and not args:
+		printDebug("Please specify a folder to be used for the local library e.g. 'ontospy-manager -u /Users/john/ontologies'", 'important')
+		sys.exit(0)
+				
 	if not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._import and not opts._web:
 		parser.print_help()
 		sys.exit(0)
@@ -225,14 +263,21 @@ def parse_options():
 def main():
 	""" command line script """
 	
-	print "OntoSPy " + ontospy.VERSION
-	ontospy.get_or_create_home_repo()
-		 
+	print "OntoSPy " + ontospy.VERSION	 
 	opts, args = parse_options()
-
+	
+	if not opts._setup:
+		ontospy.get_or_create_home_repo()
+		
 	# move local lib
 	if opts._setup:
-		ontospy.set_home_location(asknew=True)
+		_location = args[0]
+		output = action_update_library_location(_location)
+		if output:
+			printDebug("----------\n" + "New location: '%s'" % _location, "important")
+			printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")
+		else:
+			printDebug("----------\n" + "Please specify an existing folder path.", "important")
 		raise SystemExit, 1
 		
 	# reset local stuff
