@@ -472,25 +472,6 @@ class Shell(cmd.Cmd):
 				self._print("Only one ontology available in repository.")	 
 
 
-	def do_delete(self, line):
-		""" Delete an ontology from the local repository. """
-		if not line:
-			print "Please specify an ontology name"
-		else:
-			fullpath = self.LOCAL_MODELS + "/" + line
-			if os.path.exists(fullpath):
-				var = raw_input("Are you sure? (y/n)")
-				if var == "y":
-					os.remove(fullpath)
-					# @todo: do this operation in /cache...
-					if os.path.exists(fullpath + ".pickle"):
-						os.remove(fullpath + ".pickle")
-					self.ontologies = ontospy.get_localontologies()
-					print "Deleted %s" % fullpath
-			else:
-				print "Not found"
-
-
 	def do_up(self, line):
 		"Go up one level. From entity => ontology; from ontology => ontospy top level."
 		if self.currentEntity:
@@ -625,19 +606,6 @@ class Shell(cmd.Cmd):
 							if f.startswith(text)
 							]
 		return completions
-				
-
-	def complete_delete(self, text, line, begidx, endidx):
-		if not text:
-			completions = self.ontologies[:]
-		else:
-			completions = [ f
-							for f in self.ontologies
-							if f.startswith(text)
-							]
-		return completions
-							
-
 
 
 

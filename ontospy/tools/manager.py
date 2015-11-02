@@ -91,6 +91,38 @@ def action_listlocal():
 
 
 
+def actions_delete():
+	"""
+	delete an ontology from the local repo
+	"""
+
+	filename = ontospy.actionSelectFromLocal()
+	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
+	
+	print ONTOSPY_LOCAL_MODELS
+	
+	if filename:
+		fullpath = ONTOSPY_LOCAL_MODELS + filename
+		if os.path.exists(fullpath):
+			var = raw_input("Are you sure? (y/n)")
+			if var == "y":
+				os.remove(fullpath)
+				printDebug("Deleted %s" % fullpath, "important")
+				cachepath = ontospy.ONTOSPY_LOCAL_CACHE + filename + ".pickle"
+				# @todo: do this operation in /cache...
+				if os.path.exists(cachepath):
+					os.remove(cachepath)
+					printDebug("Deleted %s" % cachepath, "important")
+				
+				return True
+
+	return False
+
+	
+
+
+
+
 def action_erase():
 	"""just a wrapper.. possibly to be extended in the future"""
 	ontospy.get_or_create_home_repo(reset=True)
@@ -219,7 +251,7 @@ def parse_options():
 
 	parser.add_option("-d", "--delete",
 			action="store_true", default=False, dest="_delete",
-			help="[@todo] Delete ontologies from the local library.") 
+			help="Delete ontologies from the local library.") 
 						
 	parser.add_option("-c", "--cache",
 			action="store_true", default=False, dest="cache",
@@ -251,7 +283,7 @@ def parse_options():
 		printDebug("Please specify a folder to be used for the local library e.g. 'ontospy-manager -u /Users/john/ontologies'", 'important')
 		sys.exit(0)
 				
-	if not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._import and not opts._web:
+	if not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._import and not opts._web and not opts._delete:
 		parser.print_help()
 		sys.exit(0)
 
@@ -279,6 +311,12 @@ def main():
 		else:
 			printDebug("----------\n" + "Please specify an existing folder path.", "important")
 		raise SystemExit, 1
+	
+	
+	# reset local stuff
+	if opts._delete:
+		res = actions_delete()
+		raise SystemExit, 1	
 		
 	# reset local stuff
 	if opts.erase:

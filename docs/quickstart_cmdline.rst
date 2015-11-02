@@ -7,8 +7,7 @@ Currently these are the utility scripts available:
 - ``ontospy``: load a graph and show schema information
 - ``ontospy-docs``: generates html documentation  
 - ``ontospy-shell``: launch the interactive ontospy shell  
-- ``ontospy-web``: discover commonly used ontologies listed on prefix.cc 
-- ``ontospy-match``: bootstrap mappings between two vocabularies
+- ``ontospy-manager``: manage your local ontospy installation 
 - ``ontospy-sketch``: sketch a turtle model interactively
 
 
@@ -33,8 +32,7 @@ The ``ontospy`` command
     # etc..
 
 
-Getting help
----------------------------------------------
+For more info, use the -h option:
 
 .. code-block:: shell
 
@@ -59,9 +57,7 @@ Getting help
                   
                   
 
-Print options  
----------------------------------------------
-E.g. print only the class tree and show rdfs:labels 
+Print only the class tree and show rdfs:labels 
 
 .. code-block:: shell
 
@@ -110,6 +106,7 @@ E.g. print only the class tree and show rdfs:labels
     Time:	   2.77s
 
 
+
 The ``ontospy-docs`` command
 *******************
 This utility allows to generate html documentation for any ontology. 
@@ -141,7 +138,7 @@ The shell is an interactive environment that lets you import, load and inspect v
 
     > ontospy-shell
     
-    ** OntoSPy Interactive Ontology Browser v1.6.1 **
+    ** OntoSPy Interactive Ontology Browser v1.6 **
     Local repository: </Users/michele.pasin/.ontospy>
     Type 'help' to get started. Use TAB to explore commands.
     <OntoSPy>: help
@@ -236,103 +233,27 @@ The shell is an interactive environment that lets you import, load and inspect v
 
 
 
-The ``ontospy-web`` command
+
+The ``ontospy-manager`` command
 *******************
-
-Show a list of vocabularies registered on http://prefix.cc
-
-
-.. code-block:: shell
-
-    > ontospy-web -h
-
-    Options:
-      --version   show program's version number and exit
-      -h, --help  show this help message and exit
-      -a, --all   Show all entries found by querying http://prefix.cc/popular/all.
-      -q QUERY    A query string used to match the catalog entries.
-
-
-Pass an argument to show only ontology that match it:
-
-.. code-block:: shell
-
-    > ontospy-web -q agent
-    ----------
-    Reading source...
-    ----------
-    Loaded 6497 triples from <http://prefix.cc/popular/all.file.vann>
-    started scanning...
-    ----------
-    Ontologies found: 1624
-    Classes found...: 0
-    Properties found: 0
-    Annotation......: 0
-    Datatype........: 0
-    Object..........: 0
-    ----------
-    3 results found.
-    agents  ==>  http://eulersharp.sourceforge.net/2003/03swap/agent#
-    swanag  ==>  http://purl.org/swan/1.2/agents/
-    agent  ==>  http://eulersharp.sourceforge.net/2003/03swap/agent#
-    ----------
-    Time:      10.04s
-
-
-
-
-
-
-The ``ontospy-match`` command
-*******************
-
-Match two models (in development)
+This utility allows to run management operations on a local ontospy library installation. 
 
 .. code-block:: python
-
-    > ontospy-match -h
-    Usage: 
+    > ontospy-docs 
+    OntoSPy v1.6.2.2
+    Local library: </Users/michele.pasin/.ontospy>
+    Usage: ontospy-manager <options>
 
     Options:
-      --version             show program's version number and exit
-      -h, --help            show this help message and exit
-      -o OUTPUTFILE, --outputfile=OUTPUTFILE
-                            The name of the output csv file.
-      -v, --verbose         Verbose mode: prints results on screen too.
+      --version        show program's version number and exit
+      -h, --help       show this help message and exit
+      -l, --list       Select ontologies saved in the local library.
+      -u, --update     Update local library location.
+      -c, --cache      Force caching of the local library (for faster loading)
+      -e, --erase      Erase the local library by removing all existing files
+      -i, --import     Import a file/folder/url into the local library.
+      -w, --importweb  Import vocabularies registered on http://prefix.cc/popular.
 
-                            
-
-    
-    > ontospy-match data/schemas/foaf.rdf data/schemas/bibo.owl 
-    Match classes or properties? [c|p]: c
-    ----------
-    Loaded 630 triples from <data/schemas/foaf.rdf>
-    started scanning...
-    ----------
-    Ontologies found: 1
-    Classes found...: 15
-    Properties found: 67
-    Annotation......: 7
-    Datatype........: 26
-    Object..........: 34
-    ----------
-    Loaded 1215 triples from <data/schemas/bibo.owl>
-    started scanning...
-    ----------
-    Ontologies found: 1
-    Classes found...: 65
-    Properties found: 117
-    Annotation......: 12
-    Datatype........: 54
-    Object..........: 51
-    ----------
-    Now matching...
-    31 candidates found.
-    ----------
-    Time:	   7.14s
-
-    # results are saved by default in same folder
-    
 
 
 
