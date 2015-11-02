@@ -99,8 +99,6 @@ def actions_delete():
 	filename = ontospy.actionSelectFromLocal()
 	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
 	
-	print ONTOSPY_LOCAL_MODELS
-	
 	if filename:
 		fullpath = ONTOSPY_LOCAL_MODELS + filename
 		if os.path.exists(fullpath):
