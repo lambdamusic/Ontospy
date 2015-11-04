@@ -65,7 +65,7 @@ def get_or_create_home_repo(reset=False):
 		os.mkdir(ONTOSPY_LOCAL_CACHE)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):	
 		os.mkdir(ONTOSPY_LOCAL_VIZ) 
-	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)):	
+	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)): 
 		os.mkdir(ONTOSPY_LIBRARY_DEFAULT)
 		
 	LIBRARY_HOME = get_home_location() # from init file, or default
@@ -339,17 +339,19 @@ def parse_options():
 	"""
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
-	
+				
+	parser.add_option("-l", "--library",
+			action="store_true", default=False, dest="lib",
+			help="Select ontologies saved in the local library.") 
 
-			
 	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
 			help="Import a file/folder/url into the local library.") 
 
-	parser.add_option("-l", "--library",
-			action="store_true", default=False, dest="lib",
-			help="Select ontologies saved in the local library.") 
-			
+	# parser.add_option("-s", "--shell",
+	# 		action="store_true", default=False, dest="_shell",
+	# 		help="@todo: run shell.")
+						
 	parser.add_option("-o", "",
 			action="store_true", default=False, dest="ontoannotations",
 			help="Show only the ontology annotations/metadata.")
@@ -378,7 +380,7 @@ def parse_options():
 		sys.exit(0)
 				
 	# not opts.shell and not opts.erase and not opts.cache and 
-	if not opts.lib and not args:
+	if not opts.lib and not args: #not opts._shell and 
 		parser.print_help()
 		sys.exit(0)
 			
@@ -394,9 +396,9 @@ def main():
 	""" command line script """
 	
 	printDebug("OntoSPy " + VERSION, "comment")
-	get_or_create_home_repo()
-	
 	opts, args = parse_options()
+	
+	get_or_create_home_repo()
 	
 	print_opts = {
 					'ontoannotations' : opts.ontoannotations, 
@@ -433,6 +435,12 @@ def main():
 			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
 		raise SystemExit, 1
 
+	
+	#test.... 2015-11-03
+	# if opts._shell:
+	# 	from .tools.shell import Shell
+	# 	Shell().cmdloop()
+	# 	raise SystemExit, 1
 		
 	# for all other cases...
 

@@ -158,6 +158,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 </head>
 
 
+
 <body>
 	
 	
@@ -231,8 +232,14 @@ var vis = d3.select("#graph").append("svg:svg")
     }
   }
 
-  // Initialize the display to show no nodes:
-  // root.children.forEach(toggleAll);
+	{% if total_entities > 300 %}
+	
+		// Initialize the display to show no nodes:
+		root.children.forEach(toggleAll);
+	
+	{% endif %}
+
+
 
   update(root);
 // });

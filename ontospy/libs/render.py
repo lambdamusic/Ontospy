@@ -104,10 +104,13 @@ def interactiveD3Tree(graph, entity="classes"):
 	
 	if entity == "classes":
 		mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
+		total = len(graph.classes)
 	elif entity == "properties":
 		mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
+		total = len(graph.properties)
 	elif entity == "skos":
 		mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
+		total = len(graph.skosConcepts)
 	
 	# hack to make sure that we have a default top level object
 	mydict = {'children' : mylist, 'name' : 'Entities'}
@@ -117,6 +120,7 @@ def interactiveD3Tree(graph, entity="classes"):
 
 	c = Context({	
 					"ontology": ontology,
+					"total_entities": total, 
 					'JSON_DATA' : JSON_DATA,
 					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/" ,
 				})
