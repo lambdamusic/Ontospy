@@ -7,15 +7,21 @@ from .. import ontospy
 from .util import *
 
 import json
-try:
-	# https://docs.djangoproject.com/en/dev/ref/templates/api/
+
+# django loading requires different steps based on version
+# https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
+import django
+if django.get_version() > '1.7':	
 	from django.conf import settings
 	from django.template import Context, Template
 	settings.configure()	
-except:
-	raise Exception("Cannot find the django library.")
-	
-	
+	django.setup()
+else:
+	from django.conf import settings
+	from django.template import Context, Template
+	settings.configure()
+		
+
 
 
 def _safe_str(u, errors="replace"):
@@ -42,6 +48,8 @@ def htmlBasicTemplate(graph):
 	""" 
 	From a graph instance outputs a nicely formatted html documentation file. 
 	2015-10-21: mainly used with w3c template
+	
+	Django templates API: https://docs.djangoproject.com/en/dev/ref/templates/api/
 	
 	output = string
 	"""

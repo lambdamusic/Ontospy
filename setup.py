@@ -84,8 +84,13 @@ setup(
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
-    # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
-    install_requires=['rdflib', 'colorama', 'django', 'github3.py'],
+    # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
+    install_requires=[
+		'rdflib', 
+		'colorama', 
+		'django', 
+		'github3.py'
+	],
 
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
