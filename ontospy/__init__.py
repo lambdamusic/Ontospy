@@ -3,7 +3,5 @@
 
 from ._version import __version__
 
-from .libs.graph import Graph, SparqlEndpoint
-
 import logging
 logging.basicConfig()

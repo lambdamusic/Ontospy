@@ -20,10 +20,10 @@ import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
 from colorama import Fore, Back, Style
 from ConfigParser import SafeConfigParser
 
+from ._version import *
 from .libs.graph import Graph, SparqlEndpoint
 from .libs.util import bcolors, pprinttable, printDebug, _clear_screen, pprint2columns
 
-from ._version import *
 
 
 # python package installation
@@ -180,14 +180,14 @@ def actionSelectFromLocal():
 		data = []
 		for x in options:
 			data += [ Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL]
-			# print Fore.BLUE + x[0], " ==> ", x[1]
 			counter += 1
 		
 		# from util.
 		pprint2columns(data)
 	
 		while True:
-			var = raw_input(Style.DIM + "------------------\nSelect a model by typing its number: (q=exit)\n" + Style.RESET_ALL)
+			printDebug("------------------\nSelect a model by typing its number: (q=exit)", "important")
+			var = raw_input()
 			if var == "q":
 				return None
 			else:
@@ -195,10 +195,10 @@ def actionSelectFromLocal():
 					_id = int(var)
 					ontouri = options[_id - 1]
 					printDebug("You selected:", "comment")
-					print Fore.RED + "---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+					printDebug("---------\n" + ontouri + "\n---------", "red")
 					return ontouri
 				except:
-					print "Please enter a valid number."
+					printDebug("Please enter a valid number.", "comment")
 					continue
 
 
@@ -336,12 +336,14 @@ def parse_options():
 	
 	https://docs.python.org/2/library/optparse.html
 	
+	note: invoke help with `parser.print_help()`
+	
 	"""
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 				
 	parser.add_option("-l", "--library",
-			action="store_true", default=False, dest="lib",
+			action="store_true", default=False, dest="_library",
 			help="Select ontologies saved in the local library.") 
 
 	parser.add_option("-i", "--import",
@@ -374,17 +376,8 @@ def parse_options():
 
 			
 	opts, args = parser.parse_args()
-	
-	if opts._import and not args:
-		printDebug("Please specify a file/folder/url to import into local library.")
-		sys.exit(0)
-				
-	# not opts.shell and not opts.erase and not opts.cache and 
-	if not opts.lib and not args: #not opts._shell and 
-		parser.print_help()
-		sys.exit(0)
-			
-	return opts, args
+					
+	return opts, args, parser
 
 
 
@@ -396,7 +389,7 @@ def main():
 	""" command line script """
 	
 	printDebug("OntoSPy " + VERSION, "comment")
-	opts, args = parse_options()
+	opts, args, parser = parse_options()
 	
 	get_or_create_home_repo()
 	
@@ -410,8 +403,33 @@ def main():
 
 
 
+	# default behaviour: print library if existing, otherwise -help
+	if not args and not opts._library and not opts._import:		
+		local_ontos = get_localontologies()
+		if local_ontos:		
+			opts._library = True
+		else:
+			parser.print_help()
+			sys.exit(0)
+			
+			
+	# import an ontology (ps implemented in both .ontospy and .tools.manager)
+	if opts._import:
+		if not args:
+			printDebug("Please specify a file/folder/url to import into local library.")
+			sys.exit(0)		
+		_location = args[0]
+		if os.path.isdir(_location):
+			res = action_import_folder(_location)
+		else:
+			res = action_import(_location)
+		if res: 
+			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
+		raise SystemExit, 1
+
+
 	# select a model from the local ontologies
-	if opts.lib:
+	if opts._library:
 		filename = actionSelectFromLocal()
 		if filename:
 			g = get_pickled_ontology(filename)
@@ -422,37 +440,21 @@ def main():
 		raise SystemExit, 1 
 
 
-
-	# import an ontology
-	# note: method duplicated in .ontospy and .tools.manager
-	if opts._import:
-		_location = args[0]
-		if os.path.isdir(_location):
-			res = action_import_folder(_location)
-		else:
-			res = action_import(_location)
-		if res: 
-			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
-		raise SystemExit, 1
-
-	
 	#test.... 2015-11-03
 	# if opts._shell:
 	# 	from .tools.shell import Shell
 	# 	Shell().cmdloop()
 	# 	raise SystemExit, 1
+
 		
-	# for all other cases...
-
+	# last case: a new URI/path is passed
 	sTime = time.time()
-
 	# load the ontology when a uri is passed manually
 	if args:
 		g = Graph(args[0])	
 		shellPrintOverview(g, print_opts)
 
-	# finally:	
-	# print some stats.... 
+	# finally: print some stats.... 
 	eTime = time.time()
 	tTime = eTime - sTime
 	printDebug("\n----------\n" + "Time:	   %0.2fs" %  tTime, "comment")

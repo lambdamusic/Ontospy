@@ -5,7 +5,7 @@
 """
 Python and RDF Utils for OntoSPy
 
-Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2010-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 """
 
@@ -18,6 +18,198 @@ DEFAULT_LANGUAGE = "en"
 
 import sys, os, subprocess, random, platform 
 from colorama import Fore, Back, Style
+
+
+
+
+
+
+
+
+# ===========
+# generic python utils
+# ===========
+
+
+
+
+def remove_duplicates(seq, idfun=None): 
+	""" removes duplicates from a list, order preserving, as found in
+	http://www.peterbe.com/plog/uniqifiers-benchmark
+	"""
+	# order preserving
+	if idfun is None:
+		def idfun(x): return x
+	seen = {}
+	result = []
+	for item in seq:
+		marker = idfun(item)
+		# in old Python versions:
+		# if seen.has_key(marker)
+		# but in new ones:
+		if marker in seen: continue
+		seen[marker] = 1
+		result.append(item)
+	return result
+
+
+
+
+def printDebug(s, style=None):
+	"""
+	util for printing in colors to sys.stderr stream
+	"""
+	if style == "comment":
+		s = Style.DIM + s + Style.RESET_ALL
+	elif style == "important":
+		s = Style.BRIGHT + s + Style.RESET_ALL
+	elif style == "normal":
+		s = Style.RESET_ALL + s + Style.RESET_ALL	
+	elif style == "red":
+		s = Fore.RED + s + Style.RESET_ALL			
+	try:
+		print >> sys.stderr, s
+	except: 
+		pass
+
+
+
+
+
+
+def pprint2columns(llist, max_length=60):
+	"""
+	llist = a list of strings 
+	max_length = if a word is longer than that, for single col display
+	
+	> prints a list in two columns, taking care of alignment too
+	"""
+	col_width = max(len(word) for word in llist) + 2  # padding	
+
+	# llist length must be even, otherwise splitting fails
+	if not len(llist) % 2 == 0:
+		llist += [' '] # add a fake element
+
+	if col_width > max_length:
+		for el in llist:
+			print el
+	else:
+		column1 = llist[:len(llist)/2]
+		column2 = llist[len(llist)/2:]	
+		for c1, c2 in zip(column1, column2):
+			space = " " * (col_width - len(c1))
+			print "%s%s%s" % (c1, space, c2)
+
+
+
+
+def pprinttable(rows):
+	"""
+	Pretty prints a table via python
+	http://stackoverflow.com/questions/5909873/python-pretty-printing-ascii-tables
+
+	Example
+
+	>>> from collections import namedtuple
+	>>> Row = namedtuple('Row',['first','second','third'])
+	>>> data = Row(1,2,3)
+	>>> data
+	Row(first=1, second=2, third=3)
+	>>> pprinttable([data])
+	 first = 1
+	second = 2
+	 third = 3
+	>>> pprinttable([data,data])
+	first | second | third
+	------+--------+------
+		1 |		 2 |	 3
+		1 |		 2 |	 3
+
+	"""
+	if len(rows) > 1:
+		headers = rows[0]._fields
+		lens = []
+		for i in range(len(rows[0])):
+			lens.append(len(max([x[i] for x in rows] + [headers[i]],key=lambda x:len(str(x)))))
+		formats = []
+		hformats = []
+		for i in range(len(rows[0])):
+			if isinstance(rows[0][i], int):
+				formats.append("%%%dd" % lens[i])
+			else:
+				formats.append("%%-%ds" % lens[i])
+			hformats.append("%%-%ds" % lens[i])
+		pattern = " | ".join(formats)
+		hpattern = " | ".join(hformats)
+		separator = "-+-".join(['-' * n for n in lens])
+		print hpattern % tuple(headers)
+		print separator
+		for line in rows:
+			print pattern % tuple(line)
+	elif len(rows) == 1:
+		row = rows[0]
+		hwidth = len(max(row._fields,key=lambda x: len(x)))
+		for i in range(len(row)):
+			print "%*s = %s" % (hwidth,row._fields[i],row[i])
+
+
+
+
+
+def save_anonymous_gist(title, files):
+	"""
+	October 21, 2015
+	title = the gist title
+	files = {
+	    'spam.txt' : {
+	        'content': 'What... is the air-speed velocity of an unladen swallow?'
+	        }
+			# ..etc...
+	    }
+		
+	works also in blocks eg from
+	https://gist.github.com/anonymous/b839e3a4d596b215296f
+	to
+	http://bl.ocks.org/anonymous/b839e3a4d596b215296f	
+	
+	So we return 3 different urls
+	
+	"""
+	
+	try:
+		from github3 import create_gist
+	except:
+		print "github3 library not found (pip install github3)"
+		raise SystemExit, 1
+
+	gist = create_gist(title, files)
+	
+	urls = {
+		'gist' : gist.html_url, 
+		'blocks' : "http://bl.ocks.org/anonymous/" + gist.html_url.split("/")[-1],
+		'blocks_fullwin' : "http://bl.ocks.org/anonymous/raw/" + gist.html_url.split("/")[-1]
+	}
+	
+	return urls
+
+
+
+
+	
+
+def _clear_screen():
+	""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
+	if platform.system() == "Windows":
+		tmp = os.system('cls') #for window
+	else:
+		tmp = os.system('clear') #for Linux
+	return True
+
+
+
+
+
+
 
 
 class bcolors:
@@ -40,22 +232,6 @@ class bcolors:
 
 
 
-def printDebug(s, style=None):
-	if style == "comment":
-		s = Style.DIM + s + Style.RESET_ALL
-	elif style == "important":
-		s = Style.BRIGHT + s + Style.RESET_ALL
-	elif style == "normal":
-		s = Style.RESET_ALL + s + Style.RESET_ALL			
-	try:
-		print >> sys.stderr, s
-	except: 
-		pass
-
-
-
-
-
 def playSound(folder, name=""):
 	""" as easy as that """								
 	try:
@@ -66,6 +242,68 @@ def playSound(folder, name=""):
 		# subprocess.call(["say", "%d started, batch %d" % (adate, batch)])
 	except:
 		pass
+
+
+
+def truncate(data, l=20):
+	"truncate a string"
+	info = (data[:l] + '..') if len(data) > l else data
+	return info
+
+
+
+
+		
+# ========
+# rdf utils
+# ===========
+
+
+
+def isBlankNode(aClass):
+	""" small utility that checks if a class is a blank node """
+	if type(aClass) == BNode:
+		return True
+	else:
+		return False
+
+
+
+
+
+
+def printBasicInfo(onto):
+	"""
+	Terminal printing of basic ontology information
+	"""
+	rdfGraph = onto.rdfGraph
+
+	print "_" * 50, "\n"	
+	print "TRIPLES = %s" % len(rdfGraph)
+	print "_" * 50
+	print "\nNAMESPACES:\n"
+	for x in onto.ontologyNamespaces:
+		print "%s : %s" % (x[0], x[1])
+
+	
+	print "_" * 50, "\n"
+	print "ONTOLOGY METADATA:\n"	
+	for x, y in onto.ontologyAnnotations():
+		print "%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
+	print "_" * 50, "\n"
+
+
+	print "CLASS TAXONOMY:\n"
+	onto.printClassTree()
+	print "_" * 50, "\n"
+
+
+
+
+
+
+
+
 
 
 def inferMainPropertyType(uriref):
@@ -152,32 +390,15 @@ def firstStringInList(literalEntities, prefLanguage="en"):
 			match = literalEntities[0]
 	return match
 
+
+
+
 def firstEnglishStringInList(literalEntities,): 
 	return firstStringInList(literalEntities, "en")
 
 
 
-def truncate(data, l=20):
-	"truncate a string"
-	info = (data[:l] + '..') if len(data) > l else data
-	return info
 
-
-
-
-		
-# ========
-# rdf utils
-# ===========
-
-
-
-def isBlankNode(aClass):
-	""" small utility that checks if a class is a blank node """
-	if type(aClass) == BNode:
-		return True
-	else:
-		return False
 
 
 
@@ -400,15 +621,6 @@ def niceString2uri(aUriString, namespaces = None):
 	
 	
 	
-	
-	
-		
-
-###########
-
-# GENERIC METHODS FOR ANY RDF RESOURCE (ENTITIES) FROM AN RDF GRAPH
-
-###########
 
 
 def entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
@@ -496,206 +708,5 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 
 
-
-
-
-# ===========
-# utils for terminal printing of ontology info
-# ===========
-
-
-
-
-def printBasicInfo(onto):
-	"""
-	Terminal printing of basic ontology information
-	"""
-	rdfGraph = onto.rdfGraph
-
-	print "_" * 50, "\n"	
-	print "TRIPLES = %s" % len(rdfGraph)
-	print "_" * 50
-	print "\nNAMESPACES:\n"
-	for x in onto.ontologyNamespaces:
-		print "%s : %s" % (x[0], x[1])
-
-	
-	print "_" * 50, "\n"
-	print "ONTOLOGY METADATA:\n"	
-	for x, y in onto.ontologyAnnotations():
-		print "%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
-	print "_" * 50, "\n"
-
-
-	print "CLASS TAXONOMY:\n"
-	onto.printClassTree()
-	print "_" * 50, "\n"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ===========
-# generic python utils
-# ===========
-
-
-
-
-def remove_duplicates(seq, idfun=None): 
-	""" removes duplicates from a list, order preserving, as found in
-	http://www.peterbe.com/plog/uniqifiers-benchmark
-	"""
-	# order preserving
-	if idfun is None:
-		def idfun(x): return x
-	seen = {}
-	result = []
-	for item in seq:
-		marker = idfun(item)
-		# in old Python versions:
-		# if seen.has_key(marker)
-		# but in new ones:
-		if marker in seen: continue
-		seen[marker] = 1
-		result.append(item)
-	return result
-
-
-
-
-def pprint2columns(llist, max_length=60):
-	"""
-	llist = a list of strings 
-	max_length = if a word is longer than that, for single col display
-	
-	> prints a list in two columns, taking care of alignment too
-	"""
-	col_width = max(len(word) for word in llist) + 2  # padding	
-
-	if col_width > max_length:
-		for el in llist:
-			print el
-	else:
-		column1 = llist[:len(llist)/2]
-		column2 = llist[len(llist)/2:]	
-		for c1, c2 in zip(column1, column2):
-			space = " " * (col_width - len(c1))
-			print "%s%s%s" % (c1, space, c2)
-
-
-
-
-def pprinttable(rows):
-	"""
-	Pretty prints a table via python
-	http://stackoverflow.com/questions/5909873/python-pretty-printing-ascii-tables
-
-	Example
-
-	>>> from collections import namedtuple
-	>>> Row = namedtuple('Row',['first','second','third'])
-	>>> data = Row(1,2,3)
-	>>> data
-	Row(first=1, second=2, third=3)
-	>>> pprinttable([data])
-	 first = 1
-	second = 2
-	 third = 3
-	>>> pprinttable([data,data])
-	first | second | third
-	------+--------+------
-		1 |		 2 |	 3
-		1 |		 2 |	 3
-
-	"""
-	if len(rows) > 1:
-		headers = rows[0]._fields
-		lens = []
-		for i in range(len(rows[0])):
-			lens.append(len(max([x[i] for x in rows] + [headers[i]],key=lambda x:len(str(x)))))
-		formats = []
-		hformats = []
-		for i in range(len(rows[0])):
-			if isinstance(rows[0][i], int):
-				formats.append("%%%dd" % lens[i])
-			else:
-				formats.append("%%-%ds" % lens[i])
-			hformats.append("%%-%ds" % lens[i])
-		pattern = " | ".join(formats)
-		hpattern = " | ".join(hformats)
-		separator = "-+-".join(['-' * n for n in lens])
-		print hpattern % tuple(headers)
-		print separator
-		for line in rows:
-			print pattern % tuple(line)
-	elif len(rows) == 1:
-		row = rows[0]
-		hwidth = len(max(row._fields,key=lambda x: len(x)))
-		for i in range(len(row)):
-			print "%*s = %s" % (hwidth,row._fields[i],row[i])
-
-
-
-
-
-def save_anonymous_gist(title, files):
-	"""
-	October 21, 2015
-	title = the gist title
-	files = {
-	    'spam.txt' : {
-	        'content': 'What... is the air-speed velocity of an unladen swallow?'
-	        }
-			# ..etc...
-	    }
-		
-	works also in blocks eg from
-	https://gist.github.com/anonymous/b839e3a4d596b215296f
-	to
-	http://bl.ocks.org/anonymous/b839e3a4d596b215296f	
-	
-	So we return 3 different urls
-	
-	"""
-	
-	try:
-		from github3 import create_gist
-	except:
-		print "github3 library not found (pip install github3)"
-		raise SystemExit, 1
-
-	gist = create_gist(title, files)
-	
-	urls = {
-		'gist' : gist.html_url, 
-		'blocks' : "http://bl.ocks.org/anonymous/" + gist.html_url.split("/")[-1],
-		'blocks_fullwin' : "http://bl.ocks.org/anonymous/raw/" + gist.html_url.split("/")[-1]
-	}
-	
-	return urls
-
-
-
-
-	
-
-def _clear_screen():
-	""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
-	if platform.system() == "Windows":
-		tmp = os.system('cls') #for window
-	else:
-		tmp = os.system('clear') #for Linux
-	return True
 
 
