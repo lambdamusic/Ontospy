@@ -27,7 +27,7 @@ QUOTES = [
 	} ,
 	{
 		"text" : "An ontology is an explicit specification of a conceptualization.", 
-		"source" : "Tom Gruber Hitchens", 
+		"source" : "Tom Gruber", 
 	} ,
 	{
 		"text" : "I shall distinguish descriptive, formal and formalized ontology. Each of these ontologies comes in two guises: domain-dependent and domain-independent. Domain-dependent ontologies concern categorically closed regions of being; on the other hand, a domain independent ontology may be properly called general ontology. (...)Descriptive ontology concerns the collection of such prima facie information either in some specific domain of analysis or in general.", 

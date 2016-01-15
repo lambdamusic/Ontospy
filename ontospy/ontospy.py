@@ -186,7 +186,7 @@ def actionSelectFromLocal():
 		pprint2columns(data)
 	
 		while True:
-			printDebug("------------------\nSelect a model by typing its number: (q=exit)", "important")
+			printDebug("------------------\nSelect a model by typing its number: (q=quit)", "important")
 			var = raw_input()
 			if var == "q":
 				return None
@@ -403,14 +403,21 @@ def main():
 
 
 
-	# default behaviour: print library if existing, otherwise -help
-	if not args and not opts._library and not opts._import:		
-		local_ontos = get_localontologies()
-		if local_ontos:		
-			opts._library = True
-		else:
-			parser.print_help()
-			sys.exit(0)
+	# default behaviour: launch shell
+	if not args and not opts._library and not opts._import:	
+		from tools.shell import Shell, STARTUP_MESSAGE
+		Shell()._clear_screen()
+		# print Style.BRIGHT + "** OntoSPy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL
+		print STARTUP_MESSAGE
+		Shell().cmdloop()
+		raise SystemExit, 1
+		
+		# local_ontos = get_localontologies()
+		# if local_ontos:
+		# 	opts._library = True
+		# else:
+		# 	parser.print_help()
+		# 	sys.exit(0)
 			
 			
 	# import an ontology (ps implemented in both .ontospy and .tools.manager)

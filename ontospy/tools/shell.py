@@ -13,8 +13,23 @@ from colorama import Fore, Back, Style
 # Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 from .. import ontospy
+from .. import _version 
 from ..libs.util import *
 from ..libs.quotes import QUOTES
+
+
+_intro_ = """
+******                                     ******
+***                                           ***
+** OntoSPy Interactive Ontology Browser %s **
+***                                           ***
+******                                     ******
+
+"""
+
+STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
+#
+# STARTUP_MESSAGE = Style.BRIGHT + "******\n****\n** OntoSPy Interactive Ontology Browser " + _version.VERSION + " **\n****\n******" + Style.RESET_ALL
 
 
 class Shell(cmd.Cmd):
@@ -22,7 +37,7 @@ class Shell(cmd.Cmd):
 
 	DEFAULT_COL = Fore.RED
 	prompt = DEFAULT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
-	intro = "Type 'help' to get started. Use TAB to explore commands."
+	intro = "Type 'help' to get started, or 'ontology' to list local files. Use TAB to explore commands.\n"
 
 	doc_header = 'Commands'
 	misc_header = 'Miscellaneous'
@@ -137,12 +152,15 @@ class Shell(cmd.Cmd):
 		*using_pattern* flag to know if we're showing all choices or not
 		Note: the list items need to be OntoSPy entities.
 		"""
+		if not _list:
+			self._print("No matching items.", "TIP")
+			return None
 		if len(_list) == 1: # if by any chance there's no need to select a choice
 			return _list[0]
 		if using_pattern:
-			self._print("%d matching results: " % len(_list), "TIP")
+			self._print("%d matching items: " % len(_list), "TIP")
 		else:
-			self._print("%d results in total: " % len(_list), "TIP")
+			self._print("%d items available: " % len(_list), "TIP")
 		counter = 1
 		_temp = []
 		for el in _list:
@@ -483,6 +501,7 @@ class Shell(cmd.Cmd):
 
 	def do_quit(self, line):
 		"Exit OntoSPy shell"
+		self._clear_screen()
 		return True
 
 
@@ -496,7 +515,7 @@ class Shell(cmd.Cmd):
 
 	def default(self, line):
 		"default message when a command is not recognized"
-		foo = ["Wow first time I hear that", "That looks like the wrong command", "Are you sure you mean that? try 'help' for some suggestions"]
+		foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
 		print(random.choice(foo))
 
 

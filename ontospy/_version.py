@@ -11,13 +11,13 @@
 
 
 
-__version__ = "1.6.4.3"
+__version__ = "1.6.5"
 __copyright__ = "CopyRight (C) 2015 by Michele Pasin"
 __license__ = "GNU"
 __author__ = "Michele Pasin"
 __author_email__ = "michele dot pasin at gmail dot com"
 
-USAGE = "%prog <ontology-file-or-uri> [options]"
+USAGE = "%prog [graph-uri-or-location] [options]"
 VERSION = "v" + __version__
 
 AGENT = "%s/%s" % (__name__, __version__)

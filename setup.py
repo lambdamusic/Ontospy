@@ -86,6 +86,7 @@ setup(
     # requirements files see:
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
     install_requires=[
+		'readline',  # for shell autocomplete
 		'rdflib', 
 		'colorama', 
 		'django', 

@@ -84,6 +84,9 @@ def pprint2columns(llist, max_length=60):
 	
 	> prints a list in two columns, taking care of alignment too
 	"""
+	if len(llist) == 0:
+		return None
+
 	col_width = max(len(word) for word in llist) + 2  # padding	
 
 	# llist length must be even, otherwise splitting fails

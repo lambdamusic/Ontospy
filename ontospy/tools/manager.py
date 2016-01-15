@@ -204,7 +204,7 @@ def action_webimport(options):
 		counter += 1
 
 	while True:
-		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=exit)\n" + Style.RESET_ALL)
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
 		if var == "q":
 			break
 		else:
