@@ -196,36 +196,6 @@ class Shell(cmd.Cmd):
 			return None
 
 
-
-	# MAIN METHODS
-	# --------
-
-
-	# 2015-09-16:deprecated
-	def _list_ontologies(self):
-		counter = 0
-		for file in self.ontologies:
-			counter += 1
-			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter,	Fore.RED, file, Style.RESET_ALL
-
-
-
-	def _select_ontology(self, line):
-		# if
-		try:
-			var = int(line)	 # it's a string
-			if var in range(1, len(self.ontologies)+1):
-				self._load_ontology(self.ontologies[var-1])
-		except ValueError:
-			out = []
-			for each in self.ontologies:
-				if line in each:
-					out += [each]
-			choice = self._selectFromList(out, line)
-			if choice:
-				self._load_ontology(choice)
-
-
 	def _next_ontology(self):
 		"""Dynamically retrieves the next ontology in the list"""
 		currentfile = self.current['file']
@@ -235,6 +205,10 @@ class Shell(cmd.Cmd):
 		except:
 			return self.ontologies[0]
 
+
+
+	# MAIN METHODS
+	# --------
 
 
 	def _load_ontology(self, filename):
@@ -249,6 +223,21 @@ class Shell(cmd.Cmd):
 		self.currentEntity = None
 		self._print_entity_intro(g)
 
+
+	def _select_ontology(self, line):
+		"""try to select an ontology NP: the actual load from FS is in <_load_ontology> """
+		try:
+			var = int(line)	 # it's a string
+			if var in range(1, len(self.ontologies)+1):
+				self._load_ontology(self.ontologies[var-1])
+		except ValueError:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out, line)
+			if choice:
+				self._load_ontology(choice)
 
 
 	def _select_class(self, line):			
@@ -470,7 +459,21 @@ class Shell(cmd.Cmd):
 	# 			self._print("No skos concepts available.")
 	#
 
-	
+
+
+	def do_show(self, line):
+		"""Shows stuff @todo"""
+		opts = [ 'triples' , 'xml' , 'turtle', 'toplayer' ]
+		if not self.current:
+			self._print("Please select an ontology first")
+		line = line.split()	
+
+		if (not line) or (line[0] not in opts):
+			self._print("Usage: show (%s)" % "|".join([x for x in opts]))
+
+		self._print("Not implemented.")
+				
+					
 	def do_next(self, line):
 		"""Jump to the next entities (ontology, class or property) depending on context"""
 		if not self.current:
@@ -632,6 +635,20 @@ class Shell(cmd.Cmd):
 							]
 		return completions	
 
+	def complete_show(self, text, line, begidx, endidx):
+		"""completion for show command"""
+		
+		options = ['triples', 'xml', 'turtle', '@todo etcetera']
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+		
 
 	def complete_serialize(self, text, line, begidx, endidx):
 		"""completion for tree command"""
