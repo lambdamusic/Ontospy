@@ -1,21 +1,34 @@
+#!/usr/bin/env python
+
+
+"""
+OntoSPy Shell Module
+michele.pasin@gmail.com
 
 # docs:
 # https://docs.python.org/2/library/cmd.html
 # https://hg.python.org/cpython/file/2.7/Lib/cmd.py
 # http://pymotw.com/2/cmd/
 
-import os, cmd, random, urllib2, shutil, platform
-from colorama import Fore, Back, Style
-
-# Colorama: https://pypi.python.org/pypi/colorama
+# Colorama cheatsheet: https://pypi.python.org/pypi/colorama
 # Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 # Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
 # Style: DIM, NORMAL, BRIGHT, RESET_ALL
+
+"""
+
+
+
+import os, cmd, random, urllib2, shutil, platform
+from colorama import Fore, Back, Style
 
 from .. import ontospy
 from .. import _version 
 from ..libs.util import *
 from ..libs.quotes import QUOTES
+
+
+
 
 
 _intro_ = """
@@ -28,8 +41,9 @@ _intro_ = """
 """
 
 STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
-#
-# STARTUP_MESSAGE = Style.BRIGHT + "******\n****\n** OntoSPy Interactive Ontology Browser " + _version.VERSION + " **\n****\n******" + Style.RESET_ALL
+
+
+
 
 
 class Shell(cmd.Cmd):
@@ -155,12 +169,12 @@ class Shell(cmd.Cmd):
 		if not _list:
 			self._print("No matching items.", "TIP")
 			return None
-		if len(_list) == 1: # if by any chance there's no need to select a choice
+		if using_pattern and len(_list) == 1: # if by any chance there's no need to select a choice
 			return _list[0]
 		if using_pattern:
-			self._print("%d matching items: " % len(_list), "TIP")
+			self._print("%d matching items: \n--------------" % len(_list), "TIP")
 		else:
-			self._print("%d items available: " % len(_list), "TIP")
+			self._print("%d items available: \n--------------" % len(_list), "TIP")
 		counter = 1
 		_temp = []
 		for el in _list:
@@ -236,17 +250,21 @@ class Shell(cmd.Cmd):
 		self._print_entity_intro(g)
 
 
-			
 
 	def _select_class(self, line):			
-		# try to match a class and load it	
+		"""try to match a class and load it from the graph"""	
 		g = self.current['graph']
-		if line.isdigit():
-			line =	int(line)
-		out = g.getClass(line)
+		if not line:
+			out = g.classes
+			using_pattern=False
+		else:
+			using_pattern=True
+			if line.isdigit():
+				line =	int(line)
+			out = g.getClass(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out)
+				choice = self._selectFromList(out, using_pattern)
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'class'}				
 			else:
@@ -261,14 +279,19 @@ class Shell(cmd.Cmd):
 
 
 	def _select_property(self, line):			
-		# try to match a class and load it
+		"""try to match a property and load it"""
 		g = self.current['graph']
-		if line.isdigit():
-			line =	int(line)
-		out = g.getProperty(line)
+		if not line:
+			out = g.properties
+			using_pattern=False
+		else:
+			using_pattern=True			
+			if line.isdigit():
+				line =	int(line)
+			out = g.getProperty(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out)
+				choice = self._selectFromList(out, using_pattern)
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'property'} 
 
@@ -283,14 +306,19 @@ class Shell(cmd.Cmd):
 			
 
 	def _select_concept(self, line):
-		# try to match a class and load it
+		"""try to match a class and load it"""
 		g = self.current['graph']
-		if line.isdigit():
-			line =	int(line)
-		out = g.getSkosConcept(line)
+		if not line:
+			out = g.skosConcepts
+			using_pattern=False
+		else:
+			using_pattern=True
+			if line.isdigit():
+				line =	int(line)
+			out = g.getSkosConcept(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out)
+				choice = self._selectFromList(out, using_pattern)
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'concept'}
 			else:
@@ -309,22 +337,179 @@ class Shell(cmd.Cmd):
 	# --------
 	# NOTE: all commands should start with 'do_' and must pass 'line'
 
-		
-	def do_currentOntology(self, line):
-		""" List the ontology currently loaded""" 
-		 # {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-		if self.current:
-			print self.current['file']
-		else:
-			print "No ontology loaded. Use the 'ontology' command"
 
-	def do_currentEntity(self, line):
-		""" List the entity (class, property or concept) currently loaded""" 
-		 # {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-		if self.currentEntity:
-			print self.currentEntity['name']
+
+	def do_ls(self, line):
+		"""Shows entities of a given kind. \nOptions: [ ontologies | classes | properties | concepts ]"""
+		line = line.split()
+		_pattern = ""
+		if len(line) > 1:
+			_pattern = line[1]			
+		opts = [ 'ontologies', 'classes' , 'properties' , 'concepts' ]
+
+		if (not line) or (line[0] not in opts):
+			self._print("Usage: ls (%s) [pattern]" % "|".join([x for x in opts]))
+
+		elif line[0] == "ontologies":
+			if not self.ontologies:
+				self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. ")
+			else:
+				self._select_ontology(_pattern)
+
+		elif line[0] in opts and not self.current:
+			self._print("Please select an ontology first")
+
+		elif line[0] == "classes":
+			g = self.current['graph']
+			if g.classes:
+				self._select_class(_pattern)
+			else:
+				self._print("No classes available.")
+
+		elif line[0] == "properties":
+			g = self.current['graph']
+			if g.properties:
+				self._select_property(_pattern)
+			else:
+				self._print("No properties available.")	
+
+		elif line[0] == "concepts":
+			g = self.current['graph']
+			if g.skosConcepts:
+				self._select_concept(_pattern)
+			else:
+				self._print("No concepts available.")	
+
+		else: # should never arrive here
+			pass
+
+							
+	def do_tree(self, line):
+		"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
+		opts = [ 'classes' , 'properties' , 'concepts' ]
+		if not self.current:
+			self._print("Please select an ontology first")
+		line = line.split()	
+
+		if (not line) or (line[0] not in opts):
+			self._print("Usage: tree (%s)" % "|".join([x for x in opts]))
+
+		elif line[0] == "classes":
+			g = self.current['graph']
+			if g.classes:
+				g.printClassTree(showids=True, labels=False)
+			else:
+				self._print("No classes available.")							
+		
+		elif line[0] == "properties":
+			g = self.current['graph']
+			if g.properties:
+				g.printPropertyTree(showids=True, labels=False)
+			else:
+				self._print("No properties available.")
+		
+		elif line[0] == "concepts":
+			g = self.current['graph']
+			if g.skosConcepts:
+				g.printSkosTree(showids=True, labels=False)
+			else:
+				self._print("No concepts available.")
+
+		else: # never get here
+			pass	
+						
+	#
+	# def do_ontology(self, line):
+	# 	"""Select an ontology"""
+	# 	if not self.ontologies:
+	# 		print "No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. "
+	# 	else:
+	# 		self._select_ontology(line)
+	#
+	#
+	# def do_class(self, line):
+	# 	"""Select a class"""
+	# 	if not self.current:
+	# 		print "Please select an ontology first"
+	# 	elif line:
+	# 		self._select_class(line)
+	# 	else:
+	# 		g = self.current['graph']
+	# 		if g.classes:
+	# 			g.printClassTree(showids=True, labels=False)
+	# 			self._print("Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions")
+	# 		else:
+	# 			self._print("No classes available.")
+	#
+	# def do_property(self, line):
+	# 	"""Select a property"""
+	# 	if not self.current:
+	# 		print "Please select an ontology first"
+	# 	elif line:
+	# 		self._select_property(line)
+	# 	else:
+	# 		g = self.current['graph']
+	# 		if g.properties:
+	# 			g.printPropertyTree(showids=True, labels=False)
+	# 			self._print("Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions")
+	# 		else:
+	# 			self._print("No properties available.")
+	#
+	# def do_concept(self, line):
+	# 	"""Select a SKOS concept"""
+	# 	if not self.current:
+	# 		print "Please select an ontology first"
+	# 	elif line:
+	# 		self._select_concept(line)
+	# 	else:
+	# 		g = self.current['graph']
+	# 		if g.skosConcepts:
+	# 			g.printSkosTree(showids=True, labels=False)
+	# 			self._print("Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions")
+	# 		else:
+	# 			self._print("No skos concepts available.")
+	#
+
+	
+	def do_next(self, line):
+		"""Jump to the next entities (ontology, class or property) depending on context"""
+		if not self.current:
+			print "Please select an ontology first"
+		elif self.currentEntity:
+			g = self.current['graph']
+			if self.currentEntity['type'] == 'class':
+				nextentity = g.nextClass(self.currentEntity['object'].uri)
+				self._select_class(str(nextentity.uri))
+			elif self.currentEntity['type'] == 'property':
+				nextentity = g.nextProperty(self.currentEntity['object'].uri)
+				self._select_property(str(nextentity.uri))
+			elif self.currentEntity['type'] == 'concept':
+				nextentity = g.nextConcept(self.currentEntity['object'].uri)
+				self._select_concept(str(nextentity.uri))
+			else:
+				print "Not implemented" 
 		else:
-			print "No entity loaded. Use the 'class' or 'property' command"
+			if len(self.ontologies) > 1:
+				nextonto = self._next_ontology()
+				self._load_ontology(nextonto)
+			else:
+				self._print("Only one ontology available in repository.")	 
+
+
+	def do_up(self, line):
+		"Go up one level. From entity => ontology; from ontology => ontospy top level."
+		if self.currentEntity:
+			self.currentEntity = None
+			self.prompt = self._get_prompt(self.current['file'])
+		else:
+			self.current = None
+			self.prompt = self._get_prompt()
+
+	def do_quit(self, line):
+		"Exit OntoSPy shell"
+		self._clear_screen()
+		return True
+
 
 
 
@@ -356,72 +541,6 @@ class Shell(cmd.Cmd):
 		else:
 			print "Please select an ontology first."
 	
-  
-				
-	def do_tree(self, line):
-		"""Shows the subsumtion tree of an ontology.\nOptions: [classes | properties]\nDefault: classes"""
-		if not self.current:
-			print "Please select an ontology first"
-		elif line and line == "properties":
-			g = self.current['graph']
-			g.printPropertyTree(showids=True, labels=False)
-		elif line and line == "concepts":
-			g = self.current['graph']
-			g.printSkosTree(showids=True, labels=False)
-		else: # self.current exists
-			g = self.current['graph']
-			g.printClassTree(showids=True, labels=False)	
-						
-			
-	def do_ontology(self, line):
-		"""Select an ontology"""		
-		if not self.ontologies:
-			print "No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. "
-		else:
-			self._select_ontology(line)
-
-				
-	def do_class(self, line):
-		"""Select a class""" 
-		if not self.current:	
-			print "Please select an ontology first"
-		elif line:
-			self._select_class(line)
-		else:
-			g = self.current['graph']
-			if g.classes:
-				g.printClassTree(showids=True, labels=False)
-				self._print("Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions")
-			else:
-				self._print("No classes available.")
-
-	def do_property(self, line):
-		"""Select a property""" 
-		if not self.current:	
-			print "Please select an ontology first"
-		elif line:
-			self._select_property(line)
-		else:
-			g = self.current['graph']
-			if g.properties:
-				g.printPropertyTree(showids=True, labels=False)
-				self._print("Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions")
-			else:
-				self._print("No properties available.")
-
-	def do_concept(self, line):
-		"""Select a SKOS concept"""
-		if not self.current:
-			print "Please select an ontology first"
-		elif line:
-			self._select_concept(line)
-		else:
-			g = self.current['graph']
-			if g.skosConcepts:
-				g.printSkosTree(showids=True, labels=False)
-				self._print("Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions")
-			else:
-				self._print("No skos concepts available.") 
 
 	def do_parents(self, line):
 		"""Show the parents (superclass or superproperty) of an entity"""
@@ -464,46 +583,8 @@ class Shell(cmd.Cmd):
 			self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
 		else:
 			print "Please select an ontology first"
-	
-	def do_next(self, line):
-		"""Jump to the next entities (ontology, class or property) depending on context"""
-		if not self.current:
-			print "Please select an ontology first"
-		elif self.currentEntity:
-			g = self.current['graph']
-			if self.currentEntity['type'] == 'class':
-				nextentity = g.nextClass(self.currentEntity['object'].uri)
-				self._select_class(str(nextentity.uri))
-			elif self.currentEntity['type'] == 'property':
-				nextentity = g.nextProperty(self.currentEntity['object'].uri)
-				self._select_property(str(nextentity.uri))
-			elif self.currentEntity['type'] == 'concept':
-				nextentity = g.nextConcept(self.currentEntity['object'].uri)
-				self._select_concept(str(nextentity.uri))
-			else:
-				print "Not implemented" 
-		else:
-			if len(self.ontologies) > 1:
-				nextonto = self._next_ontology()
-				self._load_ontology(nextonto)
-			else:
-				self._print("Only one ontology available in repository.")	 
-
-
-	def do_up(self, line):
-		"Go up one level. From entity => ontology; from ontology => ontospy top level."
-		if self.currentEntity:
-			self.currentEntity = None
-			self.prompt = self._get_prompt(self.current['file'])
-		else:
-			self.current = None
-			self.prompt = self._get_prompt()
-
-	def do_quit(self, line):
-		"Exit OntoSPy shell"
-		self._clear_screen()
-		return True
-
+			
+			
 
 	def do_zen(self, line):
 		"""Inspiring quotes for the working ontologist"""
@@ -523,7 +604,20 @@ class Shell(cmd.Cmd):
 	# AUTOCOMPLETE METHODS
 	# --------
 
+	def complete_ls(self, text, line, begidx, endidx):
+		"""completion for ls command"""
+		
+		options = ['ontologies', 'classes', 'properties', 'concepts']
 
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+		
 	def complete_tree(self, text, line, begidx, endidx):
 		"""completion for tree command"""
 		
@@ -554,78 +648,78 @@ class Shell(cmd.Cmd):
 		return completions	
 				
 		
-	def complete_ontology(self, text, line, begidx, endidx):
-		"""completion for select command"""
-		
-		options = self.ontologies[:]
-
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions						
-			
-	
-	def complete_class(self, text, line, begidx, endidx):
-		"""completion for select command"""
-		
-		if self.current:
-			g = self.current['graph']
-			options = [x.locale for x in g.classes]
-		else:
-			options = []
-
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions		
-
-
-	def complete_property(self, text, line, begidx, endidx):
-		"""completion for select command"""
-		
-		if self.current:
-			g = self.current['graph']
-			options = [x.locale for x in g.properties]
-		else:
-			options = []
-
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions	
-
-
-
-	def complete_concept(self, text, line, begidx, endidx):
-		"""completion for select command"""
-
-		if self.current:
-			g = self.current['graph']
-			options = [x.locale for x in g.skosConcepts]
-		else:
-			options = []
-
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions
-
+	# def complete_ontology(self, text, line, begidx, endidx):
+	# 	"""completion for select command"""
+	#
+	# 	options = self.ontologies[:]
+	#
+	# 	if not text:
+	# 		completions = options
+	# 	else:
+	# 		completions = [ f
+	# 						for f in options
+	# 						if f.startswith(text)
+	# 						]
+	# 	return completions
+	#
+	#
+	# def complete_class(self, text, line, begidx, endidx):
+	# 	"""completion for select command"""
+	#
+	# 	if self.current:
+	# 		g = self.current['graph']
+	# 		options = [x.locale for x in g.classes]
+	# 	else:
+	# 		options = []
+	#
+	# 	if not text:
+	# 		completions = options
+	# 	else:
+	# 		completions = [ f
+	# 						for f in options
+	# 						if f.startswith(text)
+	# 						]
+	# 	return completions
+	#
+	#
+	# def complete_property(self, text, line, begidx, endidx):
+	# 	"""completion for select command"""
+	#
+	# 	if self.current:
+	# 		g = self.current['graph']
+	# 		options = [x.locale for x in g.properties]
+	# 	else:
+	# 		options = []
+	#
+	# 	if not text:
+	# 		completions = options
+	# 	else:
+	# 		completions = [ f
+	# 						for f in options
+	# 						if f.startswith(text)
+	# 						]
+	# 	return completions
+	#
+	#
+	#
+	# def complete_concept(self, text, line, begidx, endidx):
+	# 	"""completion for select command"""
+	#
+	# 	if self.current:
+	# 		g = self.current['graph']
+	# 		options = [x.locale for x in g.skosConcepts]
+	# 	else:
+	# 		options = []
+	#
+	# 	if not text:
+	# 		completions = options
+	# 	else:
+	# 		completions = [ f
+	# 						for f in options
+	# 						if f.startswith(text)
+	# 						]
+	# 	return completions
+	#
 
 
 	

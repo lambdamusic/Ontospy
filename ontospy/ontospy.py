@@ -151,16 +151,16 @@ def do_pickle_ontology(filename, g=None):
 		cPickle.dump(g, open( pickledpath, "wb" ) )
 		# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
 	except Exception,e: 
-		print Style.BRIGHT + "\n.. ERROR caching <%s>" % filename + Style.RESET_ALL
+		print Style.DIM + "\n.. Failed caching <%s>" % filename + Style.RESET_ALL
 		print str(e)
-		print Style.DIM + "\n.. attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL
+		print Style.DIM + "\n... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL
  
 		try:
 			sys.setrecursionlimit(sys.getrecursionlimit()*10)
 			cPickle.dump(g, open( pickledpath, "wb" ) )
-			print Style.BRIGHT + ".. SUCCESSFULLY cached <%s>" % pickledpath + Style.RESET_ALL
+			print Style.BRIGHT + "... SUCCESSFULLY cached <%s>" % pickledpath + Style.RESET_ALL
 		except Exception,e: 
-			print Style.BRIGHT + "\n.. ERROR caching <%s>... aborting..." % filename + Style.RESET_ALL
+			print Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL
 			print str(e)	
 		sys.setrecursionlimit(sys.getrecursionlimit()/10)
 	return g
@@ -402,23 +402,15 @@ def main():
 				}
 
 
-
 	# default behaviour: launch shell
 	if not args and not opts._library and not opts._import:	
 		from tools.shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
-		# print Style.BRIGHT + "** OntoSPy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL
 		print STARTUP_MESSAGE
 		Shell().cmdloop()
 		raise SystemExit, 1
 		
-		# local_ontos = get_localontologies()
-		# if local_ontos:
-		# 	opts._library = True
-		# else:
-		# 	parser.print_help()
-		# 	sys.exit(0)
-			
+
 			
 	# import an ontology (ps implemented in both .ontospy and .tools.manager)
 	if opts._import:
