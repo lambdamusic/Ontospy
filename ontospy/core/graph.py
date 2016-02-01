@@ -330,17 +330,16 @@ class Graph(object):
 		
 		qres = self.queryHelper.getAllClasses()
 
-		for candidate in qres:
+		for class_tuple in qres:
 			
-			test_existing_cl = self.getClass(uri=candidate[0])
+			test_existing_cl = self.getClass(uri=class_tuple[0])
 			if not test_existing_cl:
 				# create it
-				self.classes += [OntoClass(candidate[0], candidate[1], self.namespaces)]
+				self.classes += [OntoClass(class_tuple[0], class_tuple[1], self.namespaces)]
 			else:
-				# update it
-				if candidate[1] == rdflib.OWL.Class:
-					# prefer OWL.Class over RDFS.Class
-					test_existing_cl.rdftype = rdflib.OWL.Class 
+				# if OWL.Class over RDFS.Class - update it
+				if class_tuple[1] == rdflib.OWL.Class:
+					test_existing_cl.rdftype = class_tuple[1]
 					
 				
 		
@@ -461,8 +460,11 @@ class Graph(object):
 				pass
 	
 		#add more data
+		skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
+		
 		for aConcept in self.skosConcepts:
 			
+			aConcept.rdftype = skos['Concept']
 			aConcept.triples = self.queryHelper.entityTriples(aConcept.uri)
 			aConcept._buildGraph() # force construction of mini graph
 			
@@ -756,7 +758,7 @@ class Graph(object):
 		self.toplayerSkosConcepts = exit # sorted(exit, key=lambda x: x.id) # doesnt work
 				
 
-	def printClassTree(self, element = None, showids=True, labels=False):
+	def printClassTree(self, element = None, showids=True, labels=False, showtype=True):
 		""" 
 		Print nicely into stdout the class tree of an ontology 
 		
@@ -765,16 +767,17 @@ class Graph(object):
 		[1]123--
 		[12]12--
 		"""
+		TYPE_MARGIN = 11 # length for owl:class etc..
 		
 		if not element:	 # first time
 			for x in self.toplayer:
-				printGenericTree(x, 0, showids, labels)
+				printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 		
 		else:
-			printGenericTree(element, 0, showids, labels)		
+			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)		
 
 
-	def printPropertyTree(self, element = None, showids=True, labels=False):
+	def printPropertyTree(self, element = None, showids=True, labels=False, showtype=True):
 		""" 
 		Print nicely into stdout the property tree of an ontology 
 		
@@ -783,16 +786,17 @@ class Graph(object):
 		[1]123--
 		[12]12--
 		"""
+		TYPE_MARGIN = 23 # length for owl:AnnotationProperty etc..
 		
 		if not element:	 # first time
 			for x in self.toplayerProperties:
-				printGenericTree(x, 0, showids, labels)
+				printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 		
 		else:
-			printGenericTree(element, 0, showids, labels)
+			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
 			
 
-	def printSkosTree(self, element = None, showids=True, labels=False):
+	def printSkosTree(self, element = None, showids=True, labels=False, showtype=True):
 		""" 
 		Print nicely into stdout the SKOS tree of an ontology 
 		
@@ -801,13 +805,14 @@ class Graph(object):
 		[1]123--
 		[12]12--
 		"""
+		TYPE_MARGIN = 13 # length for skos:concept
 		
 		if not element:	 # first time
 			for x in self.toplayerSkosConcepts:
-				printGenericTree(x, 0, showids, labels)
+				printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 		
 		else:
-			printGenericTree(element, 0, showids, labels)
+			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
 						
 
 

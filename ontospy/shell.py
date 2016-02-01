@@ -434,19 +434,19 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "classes":			
 			if g.classes:
-				g.printClassTree(showids=False, labels=False)
+				g.printClassTree(showids=False, labels=False, showtype=True)
 			else:
 				self._print("No classes available.")							
 		
 		elif line[0] == "properties":
 			if g.properties:
-				g.printPropertyTree(showids=False, labels=False)
+				g.printPropertyTree(showids=False, labels=False, showtype=True)
 			else:
 				self._print("No properties available.")
 		
 		elif line[0] == "concepts":
 			if g.skosConcepts:
-				g.printSkosTree(showids=False, labels=False)
+				g.printSkosTree(showids=False, labels=False, showtype=True)
 			else:
 				self._print("No concepts available.")
 

@@ -262,6 +262,18 @@ def truncate(data, l=20):
 # ===========
 
 
+NAMESPACES_DEFAULT = [
+			("rdf",  rdflib.URIRef("http://www.w3.org/1999/02/22-rdf-syntax-ns#")),
+			("rdfs",  rdflib.URIRef("http://www.w3.org/2000/01/rdf-schema#")),
+			("xml",  rdflib.URIRef("http://www.w3.org/XML/1998/namespace")),
+			("xsd",  rdflib.URIRef("http://www.w3.org/2001/XMLSchema#")),
+			('foaf',  rdflib.URIRef("http://xmlns.com/foaf/0.1/")),
+			("skos",  rdflib.URIRef("http://www.w3.org/2004/02/skos/core#")),
+			("owl",  rdflib.URIRef("http://www.w3.org/2002/07/owl#")),
+		]
+			
+			
+
 
 def isBlankNode(aClass):
 	""" small utility that checks if a class is a blank node """
@@ -342,7 +354,7 @@ def inferMainPropertyType(uriref):
 
 
 
-def printGenericTree(element, level=0, showids=True, labels=False):
+def printGenericTree(element, level=0, showids=True, labels=False, showtype=True, TYPE_MARGIN=23):
 	""" 
 	Print nicely into stdout the taxonomical tree of an ontology. 
 	
@@ -352,6 +364,8 @@ def printGenericTree(element, level=0, showids=True, labels=False):
 	[123]1--
 	[1]123--
 	[12]12--
+	
+	<TYPE_MARGIN> is parametrized so that classes and properties can have different default spacing (eg owl:class vs owl:AnnotationProperty)
 	"""
 
 	ID_MARGIN = 5
@@ -360,6 +374,12 @@ def printGenericTree(element, level=0, showids=True, labels=False):
 		_id_ = Fore.BLUE +	\
 		"[%d]%s" % (element.id, " " * (ID_MARGIN  - len(str(element.id)))) +  \
 			Fore.RESET
+	
+	elif showtype:
+		_id_ = Fore.BLUE +	\
+		"[%s]%s" % (uri2niceString(element.rdftype), " " * (TYPE_MARGIN  - len(uri2niceString(element.rdftype)))) +  \
+			Fore.RESET
+			
 	else:
 		_id_ = ""
 	
@@ -371,8 +391,10 @@ def printGenericTree(element, level=0, showids=True, labels=False):
 		bestLabel = ""
 		
 	printDebug("%s%s%s%s" % (_id_ , "-" * 4 * level, element.qname, bestLabel))
+	
+	# recursion
 	for sub in element.children():
-		printGenericTree(sub, (level + 1), showids, labels)
+		printGenericTree(sub, (level + 1), showids, labels, showtype, TYPE_MARGIN)
 	
 	
 
@@ -563,7 +585,7 @@ def uri2niceString(aUri, namespaces = None):
 	
 	"""
 	if not namespaces:
-		namespaces = []
+		namespaces = NAMESPACES_DEFAULT
 		
 	if type(aUri) == rdflib.term.URIRef:	
 		# we have a URI: try to create a qName
