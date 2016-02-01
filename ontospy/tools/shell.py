@@ -31,14 +31,11 @@ from ..libs.quotes import QUOTES
 
 
 
-_intro_ = """
-******                                     ******
+_intro_ = """******                                     ******
 ***                                           ***
 ** OntoSPy Interactive Ontology Browser %s **
 ***                                           ***
-******                                     ******
-
-"""
+******                                     ******"""
 
 STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
 
@@ -51,7 +48,7 @@ class Shell(cmd.Cmd):
 
 	DEFAULT_COL = Fore.RED
 	prompt = DEFAULT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
-	intro = "Type 'help' to get started, or 'ontology' to list local files. Use TAB to explore commands.\n"
+	intro = "Type 'help' to get started, TAB to explore commands.\n"
 
 	doc_header = 'Commands'
 	misc_header = 'Miscellaneous'
@@ -104,19 +101,25 @@ class Shell(cmd.Cmd):
 					'TIP': Style.DIM, 
 					'URI' : Style.BRIGHT,  
 					'TEXT' : Fore.GREEN, 
+					'MAGENTA' : Fore.MAGENTA ,
+					'GREEN' : Fore.GREEN ,
 					'DEFAULT' : Style.DIM ,
 					}
 		
-		if style == "IMPORTANT":
-			print styles1['IMPORTANT'] + ms + Style.RESET_ALL	
-		elif style == "TIP":
-			print styles1['TIP'] + ms + Style.RESET_ALL		
-		elif style=="URI":
-			print styles1['URI'] + ms + Style.RESET_ALL
-		elif style=="TEXT":
-			print styles1['TEXT'] + ms + Style.RESET_ALL	
-		else:
-			print styles1['DEFAULT'] + ms + Style.RESET_ALL
+		try:
+			print styles1[style] + ms + Style.RESET_ALL	
+		except:
+			print styles1[style] + ms + Style.RESET_ALL
+		# if style == "IMPORTANT":
+		# 	print styles1['IMPORTANT'] + ms + Style.RESET_ALL
+		# elif style == "TIP":
+		# 	print styles1['TIP'] + ms + Style.RESET_ALL
+		# elif style=="URI":
+		# 	print styles1['URI'] + ms + Style.RESET_ALL
+		# elif style=="TEXT":
+		# 	print styles1['TEXT'] + ms + Style.RESET_ALL
+		# else:
+		# 	print styles1['DEFAULT'] + ms + Style.RESET_ALL
 
 
 
@@ -129,32 +132,41 @@ class Shell(cmd.Cmd):
 		return True
 
 
+	def _printTriples(self, entity):
+		""" display triples """
+		self._print("----------------", "TIP")
+		self._print(unicode(entity.uri) , "IMPORTANT")
+		for x in entity.triples:
+			self._print("=> " + unicode(x[1]) , "MAGENTA")
+			self._print(".... " + unicode(x[2]) , "GREEN")
+		self._print("----------------", "TIP")
+
 
 	def _print_entity_intro(self, g=None, entity=None, first_time=True, stats=False):
 		"""after a selection, prints on screen basic info about onto or entity, plus change prompt 
 		2015-10-18: removed the sound
+		2016-01-18: entity is the shell wrapper around the ontospy entity
 		"""
 		if entity:
-			# self._clear_screen()
-			self._print(entity.uri, "URI")
-			self._print(entity.bestDescription(), "TEXT")
-			# print Style.BRIGHT + entity.uri + Style.RESET_ALL
-			# print Style.DIM + entity.bestDescription() + Style.RESET_ALL
+			self._clear_screen()
+			obj = entity['object']
+			self._print("Loaded %s: <%s>" % (entity['type'].capitalize(), str(obj.uri)), "TIP")
+			self._print("----------------", "TIP")
+			# self._print(obj.bestDescription(), "TEXT")
 			if stats:
-				entity.printStats()
+				obj.printStats()
 			if first_time:
 				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		elif g:
 			if first_time:
 				self._clear_screen()
 				# playSound(ontospy.ONTOSPY_SOUNDS)  # new..
-				self._print("Loaded " + self.current['fullpath'], 'TIP')
+				self._print("Loaded graph: <" + self.current['fullpath'] + ">", 'TIP')
 			g.printStats()
 			for o in g.ontologies:
-				self._print(o.uri, "URI")
-				self._print(o.bestDescription(), "TEXT")
-				# print Fore.RED + Style.BRIGHT + o.uri + Style.RESET_ALL
-				# print Style.DIM + o.bestDescription() + Style.RESET_ALL
+				self._print("==> Ontology URI: <%s>" % str(o.uri), "TIP")
+			self._print("----------------", "TIP")
+				# self._print(o.bestDescription(), "TEXT")
 			if first_time:
 				self.prompt = self._get_prompt(self.current['file'])
 
@@ -169,8 +181,9 @@ class Shell(cmd.Cmd):
 		if not _list:
 			self._print("No matching items.", "TIP")
 			return None
-		if using_pattern and len(_list) == 1: # if by any chance there's no need to select a choice
-			return _list[0]
+		if using_pattern and len(_list) == 1: # removed
+			pass
+			# return _list[0]
 		if using_pattern:
 			self._print("%d matching items: \n--------------" % len(_list), "TIP")
 		else:
@@ -260,7 +273,7 @@ class Shell(cmd.Cmd):
 				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'class'}				
 			# ..finally:
 			if self.currentEntity:
-				self._print_entity_intro(entity=self.currentEntity['object'])
+				self._print_entity_intro(entity=self.currentEntity)
 				
 				# self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		else:
@@ -289,7 +302,7 @@ class Shell(cmd.Cmd):
 			
 			# ..finally:
 			if self.currentEntity:
-				self._print_entity_intro(entity=self.currentEntity['object'])	
+				self._print_entity_intro(entity=self.currentEntity)	
 		else:
 			print "not found"
 			
@@ -314,7 +327,7 @@ class Shell(cmd.Cmd):
 				self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'concept'}
 			# ..finally:
 			if self.currentEntity:
-				self._print_entity_intro(entity=self.currentEntity['object'])
+				self._print_entity_intro(entity=self.currentEntity)
 
 		else:
 			print "not found"
@@ -333,11 +346,12 @@ class Shell(cmd.Cmd):
 		line = line.split()
 		_pattern = ""
 		if len(line) > 1:
-			_pattern = line[1]			
+			# _pattern = line[1]	
+			pass		
 		opts = [ 'ontologies', 'classes' , 'properties' , 'concepts' ]
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: ls (%s) [pattern]" % "|".join([x for x in opts]))
+			self._print("Usage: ls [%s]" % "|".join([x for x in opts]))
 
 		elif line[0] == "ontologies":
 			if not self.ontologies:
@@ -372,108 +386,185 @@ class Shell(cmd.Cmd):
 		else: # should never arrive here
 			pass
 
+
+	def do_get(self, line):
+		"""Finds entities matching a given string pattern. \nOptions: [ ontologies | classes | properties | concepts ]"""
+		line = line.split()
+		_pattern = ""
+		if len(line) > 1:
+			_pattern = line[1]			
+		opts = [ 'ontology', 'class' , 'property' , 'concept' ]
+
+		if (not line) or (line[0] not in opts) or (not _pattern):
+			self._print("Usage: get [%s] string-pattern" % "|".join([x for x in opts]))
+
+		elif line[0] == "ontology":
+			if not self.ontologies:
+				self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. ")
+			else:
+				self._select_ontology(_pattern)
+
+		elif line[0] in opts and not self.current:
+			self._print("Please select an ontology first")
+
+		elif line[0] == "class":
+			g = self.current['graph']
+			if g.classes:
+				self._select_class(_pattern)
+			else:
+				self._print("No classes available.")
+
+		elif line[0] == "property":
+			g = self.current['graph']
+			if g.properties:
+				self._select_property(_pattern)
+			else:
+				self._print("No properties available.")	
+
+		elif line[0] == "concept":
+			g = self.current['graph']
+			if g.skosConcepts:
+				self._select_concept(_pattern)
+			else:
+				self._print("No concepts available.")	
+
+		else: # should never arrive here
+			pass
 							
 	def do_tree(self, line):
 		"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
 		opts = [ 'classes' , 'properties' , 'concepts' ]
 		if not self.current:
 			self._print("Please select an ontology first")
+			return None
+		
 		line = line.split()	
+		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: tree (%s)" % "|".join([x for x in opts]))
+			self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
 
-		elif line[0] == "classes":
-			g = self.current['graph']
+		elif line[0] == "classes":			
 			if g.classes:
-				g.printClassTree(showids=True, labels=False)
+				g.printClassTree(showids=False, labels=False)
 			else:
 				self._print("No classes available.")							
 		
 		elif line[0] == "properties":
-			g = self.current['graph']
 			if g.properties:
-				g.printPropertyTree(showids=True, labels=False)
+				g.printPropertyTree(showids=False, labels=False)
 			else:
 				self._print("No properties available.")
 		
 		elif line[0] == "concepts":
-			g = self.current['graph']
 			if g.skosConcepts:
-				g.printSkosTree(showids=True, labels=False)
+				g.printSkosTree(showids=False, labels=False)
 			else:
 				self._print("No concepts available.")
 
 		else: # never get here
 			pass	
-						
-	#
-	# def do_ontology(self, line):
-	# 	"""Select an ontology"""
-	# 	if not self.ontologies:
-	# 		print "No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. "
-	# 	else:
-	# 		self._select_ontology(line)
-	#
-	#
-	# def do_class(self, line):
-	# 	"""Select a class"""
-	# 	if not self.current:
-	# 		print "Please select an ontology first"
-	# 	elif line:
-	# 		self._select_class(line)
-	# 	else:
-	# 		g = self.current['graph']
-	# 		if g.classes:
-	# 			g.printClassTree(showids=True, labels=False)
-	# 			self._print("Type 'class' followed by a class name or number, or type 'class <space><tab>' for suggestions")
-	# 		else:
-	# 			self._print("No classes available.")
-	#
-	# def do_property(self, line):
-	# 	"""Select a property"""
-	# 	if not self.current:
-	# 		print "Please select an ontology first"
-	# 	elif line:
-	# 		self._select_property(line)
-	# 	else:
-	# 		g = self.current['graph']
-	# 		if g.properties:
-	# 			g.printPropertyTree(showids=True, labels=False)
-	# 			self._print("Type 'property' followed by a property name or number, or type 'property <space><tab>' for suggestions")
-	# 		else:
-	# 			self._print("No properties available.")
-	#
-	# def do_concept(self, line):
-	# 	"""Select a SKOS concept"""
-	# 	if not self.current:
-	# 		print "Please select an ontology first"
-	# 	elif line:
-	# 		self._select_concept(line)
-	# 	else:
-	# 		g = self.current['graph']
-	# 		if g.skosConcepts:
-	# 			g.printSkosTree(showids=True, labels=False)
-	# 			self._print("Type 'concept' followed by a concept name or number, or type 'concept <space><tab>' for suggestions")
-	# 		else:
-	# 			self._print("No skos concepts available.")
-	#
 
 
 
 	def do_show(self, line):
 		"""Shows stuff @todo"""
-		opts = [ 'triples' , 'xml' , 'turtle', 'toplayer' ]
+		opts = [ 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		
 		if not self.current:
 			self._print("Please select an ontology first")
+			return None
+		
 		line = line.split()	
+		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: show (%s)" % "|".join([x for x in opts]))
+			self._print("Usage: show [%s]" % "|".join([x for x in opts]))
 
-		self._print("Not implemented.")
-				
+		elif line[0] == "description":		
+			self._print("----------------", "TIP")	
+			NOTFOUND = "[not found]"
+			if self.currentEntity:
+				obj = self.currentEntity['object']
+				label = obj.bestLabel() or NOTFOUND
+				description = obj.bestDescription() or NOTFOUND
+				self._print("Title: " + label, "TEXT")
+				self._print("Description: " + description, "TEXT")
 					
+			else:
+				for obj in self.current['graph'].ontologies:
+					self._print("==> Ontology: <%s>" % str(obj.uri), "TIP")
+					label = obj.bestLabel() or NOTFOUND
+					description = obj.bestDescription() or NOTFOUND
+					self._print("Title: " + label, "TEXT")
+					self._print("Description: " + description, "TEXT")
+			self._print("----------------", "TIP")				
+				
+		elif line[0] == "toplayer":			
+			for x in g.toplayer:
+				print x.qname
+		
+		elif line[0] == "parents":
+			if self.currentEntity:
+				for x in self.currentEntity['object'].parents():
+					print x.qname
+			else:
+				self._print("Please select an entity first.") 
+
+		elif line[0] == "children":			
+			if self.currentEntity:
+				for x in self.currentEntity['object'].children():
+					print x.qname
+			else:
+				self._print("Please select an entity first.") 
+
+		elif line[0] == "stats":	
+			if self.currentEntity:
+				obj = self.currentEntity['object']
+				obj.printStats()
+				# self._print_entity_intro(entity=self.currentEntity, first_time=False, stats=True)
+			else:
+				self.current['graph'].printStats()
+				# self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
+		
+		elif line[0] == "triples":	
+			if self.currentEntity:
+				self._printTriples(self.currentEntity['object'])
+				# self.currentEntity['object'].printTriples()
+			else:
+				for o in g.ontologies:
+					self._printTriples(o)
+					# o.printTriples()
+																			
+		else:
+			pass # never get here
+				
+
+
+
+	def do_serialize(self, line):
+		"""Serialize an entity into an RDF flavour"""
+		opts = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+		
+		if not self.current:
+			self._print("Please select an ontology first")
+			return None
+		
+		line = line.split()	
+		g = self.current['graph']
+
+		if (not line) or (line[0] not in opts):
+			self._print("Usage: serialize [%s]" % "|".join([x for x in opts]))
+		
+		elif self.currentEntity:
+			self.currentEntity['object'].printSerialize(line[0])
+
+		else:	
+			for o in g.ontologies:
+				o.printSerialize(line[0])
+
+	
+									
 	def do_next(self, line):
 		"""Jump to the next entities (ontology, class or property) depending on context"""
 		if not self.current:
@@ -499,8 +590,8 @@ class Shell(cmd.Cmd):
 				self._print("Only one ontology available in repository.")	 
 
 
-	def do_up(self, line):
-		"Go up one level. From entity => ontology; from ontology => ontospy top level."
+	def do_back(self, line):
+		"Go back one step. From entity => ontology; from ontology => ontospy top level."
 		if self.currentEntity:
 			self.currentEntity = None
 			self.prompt = self._get_prompt(self.current['file'])
@@ -513,81 +604,6 @@ class Shell(cmd.Cmd):
 		self._clear_screen()
 		return True
 
-
-
-
-	def do_triples(self, line):
-		"""Print out the triples that have the current entity as subject""" 
-		# print "If no ontology > no triples \n if ontology = show annotations \n if entity = show triples"
-		if self.currentEntity:
-			self.currentEntity['object'].printTriples()
-		elif self.current:
-			g = self.current['graph']		
-			for o in g.ontologies:
-				o.printTriples()		
-		else:
-			print "Please select an ontology first."
-			
-			
-	def do_serialize(self, line):
-		"""Serialize current entity into an RDF format.\nValid options: xml | n3 | turtle | nt | pretty-xml
-		""" 
-		# print "If no ontology > no triples \n if ontology = show annotations \n if entity = show triples"
-		if line not in ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']:
-			line = "turtle"
-		if self.currentEntity:
-			self.currentEntity['object'].printSerialize(line)
-		elif self.current:
-			g = self.current['graph']		
-			for o in g.ontologies:
-				o.printSerialize(line)		
-		else:
-			print "Please select an ontology first."
-	
-
-	def do_parents(self, line):
-		"""Show the parents (superclass or superproperty) of an entity"""
-		if self.currentEntity:
-			for x in self.currentEntity['object'].parents():
-				print x.qname
-		else:
-			self._print("Please select an entity first.") 
-
-	def do_children(self, line):
-		"""Show the children (subclass or subproperty) of an entity"""
-		if self.currentEntity:
-			for x in self.currentEntity['object'].children():
-				print x.qname
-		else:
-			self._print("Please select an entity first.") 
-			
-	def do_toplayer(self, line):
-		"""Show the toplayer (classes) of the ontology"""
-		if not self.current:
-			self._print("Please select an ontology first")
-		else:
-			for x in self.current['graph'].toplayer:
-				print x.qname
-			
-	def do_annotations(self, line):
-		"Show annotations for current ontology"
-		if not self.current:
-			print "No ontology loaded"
-		else:
-			g = self.current['graph']
-			for o in g.ontologies:
-				o.printTriples()
-
-	def do_summary(self, line):
-		"Print a summary of the currently active entity"
-		if self.currentEntity:
-			self._print_entity_intro(entity=self.currentEntity['object'], first_time=False, stats=True)
-		elif self.current:
-			self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
-		else:
-			print "Please select an ontology first"
-			
-			
 
 	def do_zen(self, line):
 		"""Inspiring quotes for the working ontologist"""
@@ -620,7 +636,21 @@ class Shell(cmd.Cmd):
 							if f.startswith(text)
 							]
 		return completions	
+
+	def complete_get(self, text, line, begidx, endidx):
+		"""completion for find command"""
 		
+		options = ['ontology', 'class', 'property', 'concept']
+
+		if not text:
+			completions = options
+		else:
+			completions = [ f
+							for f in options
+							if f.startswith(text)
+							]
+		return completions	
+				
 	def complete_tree(self, text, line, begidx, endidx):
 		"""completion for tree command"""
 		
@@ -638,110 +668,36 @@ class Shell(cmd.Cmd):
 	def complete_show(self, text, line, begidx, endidx):
 		"""completion for show command"""
 		
-		options = ['triples', 'xml', 'turtle', '@todo etcetera']
+		opts = [ 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
 
 		if not text:
-			completions = options
+			completions = opts
 		else:
 			completions = [ f
-							for f in options
+							for f in opts
 							if f.startswith(text)
 							]
 		return completions	
 		
-
 	def complete_serialize(self, text, line, begidx, endidx):
-		"""completion for tree command"""
+		"""completion for serialize command"""
 		
-		options = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+		opts = [ 'xml', 'n3', 'turtle', 'nt', 'pretty-xml']
 
 		if not text:
-			completions = options
+			completions = opts
 		else:
 			completions = [ f
-							for f in options
+							for f in opts
 							if f.startswith(text)
 							]
 		return completions	
-				
-		
-	# def complete_ontology(self, text, line, begidx, endidx):
-	# 	"""completion for select command"""
-	#
-	# 	options = self.ontologies[:]
-	#
-	# 	if not text:
-	# 		completions = options
-	# 	else:
-	# 		completions = [ f
-	# 						for f in options
-	# 						if f.startswith(text)
-	# 						]
-	# 	return completions
-	#
-	#
-	# def complete_class(self, text, line, begidx, endidx):
-	# 	"""completion for select command"""
-	#
-	# 	if self.current:
-	# 		g = self.current['graph']
-	# 		options = [x.locale for x in g.classes]
-	# 	else:
-	# 		options = []
-	#
-	# 	if not text:
-	# 		completions = options
-	# 	else:
-	# 		completions = [ f
-	# 						for f in options
-	# 						if f.startswith(text)
-	# 						]
-	# 	return completions
-	#
-	#
-	# def complete_property(self, text, line, begidx, endidx):
-	# 	"""completion for select command"""
-	#
-	# 	if self.current:
-	# 		g = self.current['graph']
-	# 		options = [x.locale for x in g.properties]
-	# 	else:
-	# 		options = []
-	#
-	# 	if not text:
-	# 		completions = options
-	# 	else:
-	# 		completions = [ f
-	# 						for f in options
-	# 						if f.startswith(text)
-	# 						]
-	# 	return completions
-	#
-	#
-	#
-	# def complete_concept(self, text, line, begidx, endidx):
-	# 	"""completion for select command"""
-	#
-	# 	if self.current:
-	# 		g = self.current['graph']
-	# 		options = [x.locale for x in g.skosConcepts]
-	# 	else:
-	# 		options = []
-	#
-	# 	if not text:
-	# 		completions = options
-	# 	else:
-	# 		completions = [ f
-	# 						for f in options
-	# 						if f.startswith(text)
-	# 						]
-	# 	return completions
-	#
+
 
 
 	
 def main():
-	""" command line script """
+	""" standalone line script """
 	
 	print "OntoSPy " + ontospy.VERSION
 	
