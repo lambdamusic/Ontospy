@@ -21,8 +21,8 @@ from colorama import Fore, Back, Style
 from ConfigParser import SafeConfigParser
 
 from ._version import *
-from .libs.graph import Graph, SparqlEndpoint
-from .libs.util import bcolors, pprinttable, printDebug, _clear_screen, pprint2columns
+from .core.graph import Graph, SparqlEndpoint
+from .core.util import bcolors, pprinttable, printDebug, _clear_screen, pprint2columns
 
 
 
@@ -348,11 +348,8 @@ def parse_options():
 
 	parser.add_option("-i", "--import",
 			action="store_true", default=False, dest="_import",
-			help="Import a file/folder/url into the local library.") 
+			help="Import a file/folder/url into the local library.")
 
-	# parser.add_option("-s", "--shell",
-	# 		action="store_true", default=False, dest="_shell",
-	# 		help="@todo: run shell.")
 						
 	parser.add_option("-o", "",
 			action="store_true", default=False, dest="ontoannotations",
@@ -404,7 +401,7 @@ def main():
 
 	# default behaviour: launch shell
 	if not args and not opts._library and not opts._import:	
-		from tools.shell import Shell, STARTUP_MESSAGE
+		from shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
 		print STARTUP_MESSAGE
 		Shell().cmdloop()
@@ -412,7 +409,7 @@ def main():
 		
 
 			
-	# import an ontology (ps implemented in both .ontospy and .tools.manager)
+	# import an ontology (ps implemented in both .ontospy and .extras)
 	if opts._import:
 		if not args:
 			printDebug("Please specify a file/folder/url to import into local library.")
@@ -441,7 +438,7 @@ def main():
 
 	#test.... 2015-11-03
 	# if opts._shell:
-	# 	from .tools.shell import Shell
+	# 	from .extras.shell import Shell
 	# 	Shell().cmdloop()
 	# 	raise SystemExit, 1
 

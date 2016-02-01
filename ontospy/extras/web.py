@@ -18,8 +18,8 @@ USAGE = "ontospy-web <options>"
 import time, optparse, os, rdflib, sys
 
 from .. import ontospy 
-from ..libs.graph import Graph
-from ..libs.util import *
+from ..core.graph import Graph
+from ..core.util import *
 
 
 

@@ -3,11 +3,11 @@ import time, optparse, os, sys, webbrowser
 import rdflib	 # so we have it available as a namespace
 
 from .. import ontospy 
-from ..libs.util import *
-from ..libs import render
+from ..core.util import *
+from ..core import render
 
-MODULE_VERSION = 0.1
-USAGE = "ontospy-doc <uri>"
+MODULE_VERSION = 0.2
+USAGE = "ontospy-exporter [graph-uri-or-location] [options]"
 
 
 

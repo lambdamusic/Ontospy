@@ -22,10 +22,10 @@ michele.pasin@gmail.com
 import os, cmd, random, urllib2, shutil, platform
 from colorama import Fore, Back, Style
 
-from .. import ontospy
-from .. import _version 
-from ..libs.util import *
-from ..libs.quotes import QUOTES
+from . import ontospy
+from . import _version 
+from .core.util import *
+from .core.quotes import QUOTES
 
 
 
@@ -110,18 +110,6 @@ class Shell(cmd.Cmd):
 			print styles1[style] + ms + Style.RESET_ALL	
 		except:
 			print styles1[style] + ms + Style.RESET_ALL
-		# if style == "IMPORTANT":
-		# 	print styles1['IMPORTANT'] + ms + Style.RESET_ALL
-		# elif style == "TIP":
-		# 	print styles1['TIP'] + ms + Style.RESET_ALL
-		# elif style=="URI":
-		# 	print styles1['URI'] + ms + Style.RESET_ALL
-		# elif style=="TEXT":
-		# 	print styles1['TEXT'] + ms + Style.RESET_ALL
-		# else:
-		# 	print styles1['DEFAULT'] + ms + Style.RESET_ALL
-
-
 
 	def _clear_screen(self):
 		""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """

@@ -56,9 +56,9 @@ import rdflib, time, optparse, csv, os
 from difflib import SequenceMatcher
 
 # from ontospy import ontospy
-# from ontospy.libs.util import *
+# from ontospy.core.util import *
 from .. import ontospy
-from ..libs.util import *
+from ..core.util import *
 
 
 def similar(a, b):

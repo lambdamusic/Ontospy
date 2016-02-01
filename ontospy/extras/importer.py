@@ -9,16 +9,16 @@ Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 """
 
-MODULE_VERSION = 0.1
-USAGE = "ontospy-manager <options>"
+MODULE_VERSION = 0.2
+USAGE = "ontospy-importer [file/folder/url] [options]"
 
 
 import time, optparse, os, rdflib, sys, datetime
 from ConfigParser import SafeConfigParser
 
 from .. import ontospy 
-from ..libs.graph import Graph
-from ..libs.util import *
+from ..core.graph import Graph
+from ..core.util import *
 
 
 
@@ -241,11 +241,11 @@ def parse_options():
 	
 	parser.add_option("-l", "--list",
 			action="store_true", default=False, dest="list",
-			help="Select ontologies saved in the local library.") 
+			help="List ontologies saved in the local library.") 
 
 	parser.add_option("-u", "--update",
 			action="store_true", default=False, dest="_setup",
-			help="Update local library location.") 
+			help="Update path of local library.") 
 
 	parser.add_option("-d", "--delete",
 			action="store_true", default=False, dest="_delete",
@@ -259,9 +259,9 @@ def parse_options():
 			action="store_true", default=False, dest="erase",
 			help="Erase the local library by removing all existing files")
 
-	parser.add_option("-i", "--import",
-			action="store_true", default=False, dest="_import",
-			help="Import a file/folder/url into the local library.") 
+	# parser.add_option("-i", "--import",
+	# 		action="store_true", default=False, dest="_import",
+	# 		help="Import a file/folder/url into the local library.")
 
 	parser.add_option("-w", "--importweb",
 			action="store_true", default=False, dest="_web",
@@ -273,15 +273,11 @@ def parse_options():
 									
 	opts, args = parser.parse_args()
 
-	if opts._import and not args:
-		printDebug("Please specify a file/folder/url to import into local library.", 'important')
-		sys.exit(0)
-
 	if opts._setup and not args:
 		printDebug("Please specify a folder to be used for the local library e.g. 'ontospy-manager -u /Users/john/ontologies'", 'important')
 		sys.exit(0)
 				
-	if not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._import and not opts._web and not opts._delete:
+	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._web and not opts._delete:
 		parser.print_help()
 		sys.exit(0)
 
@@ -298,6 +294,20 @@ def main():
 	
 	if not opts._setup:
 		ontospy.get_or_create_home_repo()
+	
+	# default: import
+	if len(args) > 0 and (not opts._setup):		
+		# import an ontology
+		# note: method duplicated in .ontospy and .extras.manager
+		_location = args[0]
+		if os.path.isdir(_location):
+			res = ontospy.action_import_folder(_location)
+		else:
+			res = ontospy.action_import(_location)
+		if res: 
+			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
+		raise SystemExit, 1	
+
 		
 	# move local lib
 	if opts._setup:
@@ -337,18 +347,6 @@ def main():
 		printDebug("Time:	   %0.2fs" %  tTime, "comment")
 		raise SystemExit, 1
 
-
-	# import an ontology
-	# note: method duplicated in .ontospy and .tools.manager
-	if opts._import:
-		_location = args[0]
-		if os.path.isdir(_location):
-			res = ontospy.action_import_folder(_location)
-		else:
-			res = ontospy.action_import(_location)
-		if res: 
-			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
-		raise SystemExit, 1
 			
 			
 	if opts._web:
