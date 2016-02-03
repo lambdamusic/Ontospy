@@ -436,12 +436,6 @@ def main():
 		raise SystemExit, 1 
 
 
-	#test.... 2015-11-03
-	# if opts._shell:
-	# 	from .extras.shell import Shell
-	# 	Shell().cmdloop()
-	# 	raise SystemExit, 1
-
 		
 	# last case: a new URI/path is passed
 	sTime = time.time()

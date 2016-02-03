@@ -518,8 +518,8 @@ def guess_fileformat(aUri):
 		return "trix"
 	elif aUri.endswith(".rdfa"):
 		return "rdfa"
-	else:  # defaults to XML
-		return "xml"
+	else:  # to be handled outside this method
+		return None
 
 
 

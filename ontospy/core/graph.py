@@ -92,7 +92,7 @@ class Graph(object):
 				
 		if text:
 			self.IS_TEXT = True
-			rdf_format = rdf_format or "turtle"
+			rdf_format = rdf_format or "turtle"  # only turtle is accepted as text!
 		
 		
 		elif endpoint:
@@ -103,7 +103,6 @@ class Graph(object):
 
 
 		else:
-
 			if type(source) == type("string"):
 				if source.startswith("www."): #support for lazy people
 					source = "http://%s" % str(source)
@@ -127,26 +126,52 @@ class Graph(object):
 				raise Exception("You passed an unknown object. Only URIs and files are accepted.") 
 			
 		#FINALLY, TRY LOADING:		
-
-		try:
-			if self.IS_TEXT:			
-				self.rdfgraph.parse(data=source, format=rdf_format)
-				printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
-			elif self.IS_ENDPOINT:
-				printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
-				printDebug("(note: support for sparql endpoints is still experimental)")
+		
+		printDebug("----------")
+		if self.IS_ENDPOINT:
+			printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
+			printDebug("(note: support for sparql endpoints is still experimental)")
+			successflag = True
+		
+		else:	
+			
+			if not rdf_format:
+				rdf_format_opts = ['xml', 'n3', 'nt', 'trix', 'rdfa']
 			else:
-				self.rdfgraph.parse(source, format=rdf_format)
-				printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
-			# set up the query helper too
-			self.queryHelper = QueryHelper(self.rdfgraph)	
-
-
+				rdf_format_opts = [rdf_format]
+			
+			successflag = False	
+			for f in rdf_format_opts:
+				
+				printDebug(".. trying rdf serialization: <%s>" % f)
+				
+				try:
+					if self.IS_TEXT:			
+						self.rdfgraph.parse(data=source, format=f)
+						printDebug("..... success!")
+						successflag = True	
+						printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
+					else:
+						self.rdfgraph.parse(source, format=f)
+						printDebug("..... success!")
+						successflag = True
+						printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
+					# set up the query helper too
+					self.queryHelper = QueryHelper(self.rdfgraph)
+			
+				except:
+					printDebug("..... failed")
+			
+				if successflag == True:
+					break 
 
 		
-		except:
-			printDebug("\nError Parsing Graph (assuming RDF serialization was *%s*)\n" % (rdf_format))	 
-			raise
+		if not successflag == True: 
+			# abort loading
+			
+			printDebug("----------\nFatal error parsing graph (tried using RDF serialization: %s)\n" % (str(rdf_format_opts)))	
+			printDebug("RDF validation services:\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
+			sys.exit(0)
 
 
 

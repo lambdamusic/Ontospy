@@ -457,7 +457,7 @@ class Shell(cmd.Cmd):
 
 	def do_show(self, line):
 		"""Shows stuff @todo"""
-		opts = [ 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		opts = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
 		
 		if not self.current:
 			self._print("Please select an ontology first")
@@ -487,7 +487,11 @@ class Shell(cmd.Cmd):
 					self._print("Title: " + label, "TEXT")
 					self._print("Description: " + description, "TEXT")
 			self._print("----------------", "TIP")				
-				
+
+		elif line[0] == "namespaces":			
+			for x in g.namespaces:
+				self._print("@prefix %s: <%s> ." % (x[0], x[1])) 
+								
 		elif line[0] == "toplayer":			
 			for x in g.toplayer:
 				print x.qname
@@ -656,7 +660,7 @@ class Shell(cmd.Cmd):
 	def complete_show(self, text, line, begidx, endidx):
 		"""completion for show command"""
 		
-		opts = [ 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
+		opts = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
 
 		if not text:
 			completions = opts
