@@ -783,7 +783,7 @@ class Graph(object):
 		self.toplayerSkosConcepts = exit # sorted(exit, key=lambda x: x.id) # doesnt work
 				
 
-	def printClassTree(self, element = None, showids=True, labels=False, showtype=True):
+	def printClassTree(self, element = None, showids=False, labels=False, showtype=False):
 		""" 
 		Print nicely into stdout the class tree of an ontology 
 		
@@ -802,7 +802,7 @@ class Graph(object):
 			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)		
 
 
-	def printPropertyTree(self, element = None, showids=True, labels=False, showtype=True):
+	def printPropertyTree(self, element = None, showids=False, labels=False, showtype=False):
 		""" 
 		Print nicely into stdout the property tree of an ontology 
 		
@@ -821,7 +821,7 @@ class Graph(object):
 			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
 			
 
-	def printSkosTree(self, element = None, showids=True, labels=False, showtype=True):
+	def printSkosTree(self, element = None, showids=False, labels=False, showtype=False):
 		""" 
 		Print nicely into stdout the SKOS tree of an ontology 
 		

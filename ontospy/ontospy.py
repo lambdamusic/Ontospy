@@ -378,37 +378,18 @@ def action_export(from_library, save_gist, args):
 def shellPrintOverview(g, opts):
 	ontologies = g.ontologies
 				
-	if opts['ontoannotations']:
-		for o in ontologies:
-			print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
-			o.printTriples()
-
-	elif opts['classtaxonomy']:
+	for o in ontologies:
+		print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
+		o.printTriples()
+	if g.classes:
 		print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
 		g.printClassTree(showids=False, labels=opts['labels'])
-			
-	elif opts['propertytaxonomy']:
+	if g.properties:
 		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 		g.printPropertyTree(showids=False, labels=opts['labels'])
-
-	elif opts['skostaxonomy']:
-		print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10 + Style.RESET_ALL
+	if g.skosConcepts:
+		print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
 		g.printSkosTree(showids=False, labels=opts['labels'])
-	
-	else:
-		# default: print anything available 
-		for o in ontologies:
-			print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
-			o.printTriples()
-		if g.classes:
-			print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
-			g.printClassTree(showids=False, labels=opts['labels'])
-		if g.properties:
-			print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
-			g.printPropertyTree(showids=False, labels=opts['labels'])
-		if g.skosConcepts:
-			print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
-			g.printSkosTree(showids=False, labels=opts['labels'])
 			
 
 
@@ -476,12 +457,7 @@ def main():
 
 	get_or_create_home_repo()
 	
-	# in previous version this was customizable - now only 'labels'
 	print_opts = {
-					'ontoannotations' : True, 
-					'classtaxonomy' : True, 
-					'propertytaxonomy' : True,
-					'skostaxonomy' : True,
 					'labels' : opts.labels,
 				}
 
@@ -518,7 +494,7 @@ def main():
 			if not g:
 				g = do_pickle_ontology(filename)	
 			shellPrintOverview(g, print_opts)		
-			printDebug("----------\n" + "Completed", "comment")	
+			# printDebug("----------\n" + "Completed", "comment")
 		# continue and print timing at bottom 
 
 
