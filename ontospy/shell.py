@@ -102,14 +102,16 @@ class Shell(cmd.Cmd):
 					'URI' : Style.BRIGHT,  
 					'TEXT' : Fore.GREEN, 
 					'MAGENTA' : Fore.MAGENTA ,
+					'BLUE' : Fore.BLUE ,
 					'GREEN' : Fore.GREEN ,
+					'RED' : Fore.RED ,
 					'DEFAULT' : Style.DIM ,
 					}
 		
 		try:
 			print styles1[style] + ms + Style.RESET_ALL	
 		except:
-			print styles1[style] + ms + Style.RESET_ALL
+			print styles1['DEFAULT'] + ms + Style.RESET_ALL
 
 	def _clear_screen(self):
 		""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
@@ -158,11 +160,11 @@ class Shell(cmd.Cmd):
 				self.prompt = self._get_prompt(self.current['file'])
 
 
-	def _printStats(self, g, entity=None):
+	def _printStats(self, g, entity=None, verbose=True):
 		"""
 		print more informative stats about the object
 		"""
-		if not entity:
+		if not entity:  # the graph
 			self._print("----------------")
 			self._print("Ontologies......: %d" % len(g.ontologies))
 			self._print("Classes.........: %d" % len(g.classes))
@@ -174,32 +176,50 @@ class Shell(cmd.Cmd):
 			self._print("----------------")
 
 		elif entity['type'] == 'class':
+			x = entity['object']
 			self._print("----------------")
-			self._print("Parents......: %d" % len(entity['object'].parents()))
-			self._print("Children.....: %d" % len(entity['object'].children()))
-			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
-			self._print("Descendants..: %d" % len(entity['object'].descendants()))
-			self._print("Domain of....: %d" % len(entity['object'].domain_of))
-			self._print("Range of.....: %d" % len(entity['object'].range_of))
-			self._print("Instances....: %d" % entity['object'].count())
-			self._print("----------------")
-			
+			self._print("Parents......: %d" % len(x.parents()), "IMPORTANT")
+			if verbose and x.parents():
+				self._print("%s" % ", ".join([p.qname for p in x.parents()]), "BLUE")
+			self._print("\nAncestors....: %d" % len(x.ancestors()), "IMPORTANT")
+			if verbose and x.ancestors():
+				self._print("%s" % ", ".join([p.qname for p in x.ancestors()]), "BLUE")
+			self._print("\nChildren.....: %d" % len(x.children()), "IMPORTANT")
+			if verbose and x.children():
+				self._print("%s" % ", ".join([p.qname for p in x.children()]), "BLUE")
+			self._print("\nDescendants..: %d" % len(x.descendants()), "IMPORTANT")
+			if verbose and x.descendants():
+				self._print("%s" % ", ".join([p.qname for p in x.descendants()]), "BLUE")
+			self._print("\nDomain of....: %d" % len(x.domain_of), "IMPORTANT")
+			if verbose and x.domain_of:
+				self._print("%s" % ", ".join([p.qname for p in x.domain_of]), "BLUE")
+			self._print("\nRange of.....: %d" % len(x.range_of), "IMPORTANT")
+			if verbose and x.range_of:
+				self._print("%s" % ", ".join([p.qname for p in x.range_of]), "BLUE")
+			self._print("\nInstances....: %d" % x.count(), "IMPORTANT")
+			if verbose and x.all():
+				self._print("%s" % ", ".join([p.qname for p in x.all()]), "BLUE")
+			self._print("\n----------------")
+
+																
 		elif entity['type'] == 'property':
+			x = entity['object']
 			self._print("----------------")
-			self._print("Parents......: %d" % len(entity['object'].parents()))
-			self._print("Children.....: %d" % len(entity['object'].children()))
-			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
-			self._print("Descendants..: %d" % len(entity['object'].descendants()))
-			self._print("Has Domain...: %d" % len(entity['object'].domains))
-			self._print("Has Range....: %d" % len(entity['object'].ranges))
+			self._print("Parents......: %d" % len(x.parents()))
+			self._print("Children.....: %d" % len(x.children()))
+			self._print("Ancestors....: %d" % len(x.ancestors()))
+			self._print("Descendants..: %d" % len(x.descendants()))
+			self._print("Has Domain...: %d" % len(x.domains))
+			self._print("Has Range....: %d" % len(x.ranges))
 			self._print("----------------")
 
 		elif entity['type'] == 'concept':
+			x = entity['object']
 			self._print("----------------")
-			self._print("Parents......: %d" % len(entity['object'].parents()))
-			self._print("Children.....: %d" % len(entity['object'].children()))
-			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
-			self._print("Descendants..: %d" % len(entity['object'].descendants()))
+			self._print("Parents......: %d" % len(x.parents()))
+			self._print("Children.....: %d" % len(x.children()))
+			self._print("Ancestors....: %d" % len(x.ancestors()))
+			self._print("Descendants..: %d" % len(x.descendants()))
 			self._print("----------------")
 
 		else:
