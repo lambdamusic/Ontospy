@@ -248,11 +248,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 				<p>{{each.bestDescription}}</p>
 
 				{% if each.parents %}
-					<p><b>Is Subclass Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Super-class:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.children %}
-					<p><b>Has SubClass:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Sub-class:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 
@@ -289,11 +289,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 				<p>{{each.bestDescription}}</p>
 		
 				{% if each.parents %}
-					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Super-property:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.children %}
-					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Sub-property:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.domains %}
@@ -341,11 +341,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 				<p>{{each.bestDescription}}</p>
 		
 				{% if each.parents %}
-					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Super-property:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.children %}
-					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Sub-property:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.domains %}
@@ -392,11 +392,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 				<p>{{each.bestDescription}}</p>
 		
 				{% if each.parents %}
-					<p><b>Is SubProperty Of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Super-property:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.children %}
-					<p><b>Has SubProperty:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Sub-property:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.domains %}
@@ -442,11 +442,11 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">
 				<p>{{each.bestDescription}}</p>
 				
 				{% if each.parents %}
-					<p><b>Is SubConcept of:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Super-concept:</b> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				{% if each.children %}
-					<p><b>Has SubConcept:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p><b>Has Sub-concept:</b> {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 				
 				<span>Implementation:</span>

@@ -130,7 +130,7 @@ class Shell(cmd.Cmd):
 		self._print("----------------", "TIP")
 
 
-	def _print_entity_intro(self, g=None, entity=None, first_time=True, stats=False):
+	def _print_entity_intro(self, g=None, entity=None, first_time=True):
 		"""after a selection, prints on screen basic info about onto or entity, plus change prompt 
 		2015-10-18: removed the sound
 		2016-01-18: entity is the shell wrapper around the ontospy entity
@@ -141,8 +141,6 @@ class Shell(cmd.Cmd):
 			self._print("Loaded %s: <%s>" % (entity['type'].capitalize(), str(obj.uri)), "TIP")
 			self._print("----------------", "TIP")
 			# self._print(obj.bestDescription(), "TEXT")
-			if stats:
-				obj.printStats()
 			if first_time:
 				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
 		elif g:
@@ -158,6 +156,57 @@ class Shell(cmd.Cmd):
 				# self._print(o.bestDescription(), "TEXT")
 			if first_time:
 				self.prompt = self._get_prompt(self.current['file'])
+
+
+	def _printStats(self, g, entity=None):
+		"""
+		print more informative stats about the object
+		"""
+		if not entity:
+			self._print("----------------")
+			self._print("Ontologies......: %d" % len(g.ontologies))
+			self._print("Classes.........: %d" % len(g.classes))
+			self._print("Properties......: %d" % len(g.properties))
+			self._print("..annotation....: %d" % len(g.annotationProperties))
+			self._print("..datatype......: %d" % len(g.datatypeProperties))
+			self._print("..object........: %d" % len(g.objectProperties))
+			self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
+			self._print("----------------")
+
+		elif entity['type'] == 'class':
+			self._print("----------------")
+			self._print("Parents......: %d" % len(entity['object'].parents()))
+			self._print("Children.....: %d" % len(entity['object'].children()))
+			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
+			self._print("Descendants..: %d" % len(entity['object'].descendants()))
+			self._print("Domain of....: %d" % len(entity['object'].domain_of))
+			self._print("Range of.....: %d" % len(entity['object'].range_of))
+			self._print("Instances....: %d" % entity['object'].count())
+			self._print("----------------")
+			
+		elif entity['type'] == 'property':
+			self._print("----------------")
+			self._print("Parents......: %d" % len(entity['object'].parents()))
+			self._print("Children.....: %d" % len(entity['object'].children()))
+			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
+			self._print("Descendants..: %d" % len(entity['object'].descendants()))
+			self._print("Has Domain...: %d" % len(entity['object'].domains))
+			self._print("Has Range....: %d" % len(entity['object'].ranges))
+			self._print("----------------")
+
+		elif entity['type'] == 'concept':
+			self._print("----------------")
+			self._print("Parents......: %d" % len(entity['object'].parents()))
+			self._print("Children.....: %d" % len(entity['object'].children()))
+			self._print("Ancestors....: %d" % len(entity['object'].ancestors()))
+			self._print("Descendants..: %d" % len(entity['object'].descendants()))
+			self._print("----------------")
+
+		else:
+			self._print("Not implemented") 
+				
+				
+				
 
 
 
@@ -513,12 +562,9 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "stats":	
 			if self.currentEntity:
-				obj = self.currentEntity['object']
-				obj.printStats()
-				# self._print_entity_intro(entity=self.currentEntity, first_time=False, stats=True)
+				self._printStats(self.current, self.currentEntity)
 			else:
-				self.current['graph'].printStats()
-				# self._print_entity_intro(g=self.current['graph'], first_time=False, stats=True)
+				self._printStats(self.current['graph'])
 		
 		elif line[0] == "triples":	
 			if self.currentEntity:
