@@ -151,9 +151,10 @@ class Shell(cmd.Cmd):
 				# playSound(ontospy.ONTOSPY_SOUNDS)  # new..
 				self._print("Loaded graph: <" + self.current['fullpath'] + ">", 'TIP')
 			g.printStats()
-			for o in g.ontologies:
-				self._print("==> Ontology URI: <%s>" % str(o.uri), "TIP")
-			self._print("----------------", "TIP")
+			if g.ontologies:
+				for o in g.ontologies:
+					self._print("==> Ontology URI: <%s>" % str(o.uri), "TIP")
+				self._print("----------------", "TIP")
 				# self._print(o.bestDescription(), "TEXT")
 			if first_time:
 				self.prompt = self._get_prompt(self.current['file'])
@@ -216,7 +217,7 @@ class Shell(cmd.Cmd):
 		""" loads an ontology from the local repository 
 			note: if the ontology does not have a cached version, it is created
 		"""
-		fullpath = self.LOCAL_MODELS + "/" + filename
+		fullpath = self.LOCAL_MODELS + filename
 		g = ontospy.get_pickled_ontology(filename)
 		if not g:
 			g = ontospy.do_pickle_ontology(filename)

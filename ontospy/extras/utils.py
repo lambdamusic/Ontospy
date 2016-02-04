@@ -9,8 +9,8 @@ Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 """
 
-MODULE_VERSION = 0.2
-USAGE = "ontospy-importer [file/folder/url] [options]"
+MODULE_VERSION = 0.3
+USAGE = "ontospy-utils [options]"
 
 
 import time, optparse, os, rdflib, sys, datetime
@@ -164,63 +164,6 @@ def action_cache():
 
 
 
-def getPrefixCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
-	""" 
-	extracts a list of ontology URIs from http://prefix.cc/popular/all
-	
-	>query: a query string to match 
-	
-	"""
-
-	printDebug("----------\nReading source...")	
-	g = Graph(source)
-	
-	out = []
-	for x in g.ontologies:
-		if query:
-			if query in unicode(x.prefix) or query in unicode(x.uri):
-				out += [(unicode(x.prefix), unicode(x.uri))]
-		else:
-			out += [(unicode(x.prefix), unicode(x.uri))]
-		
-	printDebug("----------\n%d results found." % len(out))
-	
-	return out			
-
-
-
-
-def action_webimport(options):
-	"""
-	List models from web catalog (prefix.cc) and ask which one to import
-	2015-10-10: originally part of main ontospy; now standalone only 
-	"""
-
-	# options = web.getCatalog()
-	counter = 1
-	for x in options:
-		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
-		# print Fore.BLUE + x[0], " ==> ", x[1]
-		counter += 1
-
-	while True:
-		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
-		if var == "q":
-			break
-		else:
-			try:
-				_id = int(var)
-				ontouri = options[_id - 1][1]
-				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
-				ontospy.action_import(ontouri)
-			except:
-				print "Error retrieving file. Import failed."
-				continue
-
-
-
-
-
 
 
 
@@ -259,17 +202,6 @@ def parse_options():
 			action="store_true", default=False, dest="erase",
 			help="Erase the local library by removing all existing files")
 
-	# parser.add_option("-i", "--import",
-	# 		action="store_true", default=False, dest="_import",
-	# 		help="Import a file/folder/url into the local library.")
-
-	parser.add_option("-w", "--importweb",
-			action="store_true", default=False, dest="_web",
-			help="Import vocabularies registered on http://prefix.cc/popular.") 
-	
-	# parser.add_option("-q", "",
-	# 		action="store", type="string", default="", dest="query",
-	# 		help="A query string used to match the catalog entries.")
 									
 	opts, args = parser.parse_args()
 
@@ -277,7 +209,7 @@ def parse_options():
 		printDebug("Please specify a folder to be used for the local library e.g. 'ontospy-manager -u /Users/john/ontologies'", 'important')
 		sys.exit(0)
 				
-	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._web and not opts._delete:
+	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._delete:
 		parser.print_help()
 		sys.exit(0)
 
@@ -295,20 +227,6 @@ def main():
 	if not opts._setup:
 		ontospy.get_or_create_home_repo()
 	
-	# default: import
-	if len(args) > 0 and (not opts._setup):		
-		# import an ontology
-		# note: method duplicated in .ontospy and .extras.manager
-		_location = args[0]
-		if os.path.isdir(_location):
-			res = ontospy.action_import_folder(_location)
-		else:
-			res = ontospy.action_import(_location)
-		if res: 
-			printDebug("\n----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")	
-		raise SystemExit, 1	
-
-		
 	# move local lib
 	if opts._setup:
 		_location = args[0]
@@ -346,13 +264,7 @@ def main():
 		printDebug("-" * 10)
 		printDebug("Time:	   %0.2fs" %  tTime, "comment")
 		raise SystemExit, 1
-
-			
-			
-	if opts._web:
-		# _list = getPrefixCatalog(query=opts.query) # 2015-11-01: no query for now
-		_list = getPrefixCatalog(query="")
-		action_webimport(_list)		
+	
 				
 	
 if __name__ == '__main__':

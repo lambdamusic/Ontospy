@@ -120,8 +120,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ontospy-sketch=ontospy.extras.sketch:main', 
-            'ontospy-importer=ontospy.extras.importer:main', 
-            'ontospy-exporter=ontospy.extras.exporter:main', 
+            'ontospy-utils=ontospy.extras.manager:main', 
             'ontospy=ontospy.ontospy:main'
         ],
     },

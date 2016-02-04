@@ -235,7 +235,6 @@ class OntoClass(RDF_Entity):
 		
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
-
 	
 	def instances(self):  # = all instances
 		return self.all()

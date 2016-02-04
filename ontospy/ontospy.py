@@ -37,7 +37,7 @@ ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/"
 
-ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models"
+ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
 # ONTOSPY_LIBRARY_DEFAULT = os.path.join(os.path.expanduser('~'), 'ontospy-library')
 
 
@@ -253,6 +253,7 @@ def action_import(location):
 	if g:
 		printDebug("Caching...", "normal")
 		do_pickle_ontology(filename, g)
+		printDebug("----------\n...completed!", "normal")
 
 	# finally...
 	return g
@@ -272,6 +273,93 @@ def action_import_folder(location):
 	else:
 		print "Not a valid directory"
 		return None
+
+
+
+
+
+def action_webimport(options):
+	"""
+	List models from web catalog (prefix.cc) and ask which one to import
+	2015-10-10: originally part of main ontospy; now standalone only 
+	"""
+
+	# options = web.getCatalog()
+	counter = 1
+	for x in options:
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
+		# print Fore.BLUE + x[0], " ==> ", x[1]
+		counter += 1
+
+	while True:
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
+		if var == "q":
+			break
+		else:
+			try:
+				_id = int(var)
+				ontouri = options[_id - 1][1]
+				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				action_import(ontouri)
+			except:
+				print "Error retrieving file. Import failed."
+				continue
+
+
+
+
+
+def action_export(from_library, save_gist, args):
+	"""
+	export model into another format eg html, d3 etc...
+	"""
+	
+	from extras import exporter  
+					
+	# select from local ontologies:
+	if from_library:
+		ontouri = actionSelectFromLocal()
+		if ontouri:	
+			islocal = True		
+		else:	
+			raise SystemExit, 1
+	else:
+		ontouri = args[0]
+		islocal = False
+
+	
+	# select a visualization
+	viztype = exporter._askVisualization()
+	if not viztype:
+		raise SystemExit, 1
+	
+	
+	# get ontospy graph
+	if islocal:
+		g = get_pickled_ontology(ontouri)
+		if not g:
+			g = do_pickle_ontology(ontouri)	
+	else:
+		g = Graph(ontouri)
+	
+	
+	# viz dispatcher
+	contents = exporter.generateViz(g, viztype)
+
+	
+	# once viz contents are generated, save file locally or on github
+	if save_gist:
+		urls = exporter.saveVizGithub(contents)
+		printDebug("Documentation saved on github", "comment")
+		printDebug("Gist: " + urls['gist'], "important")
+		printDebug("Blocks Gist: " + urls['blocks'], "important")
+		printDebug("Full Screen Blocks Gist: " + urls['blocks_fullwin'], "important")
+		url = exporter.saveVizGithub(contents)['blocks_fullwin'] # defaults to full win
+	else:
+		url = exporter.saveVizLocally(contents)
+		printDebug("Documentation generated", "comment")
+
+	return url
 
 
 
@@ -342,34 +430,31 @@ def parse_options():
 	
 	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 				
-	parser.add_option("-l", "--library",
+	parser.add_option("-l", "",
 			action="store_true", default=False, dest="_library",
-			help="Select ontologies saved in the local library.") 
+			help="LIBRARY: select ontologies saved in the local library") 
 
-	parser.add_option("-i", "--import",
-			action="store_true", default=False, dest="_import",
-			help="Import a file/folder/url into the local library.")
-
-						
-	parser.add_option("-o", "",
-			action="store_true", default=False, dest="ontoannotations",
-			help="Show only the ontology annotations/metadata.")
-			
-	parser.add_option("-c", "",
-			action="store_true", default=False, dest="classtaxonomy",
-			help="Show only the class taxonomy.")
-
-	parser.add_option("-p", "",
-			action="store_true", default=False, dest="propertytaxonomy",
-			help="Show only the property taxonomy.")
-
-	parser.add_option("-k", "",
-			action="store_true", default=False, dest="skostaxonomy",
-			help="Show only the SKOS taxonomy.")
-			
-	parser.add_option("-a", "",
+	parser.add_option("-v", "",
 			action="store_true", default=False, dest="labels",
-			help="Show entities labels as well as URIs (used with -c or -p or -k).")
+			help="VERBOSE: show entities labels as well as URIs")
+
+	parser.add_option("-e", "",
+			action="store_true", default=False, dest="_export",
+			help="EXPORT: export a model into another format (e.g. html)")
+	
+	parser.add_option("-g", "",
+			action="store_true", default=False, dest="_gist",
+			help="GITHUB-GIST: export output as a Github Gist.")
+								
+	parser.add_option("-i", "",
+			action="store_true", default=False, dest="_import",
+			help="IMPORT: save a file/folder/url into the local library")
+	
+	parser.add_option("-w", "",
+			action="store_true", default=False, dest="_web",
+			help="WEB: save vocabularies registered on http://prefix.cc/popular.")
+					
+
 
 			
 	opts, args = parser.parse_args()
@@ -387,26 +472,55 @@ def main():
 	
 	printDebug("OntoSPy " + VERSION, "comment")
 	opts, args, parser = parse_options()
-	
+	sTime = time.time()
+
 	get_or_create_home_repo()
 	
+	# in previous version this was customizable - now only 'labels'
 	print_opts = {
-					'ontoannotations' : opts.ontoannotations, 
-					'classtaxonomy' : opts.classtaxonomy, 
-					'propertytaxonomy' : opts.propertytaxonomy,
-					'skostaxonomy' : opts.skostaxonomy,
+					'ontoannotations' : True, 
+					'classtaxonomy' : True, 
+					'propertytaxonomy' : True,
+					'skostaxonomy' : True,
 					'labels' : opts.labels,
 				}
 
 
 	# default behaviour: launch shell
-	if not args and not opts._library and not opts._import:	
+	if not args and not opts._library and not opts._import and not opts._web and not opts._export:	
 		from shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
 		print STARTUP_MESSAGE
 		Shell().cmdloop()
 		raise SystemExit, 1
 		
+
+	# select a model from the local ontologies
+	if opts._export:		
+		if (not args) and (not opts._library):
+			printDebug("Please specify a uri/file path to export, or use the '-l' option", "comment")
+			raise SystemExit, 1
+		else:
+			import webbrowser
+			url = action_export(opts._library, opts._gist, args)
+			# open browser	
+			webbrowser.open(url)
+
+			# continue and print timing at bottom 
+		
+
+
+	# select a model from the local ontologies (assuming it's not opts._export)
+	if opts._library and not opts._export:
+		filename = actionSelectFromLocal()
+		if filename:
+			g = get_pickled_ontology(filename)
+			if not g:
+				g = do_pickle_ontology(filename)	
+			shellPrintOverview(g, print_opts)		
+			printDebug("----------\n" + "Completed", "comment")	
+		# continue and print timing at bottom 
+
 
 			
 	# import an ontology (ps implemented in both .ontospy and .extras)
@@ -421,24 +535,21 @@ def main():
 			res = action_import(_location)
 		if res: 
 			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment") 
+		# continue and print timing at bottom
+
+
+			
+	if opts._web:
+		from extras.web import getCatalog
+		# _list = getCatalog(query=opts.query) # 2015-11-01: no query for now
+		_list = getCatalog(query="")
+		action_webimport(_list)	
 		raise SystemExit, 1
-
-
-	# select a model from the local ontologies
-	if opts._library:
-		filename = actionSelectFromLocal()
-		if filename:
-			g = get_pickled_ontology(filename)
-			if not g:
-				g = do_pickle_ontology(filename)	
-			shellPrintOverview(g, print_opts)		
-			printDebug("----------\n" + "Completed (note: you can explore this model interactively using the `ontospy-shell`)", "comment")	
-		raise SystemExit, 1 
-
+		
+		
 
 		
 	# last case: a new URI/path is passed
-	sTime = time.time()
 	# load the ontology when a uri is passed manually
 	if args:
 		g = Graph(args[0])	

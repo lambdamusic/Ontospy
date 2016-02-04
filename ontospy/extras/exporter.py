@@ -7,8 +7,9 @@ from ..core.util import *
 from ..core import render
 
 MODULE_VERSION = 0.2
-USAGE = "ontospy-exporter [graph-uri-or-location] [options]"
+USAGE = "exporter [graph-uri-or-location] [options]"
 
+# 2016-02-04: launched with 'ontospy -e'
 
 
 
