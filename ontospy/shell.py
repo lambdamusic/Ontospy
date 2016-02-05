@@ -31,11 +31,11 @@ from .core.quotes import QUOTES
 
 
 
-_intro_ = """******                                     ******
-***                                           ***
-** OntoSPy Interactive Ontology Browser %s **
-***                                           ***
-******                                     ******"""
+_intro_ = """******										
+***											  
+* OntoSPy Interactive Ontology Browser %s *
+***											  
+******									   """
 
 STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
 
@@ -107,11 +107,18 @@ class Shell(cmd.Cmd):
 					'RED' : Fore.RED ,
 					'DEFAULT' : Style.DIM ,
 					}
-		
 		try:
-			print styles1[style] + ms + Style.RESET_ALL	
+			print styles1[style] + ms + Style.RESET_ALL 
 		except:
 			print styles1['DEFAULT'] + ms + Style.RESET_ALL
+
+	def _printM(self, messages):
+		"""print a list of strings - for the mom used by stats printout"""
+		if len(messages) == 2:
+			print Style.BRIGHT + messages[0] + Style.RESET_ALL + Fore.BLUE + messages[1] + Style.RESET_ALL
+		else:
+			print "Not implemented"
+
 
 	def _clear_screen(self):
 		""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
@@ -148,7 +155,7 @@ class Shell(cmd.Cmd):
 		elif g:
 			if first_time:
 				self._clear_screen()
-				# playSound(ontospy.ONTOSPY_SOUNDS)  # new..
+				# playSound(ontospy.ONTOSPY_SOUNDS)	 # new..
 				self._print("Loaded graph: <" + self.current['fullpath'] + ">", 'TIP')
 			g.printStats()
 			if g.ontologies:
@@ -160,12 +167,37 @@ class Shell(cmd.Cmd):
 				self.prompt = self._get_prompt(self.current['file'])
 
 
-	def _printStats(self, g, entity=None, verbose=True):
+	def _printDescription(self, hrlinetop=True):
+		"""generic method to print out a description"""
+		if hrlinetop:
+			self._print("----------------")
+		NOTFOUND = "[not found]"
+		if self.currentEntity:
+			obj = self.currentEntity['object']
+			label = obj.bestLabel() or NOTFOUND
+			description = obj.bestDescription() or NOTFOUND
+			self._print("Title: " + label, "TEXT")
+			self._print("Description: " + description, "TEXT")
+				
+		else:
+			for obj in self.current['graph'].ontologies:
+				self._print("==> Ontology: <%s>" % str(obj.uri), "IMPORTANT")
+				self._print("----------------", "TIP")
+				label = obj.bestLabel() or NOTFOUND
+				description = obj.bestDescription() or NOTFOUND
+				self._print("Title: " + label, "TEXT")
+				self._print("Description: " + description, "TEXT")
+		self._print("----------------", "TIP")
+		
+
+	def _printStats(self, hrlinetop=True):
 		"""
 		print more informative stats about the object
 		"""
-		if not entity:  # the graph
+		if hrlinetop:
 			self._print("----------------")
+		if not self.currentEntity:	# ==> ontology level 
+			g = self.current['graph']			
 			self._print("Ontologies......: %d" % len(g.ontologies))
 			self._print("Classes.........: %d" % len(g.classes))
 			self._print("Properties......: %d" % len(g.properties))
@@ -175,56 +207,37 @@ class Shell(cmd.Cmd):
 			self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
 			self._print("----------------")
 
-		elif entity['type'] == 'class':
-			x = entity['object']
+		elif self.currentEntity['type'] == 'class':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nIn Domain of.[%d]  " % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
+			self._printM(["\nIn Range of..[%d]  " % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
+			self._printM(["\nInstances....[%d]  " % len(x.all()), "%s" % "; ".join([p.qname for p in x.all()])])
 			self._print("----------------")
-			self._print("Parents......: %d" % len(x.parents()), "IMPORTANT")
-			if verbose and x.parents():
-				self._print("%s" % ", ".join([p.qname for p in x.parents()]), "BLUE")
-			self._print("\nAncestors....: %d" % len(x.ancestors()), "IMPORTANT")
-			if verbose and x.ancestors():
-				self._print("%s" % ", ".join([p.qname for p in x.ancestors()]), "BLUE")
-			self._print("\nChildren.....: %d" % len(x.children()), "IMPORTANT")
-			if verbose and x.children():
-				self._print("%s" % ", ".join([p.qname for p in x.children()]), "BLUE")
-			self._print("\nDescendants..: %d" % len(x.descendants()), "IMPORTANT")
-			if verbose and x.descendants():
-				self._print("%s" % ", ".join([p.qname for p in x.descendants()]), "BLUE")
-			self._print("\nDomain of....: %d" % len(x.domain_of), "IMPORTANT")
-			if verbose and x.domain_of:
-				self._print("%s" % ", ".join([p.qname for p in x.domain_of]), "BLUE")
-			self._print("\nRange of.....: %d" % len(x.range_of), "IMPORTANT")
-			if verbose and x.range_of:
-				self._print("%s" % ", ".join([p.qname for p in x.range_of]), "BLUE")
-			self._print("\nInstances....: %d" % x.count(), "IMPORTANT")
-			if verbose and x.all():
-				self._print("%s" % ", ".join([p.qname for p in x.all()]), "BLUE")
-			self._print("\n----------------")
-
-																
-		elif entity['type'] == 'property':
-			x = entity['object']
-			self._print("----------------")
-			self._print("Parents......: %d" % len(x.parents()))
-			self._print("Children.....: %d" % len(x.children()))
-			self._print("Ancestors....: %d" % len(x.ancestors()))
-			self._print("Descendants..: %d" % len(x.descendants()))
-			self._print("Has Domain...: %d" % len(x.domains))
-			self._print("Has Range....: %d" % len(x.ranges))
+																			
+		elif self.currentEntity['type'] == 'property':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nHas Domain ..[%d]  " % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
+			self._printM(["\nHas Range ...[%d]  " % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
 			self._print("----------------")
 
-		elif entity['type'] == 'concept':
-			x = entity['object']
-			self._print("----------------")
-			self._print("Parents......: %d" % len(x.parents()))
-			self._print("Children.....: %d" % len(x.children()))
-			self._print("Ancestors....: %d" % len(x.ancestors()))
-			self._print("Descendants..: %d" % len(x.descendants()))
+		elif self.currentEntity['type'] == 'concept':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
 			self._print("----------------")
 
 		else:
 			self._print("Not implemented") 
-				
 				
 				
 
@@ -360,7 +373,7 @@ class Shell(cmd.Cmd):
 			
 			# ..finally:
 			if self.currentEntity:
-				self._print_entity_intro(entity=self.currentEntity)	
+				self._print_entity_intro(entity=self.currentEntity) 
 		else:
 			print "not found"
 			
@@ -432,7 +445,7 @@ class Shell(cmd.Cmd):
 			if g.properties:
 				self._select_property(_pattern)
 			else:
-				self._print("No properties available.")	
+				self._print("No properties available.") 
 
 		elif line[0] == "concepts":
 			g = self.current['graph']
@@ -477,7 +490,7 @@ class Shell(cmd.Cmd):
 			if g.properties:
 				self._select_property(_pattern)
 			else:
-				self._print("No properties available.")	
+				self._print("No properties available.") 
 
 		elif line[0] == "concept":
 			g = self.current['graph']
@@ -496,7 +509,7 @@ class Shell(cmd.Cmd):
 			self._print("Please select an ontology first")
 			return None
 		
-		line = line.split()	
+		line = line.split() 
 		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
@@ -527,37 +540,32 @@ class Shell(cmd.Cmd):
 
 	def do_show(self, line):
 		"""Shows stuff @todo"""
-		opts = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
 		
 		if not self.current:
 			self._print("Please select an ontology first")
 			return None
 		
-		line = line.split()	
+		line = line.split() 
 		g = self.current['graph']
-
-		if (not line) or (line[0] not in opts):
+		
+		# get arg, or default to 'overview'
+		if not line:
+			line = ['overview']	 # default
+		elif line and (line[0] not in opts):
 			self._print("Usage: show [%s]" % "|".join([x for x in opts]))
 
-		elif line[0] == "description":		
-			self._print("----------------", "TIP")	
-			NOTFOUND = "[not found]"
-			if self.currentEntity:
-				obj = self.currentEntity['object']
-				label = obj.bestLabel() or NOTFOUND
-				description = obj.bestDescription() or NOTFOUND
-				self._print("Title: " + label, "TEXT")
-				self._print("Description: " + description, "TEXT")
-					
-			else:
-				for obj in self.current['graph'].ontologies:
-					self._print("==> Ontology: <%s>" % str(obj.uri), "TIP")
-					label = obj.bestLabel() or NOTFOUND
-					description = obj.bestDescription() or NOTFOUND
-					self._print("Title: " + label, "TEXT")
-					self._print("Description: " + description, "TEXT")
-			self._print("----------------", "TIP")				
+		# do commands
+		if line[0] == "description":		
+			self._printDescription()		
 
+		elif line[0] == "stats":	
+			self._printStats()
+			
+		elif line[0] == "overview": 
+			self._printDescription()
+			self._printStats(hrlinetop=False)
+				
 		elif line[0] == "namespaces":			
 			for x in g.namespaces:
 				self._print("@prefix %s: <%s> ." % (x[0], x[1])) 
@@ -580,12 +588,6 @@ class Shell(cmd.Cmd):
 			else:
 				self._print("Please select an entity first.") 
 
-		elif line[0] == "stats":	
-			if self.currentEntity:
-				self._printStats(self.current, self.currentEntity)
-			else:
-				self._printStats(self.current['graph'])
-		
 		elif line[0] == "triples":	
 			if self.currentEntity:
 				self._printTriples(self.currentEntity['object'])
@@ -609,7 +611,7 @@ class Shell(cmd.Cmd):
 			self._print("Please select an ontology first")
 			return None
 		
-		line = line.split()	
+		line = line.split() 
 		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
@@ -727,7 +729,7 @@ class Shell(cmd.Cmd):
 	def complete_show(self, text, line, begidx, endidx):
 		"""completion for show command"""
 		
-		opts = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
+		opts = [ 'namespaces', 'overview', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
 
 		if not text:
 			completions = opts
