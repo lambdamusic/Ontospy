@@ -309,7 +309,7 @@ def action_webimport(options):
 
 
 
-def action_export(from_library, save_gist, args):
+def action_export(args, save_gist):
 	"""
 	export model into another format eg html, d3 etc...
 	"""
@@ -317,7 +317,7 @@ def action_export(from_library, save_gist, args):
 	from extras import exporter  
 					
 	# select from local ontologies:
-	if from_library:
+	if not(args):
 		ontouri = actionSelectFromLocal()
 		if ontouri:	
 			islocal = True		
@@ -463,7 +463,7 @@ def main():
 
 
 	# default behaviour: launch shell
-	if not args and not opts._library and not opts._import and not opts._web and not opts._export:	
+	if not args and not opts._library and not opts._import and not opts._web and not opts._export and not opts._gist:	
 		from shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
 		print STARTUP_MESSAGE
@@ -472,22 +472,21 @@ def main():
 		
 
 	# select a model from the local ontologies
-	if opts._export:		
-		if (not args) and (not opts._library):
-			printDebug("Please specify a uri/file path to export, or use the '-l' option", "comment")
-			raise SystemExit, 1
-		else:
-			import webbrowser
-			url = action_export(opts._library, opts._gist, args)
-			# open browser	
-			webbrowser.open(url)
+	elif opts._export or opts._gist:		
+		if opts._gist and not opts._export:
+			printDebug("WARNING: the -g option must be used in combination with -e (=export)")
+			sys.exit(0)
+		import webbrowser
+		url = action_export(args, opts._gist)
+		# open browser	
+		webbrowser.open(url)
 
-			# continue and print timing at bottom 
+		# continue and print timing at bottom 
 		
 
 
 	# select a model from the local ontologies (assuming it's not opts._export)
-	if opts._library and not opts._export:
+	elif opts._library:
 		filename = actionSelectFromLocal()
 		if filename:
 			g = get_pickled_ontology(filename)
@@ -500,9 +499,9 @@ def main():
 
 			
 	# import an ontology (ps implemented in both .ontospy and .extras)
-	if opts._import:
+	elif opts._import:
 		if not args:
-			printDebug("Please specify a file/folder/url to import into local library.")
+			printDebug("WARNING: please specify a file/folder/url to import into local library.")
 			sys.exit(0)		
 		_location = args[0]
 		if os.path.isdir(_location):
@@ -515,7 +514,7 @@ def main():
 
 
 			
-	if opts._web:
+	elif opts._web:
 		from extras.web import getCatalog
 		# _list = getCatalog(query=opts.query) # 2015-11-01: no query for now
 		_list = getCatalog(query="")
@@ -527,7 +526,7 @@ def main():
 		
 	# last case: a new URI/path is passed
 	# load the ontology when a uri is passed manually
-	if args:
+	elif args:
 		g = Graph(args[0])	
 		shellPrintOverview(g, print_opts)
 
