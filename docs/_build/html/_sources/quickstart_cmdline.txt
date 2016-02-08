@@ -1,14 +1,12 @@
-Command Line Tools
+Command Line Usage
 ************************
-A few examples of how to use the command line utilities that come with OntoSPy. 
+A few examples of how to use OntoSPy from the command line. 
 
 Currently these are the utility scripts available: 
 
-- ``ontospy``: load a graph and show schema information
-- ``ontospy-docs``: generates html documentation  
-- ``ontospy-shell``: launch the interactive ontospy shell  
+- ``ontospy``: launch the interactive ontospy shell
 - ``ontospy-manager``: manage your local ontospy installation 
-- ``ontospy-sketch``: sketch a turtle model interactively
+- ``ontospy-sketch``: sketch a turtle model interactively (experimental) 
 
 
 .. note::
@@ -36,107 +34,26 @@ For more info, use the -h option:
 
 .. code-block:: shell
 
-	> ontospy -h
-	OntoSPy v1.6.1
-	Usage: ontospy <ontology-file-or-uri> [options]
-
-	Options:
-	  --version   show program's version number and exit
-	  -h, --help  show this help message and exit
-	  --shell     Interactive explorer of the ontologies in the local repository
-	  --repo      List ontologies in the local repository
-	  --import    Imports file/folder/url into the local repository
-	  --cache     Rebuild the cache for the local repository
-	  --reset     Resets the local repository by removing all existing files
-	  -a          Print the ontology annotations/metadata.
-	  -c          Print the class taxonomy.
-	  -p          Print the property taxonomy.
-	  -s          Print the SKOS taxonomy.
-	  -l          Print entities labels as well as URIs (used with -c or -p or
-	              -s).
-                  
-                  
-
-Print only the class tree and show rdfs:labels 
-
-.. code-block:: shell
-
-    > ontospy foaf.rdf -c -l
-    ----------
-    Loaded 630 triples from <foaf.rdf>
-    started scanning...
-    ----------
-    Ontologies found: 1
-    Classes found...: 15
-    Properties found: 67
-    Annotation......: 7
-    Datatype........: 26
-    Object..........: 34
-    -----------
-    Metadata:
-
-    http://xmlns.com/foaf/0.1/
-    => http://purl.org/dc/elements/1.1/title
-    .... Friend of a Friend (FOAF) vocabulary
-    => http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-    .... http://www.w3.org/2002/07/owl#Ontology
-    => http://purl.org/dc/elements/1.1/description
-    .... The Friend of a Friend (FOAF) RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
-
-    Class Taxonomy
-    ----------
-    http://www.w3.org/2000/10/swap/pim/contact#Person ("Person")
-    ----foaf:Person ("Person")
-    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing ("Spatial Thing")
-    ----foaf:Person ("Person")
-    foaf:Agent ("Agent")
-    ----foaf:Group ("Group")
-    ----foaf:Organization ("Organization")
-    ----foaf:Person ("Person")
-    foaf:Document ("Document")
-    ----foaf:Image ("Image")
-    ----foaf:PersonalProfileDocument ("PersonalProfileDocument")
-    foaf:LabelProperty ("Label Property")
-    foaf:OnlineAccount ("Online Account")
-    ----foaf:OnlineChatAccount ("Online Chat Account")
-    ----foaf:OnlineEcommerceAccount ("Online E-commerce Account")
-    ----foaf:OnlineGamingAccount ("Online Gaming Account")
-    foaf:Project ("Project")
-    ----------
-    Time:	   2.77s
-
-
-
-The ``ontospy-docs`` command
-*******************
-This utility allows to generate html documentation for any ontology. 
-
-.. code-block:: python
-    > ontospy-docs 
-    OntoSPy v1.6.2.2
-    Local library: </Users/michele.pasin/.ontospy>
-    Usage: ontospy-doc <uri>
+    > ontospy -h
+    OntoSPy v1.6.5
+    Usage: ontospy [graph-uri-or-location] [options]
 
     Options:
-      --version      show program's version number and exit
-      -h, --help     show this help message and exit
-      -l, --library  Select an ontology from local library.
-      -g, --gist     Save output as a Github Gist.
-
-Just pass it a URI, or use the -l option to load one of the models previously saved in the local library. 
-
-The -g option allows to save the documentation file as a github gist. 
-
-
-
-
-The ``ontospy-shell`` command
-*******************
-The shell is an interactive environment that lets you import, load and inspect vocabularies. 
+      --version   show program's version number and exit
+      -h, --help  show this help message and exit
+      -l          LIBRARY: select ontologies saved in the local library
+      -v          VERBOSE: show entities labels as well as URIs
+      -e          EXPORT: export a model into another format (e.g. html)
+      -g          GITHUB-GIST: export output as a Github Gist.
+      -i          IMPORT: save a file/folder/url into the local library
+      -w          WEB: save vocabularies registered on http://prefix.cc/popular.
+                  
+                  
+Just calling ``ontospy`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. 
 
 .. code-block:: python
 
-    > ontospy-shell
+    > ontospy
     
     ** OntoSPy Interactive Ontology Browser v1.6 **
     Local repository: </Users/michele.pasin/.ontospy>
@@ -145,10 +62,7 @@ The shell is an interactive environment that lets you import, load and inspect v
 
     Commands
     --------
-    annotations  currentEntity    help      quit       tree   
-    class        currentOntology  ontology  serialize  triples
-    concept      delete           property  summary    up     
-    next         zen            
+    back  get  help  ls  next  quit  serialize  show  tree  zen           
 
     <OntoSPy>: ontology
     30 results in total: 
@@ -239,8 +153,9 @@ The ``ontospy-manager`` command
 This utility allows to run management operations on a local ontospy library installation. 
 
 .. code-block:: python
-    > ontospy-docs 
-    OntoSPy v1.6.2.2
+
+    > ontospy-manager 
+    OntoSPy v1.6.5
     Local library: </Users/michele.pasin/.ontospy>
     Usage: ontospy-manager <options>
 

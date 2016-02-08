@@ -32,8 +32,14 @@ Get the source code from the `GitHub repository
 Dependencies
 --------------
 OntoSPy couldn't exist without the following libraries. 
-- `rdflib 
-<http://www.rdflib.net/>`_  (tested on versions 2.4 and 3.0)
+
+- rdflib
 - colorama
+- readline
+- django
+- github3
+
+Note: all of the above should get installed automatically when you install OntoSPy.
+        
 
 

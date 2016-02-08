@@ -73,7 +73,7 @@ def get_or_create_home_repo(reset=False):
 	# check that the local library folder exists, otherwiese prompt user to create it
 	if not(os.path.exists(LIBRARY_HOME)):
 		printDebug("Warning: the local library at '%s' has been deleted or is not accessible anymore." % LIBRARY_HOME, "important")
-		printDebug("Please reset the local library by running 'ontospy-manager -u <a-valid-path>'", "comment")
+		printDebug("Please reset the local library by running 'ontospy-utils -u <a-valid-path>'", "comment")
 		raise SystemExit, 1
 		
 	if dosetup:		

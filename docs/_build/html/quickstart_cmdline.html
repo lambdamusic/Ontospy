@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Command Line Tools &mdash; OntoSPy 1.6.4 documentation</title>
+    <title>Command Line Usage &mdash; OntoSPy 1.6.5 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.6.4',
+        VERSION:     '1.6.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.6.4 documentation" href="index.html" />
+    <link rel="top" title="OntoSPy 1.6.5 documentation" href="index.html" />
     <link rel="prev" title="Quick Start - Python" href="quickstart.html" /> 
   </head>
   <body role="document">
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="quickstart.html" title="Quick Start - Python"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.4 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,16 +45,14 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="command-line-tools">
-<h1>Command Line Tools<a class="headerlink" href="#command-line-tools" title="Permalink to this headline">¶</a></h1>
-<p>A few examples of how to use the command line utilities that come with OntoSPy.</p>
+  <div class="section" id="command-line-usage">
+<h1>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
+<p>A few examples of how to use OntoSPy from the command line.</p>
 <p>Currently these are the utility scripts available:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ontospy</span></code>: load a graph and show schema information</li>
-<li><code class="docutils literal"><span class="pre">ontospy-docs</span></code>: generates html documentation</li>
-<li><code class="docutils literal"><span class="pre">ontospy-shell</span></code>: launch the interactive ontospy shell</li>
+<li><code class="docutils literal"><span class="pre">ontospy</span></code>: launch the interactive ontospy shell</li>
 <li><code class="docutils literal"><span class="pre">ontospy-manager</span></code>: manage your local ontospy installation</li>
-<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively</li>
+<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively (experimental)</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -75,82 +73,22 @@
 </div>
 <p>For more info, use the -h option:</p>
 <div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy -h
-OntoSPy v1.6.1
-Usage: ontospy &lt;ontology-file-or-uri&gt; [options]
+OntoSPy v1.6.5
+Usage: ontospy [graph-uri-or-location] [options]
 
 Options:
   --version   show program&#39;s version number and exit
   -h, --help  show this help message and exit
-  --shell     Interactive explorer of the ontologies in the local repository
-  --repo      List ontologies in the local repository
-  --import    Imports file/folder/url into the local repository
-  --cache     Rebuild the cache for the local repository
-  --reset     Resets the local repository by removing all existing files
-  -a          Print the ontology annotations/metadata.
-  -c          Print the class taxonomy.
-  -p          Print the property taxonomy.
-  -s          Print the SKOS taxonomy.
-  -l          Print entities labels as well as URIs (used with -c or -p or
-              -s).
+  -l          LIBRARY: select ontologies saved in the local library
+  -v          VERBOSE: show entities labels as well as URIs
+  -e          EXPORT: export a model into another format (e.g. html)
+  -g          GITHUB-GIST: export output as a Github Gist.
+  -i          IMPORT: save a file/folder/url into the local library
+  -w          WEB: save vocabularies registered on http://prefix.cc/popular.
 </pre></div>
 </div>
-<p>Print only the class tree and show rdfs:labels</p>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy foaf.rdf -c -l
-----------
-Loaded <span class="m">630</span> triples from &lt;foaf.rdf&gt;
-started scanning...
-----------
-Ontologies found: 1
-Classes found...: 15
-Properties found: 67
-Annotation......: 7
-Datatype........: 26
-Object..........: 34
------------
-Metadata:
-
-http://xmlns.com/foaf/0.1/
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/title
-.... Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> <span class="nv">vocabulary</span>
-<span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
-.... http://www.w3.org/2002/07/owl#Ontology
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/description
-.... The Friend of a Friend <span class="o">(</span>FOAF<span class="o">)</span> RDF vocabulary, described using W3C RDF Schema and the Web Ontology Language.
-
-Class Taxonomy
-----------
-http://www.w3.org/2000/10/swap/pim/contact#Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing <span class="o">(</span><span class="s2">&quot;Spatial Thing&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-foaf:Agent <span class="o">(</span><span class="s2">&quot;Agent&quot;</span><span class="o">)</span>
-----foaf:Group <span class="o">(</span><span class="s2">&quot;Group&quot;</span><span class="o">)</span>
-----foaf:Organization <span class="o">(</span><span class="s2">&quot;Organization&quot;</span><span class="o">)</span>
-----foaf:Person <span class="o">(</span><span class="s2">&quot;Person&quot;</span><span class="o">)</span>
-foaf:Document <span class="o">(</span><span class="s2">&quot;Document&quot;</span><span class="o">)</span>
-----foaf:Image <span class="o">(</span><span class="s2">&quot;Image&quot;</span><span class="o">)</span>
-----foaf:PersonalProfileDocument <span class="o">(</span><span class="s2">&quot;PersonalProfileDocument&quot;</span><span class="o">)</span>
-foaf:LabelProperty <span class="o">(</span><span class="s2">&quot;Label Property&quot;</span><span class="o">)</span>
-foaf:OnlineAccount <span class="o">(</span><span class="s2">&quot;Online Account&quot;</span><span class="o">)</span>
-----foaf:OnlineChatAccount <span class="o">(</span><span class="s2">&quot;Online Chat Account&quot;</span><span class="o">)</span>
-----foaf:OnlineEcommerceAccount <span class="o">(</span><span class="s2">&quot;Online E-commerce Account&quot;</span><span class="o">)</span>
-----foaf:OnlineGamingAccount <span class="o">(</span><span class="s2">&quot;Online Gaming Account&quot;</span><span class="o">)</span>
-foaf:Project <span class="o">(</span><span class="s2">&quot;Project&quot;</span><span class="o">)</span>
-----------
-Time:          2.77s
-</pre></div>
-</div>
-</div>
-<div class="section" id="the-ontospy-docs-command">
-<h1>The <code class="docutils literal"><span class="pre">ontospy-docs</span></code> command<a class="headerlink" href="#the-ontospy-docs-command" title="Permalink to this headline">¶</a></h1>
-<p>This utility allows to generate html documentation for any ontology.</p>
-<p>Just pass it a URI, or use the -l option to load one of the models previously saved in the local library.</p>
-<p>The -g option allows to save the documentation file as a github gist.</p>
-</div>
-<div class="section" id="the-ontospy-shell-command">
-<h1>The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command<a class="headerlink" href="#the-ontospy-shell-command" title="Permalink to this headline">¶</a></h1>
-<p>The shell is an interactive environment that lets you import, load and inspect vocabularies.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">ontospy</span><span class="o">-</span><span class="n">shell</span>
+<p>Just calling <code class="docutils literal"><span class="pre">ontospy</span></code> without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">ontospy</span>
 
 <span class="o">**</span> <span class="n">OntoSPy</span> <span class="n">Interactive</span> <span class="n">Ontology</span> <span class="n">Browser</span> <span class="n">v1</span><span class="o">.</span><span class="mi">6</span> <span class="o">**</span>
 <span class="n">Local</span> <span class="n">repository</span><span class="p">:</span> <span class="o">&lt;/</span><span class="n">Users</span><span class="o">/</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="o">/.</span><span class="n">ontospy</span><span class="o">&gt;</span>
@@ -159,10 +97,7 @@ Time:          2.77s
 
 <span class="n">Commands</span>
 <span class="o">--------</span>
-<span class="n">annotations</span>  <span class="n">currentEntity</span>    <span class="n">help</span>      <span class="n">quit</span>       <span class="n">tree</span>
-<span class="k">class</span>        <span class="nc">currentOntology</span>  <span class="n">ontology</span>  <span class="n">serialize</span>  <span class="n">triples</span>
-<span class="n">concept</span>      <span class="n">delete</span>           <span class="nb">property</span>  <span class="n">summary</span>    <span class="n">up</span>
-<span class="nb">next</span>         <span class="n">zen</span>
+<span class="n">back</span>  <span class="n">get</span>  <span class="n">help</span>  <span class="n">ls</span>  <span class="nb">next</span>  <span class="n">quit</span>  <span class="n">serialize</span>  <span class="n">show</span>  <span class="n">tree</span>  <span class="n">zen</span>
 
 <span class="o">&lt;</span><span class="n">OntoSPy</span><span class="o">&gt;</span><span class="p">:</span> <span class="n">ontology</span>
 <span class="mi">30</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">total</span><span class="p">:</span>
@@ -249,6 +184,22 @@ Time:          2.77s
 <div class="section" id="the-ontospy-manager-command">
 <h1>The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command<a class="headerlink" href="#the-ontospy-manager-command" title="Permalink to this headline">¶</a></h1>
 <p>This utility allows to run management operations on a local ontospy library installation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">ontospy</span><span class="o">-</span><span class="n">manager</span>
+<span class="n">OntoSPy</span> <span class="n">v1</span><span class="o">.</span><span class="mf">6.5</span>
+<span class="n">Local</span> <span class="n">library</span><span class="p">:</span> <span class="o">&lt;/</span><span class="n">Users</span><span class="o">/</span><span class="n">michele</span><span class="o">.</span><span class="n">pasin</span><span class="o">/.</span><span class="n">ontospy</span><span class="o">&gt;</span>
+<span class="n">Usage</span><span class="p">:</span> <span class="n">ontospy</span><span class="o">-</span><span class="n">manager</span> <span class="o">&lt;</span><span class="n">options</span><span class="o">&gt;</span>
+
+<span class="n">Options</span><span class="p">:</span>
+  <span class="o">--</span><span class="n">version</span>        <span class="n">show</span> <span class="n">program</span><span class="s">&#39;s version number and exit</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>       <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="nb">exit</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="nb">list</span>       <span class="n">Select</span> <span class="n">ontologies</span> <span class="n">saved</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">local</span> <span class="n">library</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">u</span><span class="p">,</span> <span class="o">--</span><span class="n">update</span>     <span class="n">Update</span> <span class="n">local</span> <span class="n">library</span> <span class="n">location</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">c</span><span class="p">,</span> <span class="o">--</span><span class="n">cache</span>      <span class="n">Force</span> <span class="n">caching</span> <span class="n">of</span> <span class="n">the</span> <span class="n">local</span> <span class="n">library</span> <span class="p">(</span><span class="k">for</span> <span class="n">faster</span> <span class="n">loading</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">e</span><span class="p">,</span> <span class="o">--</span><span class="n">erase</span>      <span class="n">Erase</span> <span class="n">the</span> <span class="n">local</span> <span class="n">library</span> <span class="n">by</span> <span class="n">removing</span> <span class="nb">all</span> <span class="n">existing</span> <span class="n">files</span>
+  <span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="o">--</span><span class="kn">import</span>     <span class="nn">Import</span> <span class="nn">a</span> <span class="nn">file</span><span class="o">/</span><span class="n">folder</span><span class="o">/</span><span class="n">url</span> <span class="n">into</span> <span class="n">the</span> <span class="n">local</span> <span class="n">library</span><span class="o">.</span>
+  <span class="o">-</span><span class="n">w</span><span class="p">,</span> <span class="o">--</span><span class="n">importweb</span>  <span class="n">Import</span> <span class="n">vocabularies</span> <span class="n">registered</span> <span class="n">on</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">prefix</span><span class="o">.</span><span class="n">cc</span><span class="o">/</span><span class="n">popular</span><span class="o">.</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -259,10 +210,8 @@ Time:          2.77s
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Command Line Tools</a></li>
+<li><a class="reference internal" href="#">Command Line Usage</a></li>
 <li><a class="reference internal" href="#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
-<li><a class="reference internal" href="#the-ontospy-docs-command">The <code class="docutils literal"><span class="pre">ontospy-docs</span></code> command</a></li>
-<li><a class="reference internal" href="#the-ontospy-shell-command">The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command</a></li>
 <li><a class="reference internal" href="#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
 </ul>
 
@@ -302,12 +251,12 @@ Time:          2.77s
         <li class="right" >
           <a href="quickstart.html" title="Quick Start - Python"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.4 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Michele Pasin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.4.
+        &copy; Copyright 2015-2016, Michele Pasin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

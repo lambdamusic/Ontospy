@@ -10,7 +10,7 @@ Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 """
 
 MODULE_VERSION = 0.3
-USAGE = "ontospy-utils [options]"
+USAGE = "ontospy-manager [options]"
 
 
 import time, optparse, os, rdflib, sys, datetime

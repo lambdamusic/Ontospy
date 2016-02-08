@@ -48,6 +48,7 @@ Here are some common usage scenarios:
 Quick example
 --------------
 
+Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`_ vocabulary. 
 
 .. code-block:: python
 

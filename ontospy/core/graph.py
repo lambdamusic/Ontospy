@@ -7,7 +7,7 @@
 ONTOSPY
 Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
-Run it from the command line by passing it an ontology URI. 
+Run it from the command line: 
 
 >>> python ontospy.py -h
 
@@ -66,9 +66,10 @@ class Graph(object):
 		self.toplayerSkosConcepts = []
 		
 		# keep track of the rdf source		
-		self.IS_ENDPOINT = False
-		self.IS_FILE = False
 		self.IS_URL = False
+		self.IS_LOCALPATH = False
+		self.IS_ENDPOINT = False
+		self.IS_FILEOBJECT = False
 		self.IS_TEXT = False
 		
 		# finally		
@@ -113,12 +114,17 @@ class Graph(object):
 					req = urllib2.Request(source, headers=headers)
 					res = urllib2.urlopen(req)
 					source = res.geturl()  # after 303 redirects
-
-				self.graphuri = source	# default uri is www location
+					self.graphuri = source	# default uri is www location
+				else:
+					self.IS_LOCALPATH = True
+					self.graphuri = "file://" + source	# default uri is www location
+				
+				
 				rdf_format = rdf_format or guess_fileformat(source)
 
 			elif type(source) == file:
-				self.IS_FILE = True				
+				# The type of open file objects such as sys.stdout; alias of the built-in file.
+				self.IS_FILEOBJECT = True				
 				self.graphuri = source.name # default uri is filename
 				rdf_format = rdf_format or guess_fileformat(source.name)
 			
@@ -215,7 +221,8 @@ class Graph(object):
 			
 			if self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
 				# if not base namespace is set, try to simulate one 
-				self.rdfgraph.bind("_file_", rdflib.Namespace(self.graphuri))
+				self.rdfgraph.bind("_ns0_", rdflib.Namespace(self.graphuri))
+					
 	
 			self.namespaces = sorted(self.rdfgraph.namespaces())
 		
