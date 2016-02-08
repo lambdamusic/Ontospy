@@ -600,7 +600,7 @@ def uri2niceString(aUri, namespaces = None):
 						if prefix:
 							stringa = prefix + ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 						else:
-							stringa = "base:" + stringa[len(aNamespaceTuple[1].__str__()):]
+							stringa = ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 			except:
 				stringa = "error"
 				
