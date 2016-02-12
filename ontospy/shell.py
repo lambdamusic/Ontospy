@@ -19,8 +19,15 @@ michele.pasin@gmail.com
 
 
 
-import os, cmd, random, urllib2, shutil, platform
+import sys, os, cmd, random, urllib2, shutil, platform
 from colorama import Fore, Back, Style
+
+
+from subprocess import PIPE, Popen
+PY2 = sys.version < '3'
+WINDOWS = os.name == 'nt'
+EOL = '\r\n' if WINDOWS and not PY2 else '\n'
+
 
 from . import ontospy
 from . import _version 
@@ -55,6 +62,12 @@ class Shell(cmd.Cmd):
 	undoc_header = 'Undocumented commands'
 	
 	ruler = '-'
+	
+	DISPLAY_OPTS = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
+	GET_OPTS = ['ontology', 'class', 'property', 'concept']
+	TREE_OPTS = ['classes', 'properties', 'concepts']
 	
 	def emptyline(self):
 		""" override default behaviour of running last command """
@@ -210,30 +223,30 @@ class Shell(cmd.Cmd):
 		elif self.currentEntity['type'] == 'class':
 			x = self.currentEntity['object']
 			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nIn Domain of.[%d]  " % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
-			self._printM(["\nIn Range of..[%d]  " % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
-			self._printM(["\nInstances....[%d]  " % len(x.all()), "%s" % "; ".join([p.qname for p in x.all()])])
+			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nIn Domain of.[%d]	" % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
+			self._printM(["\nIn Range of..[%d]	" % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
+			self._printM(["\nInstances....[%d]	" % len(x.all()), "%s" % "; ".join([p for p in x.all()])])
 			self._print("----------------")
 																			
 		elif self.currentEntity['type'] == 'property':
 			x = self.currentEntity['object']
 			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nHas Domain ..[%d]  " % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
-			self._printM(["\nHas Range ...[%d]  " % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
+			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nHas Domain ..[%d]	" % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
+			self._printM(["\nHas Range ...[%d]	" % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
 			self._print("----------------")
 
 		elif self.currentEntity['type'] == 'concept':
 			x = self.currentEntity['object']
 			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]  " % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]  " % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]  " % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
 			self._print("----------------")
 
 		else:
@@ -262,7 +275,9 @@ class Shell(cmd.Cmd):
 		counter = 1
 		_temp = []
 		for el in _list:
-			if hasattr(el, 'uri'):
+			if hasattr(el, 'qname'):
+				_temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el.qname)]
+			elif hasattr(el, 'uri'):
 				_temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el.uri)]
 			else:
 				_temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el)]
@@ -413,16 +428,18 @@ class Shell(cmd.Cmd):
 
 
 	def do_ls(self, line):
-		"""Shows entities of a given kind. \nOptions: [ ontologies | classes | properties | concepts ]"""
+		"""Shows entities of a given kind."""
 		line = line.split()
 		_pattern = ""
 		if len(line) > 1:
 			# _pattern = line[1]	
 			pass		
-		opts = [ 'ontologies', 'classes' , 'properties' , 'concepts' ]
+		opts = self.LS_OPTS
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: ls [%s]" % "|".join([x for x in opts]))
+			self.help_ls()
+			return
+			# self._print("Usage: ls [%s]" % "|".join([x for x in opts]))
 
 		elif line[0] == "ontologies":
 			if not self.ontologies:
@@ -431,7 +448,8 @@ class Shell(cmd.Cmd):
 				self._select_ontology(_pattern)
 
 		elif line[0] in opts and not self.current:
-			self._print("Please select an ontology first")
+			self._help_noontology()
+			return
 
 		elif line[0] == "classes":
 			g = self.current['graph']
@@ -464,10 +482,12 @@ class Shell(cmd.Cmd):
 		_pattern = ""
 		if len(line) > 1:
 			_pattern = line[1]			
-		opts = [ 'ontology', 'class' , 'property' , 'concept' ]
+		opts = self.GET_OPTS
 
 		if (not line) or (line[0] not in opts) or (not _pattern):
-			self._print("Usage: get [%s] string-pattern" % "|".join([x for x in opts]))
+			self.help_get()
+			return
+			# self._print("Usage: get [%s] <name>" % "|".join([x for x in opts]))
 
 		elif line[0] == "ontology":
 			if not self.ontologies:
@@ -476,7 +496,8 @@ class Shell(cmd.Cmd):
 				self._select_ontology(_pattern)
 
 		elif line[0] in opts and not self.current:
-			self._print("Please select an ontology first")
+			self._help_noontology()
+			return
 
 		elif line[0] == "class":
 			g = self.current['graph']
@@ -504,16 +525,18 @@ class Shell(cmd.Cmd):
 							
 	def do_tree(self, line):
 		"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
-		opts = [ 'classes' , 'properties' , 'concepts' ]
+		opts = self.TREE_OPTS
 		if not self.current:
-			self._print("Please select an ontology first")
-			return None
+			self._help_noontology()
+			return
 		
 		line = line.split() 
 		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
+			self.help_tree()
+			return
+			# self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
 
 		elif line[0] == "classes":			
 			if g.classes:
@@ -536,24 +559,25 @@ class Shell(cmd.Cmd):
 		else: # never get here
 			pass	
 
+	
 
 
-	def do_show(self, line):
-		"""Shows stuff @todo"""
-		opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+
+	def do_display(self, line):
+		"""Display information about current entity."""
+		opts = self.DISPLAY_OPTS
 		
 		if not self.current:
-			self._print("Please select an ontology first")
-			return None
+			self._help_noontology()
+			return
 		
 		line = line.split() 
 		g = self.current['graph']
 		
 		# get arg, or default to 'overview'
 		if not line:
-			line = ['overview']	 # default
-		elif line and (line[0] not in opts):
-			self._print("Usage: show [%s]" % "|".join([x for x in opts]))
+			self.help_display()
+			return
 
 		# do commands
 		if line[0] == "description":		
@@ -561,11 +585,7 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "stats":	
 			self._printStats()
-			
-		elif line[0] == "overview": 
-			self._printDescription()
-			self._printStats(hrlinetop=False)
-				
+							
 		elif line[0] == "namespaces":			
 			for x in g.namespaces:
 				self._print("@prefix %s: <%s> ." % (x[0], x[1])) 
@@ -602,20 +622,38 @@ class Shell(cmd.Cmd):
 				
 
 
+	def do_inspect(self, line):
+		"""Inspect the current entity and display a nice summary of key properties"""
+		opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		
+		if not self.current:
+			self._help_noontology()
+			return 
+
+		g = self.current['graph']
+		
+		self._printDescription()
+		self._printStats(hrlinetop=False)
+				
+		return 
+
+		  
 
 	def do_serialize(self, line):
 		"""Serialize an entity into an RDF flavour"""
-		opts = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+		opts = self.SERIALIZE_OPTS
 		
 		if not self.current:
-			self._print("Please select an ontology first")
-			return None
+			self._help_noontology()
+			return
 		
 		line = line.split() 
 		g = self.current['graph']
 
 		if (not line) or (line[0] not in opts):
-			self._print("Usage: serialize [%s]" % "|".join([x for x in opts]))
+			self.help_serialize()
+			return
+			# self._print("Usage: serialize [%s]" % "|".join([x for x in opts]))
 		
 		elif self.currentEntity:
 			self.currentEntity['object'].printSerialize(line[0])
@@ -629,7 +667,7 @@ class Shell(cmd.Cmd):
 	def do_next(self, line):
 		"""Jump to the next entities (ontology, class or property) depending on context"""
 		if not self.current:
-			print "Please select an ontology first"
+			print "Please select an ontology first. E.g. use the 'ls ontologies' or 'get ontology <name>' commands."
 		elif self.currentEntity:
 			g = self.current['graph']
 			if self.currentEntity['type'] == 'class':
@@ -674,11 +712,70 @@ class Shell(cmd.Cmd):
 		print Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL
 
 
+	# 2016-02-12: method taken from https://github.com/xlcnd/isbntools/blob/master/isbntools/bin/repl.py
+	def do_shell(self, line):
+		"""Send a command to the Unix shell.\n==> Usage: shell ls ~"""
+		if not line:
+			return
+		sp = Popen(line,
+				   shell=True,
+				   stdin=PIPE,
+				   stdout=PIPE,
+				   stderr=PIPE,
+				   close_fds=not WINDOWS)
+		(fo, fe) = (sp.stdout, sp.stderr)
+		if PY2:
+			out = fo.read().strip(EOL)
+			err = fe.read().strip(EOL)
+		else:
+			out = fo.read().decode("utf-8")
+			err = fe.read().decode("utf-8")
+		if out:
+			print(out)
+			return
+		if err:
+			print(err.replace('isbn_', ''))
+
+
 	def default(self, line):
 		"default message when a command is not recognized"
 		foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
 		print(random.choice(foo))
 
+
+	# HELP METHODS
+	# --------	
+
+	def help_ls(self):
+		txt = "List available graphs or entities.\n"
+		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
+		self._print(txt)
+
+	def help_serialize(self):
+		txt = "Serialize an entity into an RDF flavour.\n"
+		txt += "==> Usage: serialize [%s]" % "|".join([x for x in self.SERIALIZE_OPTS])		
+		self._print(txt)
+
+	def help_get(self):
+		txt = "Finds entities matching a given string pattern.\n"
+		txt += "==> Usage: get [%s] <name>" % "|".join([x for x in self.GET_OPTS])		
+		self._print(txt)
+
+	def help_tree(self):
+		txt = "Shows the subsumption tree of a selected entity type.\n"
+		txt += "==> Usage: tree [%s]" % "|".join([x for x in self.TREE_OPTS])		
+		self._print(txt)
+									
+	def help_display(self):
+		txt = "Display information about an entity e.g. ontology, class etc..\n"
+		txt += "==> Usage: display [%s]" % "|".join([x for x in self.DISPLAY_OPTS])		
+		self._print(txt)
+
+	def _help_noontology(self):
+		"""starts with underscore so that it doesnt appear with help methods"""
+		txt = "No graph selected. Please load a graph first.\n"
+		txt += "==> E.g. use the 'ls ontologies' or 'get ontology <name>' commands." 
+		self._print(txt)
 
 
 	# AUTOCOMPLETE METHODS
@@ -687,7 +784,7 @@ class Shell(cmd.Cmd):
 	def complete_ls(self, text, line, begidx, endidx):
 		"""completion for ls command"""
 		
-		options = ['ontologies', 'classes', 'properties', 'concepts']
+		options = self.LS_OPTS
 
 		if not text:
 			completions = options
@@ -701,7 +798,7 @@ class Shell(cmd.Cmd):
 	def complete_get(self, text, line, begidx, endidx):
 		"""completion for find command"""
 		
-		options = ['ontology', 'class', 'property', 'concept']
+		options = self.GET_OPTS
 
 		if not text:
 			completions = options
@@ -715,7 +812,7 @@ class Shell(cmd.Cmd):
 	def complete_tree(self, text, line, begidx, endidx):
 		"""completion for tree command"""
 		
-		options = ['classes', 'properties', 'concepts']
+		options = self.TREE_OPTS
 
 		if not text:
 			completions = options
@@ -726,10 +823,11 @@ class Shell(cmd.Cmd):
 							]
 		return completions	
 
-	def complete_show(self, text, line, begidx, endidx):
-		"""completion for show command"""
+	def complete_display(self, text, line, begidx, endidx):
+		"""completion for display command"""
 		
-		opts = [ 'namespaces', 'overview', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples']
+		opts = self.DISPLAY_OPTS
+		
 
 		if not text:
 			completions = opts
@@ -743,7 +841,7 @@ class Shell(cmd.Cmd):
 	def complete_serialize(self, text, line, begidx, endidx):
 		"""completion for serialize command"""
 		
-		opts = [ 'xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+		opts = self.SERIALIZE_OPTS
 
 		if not text:
 			completions = opts

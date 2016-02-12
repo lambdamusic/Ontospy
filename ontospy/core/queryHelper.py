@@ -28,6 +28,7 @@ class QueryHelper(object):
 	transforms it into a list of tuples/triples results
 	eg: 
 	[(rdflib.term.URIRef(u'http://www.w3.org/2006/time'))]
+	2016-02-12: note - when a list is returned, the object is extracted with index [0]
 	"""
 	
 		

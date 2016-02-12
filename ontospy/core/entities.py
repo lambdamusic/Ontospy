@@ -243,7 +243,7 @@ class OntoClass(RDF_Entity):
 		out = []
 		if self.queryHelper:
 			qres = self.queryHelper.getClassInstances(self.uri)
-			out = list(qres)
+			out = [x[0] for x in qres]
 		return out
 		
 	def count(self):
