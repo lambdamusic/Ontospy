@@ -57,11 +57,12 @@ class Shell(cmd.Cmd):
 	prompt = DEFAULT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 	intro = "Type 'help' to get started, TAB to explore commands.\n"
 
-	doc_header = 'Commands'
+	doc_header = 'Commands available (type `help <command>` to get help):'
 	misc_header = 'Miscellaneous'
 	undoc_header = 'Undocumented commands'
 	
 	ruler = '-'
+	maxcol = 80
 	
 	DISPLAY_OPTS = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
 	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
@@ -69,9 +70,6 @@ class Shell(cmd.Cmd):
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
 	TREE_OPTS = ['classes', 'properties', 'concepts']
 	
-	def emptyline(self):
-		""" override default behaviour of running last command """
-		pass
 		
 	def __init__(self):
 		 """
@@ -88,6 +86,34 @@ class Shell(cmd.Cmd):
 		 
 		 cmd.Cmd.__init__(self)
 
+
+
+	# BASE CLASSE OVERRIDES:
+	# --------	
+	
+	def emptyline(self):
+		""" override default behaviour of running last command """
+		pass
+		
+	def print_topics(self, header, cmds, cmdlen, maxcol):
+		"""Override 'print_topics' so that you can exclude EOF and shell.
+			2016-02-12: added to test
+		"""
+		if header:
+			if cmds:
+				self.stdout.write("%s\n" % str(header))
+				if self.ruler:
+					self.stdout.write("%s\n" % str(self.ruler * len(header)))
+				self.columnize(cmds, maxcol - 1)
+				self.stdout.write("\n") 
+
+
+	def default(self, line):
+		"default message when a command is not recognized"
+		foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
+		print(random.choice(foo))
+		
+		
 
 	# HELPER METHODS
 	# --------	
@@ -737,10 +763,6 @@ class Shell(cmd.Cmd):
 			print(err.replace('isbn_', ''))
 
 
-	def default(self, line):
-		"default message when a command is not recognized"
-		foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
-		print(random.choice(foo))
 
 
 	# HELP METHODS

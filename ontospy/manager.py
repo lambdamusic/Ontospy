@@ -16,9 +16,10 @@ USAGE = "ontospy-manager [options]"
 import time, optparse, os, rdflib, sys, datetime
 from ConfigParser import SafeConfigParser
 
-from .. import ontospy 
-from ..core.graph import Graph
-from ..core.util import *
+
+from . import ontospy 
+from .core.graph import Graph
+from .core.util import *
 
 
 
