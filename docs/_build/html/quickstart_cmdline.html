@@ -8,7 +8,7 @@
     
     <title>Command Line Usage &mdash; OntoSPy 1.6.5 documentation</title>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,21 +24,13 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="OntoSPy 1.6.5 documentation" href="index.html" />
-    <link rel="prev" title="Quick Start - Python" href="quickstart.html" /> 
+    <link rel="prev" title="Quick Start" href="quickstart.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="quickstart.html" title="Quick Start - Python"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -48,11 +40,11 @@
   <div class="section" id="command-line-usage">
 <h1>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
 <p>A few examples of how to use OntoSPy from the command line.</p>
-<p>Currently these are the utility scripts available:</p>
+<p>These are the commands available:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ontospy</span></code>: launch the interactive ontospy shell</li>
-<li><code class="docutils literal"><span class="pre">ontospy-manager</span></code>: manage your local ontospy installation</li>
-<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: sketch a turtle model interactively (experimental)</li>
+<li><code class="docutils literal"><span class="pre">ontospy</span></code>: used to launch the interactive ontospy shell, or to query a graph;</li>
+<li><code class="docutils literal"><span class="pre">ontospy-manager</span></code>: used to manage your local ontospy installation ;</li>
+<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: (experimental) sketch a turtle model interactively;</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -62,9 +54,8 @@
 <p class="first admonition-title">Warning</p>
 <p class="last">This documentation is still in draft mode.</p>
 </div>
-</div>
 <div class="section" id="the-ontospy-command">
-<h1>The <code class="docutils literal"><span class="pre">ontospy</span></code> command<a class="headerlink" href="#the-ontospy-command" title="Permalink to this headline">¶</a></h1>
+<h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> command<a class="headerlink" href="#the-ontospy-command" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-shell"><div class="highlight"><pre>&gt;ontospy http://xmlns.com/foaf/spec/
 
 <span class="c"># prints info about foaf resolving redirects etc..</span>
@@ -182,7 +173,7 @@ Options:
 </div>
 </div>
 <div class="section" id="the-ontospy-manager-command">
-<h1>The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command<a class="headerlink" href="#the-ontospy-manager-command" title="Permalink to this headline">¶</a></h1>
+<h2>The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command<a class="headerlink" href="#the-ontospy-manager-command" title="Permalink to this headline">¶</a></h2>
 <p>This utility allows to run management operations on a local ontospy library installation.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="o">&gt;</span> <span class="n">ontospy</span><span class="o">-</span><span class="n">manager</span>
 <span class="n">OntoSPy</span> <span class="n">v1</span><span class="o">.</span><span class="mf">6.5</span>
@@ -201,6 +192,7 @@ Options:
 </pre></div>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -208,23 +200,46 @@ Options:
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Command Line Usage</a></li>
-<li><a class="reference internal" href="#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
-<li><a class="reference internal" href="#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">OntoSPy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=lambdamusic&repo=OntoSPy&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Command Line Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
+</ul>
+</li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="quickstart.html"
-                        title="previous chapter">Quick Start - Python</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/quickstart_cmdline.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quickstart.html" title="previous chapter">Quick Start</a></li>
+  </ul></li>
+</ul>
+</div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -242,21 +257,20 @@ Options:
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="quickstart.html" title="Quick Start - Python"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2015-2016, Michele Pasin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/quickstart_cmdline.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2015-2016, Michele Pasin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
-    </div>
+
+    
+
+    
   </body>
 </html>

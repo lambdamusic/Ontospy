@@ -248,31 +248,31 @@ class Shell(cmd.Cmd):
 
 		elif self.currentEntity['type'] == 'class':
 			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nIn Domain of.[%d]	" % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
-			self._printM(["\nIn Range of..[%d]	" % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
-			self._printM(["\nInstances....[%d]	" % len(x.all()), "%s" % "; ".join([p for p in x.all()])])
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
+			self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
+			self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), "%s" % "; ".join([p for p in x.all()])])
 			self._print("----------------")
 																			
 		elif self.currentEntity['type'] == 'property':
 			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nHas Domain ..[%d]	" % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
-			self._printM(["\nHas Range ...[%d]	" % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
+			self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
 			self._print("----------------")
 
 		elif self.currentEntity['type'] == 'concept':
 			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]  " % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]	" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]	" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]	" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
 			self._print("----------------")
 
 		else:
@@ -676,10 +676,12 @@ class Shell(cmd.Cmd):
 		line = line.split() 
 		g = self.current['graph']
 
-		if (not line) or (line[0] not in opts):
+		if not line:
+			line = ['turtle']
+		
+		if line[0] not in opts:
 			self.help_serialize()
-			return
-			# self._print("Usage: serialize [%s]" % "|".join([x for x in opts]))
+			return	
 		
 		elif self.currentEntity:
 			self.currentEntity['object'].printSerialize(line[0])

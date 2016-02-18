@@ -8,7 +8,7 @@
     
     <title>Welcome to OntoSPy’s documentation! &mdash; OntoSPy 1.6.5 documentation</title>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,21 +24,13 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="OntoSPy 1.6.5 documentation" href="#" />
-    <link rel="next" title="Installation" href="installation.html" /> 
+    <link rel="next" title="Installation" href="installation.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -60,23 +52,26 @@
 </div>
 <div class="section" id="in-a-nutshell">
 <h2>In a nutshell<a class="headerlink" href="#in-a-nutshell" title="Permalink to this headline">¶</a></h2>
-<p>OntosPy can be used either as a standalone command line tool or as a Python package.</p>
-<p>Standalone: type <cite>ontospy -h</cite> from the command line to see what functionalities are available. This includes also an interactive shell environment that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.</p>
-<p>Python package: the basic workflow is simple; load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That&#8217;s all!</p>
+<p>OntoSPy can be used either as an interactive language shell (like a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">repl</a> ) or as a Python package.</p>
+<p>Calling the <code class="docutils literal"><span class="pre">ontospy</span></code> command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. <code class="docutils literal"><span class="pre">ontospy</span></code> <code class="docutils literal"><span class="pre">http://purl.org/spar/frbr</span></code>) then OntoSPy will attempt to extract and print out any ontology-related information contained in that graph.</p>
+<p>Many other options are available, in particular OntoSPy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!</p>
 <p><strong>Is OntoSPy for me?</strong></p>
-<p>Here are some common usage scenarios:</p>
+<p>Here are some reasons why you should use it:</p>
 <ul class="simple">
+<li>You love the command line and would never leave it no matter what.</li>
 <li>You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.</li>
-<li>You need to generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization.</li>
+<li>You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization.</li>
 <li>You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary.</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">OntoSPy offers no ontology editing functionalities currenlty, nor it can be used to interrogate a corresponding knowledge base (e.g. a triplestore).</p>
+<p class="last">OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a triplestore.</p>
 </div>
 </div>
 <div class="section" id="quick-example">
 <h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this headline">¶</a></h2>
+<p>If used as a Python package, the basic workflow is the following: load a graph by instantiating the <code class="docutils literal"><span class="pre">Graph</span></code> class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That&#8217;s all!</p>
 <p>Let&#8217;s take a look at the <a class="reference external" href="http://semanticweb.org/wiki/FOAF">Friend Of A Friend</a> vocabulary.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">ontospy</span>
 <span class="n">INFO</span><span class="p">:</span><span class="n">rdflib</span><span class="p">:</span><span class="n">RDFLib</span> <span class="n">Version</span><span class="p">:</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">0</span>
@@ -252,18 +247,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-web-recommended">Installation: Web (recommended)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#installation-manual">Installation: Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#id1">Installation:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#dependencies">Dependencies</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start - Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#loading-and-querying-the-foaf-vocabulary">Loading and querying the FOAF vocabulary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
 </ul>
 </div>
 </div>
@@ -283,27 +276,42 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Welcome to OntoSPy&#8217;s documentation!</a><ul>
-<li><a class="reference internal" href="#in-a-nutshell">In a nutshell</a></li>
-<li><a class="reference internal" href="#quick-example">Quick example</a></li>
-<li><a class="reference internal" href="#contents">Contents</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">OntoSPy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=lambdamusic&repo=OntoSPy&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Usage</a></li>
 </ul>
 
-  <h4>Next topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="next chapter">Installation</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/index.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
+  </ul></li>
+</ul>
+</div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -321,21 +329,20 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2015-2016, Michele Pasin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2015-2016, Michele Pasin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
-    </div>
+
+    
+
+    
   </body>
 </html>

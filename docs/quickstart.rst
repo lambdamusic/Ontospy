@@ -1,4 +1,4 @@
-Quick Start - Python
+Quick Start
 ************************
 A few examples showing how OntoSPy can be used in Python programs, or interactively using the Python console.
 
@@ -7,8 +7,8 @@ A few examples showing how OntoSPy can be used in Python programs, or interactiv
 
     
 
-Loading and querying the FOAF vocabulary
-+++++++++++++++++++++++++++++++
+Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`_ vocabulary:
+
 
 .. code-block:: python
 

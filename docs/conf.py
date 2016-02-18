@@ -111,13 +111,20 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # sphinx_rtd_theme - haiku - classic - pyramid - nature - traditional - agogo - bizstyle
-html_theme = 'classic'
+html_theme = 'alabaster'
 
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #html_theme_options = {}
+
+html_theme_options = {
+    'logo': 'logo.png',
+    'github_user': 'lambdamusic',
+    'github_repo': 'OntoSPy',
+	'description' : 'OntoSPy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.'
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -158,6 +165,17 @@ html_static_path = ['_static']
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
+
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
+
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.

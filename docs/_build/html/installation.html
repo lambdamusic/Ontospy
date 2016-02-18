@@ -8,7 +8,7 @@
     
     <title>Installation &mdash; OntoSPy 1.6.5 documentation</title>
     
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -24,25 +24,14 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="OntoSPy 1.6.5 documentation" href="index.html" />
-    <link rel="next" title="Quick Start - Python" href="quickstart.html" />
-    <link rel="prev" title="Welcome to OntoSPy’s documentation!" href="index.html" /> 
+    <link rel="next" title="Quick Start" href="quickstart.html" />
+    <link rel="prev" title="Welcome to OntoSPy’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="quickstart.html" title="Quick Start - Python"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to OntoSPy’s documentation!"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
-    </div>  
+  <body role="document">  
 
     <div class="document">
       <div class="documentwrapper">
@@ -58,18 +47,19 @@
 <li>A python package manager: <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a> or <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a>.</li>
 </ul>
 </div>
-<div class="section" id="installation-web-recommended">
-<h2>Installation: Web (recommended)<a class="headerlink" href="#installation-web-recommended" title="Permalink to this headline">¶</a></h2>
-<p>Once you have a package manager installed, get OntoSPy from the Python Package Index:</p>
-<p><code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">ontospy</span></code></p>
-<p>Or:</p>
-<p><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span></code></p>
+<div class="section" id="id1">
+<h2>Installation:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><strong>Web (recommended):</strong></p>
+<blockquote>
+<div><p>Once you have a package manager installed, get OntoSPy from the Python Package Index:</p>
+<p><code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">ontospy</span></code> or <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span></code></p>
 <p>The python library, its dependencies and all of its command-line executables will be installed.</p>
-</div>
-<div class="section" id="installation-manual">
-<h2>Installation: Manual<a class="headerlink" href="#installation-manual" title="Permalink to this headline">¶</a></h2>
-<p>Get the source code from the <a class="reference external" href="https://github.com/lambdamusic/ontosPy">GitHub repository</a> , then run:</p>
+</div></blockquote>
+<p><strong>Manual</strong>:</p>
+<blockquote>
+<div><p>Get the source code from the <a class="reference external" href="https://github.com/lambdamusic/ontosPy">GitHub repository</a> , then run:</p>
 <p><code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code></p>
+</div></blockquote>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
@@ -81,7 +71,7 @@
 <li>django</li>
 <li>github3</li>
 </ul>
-<p>Note: all of the above should get installed automatically when you install OntoSPy.</p>
+<p><strong>Note</strong>: all of the above will install automatically when you install OntoSPy.</p>
 </div>
 </div>
 
@@ -91,30 +81,48 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Installation</a><ul>
-<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li><a class="reference internal" href="#installation-web-recommended">Installation: Web (recommended)</a></li>
-<li><a class="reference internal" href="#installation-manual">Installation: Manual</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+<p class="blurb">OntoSPy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.</p>
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=lambdamusic&repo=OntoSPy&type=watch&count=true&size=large"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Installation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Usage</a></li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to OntoSPy&#8217;s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="quickstart.html"
-                        title="next chapter">Quick Start - Python</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/installation.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to OntoSPy&#8217;s documentation!</a></li>
+      <li>Next: <a href="quickstart.html" title="next chapter">Quick Start</a></li>
+  </ul></li>
+</ul>
+</div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -132,24 +140,20 @@
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="quickstart.html" title="Quick Start - Python"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="Welcome to OntoSPy’s documentation!"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">OntoSPy 1.6.5 documentation</a> &raquo;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2015-2016, Michele Pasin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/installation.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &copy; Copyright 2015-2016, Michele Pasin.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
-    </div>
+
+    
+
+    
   </body>
 </html>

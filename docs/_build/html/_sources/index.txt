@@ -24,29 +24,33 @@ See also:
 In a nutshell
 --------------
 
-OntosPy can be used either as a standalone command line tool or as a Python package. 
+OntoSPy can be used either as an interactive language shell (like a 
+`repl <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`_ ) or as a Python package. 
 
-Standalone: type `ontospy -h` from the command line to see what functionalities are available. This includes also an interactive shell environment that allows to save ontologies into a local repository so that they can be quickly reloaded for inspection later on.
+Calling the ``ontospy`` command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSPy will attempt to extract and print out any ontology-related information contained in that graph. 
 
-Python package: the basic workflow is simple; load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
-
+Many other options are available, in particular OntoSPy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
 
 **Is OntoSPy for me?**
 
-Here are some common usage scenarios:
+Here are some reasons why you should use it:
+
+- You love the command line and would never leave it no matter what.
 
 - You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.
 
-- You need to generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization. 
+- You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization. 
 
 - You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary. 
 
-.. note:: OntoSPy offers no ontology editing functionalities currenlty, nor it can be used to interrogate a corresponding knowledge base (e.g. a triplestore).
+.. note:: OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a triplestore.
 
 
 Quick example
 --------------
+
+If used as a Python package, the basic workflow is the following: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
 
 Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`_ vocabulary. 
 

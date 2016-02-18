@@ -2,11 +2,11 @@ Command Line Usage
 ************************
 A few examples of how to use OntoSPy from the command line. 
 
-Currently these are the utility scripts available: 
+These are the commands available: 
 
-- ``ontospy``: launch the interactive ontospy shell
-- ``ontospy-manager``: manage your local ontospy installation 
-- ``ontospy-sketch``: sketch a turtle model interactively (experimental) 
+- ``ontospy``: used to launch the interactive ontospy shell, or to query a graph;
+- ``ontospy-manager``: used to manage your local ontospy installation ;
+- ``ontospy-sketch``: (experimental) sketch a turtle model interactively; 
 
 
 .. note::
@@ -20,7 +20,7 @@ Currently these are the utility scripts available:
 
 
 The ``ontospy`` command
-*******************
+------------------------
 
 .. code-block:: shell
 
@@ -149,7 +149,8 @@ Just calling ``ontospy`` without any argument launches the shell. The shell is a
 
 
 The ``ontospy-manager`` command
-*******************
+------------------------
+
 This utility allows to run management operations on a local ontospy library installation. 
 
 .. code-block:: python
