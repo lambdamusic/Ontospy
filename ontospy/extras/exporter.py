@@ -4,7 +4,7 @@ import rdflib	 # so we have it available as a namespace
 
 from .. import ontospy 
 from ..core.util import *
-from ..core import render
+import render
 
 MODULE_VERSION = 0.2
 USAGE = "exporter [graph-uri-or-location] [options]"
@@ -15,7 +15,7 @@ USAGE = "exporter [graph-uri-or-location] [options]"
 
 # manually edited
 RENDER_OPTIONS = [
-	(1, "Basic HTML"), 
+	(1, "HTML, basic"), 
 	(2, "Expandable tree (class hierarchy) [experimental]"), 
 	(3, "Expandable tree (property hierarchy) [experimental]"), 
 	(4, "Expandable tree (skos hierarchy) [experimental]"), 

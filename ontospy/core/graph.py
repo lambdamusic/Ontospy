@@ -13,6 +13,21 @@ Run it from the command line:
 
 More info in the README file.
 
+
+@todo
+
+- properties
+	- if it has no domain or range, infer that it is owl:Thing!!!! 
+	- ie extend all inferences
+
+- create prefixed versions of names
+		- use self.namespace_manager.normalizeUri(y) instead of our own function!
+
+update use of 
+semweb=rdflib.URIRef('http://dbpedia.org/resource/Semantic_Web')
+type=g.value(semweb, rdflib.RDFS.label)
+
+
 """
 
 

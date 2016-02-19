@@ -17,14 +17,14 @@ See also:
 - Homepage: http://www.michelepasin.org/projects/ontospy
 
 
-.. warning::
-    This documentation is still in draft mode.
+.. .. warning::
+..     This documentation is still in draft mode.
 
 
 In a nutshell
 --------------
 
-OntoSPy can be used either as an interactive language shell (like a 
+OntoSPy can be used either as an interactive language shell (a 
 `repl <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`_ ) or as a Python package. 
 
 Calling the ``ontospy`` command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSPy will attempt to extract and print out any ontology-related information contained in that graph. 

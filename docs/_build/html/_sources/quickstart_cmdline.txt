@@ -1,149 +1,256 @@
 Command Line Usage
 ************************
-A few examples of how to use OntoSPy from the command line. 
+This page shows how to use OntoSPy from the command line. 
 
 These are the commands available: 
 
-- ``ontospy``: used to launch the interactive ontospy shell, or to query a graph;
-- ``ontospy-manager``: used to manage your local ontospy installation ;
-- ``ontospy-sketch``: (experimental) sketch a turtle model interactively; 
+- ``ontospy``: used to launch the interactive ontospy shell, or to query a graph.
+- ``ontospy-manager``: used to manage your local ontospy installation.
+- ``ontospy-sketch``: (experimental) sketch a turtle model interactively.
 
 
 .. note::
-    If you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (on unix-based systems, or similar on windows). 
+	If you install OntosPy via one of the suggested methods, appropriate executables for your platform should be compiled automatically and added to `usr/local/bin` (by default on unix-based systems). 
 
-.. warning::
-    This documentation is still in draft mode.
-
-    
+.. .. warning::
+..	   This documentation is still in draft mode.
+..
+..
 
 
 
 The ``ontospy`` command
 ------------------------
 
-.. code-block:: shell
-
-    >ontospy http://xmlns.com/foaf/spec/
-
-    # prints info about foaf resolving redirects etc..
-    # etc..
-
-
-For more info, use the -h option:
+A good place to start is the -h option:
 
 .. code-block:: shell
 
-    > ontospy -h
-    OntoSPy v1.6.5
-    Usage: ontospy [graph-uri-or-location] [options]
+	> ontospy -h
+	OntoSPy v1.6.5
+	Usage: ontospy [graph-uri-or-location] [options]
 
-    Options:
-      --version   show program's version number and exit
-      -h, --help  show this help message and exit
-      -l          LIBRARY: select ontologies saved in the local library
-      -v          VERBOSE: show entities labels as well as URIs
-      -e          EXPORT: export a model into another format (e.g. html)
-      -g          GITHUB-GIST: export output as a Github Gist.
-      -i          IMPORT: save a file/folder/url into the local library
-      -w          WEB: save vocabularies registered on http://prefix.cc/popular.
-                  
-                  
+	Options:
+	  --version	  show program's version number and exit
+	  -h, --help  show this help message and exit
+	  -l		  LIBRARY: select ontologies saved in the local library
+	  -v		  VERBOSE: show entities labels as well as URIs
+	  -e		  EXPORT: export a model into another format (e.g. html)
+	  -g		  GITHUB-GIST: export output as a Github Gist.
+	  -i		  IMPORT: save a file/folder/url into the local library
+	  -w		  WEB: save vocabularies registered on http://prefix.cc/popular.
+ 
+ 				  
 Just calling ``ontospy`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. 
 
-.. code-block:: python
+.. code-block:: shell
 
-    > ontospy
-    
-    ** OntoSPy Interactive Ontology Browser v1.6 **
-    Local repository: </Users/michele.pasin/.ontospy>
-    Type 'help' to get started. Use TAB to explore commands.
-    <OntoSPy>: help
+	> ontospy	
+	OntoSPy v1.6.5.1
+	Local library: </Users/michele.pasin/Dropbox/ontologies/ontospy-library/>
+	******
+	***
+	* OntoSPy Interactive Ontology Browser v1.6.5.1 *
+	***
+	******
+	Type 'help' to get started, TAB to explore commands.
 
-    Commands
-    --------
-    back  get  help  ls  next  quit  serialize  show  tree  zen           
+	<OntoSPy>: help
 
-    <OntoSPy>: ontology
-    30 results in total: 
-    [1]   7habits_centeredness.ttl
-    [2]   7habits_main_schema.ttl
-    [3]   bfo-1.1.owl
-    [4]   bibo.owl
-    [5]   blogs.ttl
-    [6]   cito.rdf
-    [7]   core
-    [8]   fabio.rdf
-    [9]   fea
-    [10]   foaf.rdf
-    [11]   frbr.rdf
-    [12]   goodrelations.rdf
-    [13]   mini_philosophy.owl
-    [14]   musicontology.rdf
-    [15]   npg-article-types-ontology.ttl
-    [16]   npg-core-ontology.ttl
-    [17]   oan
-    [18]   philosophy-2006.owl
-    [19]   philosophy-2007.owl
-    [20]   philosurfical_2010.owl
-    [21]   pizza.ttl
-    [22]   semanticbible.owl
-    [23]   skos.rdf
-    [24]   sql.rdf
-    [25]   subjects.ttl
-    [26]   time.owl
-    [27]   vann.rdf
-    [28]   vcard.rdf
-    [29]   void.rdf
-    [30]   whisky.rdf
-    --------------
-    Please select one option by entering its number: 
-    24
-    Loaded /Users/michele.pasin/.ontospy/models/sql.rdf
-    ----------------
-    Ontologies......: 1
-    Classes.........: 104
-    Properties......: 11
-    ..annotation....: 0
-    ..datatype......: 0
-    ..object........: 0
-    Concepts(SKOS)..: 0
-    ----------------
-    http://ns.inria.fr/ast/sql#
-    A vocabulary that allows SQL code abstract syntax trees to be published in RDF.
-    <sql.rdf>: class predicate
-    2 matching results: 
-    [1]   http://ns.inria.fr/ast/sql#JoinPredicate
-    [2]   http://ns.inria.fr/ast/sql#Predicate
-    --------------
-    Please select one option by entering its number: 
-    2
-    http://ns.inria.fr/ast/sql#Predicate
-    Represents a collection of one or more expressions or subqueries, that may be combined with logical operators, and when evaluated returns one of the TRUE / FALSE / UNKNOWN truth values.
-    ----------------
-    Parents......: 1
-    Children.....: 6
-    Ancestors....: 1
-    Descendants..: 12
-    Domain of....: 0
-    Range of.....: 0
-    Instances....: 0
-    ----------------
-    <sql.rdf: Predicate>: serialize
+	Commands available (type `help <command>` to get help):
+	-------------------------------------------------------
+	back  display  get	help  inspect  ls  next	 quit  serialize  shell	 tree  zen
 
-    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+	<OntoSPy>: help ls
+	List available graphs or entities.
+	==> Usage: ls [ontologies|classes|properties|concepts]
+	<OntoSPy>: ls ontologies
+	30 items available:
+	--------------
+	[1] base.owl.ttl					  
+	[2] bfo-1.1.owl						  
+	[3] cidoc_crm_v5.0.2.rdfs			  
+	[4] cidoc_crm_v5.0.2_STANDALONE.rdfs  
+	[5] cito.rdf						  
+	[6] cohere8-online.owl				  
+	[7] conflict1.owl					  
+	[8] Countries.owl					  
+	[9] dcterms.rdf						  
+	[10] discourse-relationships.owl	  
+	[11] DOLCE-Lite_397.owl				  
+	[12] fabio.rdf						  
+	[13] family.swrl.owl				  
+	[14] finance_th_web.owl				  
+	[15] foaf.rdf						  
+	[16] food.rdf						  
+	[17] frapo.owl						  
+	[18] frbr.rdf						  
+	[19] generations.owl				  
+	[20] gold-2010.owl					  
+	[21] goodrelations.rdf				  
+	[22] hucit.owl						  
+	[23] human_activities.owl.xml		  
+	[24] InstructionalObjects.xml		  
+	[25] ka.owl							  
+	[26] keys.owl						  
+	[27] koala.owl						  
+	[28] laki.rdf						  
+	[29] lexinfo.owl					  
+	[30] mini_philosophy.owl			  
+	--------------
+	Please select one option by entering its number:
+	2
+	Loaded graph: </Users/michele.pasin/Dropbox/ontologies/ontospy-library/bfo-1.1.owl>
+	----------------
+	Ontologies......: 1
+	Classes.........: 39
+	Properties......: 9
+	..annotation....: 9
+	..datatype......: 0
+	..object........: 0
+	Concepts(SKOS)..: 0
+	----------------
+	==> Ontology URI: <http://www.ifomis.org/bfo/1.1>
+	----------------
+	<bfo-1.1.owl>:
 
-    <http://ns.inria.fr/ast/sql#Predicate> a rdfs:Class ;
-        rdfs:label "Predicate"@en ;
-        rdfs:comment "Represents a collection of one or more expressions or subqueries, that may be combined with logical operators, and when evaluated returns one of the TRUE / FALSE / UNKNOWN truth values."@en ;
-        rdfs:isDefinedBy <http://ns.inria.fr/ast/sql#> ;
-        rdfs:subClassOf <http://ns.inria.fr/ast/sql#ASTNode> .
+	# etc.. 
+	# now you can interrogate the BFO ontology by typing `ls classes` etc..
+	
 
-    # etc......
-    
+Pass a valid graph URI as an argument to print out useful ontology information:					
+
+.. code-block:: shell
+
+	> ontospy http://www.ifomis.org/bfo/1.1
+
+	# prints info about BFO resolving redirects etc..
+	
+	OntoSPy v1.6.5.1
+	Local library: </Users/michele.pasin/Dropbox/ontologies/ontospy-library/>
+	----------
+	.. trying rdf serialization: <xml>
+	..... success!
+	----------
+	Loaded 429 triples from <https://raw.githubusercontent.com/BFO-ontology/BFO/releases/1.1.1/bfo.owl>
+	started scanning...
+	----------
+	Ontologies found...: 1
+	Classes found......: 39
+	Properties found...: 9
+	Annotation.........: 9
+	Datatype...........: 0
+	Object.............: 0
+	SKOS Concepts......: 0
+	----------
+
+	Ontology Annotations
+	-----------
+	http://www.ifomis.org/bfo/1.1
+	=> http://purl.org/dc/elements/1.1/source
+	.... Pierre Grenon: "BFO in a Nutshell: A Bi-categorial Axiomatization of BFO and Comparison with DOLCE"
+	=> http://purl.org/dc/elements/1.1/language
+	.... en
+	=> http://purl.org/dc/elements/1.1/title
+	.... Basic Formal Ontology (BFO)
+	=> http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+	.... http://www.w3.org/2002/07/owl#Ontology
+	=> http://purl.org/dc/elements/1.1/source
+	.... Barry Smith: "Against Fantology"
+	=> http://purl.org/dc/elements/1.1/rights
+	.... http://creativecommons.org/licenses/by/3.0
+	=> http://purl.org/dc/elements/1.1/source
+	.... Pierre Grenon, Barry Smith and Louis Goldberg: "Biodynamic Ontology: Applying BFO in the Biomedical Domain"
+	=> http://www.w3.org/2002/07/owl#versionInfo
+	.... 1.1.1
+	=> http://purl.org/dc/elements/1.1/source
+	.... Barry Smith: "Basic Tools of Formal Ontology"
+	=> http://purl.org/dc/elements/1.1/contributor
+	.... Pierre Grenon
+	=> http://purl.org/dc/elements/1.1/contributor
+	.... Andrew Spear
+	=> http://purl.org/dc/elements/1.1/publisher
+	.... Institute for Formal Ontology and Medical Information Science (IFOMIS)
+	=> http://purl.org/dc/elements/1.1/contributor
+	.... Alan Ruttenberg
+	=> http://purl.org/dc/elements/1.1/source
+	.... Pierre Grenon: "Spatio-temporality in Basic Formal Ontology: SNAP and SPAN, Upper-Level Ontology, and Framework for Formalization"
+	=> http://purl.org/dc/elements/1.1/source
+	.... Barry Smith: "Beyond Concepts: Ontology as Reality Representation"
+	=> http://purl.org/dc/elements/1.1/creator
+	.... Holger Stenzhorn
+	=> http://purl.org/dc/elements/1.1/identifier
+	.... http://www.ifomis.org/bfo/1.1
+	=> http://purl.org/dc/elements/1.1/source
+	.... Pierre Grenon: "Nuts in BFO's Nutshell: Revisions to the Bi-categorial Axiomatization of BFO"
+	=> http://purl.org/dc/elements/1.1/format
+	.... application/rdf+xml
+	=> http://purl.org/dc/elements/1.1/source
+	.... Pierre Grenon and Barry Smith: "SNAP and SPAN: Towards Geospatial Dynamics"
+	=> http://purl.org/dc/elements/1.1/source
+	.... Barry Smith and Pierre Grenon: "The Cornucopia of Formal Ontological Relations"
+
+
+	Class Taxonomy
+	----------
+	bfo:Entity
+	----snap:Continuant
+	--------snap:DependentContinuant
+	------------snap:GenericallyDependentContinuant
+	------------snap:SpecificallyDependentContinuant
+	----------------snap:Quality
+	----------------snap:RealizableEntity
+	--------------------snap:Disposition
+	--------------------snap:Function
+	--------------------snap:Role
+	--------snap:IndependentContinuant
+	------------snap:MaterialEntity
+	----------------snap:FiatObjectPart
+	----------------snap:Object
+	----------------snap:ObjectAggregate
+	------------snap:ObjectBoundary
+	------------snap:Site
+	--------snap:SpatialRegion
+	------------snap:OneDimensionalRegion
+	------------snap:ThreeDimensionalRegion
+	------------snap:TwoDimensionalRegion
+	------------snap:ZeroDimensionalRegion
+	----span:Occurrent
+	--------span:ProcessualEntity
+	------------span:FiatProcessPart
+	------------span:Process
+	------------span:ProcessAggregate
+	------------span:ProcessBoundary
+	------------span:ProcessualContext
+	--------span:SpatiotemporalRegion
+	------------span:ConnectedSpatiotemporalRegion
+	----------------span:SpatiotemporalInstant
+	----------------span:SpatiotemporalInterval
+	------------span:ScatteredSpatiotemporalRegion
+	--------span:TemporalRegion
+	------------span:ConnectedTemporalRegion
+	----------------span:TemporalInstant
+	----------------span:TemporalInterval
+	------------span:ScatteredTemporalRegion
+
+	Property Taxonomy
+	----------
+	dc:contributor
+	dc:creator
+	dc:format
+	dc:identifier
+	dc:language
+	dc:publisher
+	dc:rights
+	dc:source
+	dc:title
+
+	----------
+	Time:	   3.42s
+
+
+
+
 
 
 
@@ -153,22 +260,21 @@ The ``ontospy-manager`` command
 
 This utility allows to run management operations on a local ontospy library installation. 
 
-.. code-block:: python
+.. code-block:: shell
 
-    > ontospy-manager 
-    OntoSPy v1.6.5
-    Local library: </Users/michele.pasin/.ontospy>
-    Usage: ontospy-manager <options>
+	> ontospy-manager 
+	OntoSPy v1.6.5
+	Local library: </Users/michele.pasin/.ontospy>
+	Usage: ontospy-manager <options>
 
-    Options:
-      --version        show program's version number and exit
-      -h, --help       show this help message and exit
-      -l, --list       Select ontologies saved in the local library.
-      -u, --update     Update local library location.
-      -c, --cache      Force caching of the local library (for faster loading)
-      -e, --erase      Erase the local library by removing all existing files
-      -i, --import     Import a file/folder/url into the local library.
-      -w, --importweb  Import vocabularies registered on http://prefix.cc/popular.
+	Options:
+	  --version     show program's version number and exit
+	  -h, --help    show this help message and exit
+	  -l, --list    List ontologies saved in the local library.
+	  -u, --update  Update path of local library.
+	  -d, --delete  Delete ontologies from the local library.
+	  -c, --cache   Force caching of the local library (for faster loading)
+	  -e, --erase   Erase the local library by removing all existing files
 
 
 

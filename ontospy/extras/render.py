@@ -4,7 +4,7 @@
 
 
 from .. import ontospy 
-from .util import *
+from ..core.util import *
 
 import json
 
@@ -83,7 +83,7 @@ def htmlBasicTemplate(graph):
 		ontology = None
 	
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "w3c/index.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "html/index.html", "r")
 	
 	t = Template(ontotemplate.read())
 

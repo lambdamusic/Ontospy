@@ -105,7 +105,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/w3c/*.*', 'data/templates/d3tree/*.*'],
+         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/html/*.*', 'data/templates/d3tree/*.*', 'data/templates/misc/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
