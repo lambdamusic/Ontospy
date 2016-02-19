@@ -164,6 +164,62 @@ def interactiveD3Tree(graph, entity="classes"):
 
 
 
+
+def interactiveD3TreeAll(graph):
+	""" 
+	2016-02-19: new version with tabbed or all trees in one page ##unfinished
+	
+	<graph> : an ontospy graph
+	<entity> : flag to determine which entity tree to display
+	
+	output = string
+	"""
+	
+	try:
+		ontology = graph.ontologies[0]
+	except:
+		ontology = None
+	
+	# ontotemplate = open("template.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/index2.html", "r")
+	
+	t = Template(ontotemplate.read())
+	
+	c_mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
+	c_total = len(graph.classes)
+
+	p_mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
+	p_total = len(graph.properties)
+
+	s_mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
+	s_total = len(graph.skosConcepts)
+	
+	# hack to make sure that we have a default top level object
+	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'Classes'})
+	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties'})
+	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Classes'})
+	
+
+	c = Context({	
+					"ontology": ontology,
+					"TOTAL_CLASSES": c_total, 
+					"TOTAL_PROPERTIES": p_total, 
+					"TOTAL_CONCEPTS": s_total, 
+					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
+					'JSON_DATA_PROPERTIES' : JSON_DATA_PROPERTIES,
+					'JSON_DATA_CONCEPTS' : JSON_DATA_CONCEPTS,
+					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/" ,
+				})
+	
+	rnd = t.render(c) 
+
+	return _safe_str(rnd)
+	
+
+
+
+
+
 def _buildJSON_standardTree(old, MAX_DEPTH, level=1):
 	"""
 	  For d3s viz like the expandable tree 

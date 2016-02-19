@@ -19,6 +19,7 @@ RENDER_OPTIONS = [
 	(2, "Expandable tree (class hierarchy) [experimental]"), 
 	(3, "Expandable tree (property hierarchy) [experimental]"), 
 	(4, "Expandable tree (skos hierarchy) [experimental]"), 
+	(5, "Expandable tree [all, experimental]"), 
 ]
 
 
@@ -94,7 +95,10 @@ def generateViz(graph, visualization):
 	
 	elif visualization == 4:
 		contents = render.interactiveD3Tree(graph, "skos")	
-		
+
+	elif visualization == 5:
+		contents = render.interactiveD3TreeAll(graph)	
+				
 	return contents
 	
 
