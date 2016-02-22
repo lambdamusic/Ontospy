@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
-
-
 """
 ONTOSPY
-Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>.
+All rights reserved.
 
-Run it from the command line by passing it an ontology URI, or check out the help:
+Run it from the command line by passing it an ontology URI,
+or check out the help:
 
 >>> python ontospy.py -h
 
@@ -16,13 +15,13 @@ More info in the README file.
 """
 
 
-import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, datetime
-from colorama import Fore, Back, Style
+import sys, os, time, optparse, os.path, shutil, cPickle, urllib2
+from colorama import Fore, Style
 from ConfigParser import SafeConfigParser
 
 from ._version import *
-from .core.graph import Graph, SparqlEndpoint
-from .core.util import bcolors, pprinttable, printDebug, _clear_screen, pprint2columns
+from .core.graph import Graph
+from .core.util import printDebug, pprint2columns
 
 
 
@@ -38,9 +37,8 @@ ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/"
 
 ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
-# ONTOSPY_LIBRARY_DEFAULT = os.path.join(os.path.expanduser('~'), 'ontospy-library')
-
-
+# ONTOSPY_LIBRARY_DEFAULT = 
+# os.path.join(os.path.expanduser('~'), 'ontospy-library')
 
 
 def get_or_create_home_repo(reset=False):
@@ -50,7 +48,7 @@ def get_or_create_home_repo(reset=False):
 	dosetup = True
 	if os.path.exists(ONTOSPY_LOCAL):
 		dosetup = False
-		
+
 		if reset:
 			var = raw_input("Delete the local library and all of its contents? (y/n) ")
 			if var == "y":
@@ -67,22 +65,22 @@ def get_or_create_home_repo(reset=False):
 		os.mkdir(ONTOSPY_LOCAL_VIZ) 
 	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)): 
 		os.mkdir(ONTOSPY_LIBRARY_DEFAULT)
-		
-	LIBRARY_HOME = get_home_location() # from init file, or default
+
+	LIBRARY_HOME = get_home_location()  # from init file, or default
 
 	# check that the local library folder exists, otherwiese prompt user to create it
 	if not(os.path.exists(LIBRARY_HOME)):
 		printDebug("Warning: the local library at '%s' has been deleted or is not accessible anymore." % LIBRARY_HOME, "important")
 		printDebug("Please reset the local library by running 'ontospy-utils -u <a-valid-path>'", "comment")
 		raise SystemExit, 1
-		
+
 	if dosetup:		
 		print Fore.GREEN + "Setup successfull: local library created at <%s>" % LIBRARY_HOME + Style.RESET_ALL
 	else:
 		print Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL
-	
+
 	return True 
-	
+
 
 
 
@@ -97,12 +95,12 @@ def get_home_location():
 		return config.get('models', 'dir')
 	except:
 		# FIRST TIME, create it
-		config.add_section('models')		
+		config.add_section('models')
 		config.set('models', 'dir', ONTOSPY_LIBRARY_DEFAULT)
 		with open(config_filename, 'w') as f:
 			# note: this does not remove previously saved settings 
 			config.write(f)
-		
+
 		return ONTOSPY_LIBRARY_DEFAULT
 
 
@@ -113,7 +111,7 @@ def get_localontologies():
 	ONTOSPY_LOCAL_MODELS = get_home_location()
 	if os.path.exists(ONTOSPY_LOCAL_MODELS):
 		for f in os.listdir(ONTOSPY_LOCAL_MODELS):
-			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS,f)):
+			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
 				if not f.startswith(".") and not f.endswith(".pickle"):
 					res += [f]
 	else:
@@ -123,7 +121,7 @@ def get_localontologies():
 
 def get_pickled_ontology(filename):
 	""" try to retrieve a cached ontology """
-	pickledfile =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if os.path.isfile(pickledfile):
 		try:
 			return cPickle.load(open(pickledfile, "rb"))
@@ -134,7 +132,7 @@ def get_pickled_ontology(filename):
 		return None
 
 
-	
+
 def do_pickle_ontology(filename, g=None):
 	""" 
 	from a valid filename, generate the graph instance and pickle it too
@@ -143,23 +141,23 @@ def do_pickle_ontology(filename, g=None):
 		see http://stackoverflow.com/questions/2134706/hitting-maximum-recursion-depth-using-pythons-pickle-cpickle
 	"""
 	ONTOSPY_LOCAL_MODELS = get_home_location()
-	pickledpath =  ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	pickledpath = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if not g:
 		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)	
 	
 	try:				
-		cPickle.dump(g, open( pickledpath, "wb" ) )
+		cPickle.dump(g, open(pickledpath, "wb"))
 		# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
-	except Exception,e: 
+	except Exception, e: 
 		print Style.DIM + "\n.. Failed caching <%s>" % filename + Style.RESET_ALL
 		print str(e)
 		print Style.DIM + "\n... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL
- 
+
 		try:
 			sys.setrecursionlimit(sys.getrecursionlimit()*10)
-			cPickle.dump(g, open( pickledpath, "wb" ) )
+			cPickle.dump(g, open(pickledpath, "wb"))
 			print Style.BRIGHT + "... SUCCESSFULLY cached <%s>" % pickledpath + Style.RESET_ALL
-		except Exception,e: 
+		except Exception, e: 
 			print Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL
 			print str(e)	
 		sys.setrecursionlimit(sys.getrecursionlimit()/10)

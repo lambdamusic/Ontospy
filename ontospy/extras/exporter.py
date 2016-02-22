@@ -1,6 +1,5 @@
 
-import time, optparse, os, sys, webbrowser
-import rdflib	 # so we have it available as a namespace
+import time, optparse, sys, webbrowser
 
 from .. import ontospy 
 from ..core.util import *
@@ -16,10 +15,7 @@ USAGE = "exporter [graph-uri-or-location] [options]"
 # manually edited
 RENDER_OPTIONS = [
 	(1, "HTML, basic"), 
-	(2, "Expandable tree (class hierarchy) [experimental]"), 
-	(3, "Expandable tree (property hierarchy) [experimental]"), 
-	(4, "Expandable tree (skos hierarchy) [experimental]"), 
-	(5, "Expandable tree [all, experimental]"), 
+	(2, "D3, expandable tree [experimental]"), 
 ]
 
 
@@ -86,18 +82,9 @@ def generateViz(graph, visualization):
 	
 	if visualization == 1:
 		contents = render.htmlBasicTemplate(graph)
-	
-	elif visualization == 2:
-		contents = render.interactiveD3Tree(graph)
-	
-	elif visualization == 3:
-		contents = render.interactiveD3Tree(graph, "properties")
-	
-	elif visualization == 4:
-		contents = render.interactiveD3Tree(graph, "skos")	
 
-	elif visualization == 5:
-		contents = render.interactiveD3TreeAll(graph)	
+	elif visualization == 2:
+		contents = render.interactiveD3Tree(graph)	
 				
 	return contents
 	

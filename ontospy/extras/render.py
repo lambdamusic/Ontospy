@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-
-
 from .. import ontospy 
 from ..core.util import *
 
 import json
-
 # django loading requires different steps based on version
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
@@ -21,6 +18,7 @@ if django.get_version() > '1.7':
 	        'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	        'DIRS': [
 	            # insert your TEMPLATE_DIRS here
+	            ontospy.ONTOSPY_LOCAL_TEMPLATES + "components",
 	        ],
 	        'APP_DIRS': True,
 	        'OPTIONS': {
@@ -63,7 +61,7 @@ def _safe_str(u, errors="replace"):
 	
 
 
-# MAIN TEMPLATES: BASIC W3C
+# TEMPLATE: HTML BASIC
 	
 	
 
@@ -76,12 +74,14 @@ def htmlBasicTemplate(graph):
 	
 	output = string
 	"""
-	
+
 	try:
 		ontology = graph.ontologies[0]
+		uri = ontology.uri
 	except:
 		ontology = None
-	
+		uri = graph.graphuri
+
 	# ontotemplate = open("template.html", "r")
 	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "html/index.html", "r")
 	
@@ -90,6 +90,7 @@ def htmlBasicTemplate(graph):
 	
 	c = Context({	
 					"ontology": ontology,
+					"main_uri" : uri,
 					"classes": graph.classes,
 					"objproperties": graph.objectProperties,
 					"dataproperties": graph.datatypeProperties,
@@ -110,62 +111,10 @@ def htmlBasicTemplate(graph):
 
 
 
-# MAIN TEMPLATES: INTERACTIVE TREE
+# TEMPLATE: D3 INTERACTIVE TREE
 
 
-def interactiveD3Tree(graph, entity="classes"):
-	""" 
-	2015-10-30: d3 tree
-	
-	<graph> : an ontospy graph
-	<entity> : flag to determine which entity tree to display
-	
-	output = string
-	"""
-	
-	try:
-		ontology = graph.ontologies[0]
-	except:
-		ontology = None
-	
-	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/index.html", "r")
-	
-	t = Template(ontotemplate.read())
-	
-	if entity == "classes":
-		mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
-		total = len(graph.classes)
-	elif entity == "properties":
-		mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
-		total = len(graph.properties)
-	elif entity == "skos":
-		mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
-		total = len(graph.skosConcepts)
-	
-	# hack to make sure that we have a default top level object
-	mydict = {'children' : mylist, 'name' : 'Entities'}
-		
-	JSON_DATA = json.dumps(mydict)
-	
-
-	c = Context({	
-					"ontology": ontology,
-					"total_entities": total, 
-					'JSON_DATA' : JSON_DATA,
-					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/" ,
-				})
-	
-	rnd = t.render(c) 
-
-	return _safe_str(rnd)
-	
-
-
-
-
-
-def interactiveD3TreeAll(graph):
+def interactiveD3Tree(graph):
 	""" 
 	2016-02-19: new version with tabbed or all trees in one page ##unfinished
 	
@@ -177,11 +126,13 @@ def interactiveD3TreeAll(graph):
 	
 	try:
 		ontology = graph.ontologies[0]
+		uri = ontology.uri
 	except:
 		ontology = None
-	
+		uri = graph.graphuri
+
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/index2.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/d3tree.html", "r")
 	
 	t = Template(ontotemplate.read())
 	
@@ -195,13 +146,14 @@ def interactiveD3TreeAll(graph):
 	s_total = len(graph.skosConcepts)
 	
 	# hack to make sure that we have a default top level object
-	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'Classes'})
+	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'OWL:Thing'})
 	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties'})
-	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Classes'})
+	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Concepts'})
 	
 
 	c = Context({	
 					"ontology": ontology,
+					"main_uri" : uri,
 					"TOTAL_CLASSES": c_total, 
 					"TOTAL_PROPERTIES": p_total, 
 					"TOTAL_CONCEPTS": s_total, 
@@ -215,6 +167,59 @@ def interactiveD3TreeAll(graph):
 
 	return _safe_str(rnd)
 	
+
+
+
+# def interactiveD3Tree(graph, entity="classes"):
+# 	""" 
+# 	2015-10-30: d3 tree
+	
+# 	<graph> : an ontospy graph
+# 	<entity> : flag to determine which entity tree to display
+	
+# 	output = string
+# 	"""
+	
+# 	try:
+# 		ontology = graph.ontologies[0]
+# 	except:
+# 		ontology = None
+	
+# 	# ontotemplate = open("template.html", "r")
+# 	ontotemplate = open(ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/index.html", "r")
+	
+# 	t = Template(ontotemplate.read())
+	
+# 	if entity == "classes":
+# 		mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
+# 		total = len(graph.classes)
+# 	elif entity == "properties":
+# 		mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
+# 		total = len(graph.properties)
+# 	elif entity == "skos":
+# 		mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
+# 		total = len(graph.skosConcepts)
+	
+# 	# hack to make sure that we have a default top level object
+# 	mydict = {'children' : mylist, 'name' : 'Entities'}
+		
+# 	JSON_DATA = json.dumps(mydict)
+	
+
+# 	c = Context({	
+# 					"ontology": ontology,
+# 					"total_entities": total, 
+# 					'JSON_DATA' : JSON_DATA,
+# 					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/" ,
+# 				})
+	
+# 	rnd = t.render(c) 
+
+# 	return _safe_str(rnd)
+	
+
+
+
 
 
 
@@ -247,6 +252,7 @@ def _buildJSON_standardTree(old, MAX_DEPTH, level=1):
 		d = {}
 		# print "*" * level, x.label
 		d['name'] = x.bestLabel()
+		d['id'] = x.id
 		# d['size'] = x.npgarticlestot or 10	 # setting 10 as default size
 		if x.children() and level < MAX_DEPTH:
 			d['children'] = _buildJSON_standardTree(x.children(), MAX_DEPTH, level+1)
