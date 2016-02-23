@@ -144,7 +144,7 @@ def interactiveD3Tree(graph):
 
 	s_mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
 	s_total = len(graph.skosConcepts)
-	
+
 	# hack to make sure that we have a default top level object
 	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'OWL:Thing'})
 	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties'})
@@ -154,6 +154,9 @@ def interactiveD3Tree(graph):
 	c = Context({	
 					"ontology": ontology,
 					"main_uri" : uri,
+					"classes": graph.classes,
+					"properties": graph.properties,
+					"skosConcepts": graph.skosConcepts,
 					"TOTAL_CLASSES": c_total, 
 					"TOTAL_PROPERTIES": p_total, 
 					"TOTAL_CONCEPTS": s_total, 

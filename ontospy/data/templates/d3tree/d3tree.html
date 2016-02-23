@@ -141,10 +141,24 @@ kbd {
 	box-shadow: 5px 0 15px -6px #585858 inset;
 }
 
-a.slider_title {
-	color: red;
+a.class {
+	color: darkred;
+}
+a.prop {
+	color: darkblue;
 }
 
+.turtlesource {
+	font-size: 12px;
+}
+
+dt {
+	color: darkslategrey;
+}
+
+.text-muted {
+	color: grey;
+}
  
 </style>
   
@@ -256,6 +270,7 @@ a.slider_title {
 			});
 
 		function showpanel(argument) {
+			console.log("#"+argument);
 			$("#slide_contents").empty();
 			$("#slide_contents").html($("#"+argument).html());
 			slider.slideReveal("show");

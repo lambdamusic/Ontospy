@@ -3,6 +3,191 @@
 {# hidden divs for d3tree viz - shown within slider #}
 
 <div class="hidden" id="ontoinfo">
-	<h3>Ontology: <a href="{{main_uri}}" target="_blank" class="slider_title">{{main_uri}}</a></h3>
-	<pre>{{ontology.serialize|escape|default:"<em>No annotations available</em>"}}</pre>
+	<h2>Ontology: <a href="{{main_uri}}" target="_blank" class="class">{{main_uri}}</a></h2>
+
+	<hr class="margintop">
+
+	{% if ontology.annotations %}
+	<span>Annotations:</span>
+
+		{# <h1><a name="annotations">&nbsp;</a>Ontology annotations</h1> #}
+		
+		{% for each in ontology.annotations %}
+		
+			{% ifchanged each.1 %}
+				
+				{% if not forloop.first %}</dl>{% endif %}
+			    <dl>
+			      <dt>{{each.1}}</dt>
+				  
+			{% endifchanged %}
+					<dd>{{each.2}}</dd>
+
+		{% endfor %}
+	
+	{% else %}
+		<em>No annotations available</em>
+	{% endif %}
+
+
+	{% if ontology.annotations %}
+	<hr>
+	<span>Implementation:</span>
+	<pre class="turtlesource">{{ontology.serialize|escape}}</pre>
+
+	{% endif %}
+
 </div>
+
+
+
+
+{% for each in classes  %}
+	
+<div class="hidden" id="{{each.id}}">
+
+	
+	<h2 class="entity-section">Class: <a href="{{each.qname}}" class="class">{{each.qname}}</a>
+	</h2>
+	<hr>
+	
+	<p>{{each.bestLabel|capfirst}}</p>
+	<p>{{each.bestDescription}}</p>
+
+	<hr>
+	
+	{% if each.parents %}
+		<p><b>Has Super Class <small>(direct)</small>:</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
+		<p><b>Has Super Class <small>(all)   </small>:</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+
+	{% if each.children  %}
+		<p><b>Has Sub Class <small>(direct)</small>:</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.descendants and each.descendants|length > each.children|length %}
+		<p><b>Has Sub Class <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+
+	{% if each.domain_of %}
+		<p><b>In Domain Of:</b> {% for s in each.domain_of %}<a href="javascript:showpanel('{{s.id}}');"  class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.range_of %}
+		<p><b>In Range Of:</b> {% for s in each.range_of %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+
+	<hr>
+	<span>Implementation:</span>
+	<pre class="turtlesource">{{each.serialize|escape}}</pre>
+
+</div>
+	
+	
+{% endfor %}
+
+
+
+
+
+
+{# PROPERTIES SECTION #}
+
+
+{% for each in properties  %}
+
+<div class="hidden" id="{{each.id}}">
+	
+	<h2 class="entity-section">Property: <a  href="{{each.uri}}" class="prop">{{each.qname}}</a>
+	</h2>
+	<hr>
+
+	<p>{{each.bestLabel|capfirst}}</p>
+	<p>{{each.bestDescription}}</p>
+
+	<hr>
+
+	{% if each.parents %}
+		<p><b>Has Super Property <small>(direct)</small>:</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
+		<p><b>Has Super Property <small>(all)   </small>:</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.children %}
+		<p><b>Has Sub Property <small>(direct)</small>:</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.descendants and each.descendants|length > each.children|length %}
+		<p><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.domains %}
+		<p><b>Domain:</b> {% for s in each.domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.ranges %}
+		<p><b>Range:</b> {% for s in each.ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	<hr>
+	<span>Implementation:</span>
+	<pre class="turtlesource">{{each.serialize|escape}}</pre>
+
+
+</div>
+
+{% endfor %}
+
+
+
+
+
+
+
+{# SKOS CONCEPTS SECTION #}
+
+
+{% for each in skosConcepts  %}
+
+<div class="hidden" id="{{each.id}}">
+	
+	<h2 class="entity-section">Concept: <a href="{{each.uri}}" class="class">{{each.qname}}</a>
+	</h2>
+	<hr>
+
+	<p>{{each.bestLabel|capfirst}}</p>
+	<p>{{each.bestDescription}}</p>
+	<hr>
+	
+	{% if each.parents %}
+		<p><b>Has Super Concept <small>(direct)</small>:</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
+		<p><b>Has Super Concept <small>(all)   </small>:</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.children %}
+		<p><b>Has Sub Concept <small>(direct)</small>:</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	{% if each.descendants and each.descendants|length > each.children|length %}
+		<p><b>Has Sub Concept <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	
+	<hr>
+	<span>Implementation:</span>
+	<pre class="turtlesource">{{each.serialize|escape}}</pre>
+
+</div>
+	
+{% endfor %}
+
+
+

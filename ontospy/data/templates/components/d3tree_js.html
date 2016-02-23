@@ -177,7 +177,7 @@ function update(vis, tree, diagonal, source, root) {
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
-      .on("click", function(d) { showpanel("ontoinfo"); })
+      .on("click", function(d) { showpanel(d.id); })
 	  .on("mouseover", function(d, i) {
 	  		  label_name.text(d.name);
 	  })
@@ -192,7 +192,7 @@ function update(vis, tree, diagonal, source, root) {
 	  // .attr("text-anchor", "middle")
       .attr("opacity", "1")
 	  .style("font-size", "90px")
-	  .style("fill", "lightgray")
+	  .style("fill", "lightsteelblue")
 	  .text("");
   
 
