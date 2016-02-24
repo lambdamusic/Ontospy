@@ -12,9 +12,15 @@
 
 	var json1 = {{JSON_DATA_CLASSES|safe}};
 
+	{% if classes_TOPLAYER > 40 %}
+	var variable_height1 = 1200;
+	{% else %}
+	var variable_height1 = 800;
+	{% endif %}
+
 	var m = [20, 120, 100, 120],
 	    w = 2100 - m[1] - m[3],
-	    h = 800 - m[0] - m[2],
+	    h = variable_height1 - m[0] - m[2],
 	    i = 0,
 	    root_classes;
 
@@ -60,9 +66,16 @@
 
 	var json2 = {{JSON_DATA_PROPERTIES|safe}};
 
+
+	{% if properties_TOPLAYER > 40 %}
+	var variable_height2 = 1200;
+	{% else %}
+	var variable_height2 = 800;
+	{% endif %}
+
 	var m = [20, 120, 100, 120],
 	    w = 2100 - m[1] - m[3],
-	    h = 800 - m[0] - m[2],
+	    h = variable_height2 - m[0] - m[2],
 	    i = 0,
 	    root_properties;
 
@@ -102,9 +115,16 @@
 
 	var json3 = {{JSON_DATA_CONCEPTS|safe}};
 
+
+	{% if skosConcepts_TOPLAYER > 40 %}
+	var variable_height3 = 1200;
+	{% else %}
+	var variable_height3 = 800;
+	{% endif %}
+
 	var m = [20, 120, 100, 120],
 	    w = 2100 - m[1] - m[3],
-	    h = 800 - m[0] - m[2],
+	    h = variable_height3 - m[0] - m[2],
 	    i = 0,
 	    root_concepts;
 

@@ -54,7 +54,11 @@
 	<p>{{each.bestLabel|capfirst}}</p>
 	<p>{{each.bestDescription}}</p>
 
-	<hr>
+
+	{% if each.parents or each.children or each.domain_of or each.range_of  %}
+		<hr>
+	{% endif %}
+	
 	
 	{% if each.parents %}
 		<p><b>Has Super Class <small>(direct)</small>:</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>

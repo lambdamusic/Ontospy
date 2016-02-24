@@ -65,7 +65,7 @@ def _safe_str(u, errors="replace"):
 	
 	
 
-def htmlBasicTemplate(graph):
+def htmlBasicTemplate(graph, save_on_github=False):
 	""" 
 	From a graph instance outputs a nicely formatted html documentation file. 
 	2015-10-21: mainly used with w3c template
@@ -73,6 +73,8 @@ def htmlBasicTemplate(graph):
 	Django templates API: https://docs.djangoproject.com/en/dev/ref/templates/api/
 	
 	output = string
+
+	2016-02-24: added <save_on_github>
 	"""
 
 	try:
@@ -114,7 +116,7 @@ def htmlBasicTemplate(graph):
 # TEMPLATE: D3 INTERACTIVE TREE
 
 
-def interactiveD3Tree(graph):
+def interactiveD3Tree(graph, save_on_github=False):
 	""" 
 	2016-02-19: new version with tabbed or all trees in one page ##unfinished
 	
@@ -122,6 +124,8 @@ def interactiveD3Tree(graph):
 	<entity> : flag to determine which entity tree to display
 	
 	output = string
+
+	2016-02-24: added <save_on_github>
 	"""
 	
 	try:
@@ -154,16 +158,20 @@ def interactiveD3Tree(graph):
 	c = Context({	
 					"ontology": ontology,
 					"main_uri" : uri,
+					"save_on_github" : save_on_github,
 					"classes": graph.classes,
+					"classes_TOPLAYER": len(graph.toplayer),
 					"properties": graph.properties,
+					"properties_TOPLAYER": len(graph.toplayerProperties),
 					"skosConcepts": graph.skosConcepts,
+					"skosConcepts_TOPLAYER": len(graph.toplayer),
 					"TOTAL_CLASSES": c_total, 
 					"TOTAL_PROPERTIES": p_total, 
 					"TOTAL_CONCEPTS": s_total, 
 					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
 					'JSON_DATA_PROPERTIES' : JSON_DATA_PROPERTIES,
 					'JSON_DATA_CONCEPTS' : JSON_DATA_CONCEPTS,
-					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "d3tree/" ,
+					"STATIC_PATH" : ontospy.ONTOSPY_LOCAL_TEMPLATES + "components/libs/" ,
 				})
 	
 	rnd = t.render(c) 

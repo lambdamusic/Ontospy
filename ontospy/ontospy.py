@@ -312,7 +312,7 @@ def action_export(args, save_gist):
 	export model into another format eg html, d3 etc...
 	"""
 	
-	from extras import exporter  
+	from extras import exporter, render  
 					
 	# select from local ontologies:
 	if not(args):
@@ -341,20 +341,25 @@ def action_export(args, save_gist):
 		g = Graph(ontouri)
 	
 	
-	# viz dispatcher
-	contents = exporter.generateViz(g, viztype)
 
-	
+	# viz DISPATCHER
+	if viztype == 1:
+		contents = render.htmlBasicTemplate(g, save_gist)
+
+	elif viztype == 2:
+		contents = render.interactiveD3Tree(g, save_gist)	
+				
+
 	# once viz contents are generated, save file locally or on github
 	if save_gist:
-		urls = exporter.saveVizGithub(contents)
+		urls = exporter.saveVizGithub(contents, ontouri)
 		printDebug("Documentation saved on github", "comment")
 		printDebug("Gist: " + urls['gist'], "important")
 		printDebug("Blocks Gist: " + urls['blocks'], "important")
 		printDebug("Full Screen Blocks Gist: " + urls['blocks_fullwin'], "important")
-		url = exporter.saveVizGithub(contents)['blocks_fullwin'] # defaults to full win
+		url = urls['blocks'] # defaults to full win
 	else:
-		url = exporter.saveVizLocally(contents)
+		url = exporter.saveVizLocally(contents, ontouri)
 		printDebug("Documentation generated", "comment")
 
 	return url
