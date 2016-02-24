@@ -116,43 +116,6 @@ def generateViz(graph, visualization):
 
 
 
-
-
-# def parse_options():
-# 	"""
-# 	parse_options() -> opts, args
-
-# 	Parse any command-line options given returning both
-# 	the parsed options and arguments.
-	
-# 	https://docs.python.org/2/library/optparse.html
-	
-# 	"""
-	
-# 	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
-
-# 	parser.add_option("-l", "--library",
-# 			action="store_true", default=False, dest="lib",
-# 			help="Select an ontology from local library.")
-
-# 	parser.add_option("-g", "--gist",
-# 			action="store_true", default=False, dest="gist",
-# 			help="Save output as a Github Gist.")			
-# 	#
-# 	# parser.add_option("-q", "",
-# 	# 		action="store", type="string", default="", dest="query",
-# 	# 		help="A query string used to match the catalog entries.")
-			
-# 	opts, args = parser.parse_args()
-
-# 	if not args and not opts.lib:
-# 		parser.print_help()
-# 		sys.exit(0)
-
-# 	return opts, args
-
-
-
 	
 # def main():
 # 	""" command line script """
@@ -220,15 +183,3 @@ def generateViz(graph, visualization):
 # 	printDebug("Time:	   %0.2fs" %  tTime, "comment")
 
 
-
-
-				
-	
-# if __name__ == '__main__':
-	
-# 	# from .. import ontospy
-# 	try:
-# 		main()
-# 		sys.exit(0)
-# 	except KeyboardInterrupt, e: # Ctrl-C
-# 		raise e

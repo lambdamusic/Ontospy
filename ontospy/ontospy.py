@@ -353,15 +353,16 @@ def action_export(args, save_gist):
 	# once viz contents are generated, save file locally or on github
 	if save_gist:
 		urls = exporter.saveVizGithub(contents, ontouri)
-		printDebug("Documentation saved on github", "comment")
+		printDebug("...documentation saved on GitHub!", "comment")
 		printDebug("Gist: " + urls['gist'], "important")
 		printDebug("Blocks Gist: " + urls['blocks'], "important")
 		printDebug("Full Screen Blocks Gist: " + urls['blocks_fullwin'], "important")
 		url = urls['blocks'] # defaults to full win
 	else:
-		url = exporter.saveVizLocally(contents, ontouri)
-		printDebug("Documentation generated", "comment")
+		url = exporter.saveVizLocally(contents)
+		printDebug("...documentation generated!", "comment")
 
+	printDebug(url)
 	return url
 
 
