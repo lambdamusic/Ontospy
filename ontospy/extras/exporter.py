@@ -30,7 +30,7 @@ def _askVisualization():
 		text = "Please select an output format: (q=quit)\n"
 		for viz in RENDER_OPTIONS:
 			text += "%d) %s\n" % (viz[0], viz[1])
-		var = raw_input(text + "> ")
+		var = raw_input(text + ">")
 		if var == "q":
 			return None
 		else:

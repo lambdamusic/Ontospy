@@ -360,9 +360,8 @@ def action_export(args, save_gist):
 		url = urls['blocks'] # defaults to full win
 	else:
 		url = exporter.saveVizLocally(contents)
-		printDebug("...documentation generated!", "comment")
+		printDebug("...documentation generated! [%s]" % url, "comment")
 
-	printDebug(url)
 	return url
 
 

@@ -164,7 +164,7 @@ def interactiveD3Tree(graph, save_on_github=False):
 					"properties": graph.properties,
 					"properties_TOPLAYER": len(graph.toplayerProperties),
 					"skosConcepts": graph.skosConcepts,
-					"skosConcepts_TOPLAYER": len(graph.toplayer),
+					"skosConcepts_TOPLAYER": len(graph.toplayerSkosConcepts),
 					"TOTAL_CLASSES": c_total, 
 					"TOTAL_PROPERTIES": p_total, 
 					"TOTAL_CONCEPTS": s_total, 
