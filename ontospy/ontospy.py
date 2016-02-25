@@ -132,6 +132,26 @@ def get_pickled_ontology(filename):
 		return None
 
 
+def del_pickled_ontology(filename):
+	""" try to remove a cached ontology """
+	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	if os.path.isfile(pickledfile):
+		os.remove(pickledfile)
+		return True
+	else:
+		return None
+
+
+def rename_pickled_ontology(filename, newname):
+	""" try to rename a cached ontology """
+	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	newpickledfile = ONTOSPY_LOCAL_CACHE + "/" + newname + ".pickle"
+	if os.path.isfile(pickledfile):
+		os.rename(pickledfile, newpickledfile)
+		return True
+	else:
+		return None
+
 
 def do_pickle_ontology(filename, g=None):
 	""" 
@@ -307,12 +327,13 @@ def action_webimport(options):
 
 
 
-def action_export(args, save_gist):
+def action_export(args, save_gist, fromshell=False):
 	"""
 	export model into another format eg html, d3 etc...
+	<fromshell> : the local name is being passed from ontospy shell
 	"""
 	
-	from extras import exporter, render  
+	from extras import exporter  
 					
 	# select from local ontologies:
 	if not(args):
@@ -321,6 +342,9 @@ def action_export(args, save_gist):
 			islocal = True		
 		else:	
 			raise SystemExit, 1
+	elif fromshell:
+		ontouri = args
+		islocal = True
 	else:
 		ontouri = args[0]
 		islocal = False
@@ -329,7 +353,8 @@ def action_export(args, save_gist):
 	# select a visualization
 	viztype = exporter._askVisualization()
 	if not viztype:
-		raise SystemExit, 1
+		return None
+		# raise SystemExit, 1
 	
 	
 	# get ontospy graph
@@ -344,10 +369,10 @@ def action_export(args, save_gist):
 
 	# viz DISPATCHER
 	if viztype == 1:
-		contents = render.htmlBasicTemplate(g, save_gist)
+		contents = exporter.htmlBasicTemplate(g, save_gist)
 
 	elif viztype == 2:
-		contents = render.interactiveD3Tree(g, save_gist)	
+		contents = exporter.interactiveD3Tree(g, save_gist)	
 				
 
 	# once viz contents are generated, save file locally or on github
@@ -481,8 +506,8 @@ def main():
 			sys.exit(0)
 		import webbrowser
 		url = action_export(args, opts._gist)
-		# open browser	
-		webbrowser.open(url)
+		if url:# open browser	
+			webbrowser.open(url)
 
 		# continue and print timing at bottom 
 		

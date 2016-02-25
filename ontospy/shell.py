@@ -663,7 +663,107 @@ class Shell(cmd.Cmd):
 				
 		return 
 
-		  
+
+	def do_visualize(self, line):
+		"""Visualize an ontology - ie wrapper for export command"""
+
+		if not self.current:
+			self._help_noontology()
+			return 
+
+		line = line.split() 
+		_gist = False
+		if line and line[0] == "gist":
+			_gist = True
+
+		import webbrowser
+		url = ontospy.action_export(args=self.current['file'], save_gist=_gist, fromshell=True)
+		if url:
+			webbrowser.open(url)
+		return
+
+	
+	def do_del(self, line):
+		"""Delete an ontology"""
+		
+		if not self.ontologies:
+			self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy \
+				--import' from the command line. ")
+		else:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out, line)
+			if choice:
+				fullpath = self.LOCAL_MODELS + choice
+				if os.path.isfile(fullpath):
+
+					self._print("--------------")
+					self._print("Are you sure? [Y/N]")
+					var = raw_input()
+					if var == "y" or var == "Y":
+						os.remove(fullpath)
+						ontospy.del_pickled_ontology(choice)
+						self._print("<%s> was deleted succesfully." % choice)
+						self.ontologies = ontospy.get_localontologies()
+					else:
+						return 
+
+				else:
+					self._print("File not found.")
+				# delete
+				if self.current and self.current['fullpath'] == fullpath:
+					self.current = None
+					self.currentEntity = None
+					self.prompt = self._get_prompt()
+
+		return 
+
+
+	def do_rename(self, line):
+		"""Rename an ontology"""
+		
+		if not self.ontologies:
+			self._print("No ontologies in the local repository. Run 'ontospy --help' or \
+				'ontospy --import' from the command line. ")
+		else:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out, line)
+			if choice:
+				fullpath = self.LOCAL_MODELS + choice
+				if os.path.isfile(fullpath):
+
+					self._print("--------------")
+					self._print("Please enter a new name for <%s>, including the extension (blank=abort)"  \
+						% choice)
+					var = raw_input()
+					if var:
+						try:
+							os.rename(fullpath, self.LOCAL_MODELS + var)
+							ontospy.rename_pickled_ontology(choice, var)
+							self._print("<%s> was renamed succesfully." % choice)
+							self.ontologies = ontospy.get_localontologies()
+						except:
+							self._print("Not a valid name. An error occurred.")
+							return
+					else:
+						return 
+
+				else:
+					self._print("File not found.")
+				# delete
+				if self.current and self.current['fullpath'] == fullpath:
+					self.current = None
+					self.currentEntity = None
+					self.prompt = self._get_prompt()
+
+		return 
+
+
 
 	def do_serialize(self, line):
 		"""Serialize an entity into an RDF flavour"""
@@ -773,6 +873,21 @@ class Shell(cmd.Cmd):
 	def help_ls(self):
 		txt = "List available graphs or entities.\n"
 		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
+		self._print(txt)
+
+	def help_visualize(self):
+		txt = "Visualize the currenlty selected ontology using an HTML template. Optionally this can be saved as an anonymous GitHub Gist.\n"
+		txt += "==> Usage: visualize [gist]" 	
+		self._print(txt)
+
+	def help_del(self):
+		txt = "Delete an ontology from the local repository.\n"
+		txt += "==> Usage: del" 	
+		self._print(txt)
+
+	def help_rename(self):
+		txt = "Rename an ontology in the local repository.\n"
+		txt += "==> Usage: rename" 	
 		self._print(txt)
 
 	def help_serialize(self):
