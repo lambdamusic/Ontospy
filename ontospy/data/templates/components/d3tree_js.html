@@ -198,14 +198,27 @@ function update(vis, tree, diagonal, source, root) {
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
       .on("click", function(d) { showpanel(d.id); })
-	  .on("mouseover", function(d, i) {
-	  		  label_name.text(d.name);
-	  })
-	  .on("mouseout", function(d, i) {
-	  		  label_name.text("");
-	  });
+	  .on("mouseover", function(d){
+			d3.select(this).attr("fill", "darkorange");
+			tooltip.text(d.name);
+			tooltip.style("visibility", "visible"); }
+		)
+      .on("mousemove", function(d){return tooltip.style("top",
+		    (d3.event.pageY-100)+"px").style("left",(d3.event.pageX+50)+"px");})
+	  .on("mouseout", function(d){
+			d3.select(this).attr("fill", ""); // default = no stroke
+			return tooltip.style("visibility", "hidden");}
+			);     
+	  // .on("mouseover", function(d, i) {
+	  // 		  label_name.text(d.name);
+	  // })
+	  // .on("mouseout", function(d, i) {
+	  // 		  label_name.text("");
+	  // });
 
 
+
+   // approach 1
   var label_name = vis.append("text")
       .attr("x", 20)
       .attr("y", 200)
@@ -215,6 +228,19 @@ function update(vis, tree, diagonal, source, root) {
 	  .style("fill", "lightsteelblue")
 	  .text("");
   
+   // approach 2
+  var tooltip = d3.select("body")
+	    .append("div")
+	    .style("position", "absolute")
+	    .style("border-radius", "25px")
+	    .style("z-index", "100")
+	    .style("visibility", "hidden")
+	    .style("opacity", ".85")
+	    .style("color", "lightsteelblue")
+	    .style("background", "white")
+	    .style("font-size", "90px")
+	    .text("a simple tooltip");
+						
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()

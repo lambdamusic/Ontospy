@@ -283,9 +283,11 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 		function showpanel(argument) {
 			console.log("#"+argument);
-			$("#slide_contents").empty();
-			$("#slide_contents").html($("#"+argument).html());
-			slider.slideReveal("show");
+			if (argument != "None") {
+				$("#slide_contents").empty();
+				$("#slide_contents").html($("#"+argument).html());
+				slider.slideReveal("show");
+			}
 		}
 
 

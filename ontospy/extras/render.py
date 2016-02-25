@@ -150,9 +150,9 @@ def interactiveD3Tree(graph, save_on_github=False):
 	s_total = len(graph.skosConcepts)
 
 	# hack to make sure that we have a default top level object
-	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'OWL:Thing'})
-	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties'})
-	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Concepts'})
+	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'OWL:Thing', 'id' : "None" })
+	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties', 'id' : "None" })
+	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Concepts', 'id' : "None" })
 	
 
 	c = Context({	
