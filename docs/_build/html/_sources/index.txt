@@ -50,7 +50,7 @@ Here are some reasons why you should use it:
 Quick example
 --------------
 
-Here's how it works from the command line:
+Here's how it works from the command line (`video link <http://quick.as/1yyyubjoy>`_)():
 
 .. raw:: html 
 
