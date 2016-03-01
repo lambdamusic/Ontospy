@@ -459,7 +459,9 @@ class Shell(cmd.Cmd):
 		_pattern = ""
 		if len(line) > 1:
 			# _pattern = line[1]	
-			pass		
+			pass	
+		elif len(line) == 0:
+			line = ["ontologies"]	# default 2016-03-01
 		opts = self.LS_OPTS
 
 		if (not line) or (line[0] not in opts):

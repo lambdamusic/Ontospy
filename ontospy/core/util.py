@@ -354,7 +354,7 @@ def inferMainPropertyType(uriref):
 
 
 
-def printGenericTree(element, level=0, showids=True, labels=False, showtype=True, TYPE_MARGIN=23):
+def printGenericTree(element, level=0, showids=True, labels=False, showtype=True, TYPE_MARGIN=18):
 	""" 
 	Print nicely into stdout the taxonomical tree of an ontology. 
 	
@@ -370,15 +370,27 @@ def printGenericTree(element, level=0, showids=True, labels=False, showtype=True
 
 	ID_MARGIN = 5
 
+	SHORT_TYPES = {
+		"rdf:Property" : 			"rdf:Property" ,
+		"owl:AnnotationProperty" :  "owl:Annot.Pr.",
+		"owl:DatatypeProperty" :    "owl:DatatypePr.", 
+		"owl:ObjectProperty" :      "owl:ObjectPr.",
+	}
+
+
 	if showids:
 		_id_ = Fore.BLUE +	\
 		"[%d]%s" % (element.id, " " * (ID_MARGIN  - len(str(element.id)))) +  \
 			Fore.RESET
 	
 	elif showtype:
+		_prop = uri2niceString(element.rdftype)
+		try:
+			prop = SHORT_TYPES[_prop]
+		except:
+			prop = _prop
 		_id_ = Fore.BLUE +	\
-		"[%s]%s" % (uri2niceString(element.rdftype), " " * (TYPE_MARGIN  - len(uri2niceString(element.rdftype)))) +  \
-			Fore.RESET
+		"[%s]%s" % (prop, " " * (TYPE_MARGIN  - len(prop))) + Fore.RESET
 			
 	else:
 		_id_ = ""

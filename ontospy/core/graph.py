@@ -833,7 +833,7 @@ class Graph(object):
 		[1]123--
 		[12]12--
 		"""
-		TYPE_MARGIN = 23 # length for owl:AnnotationProperty etc..
+		TYPE_MARGIN = 18 # length for owl:AnnotationProperty etc..
 		
 		if not element:	 # first time
 			for x in self.toplayerProperties:
