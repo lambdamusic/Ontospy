@@ -90,7 +90,8 @@ setup(
 		'rdflib', 
 		'colorama', 
 		'django', 
-		'github3.py'
+		'github3.py',
+        'pyfiglet'
 	],
 
     # List additional groups of dependencies here (e.g. development dependencies).

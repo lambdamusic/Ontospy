@@ -21,7 +21,7 @@ michele.pasin@gmail.com
 
 import sys, os, cmd, random, urllib2, shutil, platform
 from colorama import Fore, Back, Style
-
+from pyfiglet import Figlet
 
 from subprocess import PIPE, Popen
 PY2 = sys.version < '3'
@@ -38,13 +38,12 @@ from .core.quotes import QUOTES
 
 
 
-_intro_ = """******										
-***											  
-* OntoSPy Interactive Ontology Browser %s *
-***											  
-******									   """
+f = Figlet(font='slant')
+_intro_ = """***											  
+The Command Line Ontology Browser (%s) 
+***											  """
 
-STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
+STARTUP_MESSAGE = f.renderText('OntoSPy') + Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
 
 
 
@@ -53,8 +52,9 @@ STARTUP_MESSAGE = Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
 class Shell(cmd.Cmd):
 	"""Simple command processor example."""
 
-	DEFAULT_COL = Fore.RED
-	prompt = DEFAULT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+	PROMPT_COL = Fore.RED
+	PROMPT_COL_ENTITY = Fore.BLUE
+	prompt = PROMPT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 	intro = "Type 'help' to get started, TAB to explore commands.\n"
 
 	doc_header = 'Commands available (type `help <command>` to get help):'
@@ -118,20 +118,20 @@ class Shell(cmd.Cmd):
 	# HELPER METHODS
 	# --------	
 
-	def _get_prompt(self, onto="", entity="", default=DEFAULT_COL):
+	def _get_prompt(self, onto="", entity="", defaultP=PROMPT_COL, defaultE=PROMPT_COL_ENTITY):
 		""" changes the prompt contextually """
 		if entity:
 			onto = self.current['file']
-			temp1_1 = default + Style.NORMAL + '%s: ' % truncate(onto, 20)
-			temp1_2 = default + Style.BRIGHT + '%s' % entity
+			temp1_1 = defaultE + Style.NORMAL + '%s: ' % truncate(onto, 20)
+			temp1_2 = defaultE + Style.BRIGHT + '%s' % entity
 			temp2 = '<%s>: ' % (temp1_1 + temp1_2)
-			return default + Style.BRIGHT + temp2 + Style.RESET_ALL
+			return defaultE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		elif onto:
-			temp1 = default + '%s' % onto 
+			temp1 = defaultE + '%s' % onto 
 			temp2 = '<%s>: ' % temp1
-			return default + Style.BRIGHT + temp2 + Style.RESET_ALL
+			return defaultE + Style.BRIGHT + temp2 + Style.RESET_ALL
 		else:
-			return default + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+			return defaultP + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
 	
 	
 	def _print(self, ms, style="TIP"):

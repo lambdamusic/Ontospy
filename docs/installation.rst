@@ -29,11 +29,12 @@ Dependencies
 --------------
 OntoSPy couldn't exist without the following libraries. 
 
-- rdflib
-- colorama
-- readline
-- django
-- github3
+- `rdflib <https://github.com/RDFLib/rdflib>`_
+- `colorama <https://pypi.python.org/pypi/colorama>`_
+- `readline <https://pypi.python.org/pypi/readline>`_
+- `django <https://www.djangoproject.com/>`_
+- `github3 <https://github3py.readthedocs.org/en/master/>`_
+- `pyfiglet <https://github.com/pwaller/pyfiglet>`_
 
 **Note**: all of the above will install automatically when you install OntoSPy.
         

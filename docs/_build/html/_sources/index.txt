@@ -6,7 +6,7 @@
 Welcome to OntoSPy's documentation!
 ===================================
 
-OntoSPy is a lightweight Python library and command line tool for browsing vocabularies encoded in the `RDF <https://en.wikipedia.org/wiki/Resource_Description_Framework>`_  family of languages. 
+OntoSPy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded in the `RDF <https://en.wikipedia.org/wiki/Resource_Description_Framework>`_  family of languages. 
 
 See also: 
 
