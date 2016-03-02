@@ -294,7 +294,7 @@ def saveVizLocally(contents, filename = "index.html"):
 
 
 def saveVizGithub(contents, ontouri):
-	title = "Ontology documentation"
+	title = "OntoSPy: ontology export"
 	readme = """This ontology documentation was automatically generated with OntoSPy (https://github.com/lambdamusic/OntoSPy).
 	The graph URI is: %s""" % str(ontouri)
 	files = {

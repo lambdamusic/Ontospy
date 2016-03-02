@@ -97,7 +97,8 @@ class Shell(cmd.Cmd):
 		
 	def print_topics(self, header, cmds, cmdlen, maxcol):
 		"""Override 'print_topics' so that you can exclude EOF and shell.
-			2016-02-12: added to test
+			2016-02-12: added to test, copied from 
+			https://github.com/xlcnd/isbntools/blob/master/isbntools/bin/repl.py 
 		"""
 		if header:
 			if cmds:
@@ -111,7 +112,7 @@ class Shell(cmd.Cmd):
 	def default(self, line):
 		"default message when a command is not recognized"
 		foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
-		print(random.choice(foo))
+		self._print(random.choice(foo))
 		
 		
 
@@ -471,7 +472,7 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "ontologies":
 			if not self.ontologies:
-				self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. ")
+				self._print("No ontologies in the local repository. Use the 'download' command, or quit OntoSPy and run 'ontospy --help' from the terminal prompt. ")
 			else:
 				self._select_ontology(_pattern)
 
@@ -684,6 +685,14 @@ class Shell(cmd.Cmd):
 			webbrowser.open(url)
 		return
 
+
+	def do_download(self, line):
+		"""Download an ontology"""
+
+		ontospy.action_webimport_select()
+		self.ontologies = ontospy.get_localontologies()
+		return
+
 	
 	def do_del(self, line):
 		"""Delete an ontology"""
@@ -828,8 +837,8 @@ class Shell(cmd.Cmd):
 			self.current = None
 			self.prompt = self._get_prompt()
 
-	def do_quit(self, line):
-		"Exit OntoSPy shell"
+	def do_q(self, line):
+		"Quit: exit the OntoSPy shell"
 		self._clear_screen()
 		return True
 
@@ -875,6 +884,11 @@ class Shell(cmd.Cmd):
 	def help_ls(self):
 		txt = "List available graphs or entities.\n"
 		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
+		self._print(txt)
+
+	def help_download(self):
+		txt = "Download an ontology from a remote repository or directory.\n"
+		txt += "==> Usage: download"		
 		self._print(txt)
 
 	def help_visualize(self):

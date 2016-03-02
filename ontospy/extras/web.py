@@ -47,15 +47,6 @@ def getCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 	return out			
 
 
-	
-def printCatalog(_list):
-	""" 
-	prints out to terminal -- 2015-10-10: deprecated
-	"""
-	for x in _list:
-		print x[0], " ==> ", x[1]			
-
-
 
 
 def action_webimport(options):
@@ -89,6 +80,33 @@ def action_webimport(options):
 
 
 
+def get_LOV_vocabularies(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list"):
+	"""
+	pulls the json from the LOV vocabulary list 
+	"""
+	import requests
+
+	query = requests.get(baseuri, params={})
+	
+	return query.json()
+
+
+def print_LOV_data(_json_list):
+
+	for d in _json_list:
+		print "%s ==> %s" % (d['titles'][0]['value'], d['uri'])
+
+
+
+
+
+
+
+# ---------------------------------
+# following section mainly for testing
+# ---------------------------------
+
+
 
 def parse_options():
 	"""
@@ -115,7 +133,7 @@ def parse_options():
 
 	if not opts.all and not opts.query:
 		parser.print_help()
-		sys.exit(0)
+		# sys.exit(0)
 
 	return opts, args
 
@@ -132,10 +150,13 @@ def main():
 					
 	sTime = time.time()
 				
-	_list = getCatalog(query=opts.query)
-	action_webimport(_list)
+	# _list = getCatalog(query=opts.query)
+	# action_webimport(_list)
 
-	
+	d = get_LOV_vocabularies()
+	print_LOV_data(d)
+
+
 	# finally:	
 	# print some stats.... 
 	eTime = time.time()

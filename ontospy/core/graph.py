@@ -191,7 +191,7 @@ class Graph(object):
 			# abort loading
 			
 			printDebug("----------\nFatal error parsing graph (tried using RDF serialization: %s)\n" % (str(rdf_format_opts)))	
-			printDebug("RDF validation services:\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
+			printDebug("----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
 			sys.exit(0)
 
 

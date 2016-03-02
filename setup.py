@@ -91,6 +91,7 @@ setup(
 		'colorama', 
 		'django', 
 		'github3.py',
+        'requests',
         'pyfiglet'
 	],
 

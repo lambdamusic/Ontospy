@@ -15,7 +15,7 @@ More info in the README file.
 """
 
 
-import sys, os, time, optparse, os.path, shutil, cPickle, urllib2
+import sys, os, time, optparse, os.path, shutil, cPickle, urllib2, requests
 from colorama import Fore, Style
 from ConfigParser import SafeConfigParser
 
@@ -296,13 +296,91 @@ def action_import_folder(location):
 
 
 
-def action_webimport(options):
+def action_webimport_select():
+	""" select from the available online directories for import """
+	DIR_OPTIONS = {1 : "http://lov.okfn.org", 2 : "http://prefix.cc/popular/"}
+	selection = None
+	while True:
+		printDebug("----------")
+		text = "Please select which online directory to scan: (q=quit)\n"
+		for x in DIR_OPTIONS:
+			text += "%d) %s\n" % (x, DIR_OPTIONS[x])
+		var = raw_input(text + ">")
+		if var == "q":
+			return None
+		else:
+			try:
+				selection = int(var)
+				test = DIR_OPTIONS[selection]  #throw exception if number wrong
+				break
+			except:
+				printDebug("Invalid selection. Please try again.", "important")
+				continue
+
+
+	try:
+		if selection == 1:
+			action_webimport_LOV()
+		elif selection == 2:
+			action_webimport_PREFIXCC()
+	except:
+		printDebug("Sorry, the online repository seems to be unreachable.")
+
+	return True
+
+
+
+def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list"):
+	"""
+	2016-03-02: import from json list 
+	"""
+
+	printDebug("----------\nReading source... <%s>" % baseuri)
+	query = requests.get(baseuri, params={})
+	options = query.json()
+	printDebug("----------\n%d results found." % len(options))
+
+	counter = 1
+	for x in options:
+		uri, title, ns = x['uri'], x['titles'][0]['value'], x['nsp']
+# print "%s ==> %s" % (d['titles'][0]['value'], d['uri'])
+
+		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + uri + " ==> ", Fore.RED + title, Style.RESET_ALL
+
+		counter += 1
+
+	while True:
+		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
+		if var == "q":
+			break
+		else:
+			try:
+				_id = int(var)
+				ontouri = options[_id - 1]['uri']
+				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+				action_import(ontouri)
+			except:
+				print "Error retrieving file. Import failed."
+				continue
+
+
+		# from extras.web import getCatalog
+		# # _list = getCatalog(query=opts.query) # 2015-11-01: no query for now
+		# _list = getCatalog(query="")
+		# action_webimport(_list)	
+
+
+
+
+def action_webimport_PREFIXCC():
 	"""
 	List models from web catalog (prefix.cc) and ask which one to import
 	2015-10-10: originally part of main ontospy; now standalone only 
 	"""
 
-	# options = web.getCatalog()
+	from extras.web import getCatalog
+	options = getCatalog(query="")
+
 	counter = 1
 	for x in options:
 		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL
@@ -447,25 +525,23 @@ def parse_options():
 			action="store_true", default=False, dest="labels",
 			help="VERBOSE: show entities labels as well as URIs")
 
+	parser.add_option("-i", "",
+			action="store_true", default=False, dest="_import",
+			help="IMPORT: save a file/folder/url into the local library")
+
+	parser.add_option("-w", "",
+			action="store_true", default=False, dest="_web",
+			help="IMPORT-FROM-REPO: import from an online directory")
+
 	parser.add_option("-e", "",
 			action="store_true", default=False, dest="_export",
 			help="EXPORT: export a model into another format (e.g. html)")
 	
 	parser.add_option("-g", "",
 			action="store_true", default=False, dest="_gist",
-			help="GITHUB-GIST: export output as a Github Gist.")
+			help="EXPORT-AS-GIST: export output as a Github Gist.")
 								
-	parser.add_option("-i", "",
-			action="store_true", default=False, dest="_import",
-			help="IMPORT: save a file/folder/url into the local library")
 	
-	parser.add_option("-w", "",
-			action="store_true", default=False, dest="_web",
-			help="WEB: save vocabularies registered on http://prefix.cc/popular.")
-					
-
-
-			
 	opts, args = parser.parse_args()
 					
 	return opts, args, parser
@@ -501,9 +577,9 @@ def main():
 
 	# select a model from the local ontologies
 	elif opts._export or opts._gist:		
-		if opts._gist and not opts._export:
-			printDebug("WARNING: the -g option must be used in combination with -e (=export)")
-			sys.exit(0)
+		# if opts._gist and not opts._export:
+		# 	printDebug("WARNING: the -g option must be used in combination with -e (=export)")
+		# 	sys.exit(0)
 		import webbrowser
 		url = action_export(args, opts._gist)
 		if url:# open browser	
@@ -543,10 +619,7 @@ def main():
 
 			
 	elif opts._web:
-		from extras.web import getCatalog
-		# _list = getCatalog(query=opts.query) # 2015-11-01: no query for now
-		_list = getCatalog(query="")
-		action_webimport(_list)	
+		action_webimport_select()
 		raise SystemExit, 1
 		
 		
@@ -555,6 +628,7 @@ def main():
 	# last case: a new URI/path is passed
 	# load the ontology when a uri is passed manually
 	elif args:
+		printDebug("----------\nYou passed the argument: <%s>" % str(args[0]), "comment")
 		g = Graph(args[0])	
 		shellPrintOverview(g, print_opts)
 
