@@ -25,6 +25,11 @@ from .core.util import printDebug, pprint2columns
 
 
 
+# ===========
+# STATIC VARIABLES AND PATHS
+# ===========
+
+
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
@@ -34,11 +39,18 @@ ONTOSPY_LOCAL_TEMPLATES = _dirname + "/data/templates/"
 # local repository constants
 ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
 ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
-ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/"
+ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/" + VERSION + "/"
 
 ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
 # ONTOSPY_LIBRARY_DEFAULT = 
 # os.path.join(os.path.expanduser('~'), 'ontospy-library')
+
+
+
+# ===========
+# GLOBAL METHODS AND UTILS
+# ===========
+
 
 
 def get_or_create_home_repo(reset=False):

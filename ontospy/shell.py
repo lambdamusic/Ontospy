@@ -837,7 +837,7 @@ class Shell(cmd.Cmd):
 			self.current = None
 			self.prompt = self._get_prompt()
 
-	def do_q(self, line):
+	def do_quit(self, line):
 		"Quit: exit the OntoSPy shell"
 		self._clear_screen()
 		return True
