@@ -23,7 +23,7 @@ See also: https://pypi.python.org/pypi/ontospy
 
 
 Changelog
-=======
+---------------
 
 v.1.6.5.6
 - made the caching functionality version-dependent 
