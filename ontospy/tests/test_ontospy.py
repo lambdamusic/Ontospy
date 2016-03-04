@@ -1,9 +1,9 @@
 """ 
 Unit test stub for ontosPy	
 
-Launch with 
+Run like this: 
 
-python test_load.py
+:path/to/ontospyProject>python -m ontospy.tests.test_ontospy
 
 """
 
@@ -11,8 +11,7 @@ import unittest, os, sys
 
 from .. import ontospy
 
-
-DATA_FOLDER = "ontospy/data/schemas/"
+DATA_FOLDER = ontospy.get_home_location()
 
 
 # sanity check

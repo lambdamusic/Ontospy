@@ -19,3 +19,16 @@ Documentation
 http://ontospy.readthedocs.org/en/latest/
 
 See also: https://pypi.python.org/pypi/ontospy
+
+
+
+Changelog
+=======
+
+v.1.6.5.6
+- made the caching functionality version-dependent 
+- added 'download' command
+
+v.1.6.5.5
+- added 'visualize' command
+- added delete, rename, shell commands 

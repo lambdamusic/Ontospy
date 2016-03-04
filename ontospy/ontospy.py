@@ -99,7 +99,7 @@ def get_or_create_home_repo(reset=False):
 
 
 def get_home_location():
-	"""Gets the path of the folder for the local library"""
+	"""Gets the path of the folder for the local library - returns a string"""
 	config = SafeConfigParser()
 	config_filename = ONTOSPY_LOCAL + '/config.ini'
 	config.read(config_filename)

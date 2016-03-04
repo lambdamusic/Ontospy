@@ -153,11 +153,21 @@ class Shell(cmd.Cmd):
 			print styles1['DEFAULT'] + ms + Style.RESET_ALL
 
 	def _printM(self, messages):
-		"""print a list of strings - for the mom used by stats printout"""
+		"""print a list of strings - for the mom used only by stats printout"""
 		if len(messages) == 2:
 			print Style.BRIGHT + messages[0] + Style.RESET_ALL + Fore.BLUE + messages[1] + Style.RESET_ALL
 		else:
 			print "Not implemented"
+
+
+	def _joinedQnames(self, _list):
+		"""util for returning a string joinin names of entities *used only in inspect command*"""
+		try:
+			s = "; ".join([p.qname for p in _list])
+		except:
+			s = "; ".join([p for p in _list])
+		return s
+		
 
 
 	def _clear_screen(self):
@@ -231,6 +241,56 @@ class Shell(cmd.Cmd):
 		
 
 	def _printStats(self, hrlinetop=True):
+		"""
+		print more informative stats about the object
+		"""
+		if hrlinetop:
+			self._print("----------------")
+		if not self.currentEntity:	# ==> ontology level 
+			g = self.current['graph']			
+			self._print("Ontologies......: %d" % len(g.ontologies))
+			self._print("Classes.........: %d" % len(g.classes))
+			self._print("Properties......: %d" % len(g.properties))
+			self._print("..annotation....: %d" % len(g.annotationProperties))
+			self._print("..datatype......: %d" % len(g.datatypeProperties))
+			self._print("..object........: %d" % len(g.objectProperties))
+			self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
+			self._print("----------------")
+
+		elif self.currentEntity['type'] == 'class':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+			self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), self._joinedQnames(x.domain_of)])
+			self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), self._joinedQnames(x.range_of)])
+			self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), self._joinedQnames(x.all())])
+			self._print("----------------")
+																			
+		elif self.currentEntity['type'] == 'property':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+			self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), self._joinedQnames(x.domains)])
+			self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), self._joinedQnames(x.ranges)])
+			self._print("----------------")
+
+		elif self.currentEntity['type'] == 'concept':
+			x = self.currentEntity['object']
+			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+			self._print("----------------")
+
+		else:
+			self._print("Not implemented") 
+				
+				
+	def _XprintStats(self, hrlinetop=True):
 		"""
 		print more informative stats about the object
 		"""
