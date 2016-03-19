@@ -2,7 +2,7 @@
 # encoding: utf-8
 """
 ONTOSPY
-Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>.
+Copyright (c) 2013-2016 __Michele Pasin__ <michelepasin.org>.
 All rights reserved.
 
 Run it from the command line by passing it an ontology URI,
@@ -22,6 +22,17 @@ from ConfigParser import SafeConfigParser
 from ._version import *
 from .core.graph import Graph
 from .core.util import printDebug, pprint2columns
+
+
+SHELL_EXAMPLES = """
+Quick Examples:
+  > ontospy http://xmlns.com/foaf/spec/    # ==> prints info about FOAF
+  > ontospy http://xmlns.com/foaf/spec/ -i # ==> prints info and save local copy
+  > ontospy http://xmlns.com/foaf/spec/ -g # ==> exports ontology data into a github gist 
+  
+  For more, visit ontospy.readthedocs.org
+
+"""
 
 
 
@@ -526,8 +537,13 @@ def parse_options():
 	note: invoke help with `parser.print_help()`
 	
 	"""
-	
-	parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+
+	class MyParser(optparse.OptionParser):
+		def format_epilog(self, formatter):
+			return self.epilog
+
+	parser = MyParser(usage=USAGE, version=VERSION, epilog=SHELL_EXAMPLES)	
+	# parser = optparse.OptionParser(usage=USAGE, version=VERSION)
 				
 	parser.add_option("-l", "",
 			action="store_true", default=False, dest="_library",

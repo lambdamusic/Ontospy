@@ -48,13 +48,31 @@ STARTUP_MESSAGE = f.renderText('OntoSPy') + Style.BRIGHT + _intro_ % _version.VE
 
 
 
+def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.BLUE):
+	""" 
+	Global util that changes the prompt contextually 
+	<defaultP> = color of 'Ontospy'
+	<defaultE> = color of subsequent entity
+	"""
+	onto_c, entity_c = "", ""
+	base = defaultP + Style.BRIGHT +'[OntoSPy]' + Style.RESET_ALL
+	if onto and not entity:
+		temp1 = defaultE + '%s' % onto 
+		onto_c = defaultE + Style.BRIGHT + temp1 + Style.RESET_ALL
+	if entity:
+		# onto = self.current['file']
+		temp1_1 = defaultE + Style.NORMAL + '%s' % truncate(onto, 20)
+		temp1_2 = defaultE + Style.BRIGHT + '@%s' % entity
+		entity_c = defaultE + Style.BRIGHT + temp1_1 + temp1_2 + Style.RESET_ALL
+
+	return base + onto_c + entity_c + " > "
+
+
 
 class Shell(cmd.Cmd):
 	"""Simple command processor example."""
 
-	PROMPT_COL = Fore.RED
-	PROMPT_COL_ENTITY = Fore.BLUE
-	prompt = PROMPT_COL + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
+	prompt = _get_prompt()
 	intro = "Type 'help' to get started, TAB to explore commands.\n"
 
 	doc_header = 'Commands available (type `help <command>` to get help):'
@@ -119,22 +137,6 @@ class Shell(cmd.Cmd):
 	# HELPER METHODS
 	# --------	
 
-	def _get_prompt(self, onto="", entity="", defaultP=PROMPT_COL, defaultE=PROMPT_COL_ENTITY):
-		""" changes the prompt contextually """
-		if entity:
-			onto = self.current['file']
-			temp1_1 = defaultE + Style.NORMAL + '%s: ' % truncate(onto, 20)
-			temp1_2 = defaultE + Style.BRIGHT + '%s' % entity
-			temp2 = '<%s>: ' % (temp1_1 + temp1_2)
-			return defaultE + Style.BRIGHT + temp2 + Style.RESET_ALL
-		elif onto:
-			temp1 = defaultE + '%s' % onto 
-			temp2 = '<%s>: ' % temp1
-			return defaultE + Style.BRIGHT + temp2 + Style.RESET_ALL
-		else:
-			return defaultP + Style.BRIGHT +'<OntoSPy>: ' + Style.RESET_ALL
-	
-	
 	def _print(self, ms, style="TIP"):
 		""" abstraction for managing color printing """
 		styles1 = {'IMPORTANT' : Style.BRIGHT, 
@@ -201,7 +203,7 @@ class Shell(cmd.Cmd):
 			self._print("----------------", "TIP")
 			# self._print(obj.bestDescription(), "TEXT")
 			if first_time:
-				self.prompt = self._get_prompt(entity=self.currentEntity['name'])
+				self.prompt = _get_prompt(self.current['file'], self.currentEntity['name'])
 		elif g:
 			if first_time:
 				self._clear_screen()
@@ -214,7 +216,7 @@ class Shell(cmd.Cmd):
 				self._print("----------------", "TIP")
 				# self._print(o.bestDescription(), "TEXT")
 			if first_time:
-				self.prompt = self._get_prompt(self.current['file'])
+				self.prompt = _get_prompt(self.current['file'])
 
 
 	def _printDescription(self, hrlinetop=True):
@@ -448,7 +450,7 @@ class Shell(cmd.Cmd):
 			if self.currentEntity:
 				self._print_entity_intro(entity=self.currentEntity)
 				
-				# self.prompt = self._get_prompt(entity=self.currentEntity['name'])
+
 		else:
 			print "not found"
 
@@ -787,7 +789,7 @@ class Shell(cmd.Cmd):
 				if self.current and self.current['fullpath'] == fullpath:
 					self.current = None
 					self.currentEntity = None
-					self.prompt = self._get_prompt()
+					self.prompt = _get_prompt()
 
 		return 
 
@@ -830,7 +832,7 @@ class Shell(cmd.Cmd):
 				if self.current and self.current['fullpath'] == fullpath:
 					self.current = None
 					self.currentEntity = None
-					self.prompt = self._get_prompt()
+					self.prompt = _get_prompt()
 
 		return 
 
@@ -892,10 +894,10 @@ class Shell(cmd.Cmd):
 		"Go back one step. From entity => ontology; from ontology => ontospy top level."
 		if self.currentEntity:
 			self.currentEntity = None
-			self.prompt = self._get_prompt(self.current['file'])
+			self.prompt = _get_prompt(self.current['file'])
 		else:
 			self.current = None
-			self.prompt = self._get_prompt()
+			self.prompt = _get_prompt()
 
 	def do_quit(self, line):
 		"Quit: exit the OntoSPy shell"
