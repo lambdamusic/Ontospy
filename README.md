@@ -28,6 +28,8 @@ Changelog
 v.1.6.5.6
 - made the caching functionality version-dependent 
 - added 'download' command
+- json serialization (via rdflib-jsonld)
+ 
 
 v.1.6.5.5
 - added 'visualize' command

@@ -57,15 +57,15 @@ def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.BLUE):
 	onto_c, entity_c = "", ""
 	base = defaultP + Style.BRIGHT +'[OntoSPy]' + Style.RESET_ALL
 	if onto and not entity:
-		temp1 = defaultE + '%s' % onto 
+		temp1 = defaultE + '[%s]' % onto 
 		onto_c = defaultE + Style.BRIGHT + temp1 + Style.RESET_ALL
 	if entity:
 		# onto = self.current['file']
-		temp1_1 = defaultE + Style.NORMAL + '%s' % truncate(onto, 20)
-		temp1_2 = defaultE + Style.BRIGHT + '@%s' % entity
+		temp1_1 = defaultE + Style.NORMAL + '[%s]' % truncate(onto, 20)
+		temp1_2 = defaultE + Style.BRIGHT + '[%s]' % entity
 		entity_c = defaultE + Style.BRIGHT + temp1_1 + temp1_2 + Style.RESET_ALL
 
-	return base + onto_c + entity_c + " > "
+	return base + onto_c + entity_c + "> "
 
 
 
@@ -83,10 +83,11 @@ class Shell(cmd.Cmd):
 	maxcol = 80
 	
 	DISPLAY_OPTS = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
-	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml']
+	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
 	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
 	TREE_OPTS = ['classes', 'properties', 'concepts']
+	FILE_OPTS = ['rename', 'delete']
 	
 		
 	def __init__(self):
@@ -210,7 +211,8 @@ class Shell(cmd.Cmd):
 				# playSound(ontospy.ONTOSPY_SOUNDS)	 # new..
 				self._print("Loaded graph: <" + self.current['fullpath'] + ">", 'TIP')
 			g.printStats()
-			if g.ontologies:
+			self._printDescription(False)
+			if False and g.ontologies:
 				for o in g.ontologies:
 					self._print("==> Ontology URI: <%s>" % str(o.uri), "TIP")
 				self._print("----------------", "TIP")
@@ -233,7 +235,7 @@ class Shell(cmd.Cmd):
 				
 		else:
 			for obj in self.current['graph'].ontologies:
-				self._print("==> Ontology: <%s>" % str(obj.uri), "IMPORTANT")
+				self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
 				self._print("----------------", "TIP")
 				label = obj.bestLabel() or NOTFOUND
 				description = obj.bestDescription() or NOTFOUND
@@ -508,6 +510,89 @@ class Shell(cmd.Cmd):
 			print "not found"
 
 
+	def _delete_file(self, line=""):
+		"""	Delete an ontology
+			2016-04-11: not a direct command anymore """
+		
+		if not self.ontologies:
+			self._help_nofiles()
+
+		else:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out, line)
+			if choice:
+				fullpath = self.LOCAL_MODELS + "/" + choice
+				if os.path.isfile(fullpath):
+
+					self._print("--------------")
+					self._print("Are you sure? [Y/N]")
+					var = raw_input()
+					if var == "y" or var == "Y":
+						os.remove(fullpath)
+						ontospy.del_pickled_ontology(choice)
+						self._print("<%s> was deleted succesfully." % choice)
+						self.ontologies = ontospy.get_localontologies()
+					else:
+						return 
+
+				else:
+					self._print("File not found.")
+				# delete
+				if self.current and self.current['fullpath'] == fullpath:
+					self.current = None
+					self.currentEntity = None
+					self.prompt = _get_prompt()
+
+		return 
+
+
+	def _rename_file(self, line=""):
+		"""Rename an ontology 
+			2016-04-11: not a direct command anymore """
+		
+		if not self.ontologies:
+			self._help_nofiles()
+		else:
+			out = []
+			for each in self.ontologies:
+				if line in each:
+					out += [each]
+			choice = self._selectFromList(out, line)
+			if choice:
+				fullpath = self.LOCAL_MODELS + "/" + choice
+				print fullpath
+				if os.path.isfile(fullpath):
+
+					self._print("--------------")
+					self._print("Please enter a new name for <%s>, including the extension (blank=abort)"  \
+						% choice)
+					var = raw_input()
+					if var:
+						try:
+							os.rename(fullpath, self.LOCAL_MODELS + "/" + var)
+							ontospy.rename_pickled_ontology(choice, var)
+							self._print("<%s> was renamed succesfully." % choice)
+							self.ontologies = ontospy.get_localontologies()
+						except:
+							self._print("Not a valid name. An error occurred.")
+							return
+					else:
+						return 
+
+				else:
+					self._print("File not found.")
+				# delete
+				if self.current and self.current['fullpath'] == fullpath:
+					self.current = None
+					self.currentEntity = None
+					self.prompt = _get_prompt()
+
+		return 
+
+
 
 
 	# COMMANDS
@@ -534,7 +619,7 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "ontologies":
 			if not self.ontologies:
-				self._print("No ontologies in the local repository. Use the 'download' command, or quit OntoSPy and run 'ontospy --help' from the terminal prompt. ")
+				self._help_nofiles()
 			else:
 				self._select_ontology(_pattern)
 
@@ -582,7 +667,7 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "ontology":
 			if not self.ontologies:
-				self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy --import' from the command line. ")
+				self._help_nofiles()
 			else:
 				self._select_ontology(_pattern)
 
@@ -715,7 +800,7 @@ class Shell(cmd.Cmd):
 
 	def do_inspect(self, line):
 		"""Inspect the current entity and display a nice summary of key properties"""
-		opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		# opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
 		
 		if not self.current:
 			self._help_noontology()
@@ -755,87 +840,27 @@ class Shell(cmd.Cmd):
 		self.ontologies = ontospy.get_localontologies()
 		return
 
-	
-	def do_del(self, line):
-		"""Delete an ontology"""
+
+	def do_file(self, line):
+		"""PErform some file operation"""
+		opts = self.FILE_OPTS
 		
 		if not self.ontologies:
-			self._print("No ontologies in the local repository. Run 'ontospy --help' or 'ontospy \
-				--import' from the command line. ")
-		else:
-			out = []
-			for each in self.ontologies:
-				if line in each:
-					out += [each]
-			choice = self._selectFromList(out, line)
-			if choice:
-				fullpath = self.LOCAL_MODELS + choice
-				if os.path.isfile(fullpath):
+			self._help_nofiles()
+			return
 
-					self._print("--------------")
-					self._print("Are you sure? [Y/N]")
-					var = raw_input()
-					if var == "y" or var == "Y":
-						os.remove(fullpath)
-						ontospy.del_pickled_ontology(choice)
-						self._print("<%s> was deleted succesfully." % choice)
-						self.ontologies = ontospy.get_localontologies()
-					else:
-						return 
+		line = line.split() 
 
-				else:
-					self._print("File not found.")
-				# delete
-				if self.current and self.current['fullpath'] == fullpath:
-					self.current = None
-					self.currentEntity = None
-					self.prompt = _get_prompt()
-
-		return 
-
-
-	def do_rename(self, line):
-		"""Rename an ontology"""
+		if not line or line[0] not in opts:
+			self.help_file()
+			return	
 		
-		if not self.ontologies:
-			self._print("No ontologies in the local repository. Run 'ontospy --help' or \
-				'ontospy --import' from the command line. ")
+		if line[0] == "rename":
+			self._rename_file()
+		elif line[0] == "delete":
+			self._delete_file() 
 		else:
-			out = []
-			for each in self.ontologies:
-				if line in each:
-					out += [each]
-			choice = self._selectFromList(out, line)
-			if choice:
-				fullpath = self.LOCAL_MODELS + choice
-				if os.path.isfile(fullpath):
-
-					self._print("--------------")
-					self._print("Please enter a new name for <%s>, including the extension (blank=abort)"  \
-						% choice)
-					var = raw_input()
-					if var:
-						try:
-							os.rename(fullpath, self.LOCAL_MODELS + var)
-							ontospy.rename_pickled_ontology(choice, var)
-							self._print("<%s> was renamed succesfully." % choice)
-							self.ontologies = ontospy.get_localontologies()
-						except:
-							self._print("Not a valid name. An error occurred.")
-							return
-					else:
-						return 
-
-				else:
-					self._print("File not found.")
-				# delete
-				if self.current and self.current['fullpath'] == fullpath:
-					self.current = None
-					self.currentEntity = None
-					self.prompt = _get_prompt()
-
-		return 
-
+			return
 
 
 	def do_serialize(self, line):
@@ -958,14 +983,9 @@ class Shell(cmd.Cmd):
 		txt += "==> Usage: visualize [gist]" 	
 		self._print(txt)
 
-	def help_del(self):
-		txt = "Delete an ontology from the local repository.\n"
-		txt += "==> Usage: del" 	
-		self._print(txt)
-
-	def help_rename(self):
-		txt = "Rename an ontology in the local repository.\n"
-		txt += "==> Usage: rename" 	
+	def help_file(self):
+		txt = "Perform some operations on the files in the local repository.\n"
+		txt += "==> Usage: file [%s]" % "|".join([x for x in self.FILE_OPTS])		
 		self._print(txt)
 
 	def help_serialize(self):
@@ -993,6 +1013,13 @@ class Shell(cmd.Cmd):
 		txt = "No graph selected. Please load a graph first.\n"
 		txt += "==> E.g. use the 'ls ontologies' or 'get ontology <name>' commands." 
 		self._print(txt)
+
+	def _help_nofiles(self):
+		"""starts with underscore so that it doesnt appear with help methods"""
+		txt = "No files available in your local repository.\n"
+		txt += "==> Use the 'download' command, or quit OntoSPy and run 'ontospy --help' for more options." 
+		self._print(txt)
+
 
 
 	# AUTOCOMPLETE METHODS
@@ -1059,6 +1086,20 @@ class Shell(cmd.Cmd):
 		"""completion for serialize command"""
 		
 		opts = self.SERIALIZE_OPTS
+
+		if not text:
+			completions = opts
+		else:
+			completions = [ f
+							for f in opts
+							if f.startswith(text)
+							]
+		return completions	
+
+	def complete_file(self, text, line, begidx, endidx):
+		"""completion for file command"""
+		
+		opts = self.FILE_OPTS
 
 		if not text:
 			completions = opts

@@ -57,6 +57,21 @@ ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
 # os.path.join(os.path.expanduser('~'), 'ontospy-library')
 
 
+BOOTSTRAP_ONTOLOGIES = [
+	"http://www.ontologydesignpatterns.org/ont/dul/DUL.owl",
+	"http://www.ifomis.org/bfo/1.1",
+	"http://topbraid.org/schema/schema.ttl",
+	"http://www.cidoc-crm.org/rdfs/cidoc_crm_v6.0-draft-2015January.rdfs",
+
+	"http://xmlns.com/foaf/spec/" ,
+	"https://www.w3.org/2006/time" ,
+	"http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine" ,
+	"http://purl.uniprot.org/core/" ,
+	"http://purl.org/spar/cito/" ,
+	"http://ns.nature.com/terms/" ,
+]
+
+
 
 # ===========
 # GLOBAL METHODS AND UTILS
@@ -244,9 +259,10 @@ def actionSelectFromLocal():
 
 
 
-
 def action_import(location):
 	"""import files into the local repo """
+
+	location = str(location) # prevent errors from unicode being passed
 
 	# 1) extract file from location and save locally
 	ONTOSPY_LOCAL_MODELS = get_home_location()
@@ -255,14 +271,18 @@ def action_import(location):
 		if location.startswith("www."): #support for lazy people
 			location = "http://%s" % str(location)
 		if location.startswith("http://"):
+			# print "here"
 			headers = {'Accept': "application/rdf+xml"}
 			req = urllib2.Request(location, headers=headers)
 			res = urllib2.urlopen(req)
 			final_location = res.geturl()  # after 303 redirects
 			print "Saving data from <%s>" % final_location
 			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
-			fullpath = ONTOSPY_LOCAL_MODELS + "/" + filename
+			# fullpath = ONTOSPY_LOCAL_MODELS + "/" + filename # 2016-04-08
+			fullpath = ONTOSPY_LOCAL_MODELS + filename
 
+			# print "==DEBUG", final_location, "**", filename,"**", fullpath
+			
 			file_ = open(fullpath, 'w')
 			file_.write(res.read())
 			file_.close()
@@ -315,6 +335,36 @@ def action_import_folder(location):
 		print "Not a valid directory"
 		return None
 
+
+
+
+def action_bootstrap():
+	"""Bootstrap the local REPO with a few cool ontologies"""
+	printDebug("--------------")
+	printDebug("The following ontologies will be imported:\n")
+	count = 0 
+	for s in BOOTSTRAP_ONTOLOGIES:
+		count += 1
+		print count, "<%s>" % s
+
+	printDebug("--------------")
+	printDebug("Note: this operation may take several minutes.")
+	printDebug("Are you sure? [Y/N]")
+	var = raw_input()
+	if var == "y" or var == "Y":
+		for uri in BOOTSTRAP_ONTOLOGIES:
+			try:
+				printDebug("--------------")
+				action_import(uri)
+			except:
+				printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
+		return True	
+	else:
+		printDebug("Goodbye")
+		return False 
+
+
+	
 
 
 
@@ -553,6 +603,10 @@ def parse_options():
 			action="store_true", default=False, dest="labels",
 			help="VERBOSE: show entities labels as well as URIs")
 
+	parser.add_option("-b", "",
+			action="store_true", default=False, dest="_bootstrap",
+			help="BOOTSTRAP: save some sample ontologies into the local library")
+
 	parser.add_option("-i", "",
 			action="store_true", default=False, dest="_import",
 			help="IMPORT: save a file/folder/url into the local library")
@@ -595,7 +649,7 @@ def main():
 
 
 	# default behaviour: launch shell
-	if not args and not opts._library and not opts._import and not opts._web and not opts._export and not opts._gist:	
+	if not args and not opts._library and not opts._import and not opts._web and not opts._export and not opts._gist and not opts._bootstrap:	
 		from shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
 		print STARTUP_MESSAGE
@@ -629,6 +683,10 @@ def main():
 		# continue and print timing at bottom 
 
 
+	# bootstrap local repo
+	elif opts._bootstrap:
+		action_bootstrap()
+		printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")
 			
 	# import an ontology (ps implemented in both .ontospy and .extras)
 	elif opts._import:

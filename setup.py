@@ -88,6 +88,7 @@ setup(
     install_requires=[
 		'readline',  # for shell autocomplete
 		'rdflib', 
+        'rdflib-jsonld',
 		'colorama', 
 		'django', 
 		'github3.py',

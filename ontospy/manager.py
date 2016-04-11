@@ -183,25 +183,25 @@ def parse_options():
 
 	
 	
-	parser.add_option("-l", "--list",
+	parser.add_option("-l", "",
 			action="store_true", default=False, dest="list",
-			help="List ontologies saved in the local library.") 
+			help="LIST: show ontologies saved in the local library.") 
 						
-	parser.add_option("-c", "--cache",
+	parser.add_option("-c", "",
 			action="store_true", default=False, dest="cache",
-			help="Force caching of the local library (for faster loading)")
+			help="CACHE: force caching of the local library (for faster loading)")
 
-	parser.add_option("-u", "--update",
+	parser.add_option("-u", "",
 			action="store_true", default=False, dest="_setup",
-			help="Update path of local library.") 
+			help="UPDATE: enter new path for the local library.") 
 
-	parser.add_option("-d", "--delete",
+	parser.add_option("-d", "",
 			action="store_true", default=False, dest="_delete",
-			help="Delete a single ontology from the local library.") 
+			help="DELETE: remove a single ontology file from the local library.") 
 			
-	parser.add_option("-e", "--erase",
+	parser.add_option("-e", "",
 			action="store_true", default=False, dest="erase",
-			help="Erase completely the local library (deletes all files)")
+			help="ERASE: reset the local library (delete all files)")
 
 									
 	opts, args = parser.parse_args()

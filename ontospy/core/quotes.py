@@ -6,6 +6,8 @@ Python and RDF Utils for OntoSPy
 
 Copyright (c) 2010 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
+# http://www.ontology.co/ontology-definitions-one.htm
+
 """
 
 
@@ -39,7 +41,7 @@ QUOTES = [
 	} ,
 	{
 		"text" : "Nonbeing must in some sense be, otherwise what is it that there is not? This tangled doctrine might be nicknamed Plato's beard; historically it has proved tough, frequently dulling the edge of Occam's razor.", 
-		"source" : "Willard Van Orman Quine, 'On What There Is', 1953", 
+		"source" : "Willard Van Orman Quine", 
 	} ,
 	{
 		"text" : "Ontology or the science of something and of nothing, of being and not-being, of the thing and the mode of the thing, of substance and accident.", 
@@ -77,4 +79,3 @@ QUOTES = [
 
 
 
-# http://www.ontology.co/ontology-definitions-one.htm
