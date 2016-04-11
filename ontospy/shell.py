@@ -836,8 +836,25 @@ class Shell(cmd.Cmd):
 	def do_download(self, line):
 		"""Download an ontology"""
 
-		ontospy.action_webimport_select()
-		self.ontologies = ontospy.get_localontologies()
+		line = line.split()
+
+		if line:
+			if line[0] == "starter-pack":
+				ontospy.action_bootstrap()
+				self.ontologies = ontospy.get_localontologies()
+			else:
+				if line[0].startswith("http"):
+					try:
+						ontospy.action_import(line[0])
+					except:
+						self._print("OPS... An Unknown Error Occurred - Aborting Installation")
+				else:
+					self._print("You must pass valid URI")
+
+		else:
+			ontospy.action_webimport_select()
+			self.ontologies = ontospy.get_localontologies()
+		
 		return
 
 
@@ -1017,7 +1034,7 @@ class Shell(cmd.Cmd):
 	def _help_nofiles(self):
 		"""starts with underscore so that it doesnt appear with help methods"""
 		txt = "No files available in your local repository.\n"
-		txt += "==> Use the 'download' command, or quit OntoSPy and run 'ontospy --help' for more options." 
+		txt += "==> Use the 'download starter-pack' command to get started." 
 		self._print(txt)
 
 

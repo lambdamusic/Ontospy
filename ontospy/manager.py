@@ -233,8 +233,9 @@ def main():
 		_location = args[0]
 		output = action_update_library_location(_location)
 		if output:
-			printDebug("----------\n" + "New location: '%s'" % _location, "important")
 			printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")
+			printDebug("----------\n" + "New location: '%s'" % _location, "important")
+			
 		else:
 			printDebug("----------\n" + "Please specify an existing folder path.", "important")
 		raise SystemExit, 1

@@ -259,7 +259,7 @@ def actionSelectFromLocal():
 
 
 
-def action_import(location):
+def action_import(location, verbose=True):
 	"""import files into the local repo """
 
 	location = str(location) # prevent errors from unicode being passed
@@ -277,9 +277,12 @@ def action_import(location):
 			res = urllib2.urlopen(req)
 			final_location = res.geturl()  # after 303 redirects
 			print "Saving data from <%s>" % final_location
-			filename = final_location.split("/")[-1] or final_location.split("/")[-2]
-			# fullpath = ONTOSPY_LOCAL_MODELS + "/" + filename # 2016-04-08
-			fullpath = ONTOSPY_LOCAL_MODELS + filename
+			# filename = final_location.split("/")[-1] or final_location.split("/")[-2]
+			filename = location.replace("http://", "").replace("/", "_")
+			if not filename.lower().endswith(('.rdf', '.owl', '.rdfs', '.ttl', '.n3')):
+				filename = filename + ".rdf"
+			fullpath = ONTOSPY_LOCAL_MODELS + "/" + filename # 2016-04-08
+			# fullpath = ONTOSPY_LOCAL_MODELS + filename
 
 			# print "==DEBUG", final_location, "**", filename,"**", fullpath
 			
@@ -303,7 +306,7 @@ def action_import(location):
 	# 2) check if valid RDF and cache it
 	try:
 		# print "Loading graph..."
-		g = Graph(fullpath)
+		g = Graph(fullpath, verbose=verbose)
 		# print "Loaded ", fullpath
 	except:
 		g = None
@@ -341,7 +344,8 @@ def action_import_folder(location):
 def action_bootstrap():
 	"""Bootstrap the local REPO with a few cool ontologies"""
 	printDebug("--------------")
-	printDebug("The following ontologies will be imported:\n")
+	printDebug("The following ontologies will be imported:")
+	printDebug("--------------")
 	count = 0 
 	for s in BOOTSTRAP_ONTOLOGIES:
 		count += 1
@@ -355,11 +359,12 @@ def action_bootstrap():
 		for uri in BOOTSTRAP_ONTOLOGIES:
 			try:
 				printDebug("--------------")
-				action_import(uri)
+				action_import(uri, verbose=False)
 			except:
 				printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
 		return True	
 	else:
+		printDebug("--------------")
 		printDebug("Goodbye")
 		return False 
 

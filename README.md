@@ -29,6 +29,7 @@ v.1.6.5.6
 - made the caching functionality version-dependent 
 - added 'download' command
 - json serialization (via rdflib-jsonld)
+- added *bootstrap* command for empty repos
  
 
 v.1.6.5.5
