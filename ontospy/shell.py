@@ -61,7 +61,7 @@ def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.BLUE):
 		onto_c = defaultE + Style.BRIGHT + temp1 + Style.RESET_ALL
 	if entity:
 		# onto = self.current['file']
-		temp1_1 = defaultE + Style.NORMAL + '[%s]' % truncate(onto, 20)
+		temp1_1 = defaultE + Style.NORMAL + '[%s]' % truncate(onto, 10)
 		temp1_2 = defaultE + Style.BRIGHT + '[%s]' % entity
 		entity_c = defaultE + Style.BRIGHT + temp1_1 + temp1_2 + Style.RESET_ALL
 
@@ -221,32 +221,11 @@ class Shell(cmd.Cmd):
 				self.prompt = _get_prompt(self.current['file'])
 
 
-	def _printDescription(self, hrlinetop=True):
-		"""generic method to print out a description"""
-		if hrlinetop:
-			self._print("----------------")
-		NOTFOUND = "[not found]"
-		if self.currentEntity:
-			obj = self.currentEntity['object']
-			label = obj.bestLabel() or NOTFOUND
-			description = obj.bestDescription() or NOTFOUND
-			self._print("Title: " + label, "TEXT")
-			self._print("Description: " + description, "TEXT")
-				
-		else:
-			for obj in self.current['graph'].ontologies:
-				self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
-				self._print("----------------", "TIP")
-				label = obj.bestLabel() or NOTFOUND
-				description = obj.bestDescription() or NOTFOUND
-				self._print("Title: " + label, "TEXT")
-				self._print("Description: " + description, "TEXT")
-		self._print("----------------", "TIP")
-		
 
 	def _printStats(self, hrlinetop=True):
 		"""
 		print more informative stats about the object
+		2016-04-21: created more specific methods. THis will be eventually removed!
 		"""
 		if hrlinetop:
 			self._print("----------------")
@@ -292,58 +271,142 @@ class Shell(cmd.Cmd):
 
 		else:
 			self._print("Not implemented") 
+
+
+	def _printDescription(self, hrlinetop=True):
+		"""generic method to print out a description"""
+		if hrlinetop:
+			self._print("----------------")
+		NOTFOUND = "[not found]"
+		if self.currentEntity:
+			obj = self.currentEntity['object']
+			label = obj.bestLabel() or NOTFOUND
+			description = obj.bestDescription() or NOTFOUND
+			print Style.BRIGHT + "Object Type: " + Style.RESET_ALL + Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL
+			print Style.BRIGHT + "URI        : " + Style.RESET_ALL+ Fore.GREEN + unicode(obj.uri) + Style.RESET_ALL
+			print Style.BRIGHT + "Title      : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL
+			print Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL
 				
-				
-	def _XprintStats(self, hrlinetop=True):
+		else:
+			for obj in self.current['graph'].ontologies:
+				self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
+				self._print("----------------", "TIP")
+				label = obj.bestLabel() or NOTFOUND
+				description = obj.bestDescription() or NOTFOUND
+				print Style.BRIGHT + "Title      : " + Style.RESET_ALL+ Fore.GREEN + label + Style.RESET_ALL
+				print Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.GREEN + description + Style.RESET_ALL
+		self._print("----------------", "TIP")
+		
+
+
+	def _printTaxonomy(self, hrlinetop=True):
+		"""
+		print a local taxonomy for the object
+		"""
+		if not self.currentEntity:	# ==> ontology level 
+			return
+		if hrlinetop:
+			self._print("----------------")
+		self._print("Taxonomy:", "IMPORTANT")
+		x = self.currentEntity['object']
+		parents = x.parents()
+								
+		if not parents:
+			if self.currentEntity['type'] == 'class':
+				self._print("OWL:Thing")
+			elif self.currentEntity['type'] == 'property':
+				self._print("RDF:Property")
+			elif self.currentEntity['type'] == 'concept':
+				self._print("SKOS:Concept")
+			else:
+				pass
+		else:
+			for p in parents:
+				self._print(p.qname)
+		self._print("..." + x.qname, "TEXT")
+		for c in x.children():
+			self._print("......" + c.qname)
+		self._print("----------------")
+		
+
+
+	def _printClassDomain(self, hrlinetop=True):
 		"""
 		print more informative stats about the object
 		"""
-		if hrlinetop:
-			self._print("----------------")
 		if not self.currentEntity:	# ==> ontology level 
-			g = self.current['graph']			
-			self._print("Ontologies......: %d" % len(g.ontologies))
-			self._print("Classes.........: %d" % len(g.classes))
-			self._print("Properties......: %d" % len(g.properties))
-			self._print("..annotation....: %d" % len(g.annotationProperties))
-			self._print("..datatype......: %d" % len(g.datatypeProperties))
-			self._print("..object........: %d" % len(g.objectProperties))
-			self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
-			self._print("----------------")
+			return
+		x = self.currentEntity['object']	
+		if self.currentEntity['type'] == 'class':
+			if hrlinetop:
+				self._print("----------------")
+			self._print("Domain Of: [%d]" % len(x.domain_of), "IMPORTANT")
+			for i in x.domain_of:
+				self._print(i.qname)
+			self._print("----------------")	
+		return 
 
-		elif self.currentEntity['type'] == 'class':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), "%s" % "; ".join([p.qname for p in x.domain_of])])
-			self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), "%s" % "; ".join([p.qname for p in x.range_of])])
-			self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), "%s" % "; ".join([p for p in x.all()])])
-			self._print("----------------")
-																			
-		elif self.currentEntity['type'] == 'property':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), "%s" % "; ".join([p.qname for p in x.domains])])
-			self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), "%s" % "; ".join([p.qname for p in x.ranges])])
-			self._print("----------------")
+	def _printClassRange(self, hrlinetop=True):
+		"""
+		print more informative stats about the object
+		"""
+		if not self.currentEntity:	# ==> ontology level 
+			return
+		x = self.currentEntity['object']	
+		if self.currentEntity['type'] == 'class':
+			if hrlinetop:
+				self._print("----------------")
+			self._print("Range Of: [%d]" % len(x.range_of), "IMPORTANT")
+			for i in x.range_of:
+				self._print(i.qname)
+			self._print("----------------")	
+		return 
 
-		elif self.currentEntity['type'] == 'concept':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), "%s" % "; ".join([p.qname for p in x.parents()])])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), "%s" % "; ".join([p.qname for p in x.ancestors()])])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), "%s" % "; ".join([p.qname for p in x.children()])])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), "%s" % "; ".join([p.qname for p in x.descendants()])])
-			self._print("----------------")
 
-		else:
-			self._print("Not implemented") 
-				
-				
+	def _printPropertyDomainRange(self, hrlinetop=True):
+		"""
+		print more informative stats about the object
+		"""
+		if not self.currentEntity:	# ==> ontology level 
+			return
+		x = self.currentEntity['object']	
+		if self.currentEntity['type'] == 'property':
+			if hrlinetop:
+				self._print("----------------")
+			self._print("Usage:", "IMPORTANT")
+			domains = x.domains
+			ranges = x.ranges
+			if x.domains:
+				for d in x.domains:
+					self._print(d.qname)
+			else:
+				self._print("OWL:Thing")
+			self._print("  " + "<" + x.qname + ">", "TEXT")	
+			if x.ranges:
+				for d in x.ranges:
+					self._print("  " + "   => " + d.qname)
+			else:
+				self._print("  " + "   => " + "OWL:Thing")
+			self._print("----------------")	
+		return 
+
+
+	def _printInstances(self, hrlinetop=True):
+		"""
+		print more informative stats about the object
+		"""
+		if not self.currentEntity:	# ==> ontology level 
+			return
+		x = self.currentEntity['object']	
+		if self.currentEntity['type'] == 'class':
+			if hrlinetop:
+				self._print("----------------")
+			self._print("Instances: [%d]" % len(x.all()), "IMPORTANT")
+			for i in x.all():
+				self._print(i.qname)
+			self._print("----------------")	
+		return 
+
 
 
 
@@ -609,7 +672,14 @@ class Shell(cmd.Cmd):
 			# _pattern = line[1]	
 			pass	
 		elif len(line) == 0:
-			line = ["ontologies"]	# default 2016-03-01
+			# default contextual behaviour [2016-03-01]
+			if not self.current:
+				line = ["ontologies"]
+			elif self.currentEntity:
+				self.do_inspect("")	
+				return	
+			else:
+				line = ["classes"]
 		opts = self.LS_OPTS
 
 		if (not line) or (line[0] not in opts):
@@ -809,7 +879,10 @@ class Shell(cmd.Cmd):
 		g = self.current['graph']
 		
 		self._printDescription()
-		self._printStats(hrlinetop=False)
+		self._printTaxonomy(False)
+		self._printClassDomain(False)
+		self._printClassRange(False)
+		self._printPropertyDomainRange(False)
 				
 		return 
 
@@ -941,7 +1014,7 @@ class Shell(cmd.Cmd):
 			self.current = None
 			self.prompt = _get_prompt()
 
-	def do_quit(self, line):
+	def do_q(self, line):
 		"Quit: exit the OntoSPy shell"
 		self._clear_screen()
 		return True
@@ -986,7 +1059,7 @@ class Shell(cmd.Cmd):
 	# --------	
 
 	def help_ls(self):
-		txt = "List available graphs or entities.\n"
+		txt = "List available graphs or entities.\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
 		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
 		self._print(txt)
 

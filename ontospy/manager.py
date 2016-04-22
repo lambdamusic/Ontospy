@@ -38,7 +38,7 @@ def action_update_library_location(_location):
 	# 	printDebug("Creating new folder..", "comment")
 	
 	printDebug("Old location: '%s'" % ontospy.get_home_location(), "comment")
-	
+
 	if os.path.isdir(_location):
 		
 		config = SafeConfigParser()
@@ -207,7 +207,9 @@ def parse_options():
 	opts, args = parser.parse_args()
 
 	if opts._setup and not args:
-		printDebug("Please specify a folder to be used for the local library e.g. 'ontospy-manager -u /Users/john/ontologies'", 'important')
+		printDebug("------------")
+		printDebug("Please specify a folder to be used for the local library.", 'important')
+		printDebug("E.g. 'ontospy-manager -u /Users/john/ontologies'")
 		sys.exit(0)
 				
 	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._delete:
@@ -231,6 +233,9 @@ def main():
 	# move local lib
 	if opts._setup:
 		_location = args[0]
+		if _location.endswith("/"):
+			# dont need the final slash
+			_location = _location[:-1]
 		output = action_update_library_location(_location)
 		if output:
 			printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")

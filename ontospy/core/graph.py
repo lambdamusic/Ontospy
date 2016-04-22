@@ -171,12 +171,12 @@ class Graph(object):
 						self.rdfgraph.parse(data=source, format=f)
 						printDebug("..... success!")
 						successflag = True	
-						printDebug("----------\nLoaded %d triples from text" % len(self.rdfgraph))
+						printDebug("----------\nLoading %d triples from text" % len(self.rdfgraph))
 					else:
 						self.rdfgraph.parse(source, format=f)
 						printDebug("..... success!")
 						successflag = True
-						printDebug("----------\nLoaded %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
+						printDebug("----------\nLoading %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
 					# set up the query helper too
 					self.queryHelper = QueryHelper(self.rdfgraph)
 			

@@ -33,6 +33,40 @@ from colorama import Fore, Back, Style
 
 
 
+def list_chunks(l, n):
+	"""Yield successive n-sized chunks from l.
+
+	import pprint
+	pprint.pprint(list(chunks(range(10, 75), 10)))
+	[[10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+	 [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+	 [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
+	 [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+	 [50, 51, 52, 53, 54, 55, 56, 57, 58, 59],
+	 [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
+	 [70, 71, 72, 73, 74]]
+
+	"""
+	for i in xrange(0, len(l), n):
+		yield l[i:i+n]
+
+
+
+def split_list(alist, wanted_parts=1):
+	"""
+	A = [0,1,2,3,4,5,6,7,8,9]
+
+	print split_list(A, wanted_parts=1)
+	print split_list(A, wanted_parts=2)
+	print split_list(A, wanted_parts=8)
+	"""
+	length = len(alist)
+	return [ alist[i*length // wanted_parts: (i+1)*length // wanted_parts] 
+			 for i in range(wanted_parts) ]
+
+
+
+
 def remove_duplicates(seq, idfun=None): 
 	""" removes duplicates from a list, order preserving, as found in
 	http://www.peterbe.com/plog/uniqifiers-benchmark
@@ -66,7 +100,9 @@ def printDebug(s, style=None):
 	elif style == "normal":
 		s = Style.RESET_ALL + s + Style.RESET_ALL	
 	elif style == "red":
-		s = Fore.RED + s + Style.RESET_ALL			
+		s = Fore.RED + s + Style.RESET_ALL	
+	elif style == "green":
+		s = Fore.GREEN + s + Style.RESET_ALL				
 	try:
 		print >> sys.stderr, s
 	except: 
@@ -164,11 +200,11 @@ def save_anonymous_gist(title, files):
 	October 21, 2015
 	title = the gist title
 	files = {
-	    'spam.txt' : {
-	        'content': 'What... is the air-speed velocity of an unladen swallow?'
-	        }
+		'spam.txt' : {
+			'content': 'What... is the air-speed velocity of an unladen swallow?'
+			}
 			# ..etc...
-	    }
+		}
 		
 	works also in blocks eg from
 	https://gist.github.com/anonymous/b839e3a4d596b215296f
