@@ -355,7 +355,6 @@ def action_import_folder(location):
 import threading
 import Queue
 
-
 class ThreadUrl(threading.Thread):
 	"""Threaded Url Grab"""
 	def __init__(self, queue, lock):
@@ -489,7 +488,7 @@ def action_bootstrap_threads():
 
 
 # ==============
-# THREADS TEST ===ends
+# END OF TESTS WITH THREADS  ===ends
 # ==============
 
 
