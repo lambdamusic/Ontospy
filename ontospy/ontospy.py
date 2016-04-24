@@ -260,7 +260,10 @@ def actionSelectFromLocal():
 
 
 def action_import(location, verbose=True, lock=None):
-	"""import files into the local repo """
+	"""import files into the local repo 
+		<lock> was used by the Threaded routine *now removed* 2016-04-24
+
+	"""
 
 	location = str(location) # prevent errors from unicode being passed
 
@@ -303,26 +306,14 @@ def action_import(location, verbose=True, lock=None):
 			os.remove(fullpath)
 		return None
 
-	if False: # for testing threading
-			# April 17, 2016: this works, but we gain NOTHING IN TIME!!! 
-			# maybe a better strategy if to thread the Graph instantation
-		if lock:
-			lock.acquire()
-		try:
-			g = Graph(fullpath, verbose=verbose)
-		finally:
-			if lock:
-				lock.release()
-	if True:
-	# 2) check if valid RDF and cache it
-		try:
-			g = Graph(fullpath, verbose=verbose)
-			printDebug("----------")
-		except:
-			g = None
-			if os.path.exists(fullpath):
-				os.remove(fullpath)
-			printDebug("Error parsing file. Please make sure %s contains valid RDF." % location, "important")
+	try:
+		g = Graph(fullpath, verbose=verbose)
+		printDebug("----------")
+	except:
+		g = None
+		if os.path.exists(fullpath):
+			os.remove(fullpath)
+		printDebug("Error parsing file. Please make sure %s contains valid RDF." % location, "important")
 
 	if g:
 		printDebug("Caching...", "red")
@@ -347,150 +338,6 @@ def action_import_folder(location):
 	else:
 		printDebug("Not a valid directory", "important")
 		return None
-
-
-# ==============
-# BOOTSTRAP WITH THREADS TEST
-
-import threading
-import Queue
-
-class ThreadUrl(threading.Thread):
-	"""Threaded Url Grab"""
-	def __init__(self, queue, lock):
-		threading.Thread.__init__(self)
-		self.queue = queue
-		self.lock = lock
-  
-	def run(self):
-		while True:
-			#grabs host from queue
-			host = self.queue.get()
-			# self.lock.acquire()
-			#grabs urls
-			action_import(host, verbose=False, lock=self.lock)
-			# finally:
-			# 	self.lock.release()
-
-			#signals to queue job is done
-			self.queue.task_done()
-
-
-def SECONDATTEMPT_action_bootstrap_threads():
-	"""Bootstrap the local REPO with a few cool ontologies
-
-	# here I tried using the patter found at
-	http://www.ibm.com/developerworks/aix/library/au-threadingpython/
-	"""
- 
-	# list ontologies
-	printDebug("--------------")
-	printDebug("The following ontologies will be imported:")
-	printDebug("--------------")	
-	count = 0 
-	for s in BOOTSTRAP_ONTOLOGIES:
-		count += 1
-		print count, "<%s>" % s
-
-	printDebug("--------------")
-	printDebug("Note: this operation may take several minutes.")
-	printDebug("Are you sure? [Y/N]")
-	# var = raw_input()
-	var = "Y" # for testing
-
-	queue = Queue.Queue()
-	lock = threading.Lock()
-
-	#spawn a pool of threads, and pass them queue instance 
-	for i in range(5):
-		t = ThreadUrl(queue, lock)
-		# t.setDaemon(True)
-		t.start()
-
-	#populate queue with data   
-	for host in BOOTSTRAP_ONTOLOGIES[:1]:
-		queue.put(host)
-		   
-	#wait on the queue until everything has been processed     
-	queue.join()
-
-	return True
-
-
-
-
-def worker1(uri, lock):
-	"""thread worker function"""
-	print threading.currentThread().getName(), 'Starting {{{{{{{{{{{'
-	printDebug("--------------")
-	action_import(uri, verbose=False, lock=lock)
-	# try:
-	# 	printDebug("--------------")
-	# 	action_import(uri, verbose=False)
-	# except:
-	# 	printDebug("OPS... An Unknown Error Occurred - Aborting Installation of %s" % uri)
-	print threading.currentThread().getName(), 'Exiting >>>>>>>>>>>>>'
-	return
-
-
-def worker2(uri_list, lock):
-	"""thread worker function"""
-	print threading.currentThread().getName(), 'Starting {{{{{{{{{{{'
-	printDebug("--------------")
-	for uri in uri_list:
-		action_import(uri, verbose=False, lock=lock)
-	print threading.currentThread().getName(), 'Exiting >>>>>>>>>>>>>'	
-	return
-
-				
-def action_bootstrap_threads():
-	"""Bootstrap the local REPO with a few cool ontologies"""
-
- 
-	# list ontologies
-	printDebug("--------------")
-	printDebug("The following ontologies will be imported:")
-	printDebug("--------------")	
-	count = 0 
-	for s in BOOTSTRAP_ONTOLOGIES:
-		count += 1
-		print count, "<%s>" % s
-
-	printDebug("--------------")
-	printDebug("Note: this operation may take several minutes.")
-	printDebug("Are you sure? [Y/N]")
-	# var = raw_input()
-	var = "Y" # for testing
-
-	threads = []
-
-	lock = threading.Lock()
-
-	# do import using threads
-	if var == "y" or var == "Y":
-
-		if True:
-			for uri in BOOTSTRAP_ONTOLOGIES:
-				t = threading.Thread(target=worker1, args=(uri,lock))
-				threads.append(t)
-				t.start()
-			return True	
-		else:
-			for group in split_list(BOOTSTRAP_ONTOLOGIES[:8], wanted_parts=4):
-				t = threading.Thread(target=worker2, args=(group,lock))
-				threads.append(t)
-				t.start()
-			return True	
-	else:
-		printDebug("--------------")
-		printDebug("Goodbye")
-		return False 
-
-
-# ==============
-# END OF TESTS WITH THREADS  ===ends
-# ==============
-
 
 
 
@@ -845,13 +692,8 @@ def main():
 
 	# bootstrap local repo
 	elif opts._bootstrap:
-		THREADS = False
-		if THREADS:
-			action_bootstrap_threads()
-			raise SystemExit, 1
-		else:
-			action_bootstrap()
-			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")
+		action_bootstrap()
+		printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")
 			
 	# import an ontology (ps implemented in both .ontospy and .extras)
 	elif opts._import:
