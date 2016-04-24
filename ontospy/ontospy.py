@@ -386,7 +386,7 @@ def action_webimport_select():
 		for x in DIR_OPTIONS:
 			text += "%d) %s\n" % (x, DIR_OPTIONS[x])
 		var = raw_input(text + ">")
-		if var == "q":
+		if var == "q" or var == "":
 			return None
 		else:
 			try:

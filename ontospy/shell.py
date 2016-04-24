@@ -86,7 +86,6 @@ class Shell(cmd.Cmd):
 	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
 	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
-	TREE_OPTS = ['classes', 'properties', 'concepts']
 	FILE_OPTS = ['rename', 'delete']
 	
 		
@@ -666,12 +665,11 @@ class Shell(cmd.Cmd):
 
 	def do_ls(self, line):
 		"""Shows entities of a given kind."""
+		opts = self.LS_OPTS
 		line = line.split()
 		_pattern = ""
-		if len(line) > 1:
-			# _pattern = line[1]	
-			pass	
-		elif len(line) == 0:
+	
+		if len(line) == 0:
 			# default contextual behaviour [2016-03-01]
 			if not self.current:
 				line = ["ontologies"]
@@ -680,7 +678,7 @@ class Shell(cmd.Cmd):
 				return	
 			else:
 				line = ["classes"]
-		opts = self.LS_OPTS
+		
 
 		if (not line) or (line[0] not in opts):
 			self.help_ls()
@@ -699,22 +697,33 @@ class Shell(cmd.Cmd):
 
 		elif line[0] == "classes":
 			g = self.current['graph']
+
 			if g.classes:
-				self._select_class(_pattern)
+				if len(line) > 1 and line[1] == "tree":
+					g.printClassTree(showids=False, labels=False, showtype=True)
+					self._print("----------------", "TIP")
+				else:
+					self._select_class(_pattern)
 			else:
 				self._print("No classes available.")
 
 		elif line[0] == "properties":
 			g = self.current['graph']
 			if g.properties:
-				self._select_property(_pattern)
+				if len(line) > 1 and line[1] == "tree":
+					g.printPropertyTree(showids=False, labels=False, showtype=True)
+				else:
+					self._select_property(_pattern)
 			else:
 				self._print("No properties available.") 
 
 		elif line[0] == "concepts":
 			g = self.current['graph']
 			if g.skosConcepts:
-				self._select_concept(_pattern)
+				if len(line) > 1 and line[1] == "tree":
+					g.printSkosTree(showids=False, labels=False, showtype=True)
+				else:
+					self._select_concept(_pattern)
 			else:
 				self._print("No concepts available.")	
 
@@ -769,41 +778,41 @@ class Shell(cmd.Cmd):
 		else: # should never arrive here
 			pass
 							
-	def do_tree(self, line):
-		"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
-		opts = self.TREE_OPTS
-		if not self.current:
-			self._help_noontology()
-			return
+	# def do_tree(self, line):
+	# 	"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
+	# 	opts = self.TREE_OPTS
+	# 	if not self.current:
+	# 		self._help_noontology()
+	# 		return
 		
-		line = line.split() 
-		g = self.current['graph']
+	# 	line = line.split() 
+	# 	g = self.current['graph']
 
-		if (not line) or (line[0] not in opts):
-			self.help_tree()
-			return
-			# self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
+	# 	if (not line) or (line[0] not in opts):
+	# 		self.help_tree()
+	# 		return
+	# 		# self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
 
-		elif line[0] == "classes":			
-			if g.classes:
-				g.printClassTree(showids=False, labels=False, showtype=True)
-			else:
-				self._print("No classes available.")							
+	# 	elif line[0] == "classes":			
+	# 		if g.classes:
+	# 			g.printClassTree(showids=False, labels=False, showtype=True)
+	# 		else:
+	# 			self._print("No classes available.")							
 		
-		elif line[0] == "properties":
-			if g.properties:
-				g.printPropertyTree(showids=False, labels=False, showtype=True)
-			else:
-				self._print("No properties available.")
+	# 	elif line[0] == "properties":
+	# 		if g.properties:
+	# 			g.printPropertyTree(showids=False, labels=False, showtype=True)
+	# 		else:
+	# 			self._print("No properties available.")
 		
-		elif line[0] == "concepts":
-			if g.skosConcepts:
-				g.printSkosTree(showids=False, labels=False, showtype=True)
-			else:
-				self._print("No concepts available.")
+	# 	elif line[0] == "concepts":
+	# 		if g.skosConcepts:
+	# 			g.printSkosTree(showids=False, labels=False, showtype=True)
+	# 		else:
+	# 			self._print("No concepts available.")
 
-		else: # never get here
-			pass	
+	# 	else: # never get here
+	# 		pass	
 
 	
 
@@ -925,6 +934,7 @@ class Shell(cmd.Cmd):
 					self._print("You must pass valid URI")
 
 		else:
+			self._print("TIP: use 'download <uri>' to download from a specific location")
 			ontospy.action_webimport_select()
 			self.ontologies = ontospy.get_localontologies()
 		
@@ -1029,7 +1039,8 @@ class Shell(cmd.Cmd):
 
 
 	# 2016-02-12: method taken from https://github.com/xlcnd/isbntools/blob/master/isbntools/bin/repl.py
-	def do_shell(self, line):
+	# 2016-04-25: hidden
+	def _do_shell(self, line):
 		"""Send a command to the Unix shell.\n==> Usage: shell ls ~"""
 		if not line:
 			return
@@ -1059,8 +1070,9 @@ class Shell(cmd.Cmd):
 	# --------	
 
 	def help_ls(self):
-		txt = "List available graphs or entities.\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
+		txt = "List available graphs or entities (or their taxonomical tree).\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
 		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
+		txt += "\n==> Usage: ls [%s] [tree]" % "|".join([x for x in self.LS_OPTS if x != "ontologies"])		
 		self._print(txt)
 
 	def help_download(self):
@@ -1086,11 +1098,6 @@ class Shell(cmd.Cmd):
 	def help_get(self):
 		txt = "Finds entities matching a given string pattern.\n"
 		txt += "==> Usage: get [%s] <name>" % "|".join([x for x in self.GET_OPTS])		
-		self._print(txt)
-
-	def help_tree(self):
-		txt = "Shows the subsumption tree of a selected entity type.\n"
-		txt += "==> Usage: tree [%s]" % "|".join([x for x in self.TREE_OPTS])		
 		self._print(txt)
 									
 	def help_display(self):
@@ -1142,20 +1149,7 @@ class Shell(cmd.Cmd):
 							if f.startswith(text)
 							]
 		return completions	
-				
-	def complete_tree(self, text, line, begidx, endidx):
-		"""completion for tree command"""
-		
-		options = self.TREE_OPTS
 
-		if not text:
-			completions = options
-		else:
-			completions = [ f
-							for f in options
-							if f.startswith(text)
-							]
-		return completions	
 
 	def complete_display(self, text, line, begidx, endidx):
 		"""completion for display command"""
