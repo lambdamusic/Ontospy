@@ -32,12 +32,12 @@ def getCatalog(source="http://prefix.cc/popular/all.file.vann", query=""):
 	"""
 
 	printDebug("----------\nReading source...")	
-	g = Graph(source)
+	g = Graph(source, verbose=False)
 	
 	out = []
 	for x in g.ontologies:
 		if query:
-			if query in unicode(x.prefix) or query in unicode(x.uri):
+			if query in unicode(x.prefix).lower() or query in unicode(x.uri).lower():
 				out += [(unicode(x.prefix), unicode(x.uri))]
 		else:
 			out += [(unicode(x.prefix), unicode(x.uri))]

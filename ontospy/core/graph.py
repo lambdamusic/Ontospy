@@ -287,9 +287,10 @@ class Graph(object):
 			
 		
 
-	def printStats(self):
+	def printStats(self, hrlinetop=False):
 		""" shotcut to pull out useful info for interactive use """
-		printDebug("----------------")
+		if hrlinetop:
+			printDebug("----------------")
 		printDebug("Ontologies......: %d" % len(self.ontologies))
 		printDebug("Classes.........: %d" % len(self.classes))
 		printDebug("Properties......: %d" % len(self.properties))

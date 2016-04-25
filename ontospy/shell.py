@@ -82,9 +82,9 @@ class Shell(cmd.Cmd):
 	ruler = '-'
 	maxcol = 80
 	
-	DISPLAY_OPTS = [ 'namespaces', 'description', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+	DISPLAY_OPTS = ['toplayer', 'parents', 'children', 'triples' ]
 	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
-	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
+	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts', 'namespaces']
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
 	FILE_OPTS = ['rename', 'delete']
 	
@@ -163,7 +163,7 @@ class Shell(cmd.Cmd):
 
 
 	def _joinedQnames(self, _list):
-		"""util for returning a string joinin names of entities *used only in inspect command*"""
+		"""util for returning a string joinin names of entities *used only in info command*"""
 		try:
 			s = "; ".join([p.qname for p in _list])
 		except:
@@ -205,71 +205,61 @@ class Shell(cmd.Cmd):
 			if first_time:
 				self.prompt = _get_prompt(self.current['file'], self.currentEntity['name'])
 		elif g:
-			if first_time:
-				self._clear_screen()
-				# playSound(ontospy.ONTOSPY_SOUNDS)	 # new..
-				self._print("Loaded graph: <" + self.current['fullpath'] + ">", 'TIP')
-			g.printStats()
 			self._printDescription(False)
-			if False and g.ontologies:
-				for o in g.ontologies:
-					self._print("==> Ontology URI: <%s>" % str(o.uri), "TIP")
-				self._print("----------------", "TIP")
-				# self._print(o.bestDescription(), "TEXT")
 			if first_time:
 				self.prompt = _get_prompt(self.current['file'])
 
 
 
-	def _printStats(self, hrlinetop=True):
-		"""
-		print more informative stats about the object
-		2016-04-21: created more specific methods. THis will be eventually removed!
-		"""
-		if hrlinetop:
-			self._print("----------------")
-		if not self.currentEntity:	# ==> ontology level 
-			g = self.current['graph']			
-			self._print("Ontologies......: %d" % len(g.ontologies))
-			self._print("Classes.........: %d" % len(g.classes))
-			self._print("Properties......: %d" % len(g.properties))
-			self._print("..annotation....: %d" % len(g.annotationProperties))
-			self._print("..datatype......: %d" % len(g.datatypeProperties))
-			self._print("..object........: %d" % len(g.objectProperties))
-			self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
-			self._print("----------------")
+	# def _printStats(self, hrlinetop=True):
+	# 	"""
+	# 	print more informative stats about the object
+	# 	2016-04-21: created more specific methods. THis will be eventually removed!
+	# 	"""
+	# 	if hrlinetop:
+	# 		self._print("----------------")
+	# 	if not self.currentEntity:	# ==> ontology level 
+	# 		g = self.current['graph']			
+	# 		self._print("Ontologies......: %d" % len(g.ontologies))
+	# 		self._print("Classes.........: %d" % len(g.classes))
+	# 		self._print("Properties......: %d" % len(g.properties))
+	# 		self._print("..annotation....: %d" % len(g.annotationProperties))
+	# 		self._print("..datatype......: %d" % len(g.datatypeProperties))
+	# 		self._print("..object........: %d" % len(g.objectProperties))
+	# 		self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
+	# 		self._print("----------------")
 
-		elif self.currentEntity['type'] == 'class':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-			self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), self._joinedQnames(x.domain_of)])
-			self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), self._joinedQnames(x.range_of)])
-			self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), self._joinedQnames(x.all())])
-			self._print("----------------")
+	# 	elif self.currentEntity['type'] == 'class':
+	# 		x = self.currentEntity['object']
+	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+	# 		self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), self._joinedQnames(x.domain_of)])
+	# 		self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), self._joinedQnames(x.range_of)])
+	# 		self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), self._joinedQnames(x.all())])
+	# 		self._print("----------------")
 																			
-		elif self.currentEntity['type'] == 'property':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-			self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), self._joinedQnames(x.domains)])
-			self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), self._joinedQnames(x.ranges)])
-			self._print("----------------")
+	# 	elif self.currentEntity['type'] == 'property':
+	# 		x = self.currentEntity['object']
+	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+	# 		self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), self._joinedQnames(x.domains)])
+	# 		self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), self._joinedQnames(x.ranges)])
+	# 		self._print("----------------")
 
-		elif self.currentEntity['type'] == 'concept':
-			x = self.currentEntity['object']
-			self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-			self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-			self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-			self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-			self._print("----------------")
+	# 	elif self.currentEntity['type'] == 'concept':
+	# 		x = self.currentEntity['object']
+	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
+	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
+	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
+	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
+	# 		self._print("----------------")
 
-		else:
-			self._print("Not implemented") 
+	# 	else:
+	# 		self._print("Not implemented") 
 
 
 	def _printDescription(self, hrlinetop=True):
@@ -287,6 +277,10 @@ class Shell(cmd.Cmd):
 			print Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL
 				
 		else:
+			self._clear_screen()
+			self._print("Graph: <" + self.current['fullpath'] + ">", 'TIP')
+			self._print("----------------", "TIP")
+			self.current['graph'].printStats()
 			for obj in self.current['graph'].ontologies:
 				self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
 				self._print("----------------", "TIP")
@@ -406,6 +400,22 @@ class Shell(cmd.Cmd):
 			self._print("----------------")	
 		return 
 
+
+	def _printSourceCode(self, hrlinetop=True):
+		"""
+		print more informative stats about the object
+		"""
+		if not self.currentEntity:	# ==> ontology level 
+			return
+		x = self.currentEntity['object']	
+		if hrlinetop:
+			self._print("----------------")
+
+		self._print("Source:", "IMPORTANT")
+		self.do_serialize("turtle")
+		self._print("----------------")	
+
+		return 
 
 
 
@@ -674,7 +684,7 @@ class Shell(cmd.Cmd):
 			if not self.current:
 				line = ["ontologies"]
 			elif self.currentEntity:
-				self.do_inspect("")	
+				self.do_info("")	
 				return	
 			else:
 				line = ["classes"]
@@ -694,6 +704,10 @@ class Shell(cmd.Cmd):
 		elif line[0] in opts and not self.current:
 			self._help_noontology()
 			return
+
+		elif line[0] == "namespaces":			
+			for x in self.current['graph'].namespaces:
+				self._print("@prefix %s: <%s> ." % (x[0], x[1])) 
 
 		elif line[0] == "classes":
 			g = self.current['graph']
@@ -778,44 +792,6 @@ class Shell(cmd.Cmd):
 		else: # should never arrive here
 			pass
 							
-	# def do_tree(self, line):
-	# 	"""Shows the subsumption tree of an ontology.\nOptions: [classes | properties | concepts] classes"""
-	# 	opts = self.TREE_OPTS
-	# 	if not self.current:
-	# 		self._help_noontology()
-	# 		return
-		
-	# 	line = line.split() 
-	# 	g = self.current['graph']
-
-	# 	if (not line) or (line[0] not in opts):
-	# 		self.help_tree()
-	# 		return
-	# 		# self._print("Usage: tree [%s]" % "|".join([x for x in opts]))
-
-	# 	elif line[0] == "classes":			
-	# 		if g.classes:
-	# 			g.printClassTree(showids=False, labels=False, showtype=True)
-	# 		else:
-	# 			self._print("No classes available.")							
-		
-	# 	elif line[0] == "properties":
-	# 		if g.properties:
-	# 			g.printPropertyTree(showids=False, labels=False, showtype=True)
-	# 		else:
-	# 			self._print("No properties available.")
-		
-	# 	elif line[0] == "concepts":
-	# 		if g.skosConcepts:
-	# 			g.printSkosTree(showids=False, labels=False, showtype=True)
-	# 		else:
-	# 			self._print("No concepts available.")
-
-	# 	else: # never get here
-	# 		pass	
-
-	
-
 
 
 	def do_display(self, line):
@@ -834,18 +810,7 @@ class Shell(cmd.Cmd):
 			self.help_display()
 			return
 
-		# do commands
-		if line[0] == "description":		
-			self._printDescription()		
-
-		elif line[0] == "stats":	
-			self._printStats()
-							
-		elif line[0] == "namespaces":			
-			for x in g.namespaces:
-				self._print("@prefix %s: <%s> ." % (x[0], x[1])) 
-								
-		elif line[0] == "toplayer":			
+		if line[0] == "toplayer":			
 			for x in g.toplayer:
 				print x.qname
 		
@@ -877,7 +842,7 @@ class Shell(cmd.Cmd):
 				
 
 
-	def do_inspect(self, line):
+	def do_info(self, line):
 		"""Inspect the current entity and display a nice summary of key properties"""
 		# opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
 		
@@ -892,6 +857,7 @@ class Shell(cmd.Cmd):
 		self._printClassDomain(False)
 		self._printClassRange(False)
 		self._printPropertyDomainRange(False)
+		# self._printSourceCode(False)
 				
 		return 
 
@@ -920,21 +886,17 @@ class Shell(cmd.Cmd):
 
 		line = line.split()
 
-		if line:
-			if line[0] == "starter-pack":
-				ontospy.action_bootstrap()
-				self.ontologies = ontospy.get_localontologies()
-			else:
-				if line[0].startswith("http"):
-					try:
-						ontospy.action_import(line[0])
-					except:
-						self._print("OPS... An Unknown Error Occurred - Aborting Installation")
-				else:
-					self._print("You must pass valid URI")
+		if line and line[0] == "starter-pack":
+			ontospy.action_bootstrap()
+			self.ontologies = ontospy.get_localontologies()
+		elif line and line[0].startswith("http"):
+			try:
+				ontospy.action_import(line[0])
+			except:
+				self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % line[0])
 
 		else:
-			self._print("TIP: use 'download <uri>' to download from a specific location")
+			self._print("TIP: use 'download <uri>' to download from a specific location.")
 			ontospy.action_webimport_select()
 			self.ontologies = ontospy.get_localontologies()
 		
@@ -1070,14 +1032,16 @@ class Shell(cmd.Cmd):
 	# --------	
 
 	def help_ls(self):
-		txt = "List available graphs or entities (or their taxonomical tree).\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
+		txt = "List available graphs or entities .\n"
 		txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])		
-		txt += "\n==> Usage: ls [%s] [tree]" % "|".join([x for x in self.LS_OPTS if x != "ontologies"])		
+		txt += "\n\nUsing the *tree* keyword allows to list the taxonomical relationships for a selected entity type .\n"
+		txt += "==> Usage: ls [%s] tree" % "|".join([x for x in self.LS_OPTS if x in ["classes", "properties", "concepts"]])		
+		txt += "\n\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
 		self._print(txt)
 
 	def help_download(self):
 		txt = "Download an ontology from a remote repository or directory.\n"
-		txt += "==> Usage: download"		
+		txt += "==> Usage: download [http uri]"		
 		self._print(txt)
 
 	def help_visualize(self):

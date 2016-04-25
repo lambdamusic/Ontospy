@@ -382,10 +382,10 @@ def action_webimport_select():
 	selection = None
 	while True:
 		printDebug("----------")
-		text = "Please select which online directory to scan: (q=quit)\n"
+		text = "Please select which online directory to scan: (enter=quit)\n"
 		for x in DIR_OPTIONS:
 			text += "%d) %s\n" % (x, DIR_OPTIONS[x])
-		var = raw_input(text + ">")
+		var = raw_input(text + "> ")
 		if var == "q" or var == "":
 			return None
 		else:
@@ -398,11 +398,16 @@ def action_webimport_select():
 				continue
 
 
+	printDebug("----------")
+	text = "Search for a specific keyword? (enter=show all)\n"
+	var = raw_input(text + "> ")
+	keyword = var
+
 	try:
 		if selection == 1:
-			action_webimport_LOV()
+			action_webimport_LOV(keyword=keyword)
 		elif selection == 2:
-			action_webimport_PREFIXCC()
+			action_webimport_PREFIXCC(keyword=keyword)
 	except:
 		printDebug("Sorry, the online repository seems to be unreachable.")
 
@@ -410,38 +415,50 @@ def action_webimport_select():
 
 
 
-def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list"):
+def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list", keyword=""):
 	"""
 	2016-03-02: import from json list 
 	"""
 
 	printDebug("----------\nReading source... <%s>" % baseuri)
 	query = requests.get(baseuri, params={})
-	options = query.json()
-	printDebug("----------\n%d results found." % len(options))
+	all_options = query.json()
+	options = []
 
-	counter = 1
-	for x in options:
-		uri, title, ns = x['uri'], x['titles'][0]['value'], x['nsp']
-# print "%s ==> %s" % (d['titles'][0]['value'], d['uri'])
+	# pre-filter if necessary
+	if keyword:
+		for x in all_options:
+			if keyword in x['uri'].lower() or keyword in x['titles'][0]['value'].lower() or keyword in x['nsp'].lower():
+				options.append(x)
+	else:
+		options = all_options
 
-		print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + uri + " ==> ", Fore.RED + title, Style.RESET_ALL
+	printDebug("----------\n%d results found.\n----------" % len(options))
 
-		counter += 1
+	if options:
+		# display: 
+		counter = 1
+		for x in options:
+			uri, title, ns = x['uri'], x['titles'][0]['value'], x['nsp']
+			# print "%s ==> %s" % (d['titles'][0]['value'], d['uri'])
 
-	while True:
-		var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
-		if var == "q":
-			break
-		else:
-			try:
-				_id = int(var)
-				ontouri = options[_id - 1]['uri']
-				print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
-				action_import(ontouri)
-			except:
-				print "Error retrieving file. Import failed."
-				continue
+			print Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + uri + " ==> ", Fore.RED + title, Style.RESET_ALL
+
+			counter += 1
+
+		while True:
+			var = raw_input(Style.BRIGHT + "=====\nSelect ID to import: (q=quit)\n" + Style.RESET_ALL)
+			if var == "q":
+				break
+			else:
+				try:
+					_id = int(var)
+					ontouri = options[_id - 1]['uri']
+					print Fore.RED + "\n---------\n" + ontouri + "\n---------" + Style.RESET_ALL
+					action_import(ontouri)
+				except:
+					print "Error retrieving file. Import failed."
+					continue
 
 
 		# from extras.web import getCatalog
@@ -452,14 +469,14 @@ def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabul
 
 
 
-def action_webimport_PREFIXCC():
+def action_webimport_PREFIXCC(keyword=""):
 	"""
 	List models from web catalog (prefix.cc) and ask which one to import
 	2015-10-10: originally part of main ontospy; now standalone only 
 	"""
 
 	from extras.web import getCatalog
-	options = getCatalog(query="")
+	options = getCatalog(query=keyword)
 
 	counter = 1
 	for x in options:
