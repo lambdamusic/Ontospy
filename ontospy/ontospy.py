@@ -288,13 +288,6 @@ def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabul
 					continue
 
 
-		# from extras.web import getCatalog
-		# # _list = getCatalog(query=opts.query) # 2015-11-01: no query for now
-		# _list = getCatalog(query="")
-		# action_webimport(_list)	
-
-
-
 
 def action_webimport_PREFIXCC(keyword=""):
 	"""
@@ -302,7 +295,7 @@ def action_webimport_PREFIXCC(keyword=""):
 	2015-10-10: originally part of main ontospy; now standalone only 
 	"""
 
-	from extras.web import getCatalog
+	from extras.import_web import getCatalog
 	options = getCatalog(query=keyword)
 
 	counter = 1

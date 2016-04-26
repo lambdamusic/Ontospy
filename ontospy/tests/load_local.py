@@ -1,18 +1,19 @@
 """ 
 Unit test stub for ontosPy	
 
-Launch with 
+Run like this: 
 
-python test_load.py
+:path/to/ontospyProject>python -m ontospy.tests.load_local
 
 """
 
 import unittest, os, sys
-
+from .. import *
 from .. import ontospy
+from ..core.util import *
 
 
-DATA_FOLDER = "ontospy/data/schemas/"
+DATA_FOLDER = ontospy.get_home_location()
 
 
 # sanity check
@@ -51,6 +52,5 @@ class TestLoadOntologies(unittest.TestCase):
 
 if __name__ == "__main__":
 	unittest.main()
-
 
 

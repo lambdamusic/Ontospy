@@ -88,7 +88,10 @@ class RDF_Entity(object):
 		if cl.parents():
 			bag = []
 			for x in cl.parents():
-				bag += [x] + self.ancestors(x, noduplicates)
+				if x.uri != cl.uri: # avoid circular relationships
+					bag += [x] + self.ancestors(x, noduplicates)
+				else:
+					bag += [x]
 			# finally:
 			if noduplicates:
 				return remove_duplicates(bag) 
@@ -105,7 +108,10 @@ class RDF_Entity(object):
 		if cl.children():
 			bag = []
 			for x in cl.children():
-				bag += [x] + self.descendants(x, noduplicates)
+				if x.uri != cl.uri: # avoid circular relationships
+					bag += [x] + self.descendants(x, noduplicates)
+				else:
+					bag += [x]
 			# finally:
 			if noduplicates:
 				return remove_duplicates(bag) 

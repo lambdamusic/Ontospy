@@ -44,8 +44,7 @@ ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
 
 BOOTSTRAP_ONTOLOGIES = [
 	"http://xmlns.com/foaf/spec/" ,
-	# "https://www.w3.org/2006/time" ,
-	"http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine" ,
+	"http://purl.org/dc/terms/" ,
 	"http://purl.uniprot.org/core/" ,
 	"http://purl.org/spar/cito/" ,
 	"http://ns.nature.com/terms/" ,

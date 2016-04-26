@@ -32,8 +32,9 @@ EOL = '\r\n' if WINDOWS and not PY2 else '\n'
 from . import * 
 from . import ontospy
 from . import _version 
+from .extras import *  # quotes
 from .core.util import *
-from .core.quotes import QUOTES
+
 
 
 
