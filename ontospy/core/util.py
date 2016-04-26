@@ -783,3 +783,33 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 
 
+
+
+def shellPrintOverview(g, opts):
+	"""
+	overview of graph invoked from command line 
+	"""
+	ontologies = g.ontologies
+				
+	for o in ontologies:
+		print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
+		o.printTriples()
+	if g.classes:
+		print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+		g.printClassTree(showids=False, labels=opts['labels'])
+	if g.properties:
+		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
+		g.printPropertyTree(showids=False, labels=opts['labels'])
+	if g.skosConcepts:
+		print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
+		g.printSkosTree(showids=False, labels=opts['labels'])
+			
+
+
+
+
+
+
+
+
+
