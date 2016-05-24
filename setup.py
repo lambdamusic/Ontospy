@@ -10,7 +10,7 @@ if mo:
     VERSIONSTRING = mo.group(1)
 else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
-	
+
 
 
 
@@ -87,13 +87,14 @@ setup(
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
     install_requires=[
 		'readline',  # for shell autocomplete
-		'rdflib', 
+		'rdflib',
         'rdflib-jsonld',
-		'colorama', 
-		'django', 
+		'colorama',
+		'django',
 		'github3.py',
         'requests',
-        'pyfiglet'
+        'pyfiglet',
+        'colorama'
 	],
 
     # List additional groups of dependencies here (e.g. development dependencies).
@@ -122,8 +123,8 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'ontospy-sketch=ontospy.extras.sketch:main', 
-            'ontospy-manager=ontospy.manager:main', 
+            'ontospy-sketch=ontospy.extras.sketch:main',
+            'ontospy-manager=ontospy.manager:main',
             'ontospy=ontospy.ontospy:main'
         ],
     },
