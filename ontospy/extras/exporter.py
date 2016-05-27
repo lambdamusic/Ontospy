@@ -263,7 +263,7 @@ def _askVisualization():
 	ask user which viz output to use
 	"""
 	while True:
-		text = "Please select an output format: (q=quit)\n"
+		text = "Please select an output format for the ontology visualization: (q=quit)\n"
 		for viz in RENDER_OPTIONS:
 			text += "%d) %s\n" % (viz[0], viz[1])
 		var = raw_input(text + ">")
