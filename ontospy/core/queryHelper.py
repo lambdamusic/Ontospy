@@ -108,6 +108,7 @@ class QueryHelper(object):
 	def getAllClasses(self):
 		"""
 		by default, obscure all RDF/RDFS/OWL/XML stuff
+		2016-05-06: not obscured anymore
 		"""
 		qres = self.rdfgraph.query(
 			  """SELECT DISTINCT ?x ?c
@@ -124,6 +125,8 @@ class QueryHelper(object):
 							 { ?y rdfs:domain ?x }
 							 union
 							 { ?y rdfs:range ?x }
+							 # union 
+							 # { ?y rdf:type ?x } 
 						 } .
 
 						 ?x a ?c
@@ -136,6 +139,7 @@ class QueryHelper(object):
 					   && !STRSTARTS(STR(?x), "http://www.w3.org/XML/1998/namespace")
 					   && (!isBlank(?x))
 					   ) .
+
 				 }
 				 ORDER BY  ?x
 				 """)

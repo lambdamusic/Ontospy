@@ -110,7 +110,7 @@ def action_import(location, verbose=True, lock=None):
 	try:
 		if location.startswith("www."): #support for lazy people
 			location = "http://%s" % str(location)
-		if location.startswith("http://"):
+		if location.startswith("http"):
 			# print("here")
 			headers = {'Accept': "application/rdf+xml"}
 			req = urllib2.Request(location, headers=headers)

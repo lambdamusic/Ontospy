@@ -203,11 +203,11 @@ class Graph(object):
 
 
 
-	def serialize(self, rdf_format="turtle"):
+	def serialize(self, format="turtle"):
 		""" Shortcut that outputs the graph
 		Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
 		"""
-		return self.rdfgraph.serialize(format=rdf_format)
+		return self.rdfgraph.serialize(format=format)
 
 
 	def sparql(self, stringa):
@@ -273,19 +273,19 @@ class Graph(object):
 		self.__extractNamespaces()
 
 		self.__extractOntologies()
-		if verbose: printDebug("Ontologies found...: %d" % len(self.ontologies), "comment")
+		if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
 
 		self.__extractClasses()
-		if verbose: printDebug("Classes found......: %d" % len(self.classes), "comment")
+		if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
 
 		self.__extractProperties()
-		if verbose: printDebug("Properties found...: %d" % len(self.properties), "comment")
-		if verbose: printDebug("Annotation.........: %d" % len(self.annotationProperties), "comment")
-		if verbose: printDebug("Datatype...........: %d" % len(self.datatypeProperties), "comment")
-		if verbose: printDebug("Object.............: %d" % len(self.objectProperties), "comment")
+		if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
+		if verbose: printDebug("..annotation.......: %d" % len(self.annotationProperties), "comment")
+		if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
+		if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
 
 		self.__extractSkosConcepts()
-		if verbose: printDebug("SKOS Concepts......: %d" % len(self.skosConcepts), "comment")
+		if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
 
 		self.__computeTopLayer()
 
@@ -296,15 +296,15 @@ class Graph(object):
 	def printStats(self, hrlinetop=False):
 		""" shotcut to pull out useful info for interactive use """
 		if hrlinetop:
-			printDebug("----------------")
-		printDebug("Ontologies......: %d" % len(self.ontologies))
-		printDebug("Classes.........: %d" % len(self.classes))
-		printDebug("Properties......: %d" % len(self.properties))
-		printDebug("..annotation....: %d" % len(self.annotationProperties))
-		printDebug("..datatype......: %d" % len(self.datatypeProperties))
-		printDebug("..object........: %d" % len(self.objectProperties))
-		printDebug("Concepts(SKOS)..: %d" % len(self.skosConcepts))
-		printDebug("----------------")
+			printDebug("----------------", "comment")
+		printDebug("Ontologies......: %d" % len(self.ontologies), "comment")
+		printDebug("Classes.........: %d" % len(self.classes), "comment")
+		printDebug("Properties......: %d" % len(self.properties), "comment")
+		printDebug("..annotation....: %d" % len(self.annotationProperties), "comment")
+		printDebug("..datatype......: %d" % len(self.datatypeProperties), "comment")
+		printDebug("..object........: %d" % len(self.objectProperties), "comment")
+		printDebug("Concepts(SKOS)..: %d" % len(self.skosConcepts), "comment")
+		printDebug("----------------", "comment")
 
 
 	def __extractOntologies(self, exclude_BNodes = False, return_string=False):
@@ -377,7 +377,7 @@ class Graph(object):
 
 		Note: queryHelper.getAllClasses() returns a list of tuples,
 		(class, classRDFtype)
-		so in some cases that's duplicates if a class is both RDFS.CLass and OWL.Class
+		so in some cases there are duplicates if a class is both RDFS.CLass and OWL.Class
 		In this case we keep only OWL.Class as it is more informative.
 		"""
 		self.classes = [] # @todo: keep adding?
@@ -385,15 +385,21 @@ class Graph(object):
 		qres = self.queryHelper.getAllClasses()
 
 		for class_tuple in qres:
+			
+			_uri = class_tuple[0]
+			try:
+				_type = class_tuple[1]
+			except:
+				_type= ""
 
-			test_existing_cl = self.getClass(uri=class_tuple[0])
+			test_existing_cl = self.getClass(uri=_uri)
 			if not test_existing_cl:
 				# create it
-				self.classes += [OntoClass(class_tuple[0], class_tuple[1], self.namespaces)]
+				self.classes += [OntoClass(_uri, _type, self.namespaces)]
 			else:
 				# if OWL.Class over RDFS.Class - update it
-				if class_tuple[1] == rdflib.OWL.Class:
-					test_existing_cl.rdftype = class_tuple[1]
+				if _type == rdflib.OWL.Class:
+					test_existing_cl.rdftype = rdflib.OWL.Class
 
 
 

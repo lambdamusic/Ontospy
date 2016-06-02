@@ -25,6 +25,7 @@ from colorama import Fore, Style
 from .core.graph import Graph, SparqlEndpoint
 # this allows to load with 'import ontospy', and using 'ontospy.Graph'
 
+from .core.util import printDebug
 
 
 
@@ -48,8 +49,10 @@ ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/" + VERSION + "/"
 
 ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
-# ONTOSPY_LIBRARY_DEFAULT =
-# os.path.join(os.path.expanduser('~'), 'ontospy-library')
+
+GLOBAL_DISABLE_CACHE = False  # set to True for testing
+
+
 
 
 BOOTSTRAP_ONTOLOGIES = [
@@ -162,7 +165,9 @@ def get_localontologies():
 def get_pickled_ontology(filename):
 	""" try to retrieve a cached ontology """
 	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
-	if os.path.isfile(pickledfile):
+	if GLOBAL_DISABLE_CACHE:
+		printDebug("WARNING: DEMO MODE cache has been disabled in __init__.py ==============", "red")
+	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
 		try:
 			return cPickle.load(open(pickledfile, "rb"))
 		except:
@@ -175,7 +180,7 @@ def get_pickled_ontology(filename):
 def del_pickled_ontology(filename):
 	""" try to remove a cached ontology """
 	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
-	if os.path.isfile(pickledfile):
+	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
 		os.remove(pickledfile)
 		return True
 	else:
@@ -186,7 +191,7 @@ def rename_pickled_ontology(filename, newname):
 	""" try to rename a cached ontology """
 	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	newpickledfile = ONTOSPY_LOCAL_CACHE + "/" + newname + ".pickle"
-	if os.path.isfile(pickledfile):
+	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
 		os.rename(pickledfile, newpickledfile)
 		return True
 	else:
@@ -205,6 +210,7 @@ def do_pickle_ontology(filename, g=None):
 	if not g:
 		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
 
+	if not GLOBAL_DISABLE_CACHE:
 	try:
 		cPickle.dump(g, open(pickledpath, "wb"))
 		# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL

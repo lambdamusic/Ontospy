@@ -24,6 +24,14 @@ See also: https://pypi.python.org/pypi/ontospy
 
 Changelog
 ---------------
+v 1.6.6 
+- fixed bug with ontospy.tests.load_local and ontospy.tests.load_remote
+- removed 'display' command
+- replaced 'download' command with 'import' [file, uri, repo, starter-pack]
+- added 'info' command options: ['toplayer', 'parents', 'children', 'ancestors', 'descendants']
+- added incremental search by passing a pattern 
+- serialize at ontology level now serializes the whole graph
+
 
 v.1.6.5.6
 - made the caching functionality version-dependent 

@@ -54,7 +54,7 @@ STARTUP_MESSAGE = f.renderText('OntoSPy') + Style.BRIGHT + _intro_ % _version.VE
 
 
 
-def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.BLUE):
+def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.GREEN):
 	"""
 	Global util that changes the prompt contextually
 	<defaultP> = color of 'Ontospy'
@@ -63,13 +63,15 @@ def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.BLUE):
 	onto_c, entity_c = "", ""
 	base = defaultP + Style.BRIGHT +'[OntoSPy]' + Style.RESET_ALL
 	if onto and not entity:
-		temp1 = defaultE + '[%s]' % onto
-		onto_c = defaultE + Style.BRIGHT + temp1 + Style.RESET_ALL
+		temp1 = Fore.BLUE + '(%s)' % onto 
+		onto_c = ">" + temp1 + Style.RESET_ALL
 	if entity:
 		# onto = self.current['file']
-		temp1_1 = defaultE + Style.NORMAL + '[%s]' % truncate(onto, 10)
-		temp1_2 = defaultE + Style.BRIGHT + '[%s]' % entity
-		entity_c = defaultE + Style.BRIGHT + temp1_1 + temp1_2 + Style.RESET_ALL
+		temp1_1 = ">" + Fore.BLUE + Style.NORMAL + '(%s)' % truncate(onto, 15)
+		# temp1_2 = defaultE + Style.BRIGHT + '[%s](%s)' % (entity['type'], entity['name'])
+		# temp1_2 = Fore.BLUE + Style.BRIGHT + '[%s]' % entity['type'] + defaultE + Style.NORMAL + '(%s)' % entity['name']
+		temp1_2 = Fore.GREEN + '(%s:%s)' % (entity['type'], entity['name'])
+		entity_c = temp1_1 + temp1_2 + Style.RESET_ALL
 
 	return base + onto_c + entity_c + "> "
 
@@ -88,11 +90,12 @@ class Shell(cmd.Cmd):
 	ruler = '-'
 	maxcol = 80
 
-	DISPLAY_OPTS = ['toplayer', 'parents', 'children', 'triples' ]
+	INFO_OPTS = ['toplayer', 'parents', 'children', 'ancestors', 'descendants']
 	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
 	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts', 'namespaces']
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
 	FILE_OPTS = ['rename', 'delete']
+	IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack',]
 
 
 	def __init__(self):
@@ -209,7 +212,7 @@ class Shell(cmd.Cmd):
 			self._print("----------------", "TIP")
 			# self._print(obj.bestDescription(), "TEXT")
 			if first_time:
-				self.prompt = _get_prompt(self.current['file'], self.currentEntity['name'])
+				self.prompt = _get_prompt(self.current['file'], self.currentEntity)
 		elif g:
 			self._printDescription(False)
 			if first_time:
@@ -217,55 +220,21 @@ class Shell(cmd.Cmd):
 
 
 
-	# def _printStats(self, hrlinetop=True):
-	# 	"""
-	# 	print(more informative stats about the object)
-	# 	2016-04-21: created more specific methods. THis will be eventually removed!
-	# 	"""
-	# 	if hrlinetop:
-	# 		self._print("----------------")
-	# 	if not self.currentEntity:	# ==> ontology level
-	# 		g = self.current['graph']
-	# 		self._print("Ontologies......: %d" % len(g.ontologies))
-	# 		self._print("Classes.........: %d" % len(g.classes))
-	# 		self._print("Properties......: %d" % len(g.properties))
-	# 		self._print("..annotation....: %d" % len(g.annotationProperties))
-	# 		self._print("..datatype......: %d" % len(g.datatypeProperties))
-	# 		self._print("..object........: %d" % len(g.objectProperties))
-	# 		self._print("Concepts(SKOS)..: %d" % len(g.skosConcepts))
-	# 		self._print("----------------")
+	def _printStats(self, graph, hrlinetop=False):
+		""" shotcut to pull out useful info for interactive use 
+		2016-05-11: note this is a local version of graph.printStats()
+		"""
+		if hrlinetop:
+			self._print("----------------", "TIP")
+		self._print("Ontologies......: %d" % len(graph.ontologies), "TIP")
+		self._print("Classes.........: %d" % len(graph.classes), "TIP")
+		self._print("Properties......: %d" % len(graph.properties), "TIP")
+		self._print("..annotation....: %d" % len(graph.annotationProperties), "TIP")
+		self._print("..datatype......: %d" % len(graph.datatypeProperties), "TIP")
+		self._print("..object........: %d" % len(graph.objectProperties), "TIP")
+		self._print("Concepts(SKOS)..: %d" % len(graph.skosConcepts), "TIP")
+		self._print("----------------", "TIP")
 
-	# 	elif self.currentEntity['type'] == 'class':
-	# 		x = self.currentEntity['object']
-	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-	# 		self._printM(["\nIn Domain of.[%d]\x20\x20" % len(x.domain_of), self._joinedQnames(x.domain_of)])
-	# 		self._printM(["\nIn Range of..[%d]\x20\x20" % len(x.range_of), self._joinedQnames(x.range_of)])
-	# 		self._printM(["\nInstances....[%d]\x20\x20" % len(x.all()), self._joinedQnames(x.all())])
-	# 		self._print("----------------")
-
-	# 	elif self.currentEntity['type'] == 'property':
-	# 		x = self.currentEntity['object']
-	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-	# 		self._printM(["\nHas Domain ..[%d]\x20\x20" % len(x.domains), self._joinedQnames(x.domains)])
-	# 		self._printM(["\nHas Range ...[%d]\x20\x20" % len(x.ranges), self._joinedQnames(x.ranges)])
-	# 		self._print("----------------")
-
-	# 	elif self.currentEntity['type'] == 'concept':
-	# 		x = self.currentEntity['object']
-	# 		self._printM(["Parents......[%d]\x20\x20" % len(x.parents()), self._joinedQnames(x.parents())])
-	# 		self._printM(["\nAncestors....[%d]\x20\x20" % len(x.ancestors()), self._joinedQnames(x.ancestors())])
-	# 		self._printM(["\nChildren.....[%d]\x20\x20" % len(x.children()), self._joinedQnames(x.children())])
-	# 		self._printM(["\nDescendants..[%d]\x20\x20" % len(x.descendants()), self._joinedQnames(x.descendants())])
-	# 		self._print("----------------")
-
-	# 	else:
-	# 		self._print("Not implemented")
 
 
 	def _printDescription(self, hrlinetop=True):
@@ -278,7 +247,7 @@ class Shell(cmd.Cmd):
 			label = obj.bestLabel() or NOTFOUND
 			description = obj.bestDescription() or NOTFOUND
 			print(Style.BRIGHT + "Object Type: " + Style.RESET_ALL + Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
-			print(Style.BRIGHT + "URI        : " + Style.RESET_ALL+ Fore.GREEN + unicode(obj.uri) + Style.RESET_ALL)
+			print(Style.BRIGHT + "URI        : " + Style.RESET_ALL+ Fore.GREEN + "<" + unicode(obj.uri) + ">" + Style.RESET_ALL)
 			print(Style.BRIGHT + "Title      : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
 			print(Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
 
@@ -286,15 +255,17 @@ class Shell(cmd.Cmd):
 			self._clear_screen()
 			self._print("Graph: <" + self.current['fullpath'] + ">", 'TIP')
 			self._print("----------------", "TIP")
-			self.current['graph'].printStats()
+			self._printStats(self.current['graph']) 
 			for obj in self.current['graph'].ontologies:
-				self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
-				self._print("----------------", "TIP")
+				print Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL
+				# self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
+				# self._print("----------------", "TIP")
 				label = obj.bestLabel() or NOTFOUND
 				description = obj.bestDescription() or NOTFOUND
-				print(Style.BRIGHT + "Title      : " + Style.RESET_ALL+ Fore.GREEN + label + Style.RESET_ALL)
-				print(Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.GREEN + description + Style.RESET_ALL)
+				print(Style.BRIGHT + "Title       : " + Style.RESET_ALL+ Fore.GREEN + label + Style.RESET_ALL)
+				print(Style.BRIGHT + "Description : " + Style.RESET_ALL+ Fore.GREEN + description + Style.RESET_ALL)
 		self._print("----------------", "TIP")
+		# self._print("----------------", "TIP")
 
 
 
@@ -322,7 +293,7 @@ class Shell(cmd.Cmd):
 		else:
 			for p in parents:
 				self._print(p.qname)
-		self._print("..." + x.qname, "TEXT")
+		self._print("...<" + x.qname + ">", "TEXT")
 		for c in x.children():
 			self._print("......" + c.qname)
 		self._print("----------------")
@@ -377,13 +348,23 @@ class Shell(cmd.Cmd):
 			ranges = x.ranges
 			if x.domains:
 				for d in x.domains:
-					self._print(d.qname)
+					# for domain/ranges which are not declared classes
+					if hasattr(d, "qname"):
+						_name = d.qname
+					else:
+						_name = str(d)						
+					self._print(_name)
 			else:
 				self._print("OWL:Thing")
 			self._print("  " + "<" + x.qname + ">", "TEXT")
 			if x.ranges:
 				for d in x.ranges:
-					self._print("  " + "   => " + d.qname)
+					# for domain/ranges which are not declared classes
+					if hasattr(d, "qname"):
+						_name = d.qname
+					else:
+						_name = str(d)					
+					self._print("  " + "   => " + _name)
 			else:
 				self._print("  " + "   => " + "OWL:Thing")
 			self._print("----------------")
@@ -425,11 +406,13 @@ class Shell(cmd.Cmd):
 
 
 
-	def _selectFromList(self, _list, using_pattern=True):
+	def _selectFromList(self, _list, using_pattern=True, objtype=None):
 		"""
 		Generic method that lets users pick an item from a list via raw_input
 		*using_pattern* flag to know if we're showing all choices or not
 		Note: the list items need to be OntoSPy entities.
+		<objtype>: if specified, it allows incremental search by keeping specifying a 
+		different pattern.
 		"""
 		if not _list:
 			self._print("No matching items.", "TIP")
@@ -454,14 +437,28 @@ class Shell(cmd.Cmd):
 		pprint2columns(_temp)
 
 		self._print("--------------")
-		self._print("Please select one option by entering its number: ")
+		self._print("Please select one option by entering its number, or a keyword to filter: ")
 		var = raw_input()
+		if var == "":
+			return None
+		elif var.isdigit():
 		try:
 			var = int(var)
 			return _list[var-1]
 		except:
 			self._print("Selection not valid")
 			return None
+		elif objtype:
+			# continuos patter matching on list (only for certain object types)
+			if objtype == 'ontology':
+				self._select_ontology(var)
+			elif objtype == 'class':
+				self._select_class(var)
+			elif objtype == 'property':
+				self._select_property(var)
+			elif objtype == 'concept':
+				self._select_concept(var)
+			return
 
 
 	def _next_ontology(self):
@@ -503,13 +500,16 @@ class Shell(cmd.Cmd):
 			for each in self.ontologies:
 				if line in each:
 					out += [each]
-			choice = self._selectFromList(out, line)
+			choice = self._selectFromList(out, line, "ontology")
 			if choice:
 				self._load_ontology(choice)
 
 
 	def _select_class(self, line):
-		"""try to match a class and load it from the graph"""
+		"""
+		try to match a class and load it from the graph
+		NOTE: the g.getClass(pattern) method does the heavy lifting 
+		"""	
 		g = self.current['graph']
 		if not line:
 			out = g.classes
@@ -521,7 +521,7 @@ class Shell(cmd.Cmd):
 			out = g.getClass(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out, using_pattern)
+				choice = self._selectFromList(out, using_pattern, "class")
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'class'}
 			else:
@@ -548,7 +548,7 @@ class Shell(cmd.Cmd):
 			out = g.getProperty(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out, using_pattern)
+				choice = self._selectFromList(out, using_pattern, "property")
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'property'}
 
@@ -575,7 +575,7 @@ class Shell(cmd.Cmd):
 			out = g.getSkosConcept(line)
 		if out:
 			if type(out) == type([]):
-				choice = self._selectFromList(out, using_pattern)
+				choice = self._selectFromList(out, using_pattern, "concept")
 				if choice:
 					self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'concept'}
 			else:
@@ -800,9 +800,10 @@ class Shell(cmd.Cmd):
 
 
 
-	def do_display(self, line):
-		"""Display information about current entity."""
-		opts = self.DISPLAY_OPTS
+	def do_info(self, line):
+		"""Inspect the current entity and display a nice summary of key properties"""
+		# opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
+		opts = self.INFO_OPTS
 
 		if not self.current:
 			self._help_noontology()
@@ -813,59 +814,50 @@ class Shell(cmd.Cmd):
 
 		# get arg, or default to 'overview'
 		if not line:
-			self.help_display()
-			return
+			self._printDescription()
+			self._printTaxonomy(False)
+			self._printClassDomain(False)
+			self._printClassRange(False)
+			self._printPropertyDomainRange(False)
+			# self._printSourceCode(False)			
 
-		if line[0] == "toplayer":
+		elif line[0] == "toplayer":		
+			if g.toplayer:
+				self._print("Top Classes\n----------------", "IMPORTANT")	
 			for x in g.toplayer:
-				print(x.qname)
+					self._print(x.qname)
+			if g.toplayerProperties:
+				self._print("\nTop Properties\n----------------", "IMPORTANT")	
+				for x in g.toplayerProperties:
+					self._print(x.qname)
+			if g.toplayerSkosConcepts:
+				self._print("\nTop Concepts (SKOS)\n----------------", "IMPORTANT")	
+				for x in g.toplayerSkosConcepts:
+					self._print(x.qname)
 
 		elif line[0] == "parents":
-			if self.currentEntity:
+			if self.currentEntity and self.currentEntity['object'].parents():
 				for x in self.currentEntity['object'].parents():
-					print(x.qname)
-			else:
-				self._print("Please select an entity first.")
+					self._print(x.qname)
 
 		elif line[0] == "children":
-			if self.currentEntity:
+			if self.currentEntity and self.currentEntity['object'].children():
 				for x in self.currentEntity['object'].children():
-					print(x.qname)
-			else:
-				self._print("Please select an entity first.")
+					self._print(x.qname)
 
-		elif line[0] == "triples":
-			if self.currentEntity:
-				self._printTriples(self.currentEntity['object'])
-				# self.currentEntity['object'].printTriples()
-			else:
-				for o in g.ontologies:
-					self._printTriples(o)
-					# o.printTriples()
+		elif line[0] == "ancestors":
+			if self.currentEntity and self.currentEntity['object'].ancestors():
+				for x in self.currentEntity['object'].ancestors():
+					self._print(x.qname)
 
-		else:
-			pass # never get here
+		elif line[0] == "descendants":
+			if self.currentEntity and self.currentEntity['object'].descendants():
+				for x in self.currentEntity['object'].descendants():
+					self._print(x.qname)
 
-
-
-	def do_info(self, line):
-		"""Inspect the current entity and display a nice summary of key properties"""
-		# opts = [ 'namespaces', 'description', 'overview', 'toplayer', 'parents', 'children', 'stats', 'triples' ]
-
-		if not self.current:
-			self._help_noontology()
 			return
 
-		g = self.current['graph']
 
-		self._printDescription()
-		self._printTaxonomy(False)
-		self._printClassDomain(False)
-		self._printClassRange(False)
-		self._printPropertyDomainRange(False)
-		# self._printSourceCode(False)
-
-		return
 
 
 	def do_visualize(self, line):
@@ -887,24 +879,43 @@ class Shell(cmd.Cmd):
 		return
 
 
-	def do_download(self, line):
-		"""Download an ontology"""
+	def do_import(self, line):
+		"""Import an ontology"""
 
 		line = line.split()
 
 		if line and line[0] == "starter-pack":
 			ontospy.action_bootstrap()
 			self.ontologies = ontospy.get_localontologies()
-		elif line and line[0].startswith("http"):
-			try:
-				ontospy.action_import(line[0])
-			except:
-				self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % line[0])
 
-		else:
-			self._print("TIP: use 'download <uri>' to download from a specific location.")
+		elif line and line[0] == "uri":
+			self._print("------------------\nEnter a valid graph URI: (e.g. http://www.w3.org/2009/08/skos-reference/skos.rdf)")
+			var = raw_input()
+			if var:
+				if var.startswith("http"):
+					try:
+						ontospy.action_import(var)
+					except:
+						self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
+				else:
+					self._print("Valid URIs should start with 'http://'")
+
+		elif line and line[0] == "file":
+			self._print("------------------\nEnter a full file path: (e.g. '/Users/mike/Desktop/journals.ttl')")
+			var = raw_input()
+			if var:
+			try:
+					ontospy.action_import(var)
+			except:
+					self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
+
+		elif line and line[0] == "repo":
 			ontospy.action_webimport_select()
 			self.ontologies = ontospy.get_localontologies()
+
+		else:
+			self._print("You didn't provide a valid option.\nUsage:")
+			self.help_import()
 
 		return
 
@@ -953,8 +964,10 @@ class Shell(cmd.Cmd):
 			self.currentEntity['object'].printSerialize(line[0])
 
 		else:
-			for o in g.ontologies:
-				o.printSerialize(line[0])
+			self._print(g.serialize(format=line[0]))
+			# 2016-05-27: was like this before
+			# for o in g.ontologies:
+			# 	o.printSerialize(line[0])
 
 
 
@@ -1045,9 +1058,9 @@ class Shell(cmd.Cmd):
 		txt += "\n\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
 		self._print(txt)
 
-	def help_download(self):
-		txt = "Download an ontology from a remote repository or directory.\n"
-		txt += "==> Usage: download [http uri]"
+	def help_import(self):
+		txt = "Import an ontology from a remote repository or directory.\n"
+		txt += "==> Usage: import [%s]" % "|".join([x for x in self.IMPORT_OPTS])		
 		self._print(txt)
 
 	def help_visualize(self):
@@ -1070,9 +1083,9 @@ class Shell(cmd.Cmd):
 		txt += "==> Usage: get [%s] <name>" % "|".join([x for x in self.GET_OPTS])
 		self._print(txt)
 
-	def help_display(self):
+	def help_info(self):
 		txt = "Display information about an entity e.g. ontology, class etc..\n"
-		txt += "==> Usage: display [%s]" % "|".join([x for x in self.DISPLAY_OPTS])
+		txt += "==> Usage: info OR info [%s]" % "|".join([x for x in self.INFO_OPTS])		
 		self._print(txt)
 
 	def _help_noontology(self):
@@ -1084,7 +1097,7 @@ class Shell(cmd.Cmd):
 	def _help_nofiles(self):
 		"""starts with underscore so that it doesnt appear with help methods"""
 		txt = "No files available in your local repository.\n"
-		txt += "==> Use the 'download starter-pack' command to get started."
+		txt += "==> Use the 'import starter-pack' command to get started." 
 		self._print(txt)
 
 
@@ -1120,12 +1133,26 @@ class Shell(cmd.Cmd):
 							]
 		return completions
 
+	def complete_info(self, text, line, begidx, endidx):
 
-	def complete_display(self, text, line, begidx, endidx):
-		"""completion for display command"""
+		"""completion for info command"""
+		
+		opts = self.INFO_OPTS
 
-		opts = self.DISPLAY_OPTS
+		if not text:
+			completions = opts
+		else:
+			completions = [ f
+							for f in opts
+							if f.startswith(text)
+							]
+		return completions	
 
+
+	def complete_import(self, text, line, begidx, endidx):
+		"""completion for serialize command"""
+
+		opts = self.IMPORT_OPTS
 
 		if not text:
 			completions = opts
