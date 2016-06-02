@@ -211,13 +211,13 @@ def do_pickle_ontology(filename, g=None):
 		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
 
 	if not GLOBAL_DISABLE_CACHE:
-	try:
-		cPickle.dump(g, open(pickledpath, "wb"))
-		# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
-	except Exception as e:
-		print(Style.DIM + "\n.. Failed caching <%s>" % filename + Style.RESET_ALL)
-		print(str(e))
-		print(Style.DIM + "\n... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL)
+		try:
+			cPickle.dump(g, open(pickledpath, "wb"))
+			# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
+		except Exception as e:
+			print(Style.DIM + "\n.. Failed caching <%s>" % filename + Style.RESET_ALL)
+			print(str(e))
+			print(Style.DIM + "\n... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL)
 
 		try:
 			sys.setrecursionlimit(sys.getrecursionlimit()*10)
