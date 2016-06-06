@@ -24,6 +24,10 @@ See also: https://pypi.python.org/pypi/ontospy
 
 Changelog
 ---------------
+v 1.6.7
+- added support for Python 3.0 (via pull request)
+
+
 v 1.6.6 
 - fixed bug with ontospy.tests.load_local and ontospy.tests.load_remote
 - removed 'display' command
