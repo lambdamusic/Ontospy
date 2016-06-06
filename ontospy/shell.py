@@ -442,12 +442,12 @@ class Shell(cmd.Cmd):
 		if var == "":
 			return None
 		elif var.isdigit():
-			try:
-				var = int(var)
-				return _list[var-1]
-			except:
-				self._print("Selection not valid")
-				return None
+		try:
+			var = int(var)
+			return _list[var-1]
+		except:
+			self._print("Selection not valid")
+			return None
 		elif objtype:
 			# continuos patter matching on list (only for certain object types)
 			if objtype == 'ontology':
@@ -904,9 +904,9 @@ class Shell(cmd.Cmd):
 			self._print("------------------\nEnter a full file path: (e.g. '/Users/mike/Desktop/journals.ttl')")
 			var = raw_input()
 			if var:
-				try:
+			try:
 					ontospy.action_import(var)
-				except:
+			except:
 					self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
 
 		elif line and line[0] == "repo":
