@@ -1,20 +1,25 @@
-#!/usr/bin/env python
-
-# encoding: utf-8
+# !/usr/bin/env python
+#  -*- coding: UTF-8 -*-
 
 """
 TURTLE SKETCH
 Copyright (c) 2014 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
-Use the interpreter interactively to create a turtle RDF model.  
+Use the interpreter interactively to create a turtle RDF model.
 
-++ Tip: make this file executable: chmod +x sketch.py ++ 
+++ Tip: make this file executable: chmod +x sketch.py ++
 
 """
 
+from __future__ import print_function
 
+import sys, os
 
-import sys, os, urllib2
+try:
+	import urllib2
+except ImportError:
+	import urllib as urllib2
+
 import rdflib	 # so we have it available as a namespace
 from rdflib import exceptions, URIRef, RDFS, RDF, BNode, OWL
 from rdflib.namespace import Namespace, NamespaceManager
@@ -29,33 +34,33 @@ from .. import ontospy
 class Sketch(object):
 	"""
 	====Sketch v 0.3====
-	
+
 	add()  ==> add turtle statements to the graph (http://www.w3.org/TR/turtle/)
-	...........SHORTCUTS: 
+	...........SHORTCUTS:
 	...........'class' = owl:Class
 	...........'sub' = rdfs:subClassOf
-	
+
 	show() ==> shows the graph. Can take an OPTIONAL argument for the format.
-	...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot'] 
-	
+	...........eg one of['xml', 'n3', 'turtle', 'nt', 'pretty-xml', dot']
+
 	clear()	 ==> clears the graph
 	...........all triples are removed
-	
+
 	omnigraffle() ==> creates a dot file and opens it with omnigraffle
 	...........First you must set Omingraffle as your system default app for dot files!
-	
-	quit() ==> exit 
-	
+
+	quit() ==> exit
+
 	====Happy modeling====
 	"""
 	def __init__(self, text=""):
 		super(Sketch, self).__init__()
-		
+
 		self.rdfGraph = rdflib.Graph()
 		self.namespace_manager = NamespaceManager(self.rdfGraph)
-		
+
 		self.SUPPORTED_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'dot']
-		
+
 		PREFIXES = [
 					("", "http://this.sketch#"),
 					("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
@@ -70,7 +75,7 @@ class Sketch(object):
 			self.bind(pref)
 		if text:
 			self.add(text)
-		
+
 	def add(self, text="", default_continuousAdd=True):
 		"""add some turtle text"""
 		if not text and default_continuousAdd:
@@ -87,28 +92,28 @@ class Sketch(object):
 			text = text.replace(" class ", " owl:Class ")
 			# finally
 			self.rdfGraph.parse(data=pprefix+text, format="turtle")
-	
-	
-	# note: problem here if typying ### on first line! 
+
+
+	# note: problem here if typying ### on first line!
 	def continuousAdd(self):
-		print "Multi-line input. Enter ### when finished."
+		print("Multi-line input. Enter ### when finished.")
 		temp = ""
 		sentinel = "###"
 		for line in iter(raw_input, sentinel):
 			if line.strip() == sentinel:
 				break
 			if not line.strip().endswith("."):
-				line += " ."	
+				line += " ."
 			temp += "%s" % line
-		self.add(temp, False) # default_continuousAdd=False	
-	
+		self.add(temp, False) # default_continuousAdd=False
+
 	def bind(self, prefixTuple):
 		p, k = prefixTuple
 		self.rdfGraph.bind(p, k)
-	
+
 	def clear(self):
 		""""
-		Clears the graph 
+		Clears the graph
 			@todo add ability to remove specific triples
 		"""
 		self.rdfGraph.remove((None, None, None))
@@ -132,7 +137,7 @@ class Sketch(object):
 		digraph graphname {
 			 a -> b [label=instanceOf];
 			 b -> d [label=isA];
-		 }	
+		 }
 		"""
 		temp = ""
 		for x,y,z in self.rdfGraph.triples((None, None, None)):
@@ -144,8 +149,8 @@ class Sketch(object):
 	def omnigraffle(self):
 		""" tries to open an export directly in omnigraffle """
 		temp = self.serialize("dot")
-		
-		try:  # try to put in the user/tmp folder 
+
+		try:  # try to put in the user/tmp folder
 			from os.path import expanduser
 			home = expanduser("~")
 			filename = home + "/tmp/turtle_sketch.dot"
@@ -160,12 +165,12 @@ class Sketch(object):
 		except:
 			os.system("start " + filename)
 
-		
+
 	def show(self, aformat="turtle"):
-		print self.serialize(aformat)
+		print(self.serialize(aformat))
 
 	def docs(self):
-		print self.__docs__		
+		print(self.__docs__)
 
 
 
@@ -176,7 +181,7 @@ class Sketch(object):
 
 
 ##################
-# 
+#
 #  Standalone Mode:
 #
 ##################
@@ -187,47 +192,47 @@ class Sketch(object):
 def main(argv=None):
 	"""
 	September 18, 2014: if an arg is passed, we visualize it
-	Otherwise a simple shell gets opened. 
+	Otherwise a simple shell gets opened.
 
 	"""
-	
-	print "OntoSPy " + ontospy.VERSION
+
+	print("OntoSPy " + ontospy.VERSION)
 	ontospy.get_or_create_home_repo()
-	
+
 	if argv:
-		print "Argument passing not implemented yet"
+		print("Argument passing not implemented yet")
 		if False:
 			onto = Model(argv[0])
 			for x in onto.getClasses():
-				print x
+				print(x)
 			onto.buildPythonClasses()
 			s = Sketch()
-	
+
 	else:
 
-		intro = """Good morning. Ready to Turtle away. Type docs() for help.""" 
+		intro = """Good morning. Ready to Turtle away. Type docs() for help."""
 		# idea: every time provide a different ontology maxim!
-		
+
 		def docs():
-			print "\n".join([x.strip() for x in Sketch.__doc__.splitlines()])
-		
+			print("\n".join([x.strip() for x in Sketch.__doc__.splitlines()]))
+
 		default_sketch = Sketch()
-		
+
 		def add(text=""):
 			default_sketch.add(text)
 		def show(aformat=None):
 			if aformat:
 				default_sketch.show(aformat)
 			else:
-				default_sketch.show()			
+				default_sketch.show()
 		def bind(prefixTuple):
 			default_sketch.bind(prefixTuple)
 		def clear():
 			default_sketch.clear()
 		def omnigraffle():
 			default_sketch.omnigraffle()
-		
-		
+
+
 		try:
 			# note: this requires IPython 0.11 or above
 			import IPython

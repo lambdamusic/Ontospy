@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-
-# encoding: utf-8
+# !/usr/bin/env python
+#  -*- coding: UTF-8 -*-
 
 """
 UTILITY TO MANAGE THE LOCAL ONTOSPY LIBRARY
@@ -8,6 +7,8 @@ UTILITY TO MANAGE THE LOCAL ONTOSPY LIBRARY
 Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
 
 """
+
+from __future__ import print_function
 
 MODULE_VERSION = 0.3
 USAGE = "ontospy-manager [options]"
@@ -17,8 +18,8 @@ import time, optparse, os, rdflib, sys, datetime
 from ConfigParser import SafeConfigParser
 
 
-from . import * 
-from . import ontospy 
+from . import *
+from . import ontospy
 from .core.graph import Graph
 from .core.util import *
 
@@ -29,29 +30,29 @@ from .core.util import *
 
 def action_update_library_location(_location):
 	"""
-	Sets the folder that contains models for the local library 
+	Sets the folder that contains models for the local library
 	@todo: add options to move things over etc..
-	note: this is called from 'manager' 
+	note: this is called from 'manager'
 	"""
-	
+
 	# if not(os.path.exists(_location)):
 	# 	os.mkdir(_location)
 	# 	printDebug("Creating new folder..", "comment")
-	
+
 	printDebug("Old location: '%s'" % ontospy.get_home_location(), "comment")
 
 	if os.path.isdir(_location):
-		
+
 		config = SafeConfigParser()
 		config_filename = ontospy.ONTOSPY_LOCAL + '/config.ini'
 		config.read(config_filename)
 		if not config.has_section('models'):
 			config.add_section('models')
-		
+
 		config.set('models', 'dir', _location)
-		with open(config_filename, 'w') as f:			
-			config.write(f) # note: this does not remove previously saved settings 
-		
+		with open(config_filename, 'w') as f:
+			config.write(f) # note: this does not remove previously saved settings
+
 		return _location
 	else:
 		return None
@@ -60,15 +61,15 @@ def action_update_library_location(_location):
 
 
 def action_listlocal():
-	""" 
-	list all local files 
+	"""
+	list all local files
 	2015-10-18: removed 'cached' from report
 	"""
 	ontologies = ontospy.get_localontologies()
 	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
 
 	if ontologies:
-		print ""
+		print("")
 		temp = []
 		from collections import namedtuple
 		Row = namedtuple('Row',['N','Added', 'File'])
@@ -86,9 +87,9 @@ def action_listlocal():
 			# cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
 			temp += [Row(str(counter),last_modified_date, name)]
 		pprinttable(temp)
-		print ""
+		print("")
 	else:
-		print "No files in the local library. Use the --import command."
+		print("No files in the local library. Use the --import command.")
 
 
 
@@ -100,7 +101,7 @@ def actions_delete():
 
 	filename = ontospy.actionSelectFromLocal()
 	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
-	
+
 	if filename:
 		fullpath = ONTOSPY_LOCAL_MODELS + filename
 		if os.path.exists(fullpath):
@@ -113,12 +114,12 @@ def actions_delete():
 				if os.path.exists(cachepath):
 					os.remove(cachepath)
 					printDebug("Deleted %s" % cachepath, "important")
-				
+
 				return True
 
 	return False
 
-	
+
 
 
 
@@ -132,33 +133,33 @@ def action_erase():
 
 
 def action_cache():
-	print """The existing cache will be erased and recreated."""
-	print """This operation may take several minutes, depending on how many files exist in your local library."""
+	print("""The existing cache will be erased and recreated.""")
+	print("""This operation may take several minutes, depending on how many files exist in your local library.""")
 	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
-	
+
 	var = raw_input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
 	if var == "y":
 		repo_contents = ontospy.get_localontologies()
-		print Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL
+		print(Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL)
 		for onto in repo_contents:
 			fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
 			try:
-				print Fore.RED + "\n=====\n" + onto + Style.RESET_ALL
-				print "Loading graph..."
+				print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
+				print("Loading graph...")
 				g = Graph(fullpath)
-				print "Loaded ", fullpath
+				print("Loaded ", fullpath)
 			except:
 				g = None
-				print "Error parsing file. Please make sure %s contains valid RDF." % fullpath
+				print("Error parsing file. Please make sure %s contains valid RDF." % fullpath)
 
 			if g:
-				print "Caching..."
+				print("Caching...")
 				ontospy.do_pickle_ontology(onto, g)
 
-		print Style.BRIGHT + "===Completed===" + Style.RESET_ALL
+		print(Style.BRIGHT + "===Completed===" + Style.RESET_ALL)
 
 	else:
-		print "Goodbye"
+		print("Goodbye")
 
 
 
@@ -175,36 +176,36 @@ def parse_options():
 
 	Parse any command-line options given returning both
 	the parsed options and arguments.
-	
+
 	https://docs.python.org/2/library/optparse.html
-	
+
 	"""
-	
+
 	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
 
-	
-	
+
+
 	parser.add_option("-l", "",
 			action="store_true", default=False, dest="list",
-			help="LIST: show ontologies saved in the local library.") 
-						
+			help="LIST: show ontologies saved in the local library.")
+
 	parser.add_option("-c", "",
 			action="store_true", default=False, dest="cache",
 			help="CACHE: force caching of the local library (for faster loading)")
 
 	parser.add_option("-u", "",
 			action="store_true", default=False, dest="_setup",
-			help="UPDATE: enter new path for the local library.") 
+			help="UPDATE: enter new path for the local library.")
 
 	parser.add_option("-d", "",
 			action="store_true", default=False, dest="_delete",
-			help="DELETE: remove a single ontology file from the local library.") 
-			
+			help="DELETE: remove a single ontology file from the local library.")
+
 	parser.add_option("-e", "",
 			action="store_true", default=False, dest="erase",
 			help="ERASE: reset the local library (delete all files)")
 
-									
+
 	opts, args = parser.parse_args()
 
 	if opts._setup and not args:
@@ -212,7 +213,7 @@ def parse_options():
 		printDebug("Please specify a folder to be used for the local library.", 'important')
 		printDebug("E.g. 'ontospy-manager -u /Users/john/ontologies'")
 		sys.exit(0)
-				
+
 	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._delete:
 		parser.print_help()
 		sys.exit(0)
@@ -221,16 +222,16 @@ def parse_options():
 
 
 
-	
+
 def main():
 	""" command line script """
-	
-	print "OntoSPy " + ontospy.VERSION	 
+
+	print("OntoSPy " + ontospy.VERSION	 )
 	opts, args = parse_options()
-	
+
 	if not opts._setup:
 		ontospy.get_or_create_home_repo()
-	
+
 	# move local lib
 	if opts._setup:
 		_location = args[0]
@@ -241,43 +242,43 @@ def main():
 		if output:
 			printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")
 			printDebug("----------\n" + "New location: '%s'" % _location, "important")
-			
+
 		else:
 			printDebug("----------\n" + "Please specify an existing folder path.", "important")
-		raise SystemExit, 1
-	
-	
+		raise SystemExit(1)
+
+
 	# reset local stuff
 	if opts._delete:
 		res = actions_delete()
-		raise SystemExit, 1	
-		
+		raise SystemExit(1)
+
 	# reset local stuff
 	if opts.erase:
 		action_erase()
-		raise SystemExit, 1
-	
+		raise SystemExit(1)
+
 	# select a model from the local ontologies
-	if opts.list:		
+	if opts.list:
 		action_listlocal()
-		raise SystemExit, 1 
-	
+		raise SystemExit(1)
+
 	# cache local ontologies
 	if opts.cache:
 		sTime = time.time()
 		action_cache()
-		# finally: print some stats....
+		# finally: print(some stats....)
 		eTime = time.time()
 		tTime = eTime - sTime
 		printDebug("-" * 10)
 		printDebug("Time:	   %0.2fs" %  tTime, "comment")
-		raise SystemExit, 1
-	
-				
-	
+		raise SystemExit(1)
+
+
+
 if __name__ == '__main__':
 	try:
 		main()
 		sys.exit(0)
-	except KeyboardInterrupt, e: # Ctrl-C
+	except KeyboardInterrupt as e: # Ctrl-C
 		raise e

@@ -1,3 +1,5 @@
+# !/usr/bin/env python
+#  -*- coding: UTF-8 -*-
 # https://groups.google.com/forum/#!msg/rdflib-dev/1owj7Ghp1X8/pwClNSz_LI4J
 
 

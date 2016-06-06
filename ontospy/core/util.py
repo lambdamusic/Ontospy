@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-
-# encoding: utf-8
+# !/usr/bin/env python
+#  -*- coding: UTF-8 -*-
 
 """
 Python and RDF Utils for OntoSPy
@@ -9,14 +8,14 @@ Copyright (c) 2010-2015 __Michele Pasin__ <michelepasin.org>. All rights reserve
 
 """
 
-
+from __future__ import print_function
 
 import rdflib
 from rdflib import RDFS, RDF, BNode
 from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
-import sys, os, subprocess, random, platform 
+import sys, os, subprocess, random, platform
 from colorama import Fore, Back, Style
 
 
@@ -61,13 +60,13 @@ def split_list(alist, wanted_parts=1):
 	print split_list(A, wanted_parts=8)
 	"""
 	length = len(alist)
-	return [ alist[i*length // wanted_parts: (i+1)*length // wanted_parts] 
+	return [ alist[i*length // wanted_parts: (i+1)*length // wanted_parts]
 			 for i in range(wanted_parts) ]
 
 
 
 
-def remove_duplicates(seq, idfun=None): 
+def remove_duplicates(seq, idfun=None):
 	""" removes duplicates from a list, order preserving, as found in
 	http://www.peterbe.com/plog/uniqifiers-benchmark
 	"""
@@ -98,14 +97,14 @@ def printDebug(s, style=None):
 	elif style == "important":
 		s = Style.BRIGHT + s + Style.RESET_ALL
 	elif style == "normal":
-		s = Style.RESET_ALL + s + Style.RESET_ALL	
+		s = Style.RESET_ALL + s + Style.RESET_ALL
 	elif style == "red":
-		s = Fore.RED + s + Style.RESET_ALL	
+		s = Fore.RED + s + Style.RESET_ALL
 	elif style == "green":
-		s = Fore.GREEN + s + Style.RESET_ALL				
+		s = Fore.GREEN + s + Style.RESET_ALL
 	try:
-		print >> sys.stderr, s
-	except: 
+		print(s, file=sys.stderr)
+	except:
 		pass
 
 
@@ -115,15 +114,15 @@ def printDebug(s, style=None):
 
 def pprint2columns(llist, max_length=60):
 	"""
-	llist = a list of strings 
+	llist = a list of strings
 	max_length = if a word is longer than that, for single col display
-	
+
 	> prints a list in two columns, taking care of alignment too
 	"""
 	if len(llist) == 0:
 		return None
 
-	col_width = max(len(word) for word in llist) + 2  # padding	
+	col_width = max(len(word) for word in llist) + 2  # padding
 
 	# llist length must be even, otherwise splitting fails
 	if not len(llist) % 2 == 0:
@@ -131,13 +130,13 @@ def pprint2columns(llist, max_length=60):
 
 	if col_width > max_length:
 		for el in llist:
-			print el
+			print(el)
 	else:
 		column1 = llist[:len(llist)/2]
-		column2 = llist[len(llist)/2:]	
+		column2 = llist[len(llist)/2:]
 		for c1, c2 in zip(column1, column2):
 			space = " " * (col_width - len(c1))
-			print "%s%s%s" % (c1, space, c2)
+			print("%s%s%s" % (c1, space, c2))
 
 
 
@@ -181,15 +180,15 @@ def pprinttable(rows):
 		pattern = " | ".join(formats)
 		hpattern = " | ".join(hformats)
 		separator = "-+-".join(['-' * n for n in lens])
-		print hpattern % tuple(headers)
-		print separator
+		print(hpattern % tuple(headers))
+		print(separator)
 		for line in rows:
-			print pattern % tuple(line)
+			print(pattern % tuple(line))
 	elif len(rows) == 1:
 		row = rows[0]
 		hwidth = len(max(row._fields,key=lambda x: len(x)))
 		for i in range(len(row)):
-			print "%*s = %s" % (hwidth,row._fields[i],row[i])
+			print("%*s = %s" % (hwidth,row._fields[i],row[i]))
 
 
 
@@ -205,36 +204,36 @@ def save_anonymous_gist(title, files):
 			}
 			# ..etc...
 		}
-		
+
 	works also in blocks eg from
 	https://gist.github.com/anonymous/b839e3a4d596b215296f
 	to
-	http://bl.ocks.org/anonymous/b839e3a4d596b215296f	
-	
+	http://bl.ocks.org/anonymous/b839e3a4d596b215296f
+
 	So we return 3 different urls
-	
+
 	"""
-	
+
 	try:
 		from github3 import create_gist
 	except:
-		print "github3 library not found (pip install github3)"
-		raise SystemExit, 1
+		print("github3 library not found (pip install github3)")
+		raise SystemExit(1)
 
 	gist = create_gist(title, files)
-	
+
 	urls = {
-		'gist' : gist.html_url, 
+		'gist' : gist.html_url,
 		'blocks' : "http://bl.ocks.org/anonymous/" + gist.html_url.split("/")[-1],
 		'blocks_fullwin' : "http://bl.ocks.org/anonymous/raw/" + gist.html_url.split("/")[-1]
 	}
-	
+
 	return urls
 
 
 
 
-	
+
 
 def _clear_screen():
 	""" http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
@@ -254,14 +253,14 @@ def _clear_screen():
 class bcolors:
 	"""
 	http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
-	eg print bcolors.YELLOW + "Warning: No active frommets remain. Continue?" 
+	eg print bcolors.YELLOW + "Warning: No active frommets remain. Continue?"
 	"""
 	PINK = '\033[95m'  # pink
 	BLUE = '\033[94m'  # blue
 	GREEN = '\033[92m' # green
 	YELLOW = '\033[93m' # yellow
 	RED = '\033[91m'	# red
-	ENDC = '\033[0m'	 
+	ENDC = '\033[0m'
 	BOLD = '\033[1m'	 # bold black
 	UNDERLINE = '\033[4m'  # underline (note: must be ended)
 
@@ -272,7 +271,7 @@ class bcolors:
 
 
 def playSound(folder, name=""):
-	""" as easy as that """								
+	""" as easy as that """
 	try:
 		if not name:
 			onlyfiles = [ f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder,f)) ]
@@ -292,7 +291,7 @@ def truncate(data, l=20):
 
 
 
-		
+
 # ========
 # rdf utils
 # ===========
@@ -307,8 +306,8 @@ NAMESPACES_DEFAULT = [
 			("skos",  rdflib.URIRef("http://www.w3.org/2004/02/skos/core#")),
 			("owl",  rdflib.URIRef("http://www.w3.org/2002/07/owl#")),
 		]
-			
-			
+
+
 
 
 def isBlankNode(aClass):
@@ -329,24 +328,24 @@ def printBasicInfo(onto):
 	"""
 	rdfGraph = onto.rdfGraph
 
-	print "_" * 50, "\n"	
-	print "TRIPLES = %s" % len(rdfGraph)
-	print "_" * 50
-	print "\nNAMESPACES:\n"
+	print("_" * 50, "\n")
+	print("TRIPLES = %s" % len(rdfGraph))
+	print("_" * 50)
+	print("\nNAMESPACES:\n")
 	for x in onto.ontologyNamespaces:
-		print "%s : %s" % (x[0], x[1])
+		print("%s : %s" % (x[0], x[1]))
 
-	
-	print "_" * 50, "\n"
-	print "ONTOLOGY METADATA:\n"	
+
+	print("_" * 50, "\n")
+	print("ONTOLOGY METADATA:\n")
 	for x, y in onto.ontologyAnnotations():
-		print "%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces))
-	print "_" * 50, "\n"
+		print("%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces), uri2niceString(y, onto.ontologyNamespaces)))
+	print("_" * 50, "\n")
 
 
-	print "CLASS TAXONOMY:\n"
+	print("CLASS TAXONOMY:\n")
 	onto.printClassTree()
-	print "_" * 50, "\n"
+	print("_" * 50, "\n")
 
 
 
@@ -359,12 +358,12 @@ def printBasicInfo(onto):
 
 def inferMainPropertyType(uriref):
 	"""
-	Attempt to reduce the property types to 4 main types 
+	Attempt to reduce the property types to 4 main types
 	(without the OWL ontology - which would be the propert way)
-	
+
 	In [3]: for x in g.properties:
 	   ...:		print x.rdftype
-	   ...:		
+	   ...:
 	http://www.w3.org/2002/07/owl#FunctionalProperty
 	http://www.w3.org/2002/07/owl#FunctionalProperty
 	http://www.w3.org/2002/07/owl#InverseFunctionalProperty
@@ -380,27 +379,27 @@ def inferMainPropertyType(uriref):
 		elif uriref == rdflib.OWL.AnnotationProperty:
 			return uriref
 		elif uriref == rdflib.RDF.Property:
-			return uriref	
+			return uriref
 		else: # hack..
 			return rdflib.OWL.ObjectProperty
 	else:
 		return None
-		
+
 
 
 
 
 def printGenericTree(element, level=0, showids=True, labels=False, showtype=True, TYPE_MARGIN=18):
-	""" 
-	Print nicely into stdout the taxonomical tree of an ontology. 
-	
+	"""
+	Print nicely into stdout the taxonomical tree of an ontology.
+
 	Works irrespectively of whether it's a class or property.
-	
+
 	Note: indentation is made so that ids up to 3 digits fit in, plus a space.
 	[123]1--
 	[1]123--
 	[12]12--
-	
+
 	<TYPE_MARGIN> is parametrized so that classes and properties can have different default spacing (eg owl:class vs owl:AnnotationProperty)
 	"""
 
@@ -409,7 +408,7 @@ def printGenericTree(element, level=0, showids=True, labels=False, showtype=True
 	SHORT_TYPES = {
 		"rdf:Property" : 			"rdf:Property" ,
 		"owl:AnnotationProperty" :  "owl:Annot.Pr.",
-		"owl:DatatypeProperty" :    "owl:DatatypePr.", 
+		"owl:DatatypeProperty" :    "owl:DatatypePr.",
 		"owl:ObjectProperty" :      "owl:ObjectPr.",
 	}
 
@@ -418,7 +417,7 @@ def printGenericTree(element, level=0, showids=True, labels=False, showtype=True
 		_id_ = Fore.BLUE +	\
 		"[%d]%s" % (element.id, " " * (ID_MARGIN  - len(str(element.id)))) +  \
 			Fore.RESET
-	
+
 	elif showtype:
 		_prop = uri2niceString(element.rdftype)
 		try:
@@ -427,32 +426,32 @@ def printGenericTree(element, level=0, showids=True, labels=False, showtype=True
 			prop = _prop
 		_id_ = Fore.BLUE +	\
 		"[%s]%s" % (prop, " " * (TYPE_MARGIN  - len(prop))) + Fore.RESET
-			
+
 	else:
 		_id_ = ""
-	
+
 	if labels:
 		bestLabel = element.bestLabel(qname_allowed=False)
 		if bestLabel:
 			bestLabel = Fore.MAGENTA + " (\"%s\")" % bestLabel + Fore.RESET
 	else:
 		bestLabel = ""
-		
+
 	printDebug("%s%s%s%s" % (_id_ , "-" * 4 * level, element.qname, bestLabel))
-	
+
 	# recursion
 	for sub in element.children():
 		printGenericTree(sub, (level + 1), showids, labels, showtype, TYPE_MARGIN)
-	
-	
+
+
 
 def firstStringInList(literalEntities, prefLanguage="en"):
 	"""
 	from a list of literals, returns the one in prefLanguage
-	if no language specification is available, return first element 
+	if no language specification is available, return first element
 	"""
 	match = ""
-	
+
 	if len(literalEntities) == 1:
 		match = literalEntities[0]
 	elif len(literalEntities) > 1:
@@ -466,7 +465,7 @@ def firstStringInList(literalEntities, prefLanguage="en"):
 
 
 
-def firstEnglishStringInList(literalEntities,): 
+def firstEnglishStringInList(literalEntities,):
 	return firstStringInList(literalEntities, "en")
 
 
@@ -477,23 +476,23 @@ def firstEnglishStringInList(literalEntities,):
 
 def sortByNamespacePrefix(urisList, nsList):
 	"""
-		Given an ordered list of namespaces prefixes, order a list of uris based on that. 
-		Eg 
-		
+		Given an ordered list of namespaces prefixes, order a list of uris based on that.
+		Eg
+
 		In [7]: ll
-		Out[7]: 
+		Out[7]:
 		[rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
 		 rdflib.term.URIRef(u'printGenericTreeorg/2000/01/rdf-schema#comment'),
 		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#label'),
 		 rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#equivalentClass')]
 
 		In [8]: sortByNamespacePrefix(ll, [OWL.OWLNS, RDFS])
-		Out[8]: 
+		Out[8]:
 		[rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#equivalentClass'),
 		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#comment'),
 		 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#label'),
 		 rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')]
-		 
+
 	"""
 	exit = []
 	urisList = sort_uri_list_by_name(urisList)
@@ -508,7 +507,7 @@ def sortByNamespacePrefix(urisList, nsList):
 	for uri in urisList:
 		if uri not in exit:
 			exit += [uri]
-						
+
 	return exit
 
 
@@ -516,10 +515,10 @@ def sortByNamespacePrefix(urisList, nsList):
 
 
 def sort_uri_list_by_name(uri_list, bypassNamespace=False):
-	""" 
-	 Sorts a list of uris 
-	 
-	 bypassNamespace: 
+	"""
+	 Sorts a list of uris
+
+	 bypassNamespace:
 		based on the last bit (usually the name after the namespace) of a uri
 		It checks whether the last bit is specified using a # or just a /, eg:
 			 rdflib.URIRef('http://purl.org/ontology/mo/Vinyl'),
@@ -540,7 +539,7 @@ def sort_uri_list_by_name(uri_list, bypassNamespace=False):
 			return sorted(uri_list)
 	except:
 		# TODO: do more testing.. maybe use a unicode-safe method instead of __str__
-		print "Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError"
+		print("Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError")
 		return uri_list
 
 
@@ -573,11 +572,11 @@ def guess_fileformat(aUri):
 
 
 def inferNamespacePrefix(aUri):
-	""" 
+	"""
 	From a URI returns the last bit and simulates a namespace prefix when rendering the ontology.
 
-	eg from <'http://www.w3.org/2008/05/skos#'> 
-		it returns the 'skos' string 
+	eg from <'http://www.w3.org/2008/05/skos#'>
+		it returns the 'skos' string
 	"""
 	stringa = aUri.__str__()
 	try:
@@ -589,18 +588,18 @@ def inferNamespacePrefix(aUri):
 
 
 def inferURILocalSymbol(aUri):
-	""" 
+	"""
 	From a URI returns a tuple (namespace, uri-last-bit)
 
 	Eg
-	from <'http://www.w3.org/2008/05/skos#something'> 
+	from <'http://www.w3.org/2008/05/skos#something'>
 		==> ('something', 'http://www.w3.org/2008/05/skos')
 	from <'http://www.w3.org/2003/01/geo/wgs84_pos'> we extract
 		==> ('wgs84_pos', 'http://www.w3.org/2003/01/geo/')
 
 	"""
 	# stringa = aUri.__str__()
-	stringa = unicode(aUri)
+	stringa = aUri
 	try:
 		ns = stringa.split("#")[0]
 		name = stringa.split("#")[1]
@@ -618,26 +617,26 @@ def inferURILocalSymbol(aUri):
 
 
 def uri2niceString(aUri, namespaces = None):
-	""" 
+	"""
 	From a URI, returns a nice string representation that uses also the namespace symbols
 	Cuts the uri of the namespace, and replaces it with its shortcut (for base, attempts to infer it or leaves it blank)
 
-	Namespaces are a list 
-	
+	Namespaces are a list
+
 	[('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
 	('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
 	(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
 	('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
 	('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
 	(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))]
-	
+
 	"""
 	if not namespaces:
 		namespaces = NAMESPACES_DEFAULT
-		
-	if type(aUri) == rdflib.term.URIRef:	
+
+	if type(aUri) == rdflib.term.URIRef:
 		# we have a URI: try to create a qName
-		stringa = aUri.toPython()  
+		stringa = aUri.toPython()
 		for aNamespaceTuple in namespaces:
 			try: # check if it matches the available NS
 				if stringa.find(aNamespaceTuple[1].__str__()) == 0:
@@ -651,61 +650,61 @@ def uri2niceString(aUri, namespaces = None):
 							stringa = ":" + stringa[len(aNamespaceTuple[1].__str__()):]
 			except:
 				stringa = "error"
-				
+
 	elif type(aUri) == rdflib.term.Literal:
 		stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
 	else:
-		print type(aUri)
+		print(type(aUri))
 		if type(aUri) == type(u''):
 			stringa = aUri
 		else:
-			stringa = aUri.toPython()			
+			stringa = aUri.toPython()
 	return stringa
 
 
 def niceString2uri(aUriString, namespaces = None):
-	""" 
-	From a string representing a URI possibly with the namespace qname, returns a URI instance. 
-	
+	"""
+	From a string representing a URI possibly with the namespace qname, returns a URI instance.
+
 	gold:Citation  ==> rdflib.term.URIRef(u'http://purl.org/linguistics/gold/Citation')
-	
-	Namespaces are a list 
-	
+
+	Namespaces are a list
+
 	[('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
 	('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
 	(u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
 	('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
 	('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
 	(u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))]
-	
+
 	"""
-	
+
 	if not namespaces:
 		namespaces = []
-	
+
 	for aNamespaceTuple in namespaces:
 		if aNamespaceTuple[0] and aUriString.find(aNamespaceTuple[0].__str__() + ":") == 0:
 			aUriString_name = aUriString.split(":")[1]
 			return rdflib.term.URIRef(aNamespaceTuple[1] + aUriString_name)
 
-	# we dont handle the 'base' URI case 
+	# we dont handle the 'base' URI case
 	return rdflib.term.URIRef(aUriString)
-	
-	
-	
-	
+
+
+
+
 
 
 def entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
-	"""		
+	"""
 	Returns the pred-obj for any given resource, excluding selected ones..
-	
+
 	Sorting: by default results are sorted alphabetically and according to namespaces: [RDF, RDFS, OWL.OWLNS, DC.DCNS]
 	"""
 	temp = []
 	if not excludeProps:
 		excludeProps = []
-	
+
 	# extract predicate/object
 	for x,y,z in rdfGraph.triples((anEntity, None, None)):
 		if excludeBNodes and isBlankNode(z):
@@ -731,17 +730,17 @@ def entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False,
 
 
 def entityLabel(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-	"""		
-	Returns the rdfs.label value of an entity (class or property), if existing. 
+	"""
+	Returns the rdfs.label value of an entity (class or property), if existing.
 	Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
 
 	Args:
-	language: 'en', 'it' etc.. 
-	getall: returns a list of all labels rather than a string 
+	language: 'en', 'it' etc..
+	getall: returns a list of all labels rather than a string
 
 	"""
 
-	if getall: 
+	if getall:
 		temp = []
 		for o in rdfGraph.objects(anEntity, RDFS.label):
 			temp += [o]
@@ -756,17 +755,17 @@ def entityLabel(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True):
 
 
 def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True):
-	"""		
-	Returns the rdfs.comment value of an entity (class or property), if existing. 
+	"""
+	Returns the rdfs.comment value of an entity (class or property), if existing.
 	Defaults to DEFAULT_LANGUAGE. Returns the RDF.Literal resource
 
 	Args:
-	language: 'en', 'it' etc.. 
-	getall: returns a list of all labels rather than a string 
+	language: 'en', 'it' etc..
+	getall: returns a list of all labels rather than a string
 
 	"""
 
-	if getall: 
+	if getall:
 		temp = []
 		for o in rdfGraph.objects(anEntity, RDFS.comment):
 			temp += [o]
@@ -787,23 +786,23 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 def shellPrintOverview(g, opts):
 	"""
-	overview of graph invoked from command line 
+	overview of graph invoked from command line
 	"""
 	ontologies = g.ontologies
-				
+
 	for o in ontologies:
-		print Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL
+		print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
 		o.printTriples()
 	if g.classes:
-		print Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL
+		print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
 		g.printClassTree(showids=False, labels=opts['labels'])
 	if g.properties:
-		print Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
+		print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
 		g.printPropertyTree(showids=False, labels=opts['labels'])
 	if g.skosConcepts:
-		print Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL
+		print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
 		g.printSkosTree(showids=False, labels=opts['labels'])
-			
+
 
 
 

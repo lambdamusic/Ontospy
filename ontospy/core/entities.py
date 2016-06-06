@@ -1,5 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# !/usr/bin/env python
+#  -*- coding: UTF-8 -*-
+
+from __future__ import print_function
 
 import rdflib
 from itertools import count
@@ -12,20 +14,20 @@ from .util import *
 
 class RDF_Entity(object):
 	"""
-	Pythonic representation of an RDF resource - normally not instantiated but used for 
-	inheritance purposes 
-	
+	Pythonic representation of an RDF resource - normally not instantiated but used for
+	inheritance purposes
+
 	<triples> : a structure like this:
 	[(rdflib.term.URIRef(u'http://xmlns.com/foaf/0.1/OnlineChatAccount'),
 	  rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#comment'),
 	  rdflib.term.Literal(u'An online chat account.')),
 	 (rdflib.term.URIRef(u'http://xmlns.com/foaf/0.1/OnlineChatAccount'),
 	  rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#subClassOf')]
-	
+
 	"""
-	
+
 	_ids = count(0)
-			
+
 	def __repr__(self):
 		return "<OntoSPy: RDF_Entity object for uri *%s*>" % (self.uri)
 
@@ -33,19 +35,19 @@ class RDF_Entity(object):
 		"""
 		Init ontology object. Load the graph in memory, then setup all necessary attributes.
 		"""
-		self.id = self._ids.next()
-		
+		self.id = next(self._ids)
+
 		self.uri = uri # rdflib.Uriref
-		self.qname = self.__buildQname(namespaces)	
+		self.qname = self.__buildQname(namespaces)
 		self.locale	 = inferURILocalSymbol(self.uri)[0]
-		self.rdftype = rdftype	
+		self.rdftype = rdftype
 		self.triples = None
 		self.rdfgraph = rdflib.Graph()
 
 		self._children = []
 		self._parents = []
 		# self.siblings = []
-		
+
 	def serialize(self, format="turtle"):
 		""" xml, n3, turtle, nt, pretty-xml, trix are built in"""
 		if self.triples:
@@ -53,26 +55,26 @@ class RDF_Entity(object):
 				self._buildGraph()
 			return self.rdfgraph.serialize(format=format)
 		else:
-			return None 
+			return None
 
 	def printSerialize(self, format="turtle"):
 		printDebug("\n" + self.serialize(format))
 
 	def printTriples(self):
 		""" display triples """
-		printDebug(Style.BRIGHT + unicode(self.uri) + Style.RESET_ALL) 
+		printDebug(Style.BRIGHT + self.uri + Style.RESET_ALL)
 		for x in self.triples:
-			printDebug(Fore.MAGENTA + "=> " + unicode(x[1])) 
-			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET) 
-		print ""
+			printDebug(Fore.MAGENTA + "=> " + x[1])
+			printDebug(Fore.GREEN + ".... " + x[2] + Fore.RESET)
+		print("")
 
 	def __buildQname(self, namespaces):
 		""" extracts a qualified name for a uri """
 		return uri2niceString(self.uri, namespaces)
 
 	def _buildGraph(self):
-		""" 
-		transforms the triples list into a proper rdflib graph 
+		"""
+		transforms the triples list into a proper rdflib graph
 		(which can be used later for querying)
 		"""
 		if self.triples:
@@ -80,7 +82,7 @@ class RDF_Entity(object):
 				self.rdfgraph.add(terzetto)
 
 	# methods added to RDF_Entity even though they apply only to some subs
-				
+
 	def ancestors(self, cl=None, noduplicates=True):
 		""" returns all ancestors in the taxonomy """
 		if not cl:
@@ -94,13 +96,13 @@ class RDF_Entity(object):
 					bag += [x]
 			# finally:
 			if noduplicates:
-				return remove_duplicates(bag) 
+				return remove_duplicates(bag)
 			else:
 				return bag
 		else:
-			return []	
+			return []
 
-		
+
 	def descendants(self, cl=None, noduplicates=True):
 		""" returns all descendants in the taxonomy """
 		if not cl:
@@ -114,7 +116,7 @@ class RDF_Entity(object):
 					bag += [x]
 			# finally:
 			if noduplicates:
-				return remove_duplicates(bag) 
+				return remove_duplicates(bag)
 			else:
 				return bag
 		else:
@@ -130,15 +132,15 @@ class RDF_Entity(object):
 		return self._children
 
 	def getValuesForProperty(self, aPropURIRef):
-		""" 
+		"""
 		generic way to extract some prop value eg
 			In [11]: c.getValuesForProperty(rdflib.RDF.type)
-			Out[11]: 
+			Out[11]:
 			[rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class'),
 			 rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')]
 		"""
 		return list(self.rdfgraph.objects(None, aPropURIRef))
-					
+
 
 	def bestLabel(self, prefLanguage="en", qname_allowed=True):
 		"""
@@ -148,7 +150,7 @@ class RDF_Entity(object):
 		"""
 
 		test = self.getValuesForProperty(rdflib.RDFS.label)
-		
+
 		if test:
 			return firstEnglishStringInList(test)
 		else:
@@ -170,7 +172,7 @@ class RDF_Entity(object):
 		"""
 
 		test_preds = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description, rdflib.namespace.DC.description, rdflib.namespace.SKOS.definition ]
-		
+
 		for pred in test_preds:
 			test = self.getValuesForProperty(pred)
 			if test:
@@ -183,7 +185,7 @@ class Ontology(RDF_Entity):
 	"""
 	Pythonic representation of an OWL ontology
 	"""
-			
+
 	def __repr__(self):
 		return "<OntoSPy: Ontology object for uri *%s*>" % (self.uri)
 
@@ -192,21 +194,21 @@ class Ontology(RDF_Entity):
 		"""
 		Init ontology object. Load the graph in memory, then setup all necessary attributes.
 		"""
-		super(Ontology, self).__init__(uri, rdftype, namespaces)	
+		super(Ontology, self).__init__(uri, rdftype, namespaces)
 		# self.uri = uri # rdflib.Uriref
 		self.prefix = prefPrefix
 
-		self.classes = []			
-		self.properties = [] 
+		self.classes = []
+		self.properties = []
 		# self.annotationProperties = []
 		# self.objectProperties = []
 		# self.datatypeProperties = []
-		self.skosConcepts = [] 
+		self.skosConcepts = []
 
 	def annotations(self):
 		""" wrapper - could be expanded later """
 		return sorted(self.triples)
-		
+
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		# self.printGenericTree()
@@ -224,7 +226,7 @@ class Ontology(RDF_Entity):
 
 class OntoClass(RDF_Entity):
 	"""
-	Python representation of a generic class within an ontology. 
+	Python representation of a generic class within an ontology.
 	Includes methods for representing and querying RDFS/OWL classes
 	"""
 
@@ -238,20 +240,20 @@ class OntoClass(RDF_Entity):
 		self.range_of = []
 		self.ontology = None
 		self.queryHelper = None	 # the original graph the class derives from
-		
+
 	def __repr__(self):
 		return "<Class *%s*>" % ( self.uri)
-	
+
 	def instances(self):  # = all instances
 		return self.all()
-		
+
 	def all(self):
 		out = []
 		if self.queryHelper:
 			qres = self.queryHelper.getClassInstances(self.uri)
 			out = [x[0] for x in qres]
 		return out
-		
+
 	def count(self):
 		if self.queryHelper:
 			return self.queryHelper.getClassInstancesCount(self.uri)
@@ -270,7 +272,7 @@ class OntoClass(RDF_Entity):
 		printDebug("Range of.....: %d" % len(self.range_of))
 		printDebug("Instances....: %d" % self.count())
 		printDebug("----------------")
-			
+
 	def printGenericTree(self):
 		printGenericTree(self)
 
@@ -286,13 +288,13 @@ class OntoClass(RDF_Entity):
 class OntoProperty(RDF_Entity):
 	"""
 	Python representation of a generic RDF/OWL property.
-	
+
 	rdftype is one of:
 	rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#ObjectProperty')
 	rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#DatatypeProperty')
 	rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#AnnotationProperty')
 	rdflib.term.URIRef(u'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')
-		
+
 	"""
 
 	def __init__(self, uri, rdftype=None, namespaces=None):
@@ -302,7 +304,7 @@ class OntoProperty(RDF_Entity):
 		super(OntoProperty, self).__init__(uri, rdftype, namespaces)
 
 		self.rdftype = inferMainPropertyType(rdftype)
-		
+
 		self.domains = []
 		self.ranges = []
 		self.ontology = None
@@ -310,11 +312,11 @@ class OntoProperty(RDF_Entity):
 	def __repr__(self):
 		return "<Property *%s*>" % ( self.uri)
 
-	
+
 	def printGenericTree(self):
 		printGenericTree(self)
 
-		
+
 	def printStats(self):
 		""" shotcut to pull out useful info for interactive use """
 		printDebug("----------------")
@@ -325,14 +327,14 @@ class OntoProperty(RDF_Entity):
 		printDebug("Has Domain...: %d" % len(self.domains))
 		printDebug("Has Range....: %d" % len(self.ranges))
 		printDebug("----------------")
-		
+
 
 	def describe(self):
 		""" shotcut to pull out useful info for interactive use """
 		self.printTriples()
 		self.printStats()
 		# self.printGenericTree()
-			
+
 
 
 
@@ -340,9 +342,9 @@ class OntoProperty(RDF_Entity):
 
 class OntoSkosConcept(RDF_Entity):
 	"""
-	Python representation of a generic SKOS concept within an ontology. 
+	Python representation of a generic SKOS concept within an ontology.
 	@todo: complete methods..
-	
+
 	"""
 
 	def __init__(self, uri, rdftype=None, namespaces=None):
@@ -354,7 +356,7 @@ class OntoSkosConcept(RDF_Entity):
 		self.instance_of = []
 		self.ontology = None
 		self.queryHelper = None	 # the original graph the class derives from
-		
+
 	def __repr__(self):
 		return "<SKOS Concept *%s*>" % ( self.uri)
 
@@ -393,4 +395,4 @@ class OntoSkosConcept(RDF_Entity):
 
 
 
-			
+
