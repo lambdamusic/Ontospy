@@ -18,10 +18,9 @@ from ..core.util import *
 
 DATA_FOLDER = ontospy.get_home_location()
 
-BOOTSTRAP_ONTOLOGIES
 
 # sanity check
-print("-------------------\nOntoSPy ",  ontospy.VERSION, "\n-------------------")
+print("-------------------\nOntoSpy ",  ontospy.VERSION, "\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):
@@ -34,7 +33,7 @@ class TestLoadOntologies(unittest.TestCase):
 		print("\nTEST 1: Loading ontologies from default list.\n=================")
 
 		printDebug("--------------")
-		printDebug("The following ontologies will be imported:")
+		printDebug("The following ontologies will be loaded from the web:")
 		printDebug("--------------")
 		count = 0
 		for s in BOOTSTRAP_ONTOLOGIES:

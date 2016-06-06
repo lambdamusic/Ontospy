@@ -38,7 +38,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/lambdamusic/ontosPy',
+    url='https://github.com/lambdamusic/ontospy',
 
     # Author details
     author='Michele Pasin',

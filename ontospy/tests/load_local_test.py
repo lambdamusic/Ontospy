@@ -5,7 +5,7 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.load_local
+:path/to/ontospyProject>python -m ontospy.tests.load_local_test
 
 """
 
@@ -21,7 +21,7 @@ DATA_FOLDER = ontospy.get_home_location()
 
 
 # sanity check
-print("-------------------\nOntoSPy ",  ontospy.VERSION, "\n-------------------")
+print("-------------------\nOntoSpy ",  ontospy.VERSION, "\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):
@@ -29,7 +29,7 @@ class TestLoadOntologies(unittest.TestCase):
 
 	def test1_loading(self):
 		"""
-		Check if the ontologies load ok (local)
+		Check if the ontologies load ok (from local repo)
 		"""
 		print("\nTEST 1: Loading ontologies from %s folder.\n=================" % DATA_FOLDER)
 

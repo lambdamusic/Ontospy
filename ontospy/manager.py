@@ -226,7 +226,7 @@ def parse_options():
 def main():
 	""" command line script """
 
-	print("OntoSPy " + ontospy.VERSION	 )
+	print("OntoSpy " + ontospy.VERSION	 )
 	opts, args = parse_options()
 
 	if not opts._setup:

@@ -1,4 +1,4 @@
-OntoSPy
+OntoSpy
 =======
 
 RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
@@ -7,7 +7,7 @@ RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
 Description
 =======
 
-OntoSPy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded using W3C Semantic Web standards (aka ontologies). 
+OntoSpy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded using W3C Semantic Web standards (aka ontologies). 
 
 The basic workflow is simple: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
 

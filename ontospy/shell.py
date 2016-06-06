@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 """
-OntoSPy Shell Module
+OntoSpy Shell Module
 michele.pasin@gmail.com
 
 # docs:
@@ -49,7 +49,7 @@ _intro_ = """***
 The Command Line Ontology Browser (%s)
 ***											  """
 
-STARTUP_MESSAGE = f.renderText('OntoSPy') + Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
+STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
 
 
 
@@ -61,7 +61,7 @@ def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.GREEN):
 	<defaultE> = color of subsequent entity
 	"""
 	onto_c, entity_c = "", ""
-	base = defaultP + Style.BRIGHT +'[OntoSPy]' + Style.RESET_ALL
+	base = defaultP + Style.BRIGHT +'[OntoSpy]' + Style.RESET_ALL
 	if onto and not entity:
 		temp1 = Fore.BLUE + '(%s)' % onto 
 		onto_c = ">" + temp1 + Style.RESET_ALL
@@ -410,7 +410,7 @@ class Shell(cmd.Cmd):
 		"""
 		Generic method that lets users pick an item from a list via raw_input
 		*using_pattern* flag to know if we're showing all choices or not
-		Note: the list items need to be OntoSPy entities.
+		Note: the list items need to be OntoSpy entities.
 		<objtype>: if specified, it allows incremental search by keeping specifying a 
 		different pattern.
 		"""
@@ -1006,7 +1006,7 @@ class Shell(cmd.Cmd):
 			self.prompt = _get_prompt()
 
 	def do_q(self, line):
-		"Quit: exit the OntoSPy shell"
+		"Quit: exit the OntoSpy shell"
 		self._clear_screen()
 		return True
 
@@ -1197,10 +1197,10 @@ class Shell(cmd.Cmd):
 def main():
 	""" standalone line script """
 
-	print("OntoSPy " + ontospy.VERSION)
+	print("OntoSpy " + ontospy.VERSION)
 
 	Shell()._clear_screen()
-	print(Style.BRIGHT + "** OntoSPy Interactive Ontology Browser " + ontospy.VERSION + " **" + Style.RESET_ALL)
+	print(Style.BRIGHT + "** OntoSpy Interactive Ontology Browser " + ontospy.VERSION + " **" + Style.RESET_ALL)
 	ontospy.get_or_create_home_repo()
 	Shell().cmdloop()
 	raise SystemExit(1)

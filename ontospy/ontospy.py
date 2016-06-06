@@ -473,7 +473,7 @@ def parse_options():
 def main():
 	""" command line script """
 
-	printDebug("OntoSPy " + VERSION, "comment")
+	printDebug("OntoSpy " + VERSION, "comment")
 	opts, args, parser = parse_options()
 	sTime = time.time()
 

@@ -1,6 +1,6 @@
 Quick Start
 ************************
-A few examples showing how OntoSPy can be used in Python programs, or interactively using the Python console.
+A few examples showing how Ontospy can be used in Python programs, or interactively using the Python console.
 
 .. warning::
   This documentation is still in draft mode. 

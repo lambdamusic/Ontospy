@@ -1,18 +1,18 @@
-.. OntoSPy documentation master file, created by
+.. OntoSpy documentation master file, created by
    sphinx-quickstart on Tue May  5 16:43:29 2015.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OntoSPy's documentation!
+Welcome to OntoSpy's documentation!
 ===================================
 
-OntoSPy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded in the `RDF <https://en.wikipedia.org/wiki/Resource_Description_Framework>`_  family of languages. 
+OntoSpy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded in the `RDF <https://en.wikipedia.org/wiki/Resource_Description_Framework>`_  family of languages. 
 
 See also: 
 
 - CheeseShop: https://pypi.python.org/pypi/ontospy 
 
-- Github: https://github.com/lambdamusic/OntoSPy
+- Github: https://github.com/lambdamusic/ontospy
 
 - Homepage: http://www.michelepasin.org/projects/ontospy
 
@@ -24,15 +24,15 @@ See also:
 In a nutshell
 --------------
 
-OntoSPy can be used either as an interactive language shell (a 
+OntoSpy can be used either as an interactive language shell (a 
 `repl <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`_ ) or as a Python package. 
 
-Calling the ``ontospy`` command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSPy will attempt to extract and print out any ontology-related information contained in that graph. 
+Calling the ``ontospy`` command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSpy will attempt to extract and print out any ontology-related information contained in that graph. 
 
-Many other options are available, in particular OntoSPy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
+Many other options are available, in particular OntoSpy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
 
-**Is OntoSPy for me?**
+**Is OntoSpy for me?**
 
 Here are some reasons why you should use it:
 
@@ -44,7 +44,7 @@ Here are some reasons why you should use it:
 
 - You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary. 
 
-.. note:: OntoSPy offers no ontology editing functionalities, nor it can be used to interrogate a triplestore.
+.. note:: OntoSpy offers no ontology editing functionalities, nor it can be used to interrogate a triplestore.
 
 
 Quick example
@@ -107,64 +107,8 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Property *http://xmlns.com/foaf/0.1/birthday*>,
 	 <Property *http://xmlns.com/foaf/0.1/currentProject*>,
 	 <Property *http://xmlns.com/foaf/0.1/depiction*>,
-	 <Property *http://xmlns.com/foaf/0.1/depicts*>,
-	 <Property *http://xmlns.com/foaf/0.1/dnaChecksum*>,
-	 <Property *http://xmlns.com/foaf/0.1/familyName*>,
-	 <Property *http://xmlns.com/foaf/0.1/family_name*>,
-	 <Property *http://xmlns.com/foaf/0.1/firstName*>,
-	 <Property *http://xmlns.com/foaf/0.1/focus*>,
-	 <Property *http://xmlns.com/foaf/0.1/fundedBy*>,
-	 <Property *http://xmlns.com/foaf/0.1/geekcode*>,
-	 <Property *http://xmlns.com/foaf/0.1/gender*>,
-	 <Property *http://xmlns.com/foaf/0.1/givenName*>,
-	 <Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
-	 <Property *http://xmlns.com/foaf/0.1/homepage*>,
-	 <Property *http://xmlns.com/foaf/0.1/icqChatID*>,
-	 <Property *http://xmlns.com/foaf/0.1/img*>,
-	 <Property *http://xmlns.com/foaf/0.1/interest*>,
-	 <Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
-	 <Property *http://xmlns.com/foaf/0.1/jabberID*>,
-	 <Property *http://xmlns.com/foaf/0.1/knows*>,
-	 <Property *http://xmlns.com/foaf/0.1/lastName*>,
-	 <Property *http://xmlns.com/foaf/0.1/logo*>,
-	 <Property *http://xmlns.com/foaf/0.1/made*>,
-	 <Property *http://xmlns.com/foaf/0.1/maker*>,
-	 <Property *http://xmlns.com/foaf/0.1/mbox*>,
-	 <Property *http://xmlns.com/foaf/0.1/mbox_sha1sum*>,
-	 <Property *http://xmlns.com/foaf/0.1/member*>,
-	 <Property *http://xmlns.com/foaf/0.1/membershipClass*>,
-	 <Property *http://xmlns.com/foaf/0.1/msnChatID*>,
-	 <Property *http://xmlns.com/foaf/0.1/myersBriggs*>,
-	 <Property *http://xmlns.com/foaf/0.1/name*>,
-	 <Property *http://xmlns.com/foaf/0.1/nick*>,
-	 <Property *http://xmlns.com/foaf/0.1/openid*>,
-	 <Property *http://xmlns.com/foaf/0.1/page*>,
-	 <Property *http://xmlns.com/foaf/0.1/pastProject*>,
-	 <Property *http://xmlns.com/foaf/0.1/phone*>,
-	 <Property *http://xmlns.com/foaf/0.1/plan*>,
-	 <Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
-	 <Property *http://xmlns.com/foaf/0.1/publications*>,
-	 <Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
-	 <Property *http://xmlns.com/foaf/0.1/sha1*>,
-	 <Property *http://xmlns.com/foaf/0.1/skypeID*>,
-	 <Property *http://xmlns.com/foaf/0.1/status*>,
-	 <Property *http://xmlns.com/foaf/0.1/surname*>,
-	 <Property *http://xmlns.com/foaf/0.1/theme*>,
-	 <Property *http://xmlns.com/foaf/0.1/thumbnail*>,
-	 <Property *http://xmlns.com/foaf/0.1/tipjar*>,
-	 <Property *http://xmlns.com/foaf/0.1/title*>,
-	 <Property *http://xmlns.com/foaf/0.1/topic*>,
-	 <Property *http://xmlns.com/foaf/0.1/topic_interest*>,
-	 <Property *http://xmlns.com/foaf/0.1/weblog*>,
-	 <Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
-	 <Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>,
-	 <Property *http://xmlns.com/foaf/0.1/yahooChatID*>,
-	 <Property *http://purl.org/dc/elements/1.1/date*>,
-	 <Property *http://purl.org/dc/elements/1.1/description*>,
-	 <Property *http://purl.org/dc/elements/1.1/title*>,
-	 <Property *http://www.w3.org/2003/06/sw-vocab-status/ns#term_status*>,
-	 <Property *http://xmlns.com/wot/0.1/assurance*>,
-	 <Property *http://xmlns.com/wot/0.1/src_assurance*>]
+		### etc....
+		]
 
 	In [5]: g.printClassTree()
 	[1]    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing

@@ -29,7 +29,7 @@ class RDF_Entity(object):
 	_ids = count(0)
 
 	def __repr__(self):
-		return "<OntoSPy: RDF_Entity object for uri *%s*>" % (self.uri)
+		return "<OntoSpy: RDF_Entity object for uri *%s*>" % (self.uri)
 
 	def __init__(self, uri, rdftype=None, namespaces = None):
 		"""
@@ -187,7 +187,7 @@ class Ontology(RDF_Entity):
 	"""
 
 	def __repr__(self):
-		return "<OntoSPy: Ontology object for uri *%s*>" % (self.uri)
+		return "<OntoSpy: Ontology object for uri *%s*>" % (self.uri)
 
 
 	def __init__(self, uri, rdftype=None, namespaces=None, prefPrefix=""):

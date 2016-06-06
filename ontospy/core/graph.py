@@ -100,7 +100,7 @@ class Graph(object):
 
 
 	def __repr__(self):
-		return "<OntoSPy Graph (%d triples)>" % (len(self.rdfgraph))
+		return "<OntoSpy Graph (%d triples)>" % (len(self.rdfgraph))
 
 
 
@@ -261,7 +261,7 @@ class Graph(object):
 
 		In [1]: g.scan("npgcore_latest.ttl")
 		Ontologies found: 1
-		Out[3]: [<OntoSPy: Ontology object for uri *http://ns.nature.com/terms/*>]
+		Out[3]: [<OntoSpy: Ontology object for uri *http://ns.nature.com/terms/*>]
 
 		"""
 

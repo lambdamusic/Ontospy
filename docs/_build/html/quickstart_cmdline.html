@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Command Line Usage &mdash; OntoSPy 1.6.5 documentation</title>
+    <title>Command Line Usage &mdash; OntoSpy 1.6.7 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.6.5',
+        VERSION:     '1.6.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="OntoSPy 1.6.5 documentation" href="index.html" />
+    <link rel="top" title="OntoSpy 1.6.7 documentation" href="index.html" />
     <link rel="prev" title="Quick Start" href="quickstart.html" />
    
   
@@ -39,7 +39,7 @@
             
   <div class="section" id="command-line-usage">
 <h1>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
-<p>This page shows how to use OntoSPy from the command line.</p>
+<p>This page shows how to use Ontospy from the command line.</p>
 <p>These are the commands available:</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">ontospy</span></code>: used to launch the interactive ontospy shell, or to query a graph.</li>
@@ -54,100 +54,35 @@
 <h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> command<a class="headerlink" href="#the-ontospy-command" title="Permalink to this headline">¶</a></h2>
 <p>A good place to start is the -h option:</p>
 <div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy -h
-OntoSPy v1.6.5
-Usage: ontospy [graph-uri-or-location] [options]
+Ontospy v1.6.7
+Usage: ontospy.py [graph-uri-or-location] [options]
 
 Options:
-  --version       show program&#39;s version number and exit
+  --version   show program&#39;s version number and exit
   -h, --help  show this help message and exit
-  -l              LIBRARY: select ontologies saved in the local library
-  -v              VERBOSE: show entities labels as well as URIs
-  -e              EXPORT: export a model into another format (e.g. html)
-  -g              GITHUB-GIST: export output as a Github Gist.
-  -i              IMPORT: save a file/folder/url into the local library
-  -w              WEB: save vocabularies registered on http://prefix.cc/popular.
+  -l          LIBRARY: select ontologies saved in the local library
+  -v          VERBOSE: show entities labels as well as URIs
+  -b          BOOTSTRAP: save some sample ontologies into the local library
+  -i          IMPORT: save a file/folder/url into the local library
+  -w          IMPORT-FROM-REPO: import from an online directory
+  -e          EXPORT: export a model into another format (e.g. html)
+  -g          EXPORT-AS-GIST: export output as a Github Gist.
+
+Quick Examples:
+  &gt; ontospy http://xmlns.com/foaf/spec/    # ==&gt; prints info about FOAF
+  &gt; ontospy http://xmlns.com/foaf/spec/ -i # ==&gt; prints info and save local copy
+  &gt; ontospy http://xmlns.com/foaf/spec/ -g # ==&gt; exports ontology data into a github gist
+
+  For more, visit ontospy.readthedocs.org
 </pre></div>
 </div>
-<p>Just calling <code class="docutils literal"><span class="pre">ontospy</span></code> without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies.</p>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy
-OntoSPy v1.6.5.1
-Local library: &lt;/Users/michele.pasin/Dropbox/ontologies/ontospy-library/&gt;
-******
-***
-* OntoSPy Interactive Ontology Browser v1.6.5.1 *
-***
-******
-Type <span class="s1">&#39;help&#39;</span> to get started, TAB to explore commands.
-
-&lt;OntoSPy&gt;: <span class="nb">help</span>
-
-Commands available <span class="o">(</span><span class="nb">type</span> <span class="sb">`</span><span class="nb">help</span> &lt;<span class="nb">command</span>&gt;<span class="sb">`</span> to get <span class="nb">help</span><span class="o">)</span>:
--------------------------------------------------------
-back  display  get      <span class="nb">help  </span>inspect  ls  next  quit  serialize  shell  tree  zen
-
-&lt;OntoSPy&gt;: <span class="nb">help </span>ls
-List available graphs or entities.
-<span class="o">==</span>&gt; Usage: ls <span class="o">[</span>ontologies<span class="p">|</span>classes<span class="p">|</span>properties<span class="p">|</span>concepts<span class="o">]</span>
-&lt;OntoSPy&gt;: ls ontologies
-<span class="m">30</span> items available:
---------------
-<span class="o">[</span>1<span class="o">]</span> base.owl.ttl
-<span class="o">[</span>2<span class="o">]</span> bfo-1.1.owl
-<span class="o">[</span>3<span class="o">]</span> cidoc_crm_v5.0.2.rdfs
-<span class="o">[</span>4<span class="o">]</span> cidoc_crm_v5.0.2_STANDALONE.rdfs
-<span class="o">[</span>5<span class="o">]</span> cito.rdf
-<span class="o">[</span>6<span class="o">]</span> cohere8-online.owl
-<span class="o">[</span>7<span class="o">]</span> conflict1.owl
-<span class="o">[</span>8<span class="o">]</span> Countries.owl
-<span class="o">[</span>9<span class="o">]</span> dcterms.rdf
-<span class="o">[</span>10<span class="o">]</span> discourse-relationships.owl
-<span class="o">[</span>11<span class="o">]</span> DOLCE-Lite_397.owl
-<span class="o">[</span>12<span class="o">]</span> fabio.rdf
-<span class="o">[</span>13<span class="o">]</span> family.swrl.owl
-<span class="o">[</span>14<span class="o">]</span> finance_th_web.owl
-<span class="o">[</span>15<span class="o">]</span> foaf.rdf
-<span class="o">[</span>16<span class="o">]</span> food.rdf
-<span class="o">[</span>17<span class="o">]</span> frapo.owl
-<span class="o">[</span>18<span class="o">]</span> frbr.rdf
-<span class="o">[</span>19<span class="o">]</span> generations.owl
-<span class="o">[</span>20<span class="o">]</span> gold-2010.owl
-<span class="o">[</span>21<span class="o">]</span> goodrelations.rdf
-<span class="o">[</span>22<span class="o">]</span> hucit.owl
-<span class="o">[</span>23<span class="o">]</span> human_activities.owl.xml
-<span class="o">[</span>24<span class="o">]</span> InstructionalObjects.xml
-<span class="o">[</span>25<span class="o">]</span> ka.owl
-<span class="o">[</span>26<span class="o">]</span> keys.owl
-<span class="o">[</span>27<span class="o">]</span> koala.owl
-<span class="o">[</span>28<span class="o">]</span> laki.rdf
-<span class="o">[</span>29<span class="o">]</span> lexinfo.owl
-<span class="o">[</span>30<span class="o">]</span> mini_philosophy.owl
---------------
-Please <span class="k">select</span> one option by entering its number:
-2
-Loaded graph: &lt;/Users/michele.pasin/Dropbox/ontologies/ontospy-library/bfo-1.1.owl&gt;
-----------------
-Ontologies......: 1
-Classes.........: 39
-Properties......: 9
-..annotation....: 9
-..datatype......: 0
-..object........: 0
-Concepts<span class="o">(</span>SKOS<span class="o">)</span>..: 0
-----------------
-<span class="o">==</span>&gt; Ontology URI: &lt;http://www.ifomis.org/bfo/1.1&gt;
-----------------
-&lt;bfo-1.1.owl&gt;:
-
-<span class="c"># etc..</span>
-<span class="c"># now you can interrogate the BFO ontology by typing `ls classes` etc..</span>
-</pre></div>
-</div>
-<p>Pass a valid graph URI as an argument to print out useful ontology information:</p>
+<p>Just calling <code class="docutils literal"><span class="pre">ontospy</span></code> without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this <a class="reference external" href="http://quick.as/1yyyubjoy">video</a>:</p>
+<iframe name='quickcast' src='http://quick.as/embed/1yyyubjoy' scrolling='no' frameborder='0' width='100%' allowfullscreen></iframe><script src='http://quick.as/embed/script/1.60'></script><p>Alternatively, you can also pass a valid graph URI as an argument to the <code class="docutils literal"><span class="pre">ontospy</span></code> command in order to print out useful ontology information:</p>
 <div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy http://www.ifomis.org/bfo/1.1
 
 <span class="c"># prints info about BFO resolving redirects etc..</span>
 
-OntoSPy v1.6.5.1
+Ontospy v1.6.5.1
 Local library: &lt;/Users/michele.pasin/Dropbox/ontologies/ontospy-library/&gt;
 ----------
 .. trying rdf serialization: &lt;xml&gt;
@@ -176,40 +111,8 @@ http://www.ifomis.org/bfo/1.1
 .... Basic Formal Ontology <span class="o">(</span>BFO<span class="o">)</span>
 <span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
 .... http://www.w3.org/2002/07/owl#Ontology
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Barry Smith: <span class="s2">&quot;Against Fantology&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/rights
-.... http://creativecommons.org/licenses/by/3.0
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Pierre Grenon, Barry Smith and Louis Goldberg: <span class="s2">&quot;Biodynamic Ontology: Applying BFO in the Biomedical Domain&quot;</span>
-<span class="o">=</span>&gt; http://www.w3.org/2002/07/owl#versionInfo
-.... 1.1.1
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Barry Smith: <span class="s2">&quot;Basic Tools of Formal Ontology&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/contributor
-.... Pierre <span class="nv">Grenon</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/contributor
-.... Andrew <span class="nv">Spear</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/publisher
-.... Institute <span class="k">for</span> Formal Ontology and Medical Information Science <span class="o">(</span>IFOMIS<span class="o">)</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/contributor
-.... Alan <span class="nv">Ruttenberg</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Pierre Grenon: <span class="s2">&quot;Spatio-temporality in Basic Formal Ontology: SNAP and SPAN, Upper-Level Ontology, and Framework for Formalization&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Barry Smith: <span class="s2">&quot;Beyond Concepts: Ontology as Reality Representation&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/creator
-.... Holger <span class="nv">Stenzhorn</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/identifier
-.... http://www.ifomis.org/bfo/1.1
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Pierre Grenon: <span class="s2">&quot;Nuts in BFO&#39;s Nutshell: Revisions to the Bi-categorial Axiomatization of BFO&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/format
-.... application/rdf+xml
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Pierre Grenon and Barry Smith: <span class="s2">&quot;SNAP and SPAN: Towards Geospatial Dynamics&quot;</span>
-<span class="o">=</span>&gt; http://purl.org/dc/elements/1.1/source
-.... Barry Smith and Pierre Grenon: <span class="s2">&quot;The Cornucopia of Formal Ontological Relations&quot;</span>
+<span class="c">### ...etc....</span>
+
 
 
 Class Taxonomy
@@ -275,18 +178,17 @@ Time:      3.42s
 <h2>The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command<a class="headerlink" href="#the-ontospy-manager-command" title="Permalink to this headline">¶</a></h2>
 <p>This utility allows to run management operations on a local ontospy library installation.</p>
 <div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy-manager
-OntoSPy v1.6.5
-Local library: &lt;/Users/michele.pasin/.ontospy&gt;
-Usage: ontospy-manager &lt;options&gt;
+Ontospy v1.6.7
+Usage: ontospy-manager [options]
 
 Options:
-  --version     show program&#39;s version number and exit
-  -h, --help    show this help message and exit
-  -l, --list    List ontologies saved in the local library.
-  -u, --update  Update path of local library.
-  -d, --delete  Delete ontologies from the local library.
-  -c, --cache   Force caching of the local library (for faster loading)
-  -e, --erase   Erase the local library by removing all existing files
+  --version   show program&#39;s version number and exit
+  -h, --help  show this help message and exit
+  -l          LIST: show ontologies saved in the local library.
+  -c          CACHE: force caching of the local library (for faster loading)
+  -u          UPDATE: enter new path for the local library.
+  -d          DELETE: remove a single ontology file from the local library.
+  -e          ERASE: reset the local library (delete all files)
 </pre></div>
 </div>
 </div>
@@ -307,12 +209,12 @@ Options:
 
 
 
-<p class="blurb">OntoSPy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.</p>
+<p class="blurb">OntoSpy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.</p>
 
 
 
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=lambdamusic&repo=OntoSPy&type=watch&count=true&size=large"
+<iframe src="https://ghbtns.com/github-btn.html?user=lambdamusic&repo=OntoSpy&type=watch&count=true&size=large"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
