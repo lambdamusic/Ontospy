@@ -49,11 +49,11 @@ A good place to start is the -h option:
 	  For more, visit ontospy.readthedocs.org
  
  				  
-Just calling ``ontospy`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this `video <http://quick.as/1yyyubjoy>`_:
+Just calling ``ontospy`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this `video <https://vimeo.com/169707591>`_:
 
 .. raw:: html 
 
-	<iframe name='quickcast' src='http://quick.as/embed/1yyyubjoy' scrolling='no' frameborder='0' width='100%' allowfullscreen></iframe><script src='http://quick.as/embed/script/1.60'></script>
+	<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
 
 Alternatively, you can also pass a valid graph URI as an argument to the ``ontospy`` command in order to print out useful ontology information:					

@@ -50,11 +50,11 @@ Here are some reasons why you should use it:
 Quick example
 --------------
 
-Here's how it works from the command line (`video link <http://quick.as/1yyyubjoy>`_):
+Here's how it works from the command line (`video link <https://vimeo.com/169707591>`_):
 
 .. raw:: html 
 
-	<iframe name='quickcast' src='http://quick.as/embed/1yyyubjoy' scrolling='no' frameborder='0' width='100%' allowfullscreen></iframe><script src='http://quick.as/embed/script/1.60'></script>
+	<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
 If used as a Python package, the basic workflow is the following: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
 
