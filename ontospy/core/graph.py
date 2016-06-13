@@ -4,28 +4,13 @@
 
 """
 ONTOSPY
-Copyright (c) 2013-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Run it from the command line:
 
 >>> python ontospy.py -h
 
 More info in the README file.
-
-
-@todo
-
-- properties
-	- if it has no domain or range, infer that it is owl:Thing!!!!
-	- ie extend all inferences
-
-- create prefixed versions of names
-		- use self.namespace_manager.normalizeUri(y) instead of our own function!
-
-update use of
-semweb=rdflib.URIRef('http://dbpedia.org/resource/Semantic_Web')
-type=g.value(semweb, rdflib.RDFS.label)
-
 
 """
 
@@ -92,6 +77,11 @@ class Graph(object):
 		self.IS_ENDPOINT = False
 		self.IS_FILEOBJECT = False
 		self.IS_TEXT = False
+
+		# # global var
+		# self.OWLTHING = None
+		# hack?
+		# self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
 		# finally
 		self.__loadRDF(source, text, endpoint, rdf_format, verbose)
@@ -380,6 +370,8 @@ class Graph(object):
 		so in some cases there are duplicates if a class is both RDFS.CLass and OWL.Class
 		In this case we keep only OWL.Class as it is more informative.
 		"""
+
+
 		self.classes = [] # @todo: keep adding?
 
 		qres = self.queryHelper.getAllClasses()
@@ -429,7 +421,6 @@ class Graph(object):
 					# add inverse relationships (= direct subs for superclass)
 					if aClass not in superclass.children():
 						 superclass._children.append(aClass)
-
 
 
 
@@ -502,6 +493,35 @@ class Graph(object):
 
 
 
+	def __buildDomainRanges(self, aProp):
+		"""
+		extract domain/range details and add to Python objects
+		"""
+		domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
+		ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
+
+		for x in domains:
+			if not isBlankNode(x):
+				aClass = self.getClass(uri=str(x))
+				if aClass:
+					aProp.domains += [aClass]
+					aClass.domain_of += [aProp]
+				else:
+					aProp.domains += [x]  # edge case: it's not an OntoClass instance?
+
+		for x in ranges:
+			if not isBlankNode(x):
+				aClass = self.getClass(uri=str(x))
+				if aClass:
+					aProp.ranges += [aClass]
+					aClass.range_of += [aProp]
+				else:
+					aProp.ranges += [x]
+
+
+
+
+
 	def __extractSkosConcepts(self):
 		"""
 		2015-08-19: first draft
@@ -515,7 +535,7 @@ class Graph(object):
 			test_existing_cl = self.getSkosConcept(uri=candidate[0])
 			if not test_existing_cl:
 				# create it
-				self.skosConcepts += [OntoSkosConcept(candidate[0], None, self.namespaces)]
+				self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
 			else:
 				pass
 
@@ -873,42 +893,6 @@ class Graph(object):
 
 		else:
 			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
-
-
-
-	###########
-
-	# METHODS for MANIPULATING RDFS/OWL PROPERTIES
-
-	###########
-
-
-
-	def __buildDomainRanges(self, aProp):
-		"""
-		extract domain/range details and add to Python objects
-		"""
-		domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
-		ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
-
-		for x in domains:
-			if not isBlankNode(x):
-				aClass = self.getClass(uri=str(x))
-				if aClass:
-					aProp.domains += [aClass]
-					aClass.domain_of += [aProp]
-				else:
-					aProp.domains += [x]  # edge case: it's not an OntoClass instance?
-
-		for x in ranges:
-			if not isBlankNode(x):
-				aClass = self.getClass(uri=str(x))
-				if aClass:
-					aProp.ranges += [aClass]
-					aClass.range_of += [aProp]
-				else:
-					aProp.ranges += [x]
-
 
 
 

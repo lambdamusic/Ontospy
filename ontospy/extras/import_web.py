@@ -4,7 +4,7 @@
 """
 UTILITY TO GET A LIST OF RDF MODELS FROM PREFIX.CC
 
-Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2015 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Shows a list of ontologies by querying http://prefix.cc/popular/all
 

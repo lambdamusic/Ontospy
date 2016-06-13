@@ -16,6 +16,8 @@ See also:
 
 - Homepage: http://www.michelepasin.org/projects/ontospy
 
+- Docs: http://ontospy.readthedocs.org
+
 
 .. .. warning::
 ..     This documentation is still in draft mode.

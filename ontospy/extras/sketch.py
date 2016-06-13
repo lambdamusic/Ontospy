@@ -3,7 +3,7 @@
 
 """
 TURTLE SKETCH
-Copyright (c) 2014 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2014 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Use the interpreter interactively to create a turtle RDF model.
 

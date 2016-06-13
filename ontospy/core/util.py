@@ -4,7 +4,7 @@
 """
 Python and RDF Utils for OntoSpy
 
-Copyright (c) 2010-2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2010-2015 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 """
 

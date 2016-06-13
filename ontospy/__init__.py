@@ -29,6 +29,20 @@ from .core.util import printDebug
 
 
 
+
+# ===========
+#
+# TESTING FLAG : DISABLE CACHING SO TO FORCE RECONSTRUCTION OF GRAPH EACH TIME
+#
+# ===========
+
+
+GLOBAL_DISABLE_CACHE = True  # set to True for testing
+
+
+
+
+
 # ===========
 #
 # STATIC VARIABLES AND PATHS
@@ -49,9 +63,6 @@ ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/" + VERSION + "/"
 
 ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
-
-GLOBAL_DISABLE_CACHE = False  # set to True for testing
-
 
 
 

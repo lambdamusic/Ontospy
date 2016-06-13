@@ -4,7 +4,7 @@
 """
 UTILITY TO START A LOCAL SERVER
 
-Copyright (c) 2015 __Michele Pasin__ <michelepasin.org>. All rights reserved.
+Copyright (c) 2015 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Shows local repo within a server
 
