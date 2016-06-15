@@ -152,14 +152,14 @@ class RDF_Entity(object):
 		test = self.getValuesForProperty(rdflib.RDFS.label)
 
 		if test:
-			return firstEnglishStringInList(test)
+			return addQuotes(firstEnglishStringInList(test))
 		else:
 			test = self.getValuesForProperty(rdflib.namespace.SKOS.prefLabel)
 			if test:
-				return firstEnglishStringInList(test)
+				return addQuotes(firstEnglishStringInList(test))
 			else:
 				if qname_allowed:
-					return self.locale
+					return addQuotes(self.locale)
 				else:
 					return ""
 
@@ -176,7 +176,7 @@ class RDF_Entity(object):
 		for pred in test_preds:
 			test = self.getValuesForProperty(pred)
 			if test:
-				return firstEnglishStringInList(test)
+				return addQuotes(firstEnglishStringInList(test))
 		return ""
 
 
@@ -238,6 +238,8 @@ class OntoClass(RDF_Entity):
 
 		self.domain_of = []
 		self.range_of = []
+		self.domain_of_inferred = []
+		self.range_of_inferred = []
 		self.ontology = None
 		self.queryHelper = None	 # the original graph the class derives from
 
@@ -282,20 +284,20 @@ class OntoClass(RDF_Entity):
 		self.printStats()
 		# self.printGenericTree()
 
-
-	def getDomainOfRecursive(self):
-		"""returns all properties valid for this class (as they have it in their domain)
-		recursively ie traveling up the descendants tree
-		Note: results in a nexted list [[class1, props], [class2, props]] including itself
-		Note: all properties with no domain info are added at the top as [None, props]
-		"""
-		_list = []
-		_list.append({self :  self.domain_of})
-		for x in self.ancestors():
-			if x.domain_of:
-				_list.append({x :  x.domain_of})
-		return _list
-
+    #
+	# def getDomainOfRecursive(self):
+	# 	"""returns all properties valid for this class (as they have it in their domain)
+	# 	recursively ie traveling up the descendants tree
+	# 	Note: results in a nexted list [[class1, props], [class2, props]] including itself
+	# 	Note: all properties with no domain info are added at the top as [None, props]
+	# 	"""
+	# 	_list = []
+	# 	_list.append({self :  self.domain_of})
+	# 	for x in self.ancestors():
+	# 		if x.domain_of:
+	# 			_list.append({x :  x.domain_of})
+	# 	return _list
+    #
 
 
 class OntoProperty(RDF_Entity):

@@ -53,7 +53,7 @@ class Graph(object):
 
 		self.rdfgraph = rdflib.Graph()
 
-		self.graphuri	= None
+		self.graphuri = None
 		self.queryHelper = None # instantiated after we have a graph
 
 		self.ontologies = []
@@ -78,10 +78,8 @@ class Graph(object):
 		self.IS_FILEOBJECT = False
 		self.IS_TEXT = False
 
-		# # global var
-		# self.OWLTHING = None
-		# hack?
-		# self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
+		# global var
+		self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
 		# finally
 		self.__loadRDF(source, text, endpoint, rdf_format, verbose)
@@ -279,6 +277,8 @@ class Graph(object):
 
 		self.__computeTopLayer()
 
+		self.__computeInferredProperties()
+
 		if verbose: printDebug("----------", "comment")
 
 
@@ -304,9 +304,6 @@ class Graph(object):
 		[ a owl:Ontology ;
 			vann:preferredNamespacePrefix "bsym" ;
 			vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
-
-
-
 		"""
 		out = []
 
@@ -570,6 +567,89 @@ class Graph(object):
 						 superclass._children.append(aConcept)
 
 
+	def __computeTopLayer(self):
+
+		exit = []
+		for c in self.classes:
+			if not c.parents():
+				exit += [c]
+		self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+		# properties
+		exit = []
+		for c in self.properties:
+			if not c.parents():
+				exit += [c]
+		self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+		# skos
+		exit = []
+		for c in self.skosConcepts:
+			if not c.parents():
+				exit += [c]
+		self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+
+	def __computeInferredProperties(self):
+		"""
+
+		:return: attach a list of dicts to each class, detailing valid props up the subsumption tree
+		"""
+		exit = []
+		for c in self.classes:
+			c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of")
+			c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of")
+
+
+	def getInferredPropertiesForClass(self, aClass, rel="domain_of"):
+		"""
+		returns all properties valid for a class (as they have it in their domain)
+		recursively ie traveling up the descendants tree
+		Note: results in a list of dicts including itself
+		Note [2]: all properties with no domain info are added at the top as [None, props]
+
+		:return:
+		[{<Class *http://xmlns.com/foaf/0.1/Person*>:
+			[<Property *http://xmlns.com/foaf/0.1/currentProject*>,<Property *http://xmlns.com/foaf/0.1/familyName*>,
+   				etc....]},
+ 		{<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>:
+ 			[<Property *http://xmlns.com/foaf/0.1/based_near*>, etc...]},
+ 			]
+		"""
+		_list = []
+
+		if rel=="domain_of":
+			_list.append({aClass: aClass.domain_of})
+			for x in aClass.ancestors():
+				if x.domain_of:
+					_list.append({x: x.domain_of})
+
+			# add properties from Owl:Thing ie the inference layer
+
+			topLevelProps = [p for p in self.properties if p.domains == []]
+			if topLevelProps:
+				_list.append({self.OWLTHING: topLevelProps})
+
+		elif rel=="range_of":
+			_list.append({aClass: aClass.range_of})
+			for x in aClass.ancestors():
+				if x.domain_of:
+					_list.append({x: x.range_of})
+
+			# add properties from Owl:Thing ie the inference layer
+
+			topLevelProps = [p for p in self.properties if p.ranges == []]
+			if topLevelProps:
+				_list.append({self.OWLTHING: topLevelProps})
+
+		return _list
+
+
+
+
+	# METHODS TO RETRIEVE OBJECTS
+
+
 
 	def getClass(self, id=None, uri=None, match=None):
 		"""
@@ -815,29 +895,6 @@ class Graph(object):
 		return None
 
 
-	def __computeTopLayer(self):
-
-		exit = []
-		for c in self.classes:
-			if not c.parents():
-				exit += [c]
-		self.toplayer = exit # sorted(exit, key=lambda x: x.id) # doesnt work
-
-		# properties
-		exit = []
-		for c in self.properties:
-			if not c.parents():
-				exit += [c]
-		self.toplayerProperties = exit # sorted(exit, key=lambda x: x.id) # doesnt work
-
-		# skos
-		exit = []
-		for c in self.skosConcepts:
-			if not c.parents():
-				exit += [c]
-		self.toplayerSkosConcepts = exit # sorted(exit, key=lambda x: x.id) # doesnt work
-
-
 	def printClassTree(self, element = None, showids=False, labels=False, showtype=False):
 		"""
 		Print nicely into stdout the class tree of an ontology
@@ -893,7 +950,6 @@ class Graph(object):
 
 		else:
 			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
-
 
 
 

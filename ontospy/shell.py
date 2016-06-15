@@ -54,26 +54,28 @@ STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % _version.VE
 
 
 
-def _get_prompt(onto="", entity="", defaultP=Fore.RED, defaultE=Fore.GREEN):
+def _get_prompt(onto="", entity=""):
 	"""
 	Global util that changes the prompt contextually
-	<defaultP> = color of 'Ontospy'
-	<defaultE> = color of subsequent entity
+	:return: [OntoSpy]>(cidoc_crm_v5.0...)>(class:E1.CRM_Entity)>
 	"""
-	onto_c, entity_c = "", ""
-	base = defaultP + Style.BRIGHT +'[OntoSpy]' + Style.RESET_ALL
-	if onto and not entity:
-		temp1 = Fore.BLUE + '(%s)' % onto 
-		onto_c = ">" + temp1 + Style.RESET_ALL
-	if entity:
-		# onto = self.current['file']
-		temp1_1 = ">" + Fore.BLUE + Style.NORMAL + '(%s)' % truncate(onto, 15)
-		# temp1_2 = defaultE + Style.BRIGHT + '[%s](%s)' % (entity['type'], entity['name'])
-		# temp1_2 = Fore.BLUE + Style.BRIGHT + '[%s]' % entity['type'] + defaultE + Style.NORMAL + '(%s)' % entity['name']
-		temp1_2 = Fore.GREEN + '(%s:%s)' % (entity['type'], entity['name'])
-		entity_c = temp1_1 + temp1_2 + Style.RESET_ALL
+	base_text, onto_text, entity_text = "", "", ""
+	base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.RED, Fore.RED
 
-	return base + onto_c + entity_c + "> "
+	base_text = base_color + '[OntoSpy]' + Style.RESET_ALL
+
+	if onto and not entity:
+		_tmp = onto_color + '(%s)' % onto
+		onto_text = ">" + _tmp + Style.RESET_ALL
+
+	if entity:
+		_tmp = onto_color + Style.BRIGHT + '(%s)' % truncate(onto, 15)
+		onto_text = ">" + _tmp + Style.RESET_ALL
+
+		_tmp2 = entity_color + '(%s:%s)' % (entity['type'], entity['name'])
+		entity_text = ">" + _tmp2 + Style.RESET_ALL
+
+	return base_text + onto_text + entity_text + "> "
 
 
 
@@ -90,7 +92,7 @@ class Shell(cmd.Cmd):
 	ruler = '-'
 	maxcol = 80
 
-	INFO_OPTS = ['toplayer', 'parents', 'children', 'ancestors', 'descendants']
+	INFO_OPTS = ['toplayer', 'parents', 'children', 'ancestors', 'descendants', 'inferred_usage']
 	SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
 	LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts', 'namespaces']
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
@@ -246,10 +248,10 @@ class Shell(cmd.Cmd):
 			obj = self.currentEntity['object']
 			label = obj.bestLabel() or NOTFOUND
 			description = obj.bestDescription() or NOTFOUND
-			print(Style.BRIGHT + "Object Type: " + Style.RESET_ALL + Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
+			print(Style.BRIGHT + "OBJECT TYPE: " + Style.RESET_ALL + Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
 			print(Style.BRIGHT + "URI        : " + Style.RESET_ALL+ Fore.GREEN + "<" + unicode(obj.uri) + ">" + Style.RESET_ALL)
-			print(Style.BRIGHT + "Title      : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
-			print(Style.BRIGHT + "Description: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
+			print(Style.BRIGHT + "TITLE      : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
+			print(Style.BRIGHT + "DESCRIPTION: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
 
 		else:
 			self._clear_screen()
@@ -262,8 +264,8 @@ class Shell(cmd.Cmd):
 				# self._print("----------------", "TIP")
 				label = obj.bestLabel() or NOTFOUND
 				description = obj.bestDescription() or NOTFOUND
-				print(Style.BRIGHT + "Title       : " + Style.RESET_ALL+ Fore.GREEN + label + Style.RESET_ALL)
-				print(Style.BRIGHT + "Description : " + Style.RESET_ALL+ Fore.GREEN + description + Style.RESET_ALL)
+				print(Style.BRIGHT + "Title       : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
+				print(Style.BRIGHT + "Description : " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
 		self._print("----------------", "TIP")
 		# self._print("----------------", "TIP")
 
@@ -277,7 +279,7 @@ class Shell(cmd.Cmd):
 			return
 		if hrlinetop:
 			self._print("----------------")
-		self._print("Taxonomy:", "IMPORTANT")
+		self._print("TAXONOMY:", "IMPORTANT")
 		x = self.currentEntity['object']
 		parents = x.parents()
 
@@ -293,16 +295,17 @@ class Shell(cmd.Cmd):
 		else:
 			for p in parents:
 				self._print(p.qname)
-		self._print("...<" + x.qname + ">", "TEXT")
+		self._print("..." + x.qname , "TEXT")
 		for c in x.children():
 			self._print("......" + c.qname)
 		self._print("----------------")
 
 
 
-	def _printClassDomain(self, hrlinetop=True):
+	def _printClassDomain(self, hrlinetop=True, print_inferred=False):
 		"""
 		print(more informative stats about the object)
+		2016-06-14: added inferred option
 		"""
 		if not self.currentEntity:	# ==> ontology level
 			return
@@ -310,15 +313,41 @@ class Shell(cmd.Cmd):
 		if self.currentEntity['type'] == 'class':
 			if hrlinetop:
 				self._print("----------------")
-			self._print("Domain Of: [%d]" % len(x.domain_of), "IMPORTANT")
+			self._print("DOMAIN OF:", "IMPORTANT")
+			self._print("... explicitly declared: : [%d]" % len(x.domain_of), "IMPORTANT")
 			for i in x.domain_of:
-				self._print(i.qname)
+				if i.ranges:
+					ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges ])
+				else:
+					ranges = "OWL:Thing"
+				print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
+					  i.qname + Style.RESET_ALL + " => " + ranges)
+
+			# inferred stuff
+			if print_inferred:
+				for _dict in x.domain_of_inferred:
+					_class = _dict.items()[0][0]
+					_propslist = _dict.items()[0][1]
+					if _class.id != x.id:  # print only inferred properties
+						self._print("... inherited from [%s]: [%d]" % (_class.qname, len(_propslist)),
+									"IMPORTANT")
+						for i in _propslist:
+							if i.ranges:
+								ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges])
+							else:
+								ranges = "OWL:Thing"
+							print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
+								  i.qname + Style.RESET_ALL + " => " + ranges)
+
+
 			self._print("----------------")
 		return
 
-	def _printClassRange(self, hrlinetop=True):
+
+	def _printClassRange(self, hrlinetop=True, print_inferred=False):
 		"""
 		print(more informative stats about the object)
+		2016-06-14: added inferred option
 		"""
 		if not self.currentEntity:	# ==> ontology level
 			return
@@ -326,9 +355,31 @@ class Shell(cmd.Cmd):
 		if self.currentEntity['type'] == 'class':
 			if hrlinetop:
 				self._print("----------------")
-			self._print("Range Of: [%d]" % len(x.range_of), "IMPORTANT")
+			self._print("RANGE OF:", "IMPORTANT")
+			self._print("... explicitly declared: : [%d]" % len(x.range_of), "IMPORTANT")
 			for i in x.range_of:
-				self._print(i.qname)
+				if i.domains:
+					domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains ])
+				else:
+					domains = "OWL:Thing"
+				print(domains + " => " + Fore.MAGENTA + i.qname + Style.RESET_ALL + " => " + Fore.GREEN +
+					  x.qname + Style.RESET_ALL)
+
+			# inferred stuff
+			if print_inferred:
+				for _dict in x.range_of_inferred:
+					_class = _dict.items()[0][0]
+					_propslist = _dict.items()[0][1]
+					if _class.id != x.id:  # print only inferred properties
+						self._print("... inherited from [%s]: [%d]" % (_class.qname, len(_propslist)),
+									"IMPORTANT")
+						for i in _propslist:
+							if i.domains:
+								domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
+							else:
+								domains = "OWL:Thing"
+							print(domains + " => " + Fore.MAGENTA + i.qname  + Style.RESET_ALL + " => " + Fore.GREEN +     								x.qname + Style.RESET_ALL)
+
 			self._print("----------------")
 		return
 
@@ -343,7 +394,7 @@ class Shell(cmd.Cmd):
 		if self.currentEntity['type'] == 'property':
 			if hrlinetop:
 				self._print("----------------")
-			self._print("Usage:", "IMPORTANT")
+			self._print("USAGE:", "IMPORTANT")
 			domains = x.domains
 			ranges = x.ranges
 			if x.domains:
@@ -356,7 +407,7 @@ class Shell(cmd.Cmd):
 					self._print(_name)
 			else:
 				self._print("OWL:Thing")
-			self._print("  " + "<" + x.qname + ">", "TEXT")
+			self._print("  " + x.qname , "TEXT")
 			if x.ranges:
 				for d in x.ranges:
 					# for domain/ranges which are not declared classes
@@ -381,7 +432,7 @@ class Shell(cmd.Cmd):
 		if self.currentEntity['type'] == 'class':
 			if hrlinetop:
 				self._print("----------------")
-			self._print("Instances: [%d]" % len(x.all()), "IMPORTANT")
+			self._print("INSTANCES: [%d]" % len(x.all()), "IMPORTANT")
 			for i in x.all():
 				self._print(i.qname)
 			self._print("----------------")
@@ -819,7 +870,20 @@ class Shell(cmd.Cmd):
 			self._printClassDomain(False)
 			self._printClassRange(False)
 			self._printPropertyDomainRange(False)
-			# self._printSourceCode(False)			
+			# self._printSourceCode(False)
+			if self.currentEntity and self.currentEntity['type'] == 'class':
+				self._print("Tip: type 'info inferred_usage' to show inherited properties")
+
+		elif line[0] == "inferred_usage":
+			if self.currentEntity:  # @todo only for classes?
+				self._printDescription()
+				self._printTaxonomy(False)
+				self._printClassDomain(False, True)
+				self._printClassRange(False, True)
+				self._printPropertyDomainRange(False)
+			# self._printSourceCode(False)
+			return
+
 
 		elif line[0] == "toplayer":		
 			if g.toplayer:
@@ -839,21 +903,29 @@ class Shell(cmd.Cmd):
 			if self.currentEntity and self.currentEntity['object'].parents():
 				for x in self.currentEntity['object'].parents():
 					self._print(x.qname)
+			else:
+				self._print("No parents. This is a top level entity.")
 
 		elif line[0] == "children":
 			if self.currentEntity and self.currentEntity['object'].children():
 				for x in self.currentEntity['object'].children():
 					self._print(x.qname)
+			else:
+				self._print("No children. This is a leaf node.")
 
 		elif line[0] == "ancestors":
 			if self.currentEntity and self.currentEntity['object'].ancestors():
 				for x in self.currentEntity['object'].ancestors():
 					self._print(x.qname)
+			else:
+				self._print("No ancestors. This is a top level entity.")
 
 		elif line[0] == "descendants":
 			if self.currentEntity and self.currentEntity['object'].descendants():
 				for x in self.currentEntity['object'].descendants():
 					self._print(x.qname)
+			else:
+				self._print("No descendants. This is a leaf node.")
 
 			return
 

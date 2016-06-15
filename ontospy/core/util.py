@@ -247,6 +247,10 @@ def _clear_screen():
 
 
 
+def addQuotes(s):
+	"""wrap a strings with quotes"""
+	return "\"" + s + "\""
+
 
 
 
