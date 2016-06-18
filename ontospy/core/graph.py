@@ -256,7 +256,9 @@ class Graph(object):
 		if source: # add triples dynamically
 			self.__loadRDF(source, text, endpoint, rdf_format)
 
-		if verbose: printDebug("started scanning...\n----------", "comment")
+		if verbose:
+			printDebug("started scanning...", "green")
+			printDebug("----------", "comment")
 
 		self.__extractNamespaces()
 

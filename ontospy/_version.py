@@ -16,7 +16,7 @@ __license__ = "GNU"
 __author__ = "Michele Pasin"
 __author_email__ = "michele dot pasin at gmail dot com"
 
-USAGE = "%prog [graph-uri-or-location] [options]"
+USAGE = "ontospy [options] [uri]"
 VERSION = "v" + __version__
 
 AGENT = "%s/%s" % (__name__, __version__)

@@ -42,14 +42,9 @@ def parse_options():
 	parser = optparse.OptionParser(usage=USAGE, version=ontospy.VERSION)
 
 
-
-	parser.add_option("-l", "",
-			action="store_true", default=False, dest="list",
-			help="LIST: show ontologies saved in the local library.")
-
 	parser.add_option("-c", "",
 			action="store_true", default=False, dest="cache",
-			help="CACHE: force caching of the local library (for faster loading)")
+			help="CACHE: force caching of the local library (for faster loading).")
 
 	parser.add_option("-u", "",
 			action="store_true", default=False, dest="_setup",
@@ -61,18 +56,17 @@ def parse_options():
 
 	parser.add_option("-e", "",
 			action="store_true", default=False, dest="erase",
-			help="ERASE: reset the local library (delete all files)")
+			help="ERASE: reset the local library (delete all files).")
 
 
 	opts, args = parser.parse_args()
 
 	if opts._setup and not args:
-		printDebug("------------")
-		printDebug("Please specify a folder to be used for the local library.", 'important')
-		printDebug("E.g. 'ontospy-manager -u /Users/john/ontologies'")
+		printDebug("Please specify a new location for the local library.", 'important')
+		printDebug("E.g. 'ontospy-manager -u /Users/john/ontologies'", 'tip')
 		sys.exit(0)
 
-	if not args and not opts._setup and not opts.list and not opts.cache and not opts.erase and not opts._delete:
+	if not args and not opts._setup and not opts.cache and not opts.erase and not opts._delete:
 		parser.print_help()
 		sys.exit(0)
 
@@ -84,7 +78,9 @@ def parse_options():
 def main():
 	""" command line script """
 
-	print("OntoSpy " + ontospy.VERSION	 )
+	printDebug("OntoSpy " + ontospy.VERSION, "important")
+	printDebug("Local library: '%s'" % ontospy.get_home_location())
+	printDebug("------------")
 	opts, args = parse_options()
 
 	if not opts._setup:
@@ -114,11 +110,6 @@ def main():
 	# reset local stuff
 	if opts.erase:
 		ontospy.action_erase()
-		raise SystemExit(1)
-
-	# select a model from the local ontologies
-	if opts.list:
-		ontospy.action_listlocal()
 		raise SystemExit(1)
 
 	# cache local ontologies

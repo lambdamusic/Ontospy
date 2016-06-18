@@ -31,13 +31,13 @@ from .core.util import printDebug
 
 
 # ===========
-#
+# ***
 # TESTING FLAG : DISABLE CACHING SO TO FORCE RECONSTRUCTION OF GRAPH EACH TIME
-#
+# ***
 # ===========
 
 
-GLOBAL_DISABLE_CACHE = True  # set to True for testing
+GLOBAL_DISABLE_CACHE = False  # set to True for testing
 
 
 
@@ -100,6 +100,7 @@ def get_or_create_home_repo(reset=False):
 		dosetup = False
 
 		if reset:
+			import shutil
 			var = raw_input("Delete the local library and all of its contents? (y/n) ")
 			if var == "y":
 				shutil.rmtree(ONTOSPY_LOCAL)
@@ -121,13 +122,13 @@ def get_or_create_home_repo(reset=False):
 	# check that the local library folder exists, otherwiese prompt user to create it
 	if not(os.path.exists(LIBRARY_HOME)):
 		printDebug("Warning: the local library at '%s' has been deleted or is not accessible anymore." % LIBRARY_HOME, "important")
-		printDebug("Please reset the local library by running 'ontospy-utils -u <a-valid-path>'", "comment")
+		printDebug("Please reset the local library by running 'ontospy-manager -u <a-valid-path>'", "comment")
 		raise SystemExit(1)
 
 	if dosetup:
 		print(Fore.GREEN + "Setup successfull: local library created at <%s>" % LIBRARY_HOME + Style.RESET_ALL)
-	else:
-		print(Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL)
+	# else:
+		# print(Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL)
 
 	return True
 
@@ -137,7 +138,9 @@ def get_or_create_home_repo(reset=False):
 
 
 def get_home_location():
-	"""Gets the path of the folder for the local library - returns a string"""
+	"""Gets the path of the local library folder
+	:return - a string e.g. "/users/mac/ontospy"
+	"""
 	config = SafeConfigParser()
 	config_filename = ONTOSPY_LOCAL + '/config.ini'
 
@@ -146,7 +149,11 @@ def get_home_location():
 
 	config.read(config_filename)
 	try:
-		return config.get('models', 'dir')
+		_location = config.get('models', 'dir')
+		if _location.endswith("/"):
+			return _location
+		else:
+			return _location + "/"
 	except:
 		# FIRST TIME, create it
 		config.add_section('models')

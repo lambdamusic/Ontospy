@@ -43,7 +43,7 @@ from .core.util import *
 
 
 
-def actionSelectFromLocal():
+def actionSelectFromLocal2():
 	" select a file from the local repo "
 
 	options = get_localontologies()
@@ -76,6 +76,79 @@ def actionSelectFromLocal():
 				except:
 					printDebug("Please enter a valid number.", "comment")
 					continue
+
+
+
+
+
+def action_listlocal():
+	" select a file from the local repo "
+
+	options = get_localontologies()
+
+	counter = 1
+	# printDebug("------------------", 'comment')
+	if not options:
+		printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
+		return
+	else:
+		_listlocal()
+
+		while True:
+			printDebug("------------------\nSelect a model by typing its number: (enter=quit)", "important")
+			var = raw_input()
+			if var == "":
+				return None
+			else:
+				try:
+					_id = int(var)
+					ontouri = options[_id - 1]
+					printDebug("You selected:", "comment")
+					printDebug("---------\n" + ontouri + "\n---------", "red")
+					return ontouri
+				except:
+					printDebug("Please enter a valid option.", "comment")
+					continue
+
+
+
+
+
+
+def _listlocal():
+	"""
+	list all local files
+	2015-10-18: removed 'cached' from report
+	2016-06-17: made a subroutine of action_listlocal()
+	"""
+	ontologies = get_localontologies()
+	ONTOSPY_LOCAL_MODELS = get_home_location()
+
+	if ontologies:
+		print("")
+		temp = []
+		from collections import namedtuple
+		Row = namedtuple('Row',['N','Added', 'File'])
+		# Row = namedtuple('Row',['N','Added','Cached', 'File'])
+		counter = 0
+		for file in ontologies:
+			counter += 1
+			# _counter = Fore.BLUE + Style.BRIGHT + str(counter) + Style.RESET_ALL
+			_counter = str(counter)
+			name = Style.BRIGHT + file + Style.RESET_ALL
+			try:
+				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
+			except OSError:
+				mtime = 0
+			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
+
+			# cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
+			temp += [Row(_counter,last_modified_date, name)]
+		pprinttable(temp)
+		print("")
+	return
+
+
 
 
 
@@ -128,7 +201,7 @@ def action_import(location, verbose=True, lock=None):
 
 	try:
 		g = Graph(fullpath, verbose=verbose)
-		printDebug("----------")
+		# printDebug("----------")
 	except:
 		g = None
 		if os.path.exists(fullpath):
@@ -167,7 +240,6 @@ def action_import_folder(location):
 
 def action_bootstrap():
 	"""Bootstrap the local REPO with a few cool ontologies"""
-	printDebug("--------------")
 	printDebug("The following ontologies will be imported:")
 	printDebug("--------------")
 	count = 0
@@ -177,7 +249,7 @@ def action_bootstrap():
 
 	printDebug("--------------")
 	printDebug("Note: this operation may take several minutes.")
-	printDebug("Are you sure? [Y/N]")
+	printDebug("Proceed? [Y/N]")
 	var = raw_input()
 	if var == "y" or var == "Y":
 		for uri in BOOTSTRAP_ONTOLOGIES:
@@ -186,6 +258,7 @@ def action_bootstrap():
 				action_import(uri, verbose=False)
 			except:
 				printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
+		printDebug("----------\n" + "Completed (note: you can load an ontology by typing `ontospy -l`)", "comment")
 		return True
 	else:
 		printDebug("--------------")
@@ -198,12 +271,13 @@ def action_bootstrap():
 
 
 
-def action_webimport_select():
+def action_webimport_select(hrlinetop=False):
 	""" select from the available online directories for import """
 	DIR_OPTIONS = {1 : "http://lov.okfn.org", 2 : "http://prefix.cc/popular/"}
 	selection = None
 	while True:
-		printDebug("----------")
+		if hrlinetop:
+			printDebug("----------")
 		text = "Please select which online directory to scan: (enter=quit)\n"
 		for x in DIR_OPTIONS:
 			text += "%d) %s\n" % (x, DIR_OPTIONS[x])
@@ -327,7 +401,7 @@ def action_export(args, save_gist, fromshell=False):
 
 	# select from local ontologies:
 	if not(args):
-		ontouri = actionSelectFromLocal()
+		ontouri = action_listlocal()
 		if ontouri:
 			islocal = True
 		else:
@@ -368,10 +442,11 @@ def action_export(args, save_gist, fromshell=False):
 	# once viz contents are generated, save file locally or on github
 	if save_gist:
 		urls = exporter.saveVizGithub(contents, ontouri)
-		printDebug("...documentation saved on GitHub!", "comment")
-		printDebug("Gist: " + urls['gist'], "important")
-		printDebug("Blocks Gist: " + urls['blocks'], "important")
-		printDebug("Full Screen Blocks Gist: " + urls['blocks_fullwin'], "important")
+		printDebug("...documentation saved on GitHub:\n", "comment")
+		# printDebug("----------")
+		printDebug("Gist (source code)           :  " + urls['gist'], "important")
+		printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
+		printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
 		url = urls['blocks'] # defaults to full win
 	else:
 		url = exporter.saveVizLocally(contents)
@@ -405,6 +480,7 @@ def action_update_library_location(_location):
 	# 	os.mkdir(_location)
 	# 	printDebug("Creating new folder..", "comment")
 
+
 	printDebug("Old location: '%s'" % get_home_location(), "comment")
 
 	if os.path.isdir(_location):
@@ -426,38 +502,6 @@ def action_update_library_location(_location):
 
 
 
-def action_listlocal():
-	"""
-	list all local files
-	2015-10-18: removed 'cached' from report
-	"""
-	ontologies = get_localontologies()
-	ONTOSPY_LOCAL_MODELS = get_home_location()
-
-	if ontologies:
-		print("")
-		temp = []
-		from collections import namedtuple
-		Row = namedtuple('Row',['N','Added', 'File'])
-		# Row = namedtuple('Row',['N','Added','Cached', 'File'])
-		counter = 0
-		for file in ontologies:
-			counter += 1
-			name = Style.BRIGHT + file + Style.RESET_ALL
-			try:
-				mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
-			except OSError:
-				mtime = 0
-			last_modified_date = str(datetime.datetime.fromtimestamp(mtime))
-
-			# cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
-			temp += [Row(str(counter),last_modified_date, name)]
-		pprinttable(temp)
-		print("")
-	else:
-		print("No files in the local library. Use the --import command.")
-
-
 
 
 def actions_delete():
@@ -465,13 +509,15 @@ def actions_delete():
 	delete an ontology from the local repo
 	"""
 
-	filename = actionSelectFromLocal()
+	filename = action_listlocal()
+
 	ONTOSPY_LOCAL_MODELS = get_home_location()
 
 	if filename:
 		fullpath = ONTOSPY_LOCAL_MODELS + filename
+
 		if os.path.exists(fullpath):
-			var = raw_input("Are you sure? (y/n)")
+			var = raw_input("Are you sure you want to delete this file? (y/n)")
 			if var == "y":
 				os.remove(fullpath)
 				printDebug("Deleted %s" % fullpath, "important")
@@ -479,9 +525,12 @@ def actions_delete():
 				# @todo: do this operation in /cache...
 				if os.path.exists(cachepath):
 					os.remove(cachepath)
-					printDebug("Deleted %s" % cachepath, "important")
+					printDebug("---------")
+					printDebug("File deleted [%s]" % cachepath, "important")
 
 				return True
+			else:
+				printDebug("Goodbye")
 
 	return False
 
@@ -499,8 +548,12 @@ def action_erase():
 
 
 def action_cache():
-	print("""The existing cache will be erased and recreated.""")
-	print("""This operation may take several minutes, depending on how many files exist in your local library.""")
+	"""
+	generate cached version of all graphs in the local repo
+	:return: True
+	"""
+	printDebug("""The existing cache will be erased and recreated.""")
+	printDebug("""This operation may take several minutes, depending on how many files exist in your local library.""")
 	ONTOSPY_LOCAL_MODELS = get_home_location()
 
 	var = raw_input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)

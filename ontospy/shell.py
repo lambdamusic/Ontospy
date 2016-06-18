@@ -958,7 +958,7 @@ class Shell(cmd.Cmd):
 
 		if line and line[0] == "starter-pack":
 			ontospy.action_bootstrap()
-			self.ontologies = ontospy.get_localontologies()
+
 
 		elif line and line[0] == "uri":
 			self._print("------------------\nEnter a valid graph URI: (e.g. http://www.w3.org/2009/08/skos-reference/skos.rdf)")
@@ -970,7 +970,7 @@ class Shell(cmd.Cmd):
 					except:
 						self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
 				else:
-					self._print("Valid URIs should start with 'http://'")
+					self._print("Not valid. TIP: URIs should start with 'http://'")
 
 		elif line and line[0] == "file":
 			self._print("------------------\nEnter a full file path: (e.g. '/Users/mike/Desktop/journals.ttl')")
@@ -981,14 +981,15 @@ class Shell(cmd.Cmd):
 				except:
 					self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
 
+
 		elif line and line[0] == "repo":
 			ontospy.action_webimport_select()
-			self.ontologies = ontospy.get_localontologies()
+
 
 		else:
-			self._print("You didn't provide a valid option.\nUsage:")
 			self.help_import()
 
+		self.ontologies = ontospy.get_localontologies()
 		return
 
 

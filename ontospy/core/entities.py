@@ -64,8 +64,8 @@ class RDF_Entity(object):
 		""" display triples """
 		printDebug(Style.BRIGHT + self.uri + Style.RESET_ALL)
 		for x in self.triples:
-			printDebug(Fore.MAGENTA + "=> " + x[1])
-			printDebug(Fore.GREEN + ".... " + x[2] + Fore.RESET)
+			printDebug(Fore.MAGENTA + "=> " + unicode(x[1]))
+			printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET)
 		print("")
 
 	def __buildQname(self, namespaces):
