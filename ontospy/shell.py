@@ -98,6 +98,7 @@ class Shell(cmd.Cmd):
 	GET_OPTS = ['ontology', 'class', 'property', 'concept']
 	FILE_OPTS = ['rename', 'delete']
 	IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack',]
+	VISUALIZE_OPTS = ['gist']
 
 
 	def __init__(self):
@@ -259,7 +260,7 @@ class Shell(cmd.Cmd):
 			self._print("----------------", "TIP")
 			self._printStats(self.current['graph']) 
 			for obj in self.current['graph'].ontologies:
-				print Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL
+				print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
 				# self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
 				# self._print("----------------", "TIP")
 				label = obj.bestLabel() or NOTFOUND
@@ -945,7 +946,7 @@ class Shell(cmd.Cmd):
 			_gist = True
 
 		import webbrowser
-		url = ontospy.action_export(args=self.current['file'], save_gist=_gist, fromshell=True)
+		url = ontospy.action_visualize(args=self.current['file'], save_gist=_gist, fromshell=True)
 		if url:
 			webbrowser.open(url)
 		return
@@ -983,7 +984,7 @@ class Shell(cmd.Cmd):
 
 
 		elif line and line[0] == "repo":
-			ontospy.action_webimport_select()
+			ontospy.action_webimport()
 
 
 		else:
@@ -1240,6 +1241,21 @@ class Shell(cmd.Cmd):
 		"""completion for serialize command"""
 
 		opts = self.SERIALIZE_OPTS
+
+		if not text:
+			completions = opts
+		else:
+			completions = [ f
+							for f in opts
+							if f.startswith(text)
+							]
+		return completions
+
+
+	def complete_visualize(self, text, line, begidx, endidx):
+		"""completion for file command"""
+
+		opts = self.VISUALIZE_OPTS
 
 		if not text:
 			completions = opts

@@ -66,7 +66,6 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
@@ -109,7 +108,8 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['data/sounds/*.*', 'data/templates/*.*', 'data/templates/components/*.*', 'data/templates/components/libs/*.*', 'data/templates/html/*.*', 'data/templates/d3tree/*.*', 'data/templates/misc/*.*'],
+         'ontospy': ['viz/static/*.*', 'viz/templates/d3tree/*.*',
+                     'viz/templates/html/*.*', 'viz/templates/shared/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

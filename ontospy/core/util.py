@@ -31,6 +31,17 @@ from colorama import Fore, Back, Style
 
 
 
+def safe_str(u, errors="replace"):
+    """Safely print the given string.
+
+    If you want to see the code points for unprintable characters then you
+    can use `errors="xmlcharrefreplace"`.
+	http://code.activestate.com/recipes/576602-safe-print/
+    """
+    s = u.encode(sys.stdout.encoding or "utf-8", errors)
+    return s
+
+
 
 def list_chunks(l, n):
 	"""Yield successive n-sized chunks from l.

@@ -43,44 +43,6 @@ from .core.util import *
 
 
 
-def actionSelectFromLocal2():
-	" select a file from the local repo "
-
-	options = get_localontologies()
-
-	counter = 1
-	printDebug("------------------", 'comment')
-	if not options:
-		printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
-	else:
-		data = []
-		for x in options:
-			data += [ Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + x + Style.RESET_ALL]
-			counter += 1
-
-		# from util.
-		pprint2columns(data)
-
-		while True:
-			printDebug("------------------\nSelect a model by typing its number: (q=quit)", "important")
-			var = raw_input()
-			if var == "q":
-				return None
-			else:
-				try:
-					_id = int(var)
-					ontouri = options[_id - 1]
-					printDebug("You selected:", "comment")
-					printDebug("---------\n" + ontouri + "\n---------", "red")
-					return ontouri
-				except:
-					printDebug("Please enter a valid number.", "comment")
-					continue
-
-
-
-
-
 def action_listlocal():
 	" select a file from the local repo "
 
@@ -92,7 +54,7 @@ def action_listlocal():
 		printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
 		return
 	else:
-		_listlocal()
+		_print_table_ontologies()
 
 		while True:
 			printDebug("------------------\nSelect a model by typing its number: (enter=quit)", "important")
@@ -115,7 +77,7 @@ def action_listlocal():
 
 
 
-def _listlocal():
+def _print_table_ontologies():
 	"""
 	list all local files
 	2015-10-18: removed 'cached' from report
@@ -238,40 +200,7 @@ def action_import_folder(location):
 
 
 
-def action_bootstrap():
-	"""Bootstrap the local REPO with a few cool ontologies"""
-	printDebug("The following ontologies will be imported:")
-	printDebug("--------------")
-	count = 0
-	for s in BOOTSTRAP_ONTOLOGIES:
-		count += 1
-		print(count, "<%s>" % s)
-
-	printDebug("--------------")
-	printDebug("Note: this operation may take several minutes.")
-	printDebug("Proceed? [Y/N]")
-	var = raw_input()
-	if var == "y" or var == "Y":
-		for uri in BOOTSTRAP_ONTOLOGIES:
-			try:
-				printDebug("--------------")
-				action_import(uri, verbose=False)
-			except:
-				printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
-		printDebug("----------\n" + "Completed (note: you can load an ontology by typing `ontospy -l`)", "comment")
-		return True
-	else:
-		printDebug("--------------")
-		printDebug("Goodbye")
-		return False
-
-
-
-
-
-
-
-def action_webimport_select(hrlinetop=False):
+def action_webimport(hrlinetop=False):
 	""" select from the available online directories for import """
 	DIR_OPTIONS = {1 : "http://lov.okfn.org", 2 : "http://prefix.cc/popular/"}
 	selection = None
@@ -301,9 +230,9 @@ def action_webimport_select(hrlinetop=False):
 
 	try:
 		if selection == 1:
-			action_webimport_LOV(keyword=keyword)
+			_import_LOV(keyword=keyword)
 		elif selection == 2:
-			action_webimport_PREFIXCC(keyword=keyword)
+			_import_PREFIXCC(keyword=keyword)
 	except:
 		printDebug("Sorry, the online repository seems to be unreachable.")
 
@@ -311,7 +240,7 @@ def action_webimport_select(hrlinetop=False):
 
 
 
-def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list", keyword=""):
+def _import_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list", keyword=""):
 	"""
 	2016-03-02: import from json list
 	"""
@@ -358,14 +287,27 @@ def action_webimport_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabul
 
 
 
-def action_webimport_PREFIXCC(keyword=""):
+
+def _import_PREFIXCC(keyword=""):
 	"""
 	List models from web catalog (prefix.cc) and ask which one to import
 	2015-10-10: originally part of main ontospy; now standalone only
+	2016-06-19: eliminated dependency on extras.import_web
 	"""
+	SOURCE = "http://prefix.cc/popular/all.file.vann"
+	options = []
 
-	from extras.import_web import getCatalog
-	options = getCatalog(query=keyword)
+	printDebug("----------\nReading source...")
+	g = Graph(SOURCE, verbose=False)
+
+	for x in g.ontologies:
+		if keyword:
+			if keyword in unicode(x.prefix).lower() or keyword in unicode(x.uri).lower():
+				options += [(unicode(x.prefix), unicode(x.uri))]
+		else:
+			options += [(unicode(x.prefix), unicode(x.uri))]
+
+	printDebug("----------\n%d results found." % len(options))
 
 	counter = 1
 	for x in options:
@@ -391,15 +333,52 @@ def action_webimport_PREFIXCC(keyword=""):
 
 
 
-def action_export(args, save_gist, fromshell=False):
+
+
+
+def action_bootstrap():
+	"""Bootstrap the local REPO with a few cool ontologies"""
+	printDebug("The following ontologies will be imported:")
+	printDebug("--------------")
+	count = 0
+	for s in BOOTSTRAP_ONTOLOGIES:
+		count += 1
+		print(count, "<%s>" % s)
+
+	printDebug("--------------")
+	printDebug("Note: this operation may take several minutes.")
+	printDebug("Proceed? [Y/N]")
+	var = raw_input()
+	if var == "y" or var == "Y":
+		for uri in BOOTSTRAP_ONTOLOGIES:
+			try:
+				printDebug("--------------")
+				action_import(uri, verbose=False)
+			except:
+				printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
+		printDebug("----------\n" + "Completed (note: you can load an ontology by typing `ontospy -l`)", "comment")
+		return True
+	else:
+		printDebug("--------------")
+		printDebug("Goodbye")
+		return False
+
+
+
+
+
+
+
+
+def action_visualize(args, save_gist, fromshell=False):
 	"""
 	export model into another format eg html, d3 etc...
 	<fromshell> : the local name is being passed from ontospy shell
 	"""
 
-	from extras import exporter
+	from .viz import ask_visualization, run_viz, saveVizGithub, saveVizLocally
 
-	# select from local ontologies:
+	# get argument
 	if not(args):
 		ontouri = action_listlocal()
 		if ontouri:
@@ -415,11 +394,10 @@ def action_export(args, save_gist, fromshell=False):
 
 
 	# select a visualization
-	viztype = exporter._askVisualization()
+	viztype = ask_visualization()
 	if not viztype:
 		return None
 		# raise SystemExit, 1
-
 
 	# get ontospy graph
 	if islocal:
@@ -429,19 +407,13 @@ def action_export(args, save_gist, fromshell=False):
 	else:
 		g = Graph(ontouri)
 
-
-
 	# viz DISPATCHER
-	if viztype == 1:
-		contents = exporter.htmlBasicTemplate(g, save_gist)
-
-	elif viztype == 2:
-		contents = exporter.interactiveD3Tree(g, save_gist)
+	contents = run_viz(g, viztype, save_gist)
 
 
 	# once viz contents are generated, save file locally or on github
 	if save_gist:
-		urls = exporter.saveVizGithub(contents, ontouri)
+		urls = saveVizGithub(contents, ontouri)
 		printDebug("...documentation saved on GitHub:\n", "comment")
 		# printDebug("----------")
 		printDebug("Gist (source code)           :  " + urls['gist'], "important")
@@ -449,10 +421,13 @@ def action_export(args, save_gist, fromshell=False):
 		printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
 		url = urls['blocks'] # defaults to full win
 	else:
-		url = exporter.saveVizLocally(contents)
-		printDebug("...documentation generated! [%s]" % url, "comment")
+		url = saveVizLocally(contents)
+		printDebug("...documentation generated!\n[%s]" % url, "comment")
 
 	return url
+
+
+
 
 
 

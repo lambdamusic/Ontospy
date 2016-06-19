@@ -167,7 +167,7 @@ def main():
 		# 	printDebug("WARNING: the -g option must be used in combination with -e (=export)")
 		# 	sys.exit(0)
 		import webbrowser
-		url = action_export(args, opts._gist)
+		url = action_visualize(args, opts._gist)
 		if url:# open browser
 			webbrowser.open(url)
 
@@ -208,7 +208,7 @@ def main():
 
 
 	elif opts._web:
-		action_webimport_select()
+		action_webimport()
 		raise SystemExit(1)
 
 

@@ -53,8 +53,10 @@ GLOBAL_DISABLE_CACHE = False  # set to True for testing
 
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
+
+ONTOSPY_VIZ_TEMPLATES = _dirname + "/viz/templates/"
+ONTOSPY_VIZ_STATIC = _dirname + "/viz/static/"
 ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
-ONTOSPY_LOCAL_TEMPLATES = _dirname + "/data/templates/"
 
 
 # local repository constants
