@@ -47,7 +47,7 @@ Quick Examples:
   > ontospy -l                             # ==> list ontologies available in the local library
   > ontospy -s http://xmlns.com/foaf/spec/ # ==> download FOAF vocabulary and save it in library
 
-For more, visit <ontospy.readthedocs.org>
+More info: <ontospy.readthedocs.org>
 ------------
 """
 

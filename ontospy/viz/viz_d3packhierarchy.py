@@ -5,31 +5,23 @@ from . import *  # imports __init__
 from .. import ontospy
 import json
 
-# TEMPLATE: D3 INTERACTIVE TREE
+# TEMPLATE: D3 PACK HIERARCHY
+# http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
+# https://github.com/d3/d3/wiki/Pack-Layout
+# http://bl.ocks.org/nilanjenator/4950148
 
-#
+
+
 # ===========
-# Comments:
+# June 20, 2016 : notes
 # ===========
-#
-
-
-
+# ....
 
 
 
 def run(graph, save_on_github=False):
 	"""
-	2016-02-19: new version with tabbed or all trees in one page ##unfinished
-
-	<graph> : an ontospy graph
-	<entity> : flag to determine which entity tree to display
-
-	output = string
-
-	2016-02-24: added <save_on_github>
 	"""
-
 	try:
 		ontology = graph.ontologies[0]
 		uri = ontology.uri
@@ -38,42 +30,27 @@ def run(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3tree.html", "r")
-
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
 	t = Template(ontotemplate.read())
 
-	c_mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
+	jsontree_classes = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
 	c_total = len(graph.classes)
 
-	p_mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
-	p_total = len(graph.properties)
 
-	s_mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
-	s_total = len(graph.skosConcepts)
-
-	# hack to make sure that we have a default top level object
-	JSON_DATA_CLASSES = json.dumps({'children' : c_mylist, 'name' : 'OWL:Thing', 'id' : "None" })
-	JSON_DATA_PROPERTIES = json.dumps({'children' : p_mylist, 'name' : 'Properties', 'id' : "None" })
-	JSON_DATA_CONCEPTS = json.dumps({'children' : s_mylist, 'name' : 'Concepts', 'id' : "None" })
-
+	if len(graph.toplayer) == 1:
+		# the first element can be the single top level
+		JSON_DATA_CLASSES = json.dumps(jsontree_classes[0])
+	else:
+		# hack to make sure that we have a default top level object
+		JSON_DATA_CLASSES = json.dumps({'children': jsontree_classes, 'name': 'OWL:Thing',})
 
 	c = Context({
 					"ontology": ontology,
 					"main_uri" : uri,
 					"STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
 					"save_on_github" : save_on_github,
-					"classes": graph.classes,
-					"classes_TOPLAYER": len(graph.toplayer),
-					"properties": graph.properties,
-					"properties_TOPLAYER": len(graph.toplayerProperties),
-					"skosConcepts": graph.skosConcepts,
-					"skosConcepts_TOPLAYER": len(graph.toplayerSkosConcepts),
-					"TOTAL_CLASSES": c_total,
-					"TOTAL_PROPERTIES": p_total,
-					"TOTAL_CONCEPTS": s_total,
 					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
-					'JSON_DATA_PROPERTIES' : JSON_DATA_PROPERTIES,
-					'JSON_DATA_CONCEPTS' : JSON_DATA_CONCEPTS,
+					"TOTAL_CLASSES": c_total,
 				})
 
 	rnd = t.render(c)
@@ -91,7 +68,6 @@ def run(graph, save_on_github=False):
 # ===========
 # Utilities
 # ===========
-
 
 
 
@@ -121,8 +97,10 @@ def _buildJSON_standardTree(old, MAX_DEPTH, level=1):
 	for x in old:
 		d = {}
 		# print "*" * level, x.label
-		d['name'] = x.bestLabel(quotes=False)
-		d['id'] = x.id
+		d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+		d['fullname'] = x.bestLabel(quotes=False)
+		if True or not x.children():
+			d['size'] = 1000 # len(x.children()) or 1
 		# d['size'] = x.npgarticlestot or 10	 # setting 10 as default size
 		if x.children() and level < MAX_DEPTH:
 			d['children'] = _buildJSON_standardTree(x.children(), MAX_DEPTH, level+1)
@@ -136,14 +114,11 @@ def _buildJSON_standardTree(old, MAX_DEPTH, level=1):
 
 
 
-
-
 if __name__ == '__main__':
 	import sys
 	try:
-
 		# script for testing - must launch this module
-		# >python -m ontospy.viz.viz_d3tree
+		# >python -m ontospy.viz.viz_packh
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)
@@ -152,6 +127,4 @@ if __name__ == '__main__':
 
 	except KeyboardInterrupt as e: # Ctrl-C
 		raise e
-
-
 

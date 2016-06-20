@@ -11,8 +11,17 @@ from .. import ontospy
 # TEMPLATE: HTML BASIC
 
 
+#
+# ===========
+# Comments:
+# ===========
+#
 
-def main(graph, save_on_github=False):
+
+
+
+
+def run(graph, save_on_github=False):
 	"""
 	From a graph instance outputs a nicely formatted html documentation file.
 	2015-10-21: mainly used with w3c template
@@ -32,7 +41,7 @@ def main(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "html/index.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "javadoc.html", "r")
 
 	t = Template(ontotemplate.read())
 
@@ -51,6 +60,27 @@ def main(graph, save_on_github=False):
 	rnd = t.render(c)
 
 	return safe_str(rnd)
+
+
+
+
+
+
+
+if __name__ == '__main__':
+	import sys
+	try:
+
+		# script for testing - must launch this module
+		# >python -m ontospy.viz.viz_html
+
+		func = locals()["run"] # main func dynamically
+		run_test_viz(func)
+
+		sys.exit(0)
+
+	except KeyboardInterrupt as e: # Ctrl-C
+		raise e
 
 
 

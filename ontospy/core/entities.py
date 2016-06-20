@@ -142,7 +142,7 @@ class RDF_Entity(object):
 		return list(self.rdfgraph.objects(None, aPropURIRef))
 
 
-	def bestLabel(self, prefLanguage="en", qname_allowed=True):
+	def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=True):
 		"""
 		facility for extrating the best available label for an entity
 
@@ -150,19 +150,22 @@ class RDF_Entity(object):
 		"""
 
 		test = self.getValuesForProperty(rdflib.RDFS.label)
+		out = ""
 
 		if test:
-			return addQuotes(firstEnglishStringInList(test))
+			out = firstEnglishStringInList(test)
 		else:
 			test = self.getValuesForProperty(rdflib.namespace.SKOS.prefLabel)
 			if test:
-				return addQuotes(firstEnglishStringInList(test))
+				out = firstEnglishStringInList(test)
 			else:
 				if qname_allowed:
-					return addQuotes(self.locale)
-				else:
-					return ""
+					out = self.locale
 
+		if quotes and out:
+			return addQuotes(out)
+		else:
+			return out
 
 	def bestDescription(self, prefLanguage="en"):
 		"""

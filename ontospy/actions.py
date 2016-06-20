@@ -65,7 +65,7 @@ def action_listlocal():
 				try:
 					_id = int(var)
 					ontouri = options[_id - 1]
-					printDebug("You selected:", "comment")
+					printDebug("\nYou selected:", "comment")
 					printDebug("---------\n" + ontouri + "\n---------", "red")
 					return ontouri
 				except:

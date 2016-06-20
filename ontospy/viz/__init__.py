@@ -12,76 +12,120 @@ from .. import ontospy
 from ..core.util import *
 
 
+
+
+
+
 # django loading requires different steps based on version
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
+
 if django.get_version() > '1.7':
-	from django.conf import settings
-	from django.template import Context, Template
-	settings.configure()
-	django.setup()
-	settings.TEMPLATES = [
-	    {
-	        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-	        'DIRS': [
-	            # insert your TEMPLATE_DIRS here
-	            ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
-	        ],
-	        'APP_DIRS': True,
-	        'OPTIONS': {
-	            'context_processors': [
-	                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-	                # list if you haven't customized them:
-	                'django.contrib.auth.context_processors.auth',
-	                'django.template.context_processors.debug',
-	                'django.template.context_processors.i18n',
-	                'django.template.context_processors.media',
-	                'django.template.context_processors.static',
-	                'django.template.context_processors.tz',
-	                'django.contrib.messages.context_processors.messages',
-	            ],
-	        },
-	    },
-	]
+    from django.conf import settings
+    from django.template import Context, Template
+
+    settings.configure()
+    django.setup()
+    settings.TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [
+                # insert your TEMPLATE_DIRS here
+                ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
+            ],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
+                    # list if you haven't customized them:
+                    'django.contrib.auth.context_processors.auth',
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.media',
+                    'django.template.context_processors.static',
+                    'django.template.context_processors.tz',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        },
+    ]
 
 else:
-	from django.conf import settings
-	from django.template import Context, Template
-	settings.configure()
+    from django.conf import settings
+    from django.template import Context, Template
+
+    settings.configure()
 
 
 
 
 
 
+# ===========
+# MAIN CATALOGUE
+# ===========
+# @todo modify here in order to add new viz
 
-# @todo modify when new viz are created
+from .viz_html import run as fun1
+from .viz_d3tree import run as fun2
+from .viz_d3packhierarchy import run as fun3
 
-RENDER_OPTIONS = [
-	(1, "JavaDoc (static)"),
-	(2, "Dendogram (interactive)"),
+
+VISUALIZATIONS_LIST = [
+    (1, "JavaDoc (static)", fun1),
+    (2, "Dendogram (interactive)", fun2),
+    (3, "Pack Hierarchy (interactive / experimental)", fun3),
 ]
+#
+# ============
+# =END CATALOGUE
+# ============
 
 
+
+
+
+def ask_visualization():
+    """
+    ask user which viz output to use
+    """
+    while True:
+        text = "Please select an output format for the ontology visualization: (q=quit)\n"
+        for viz in VISUALIZATIONS_LIST:
+            text += "%d) %s\n" % (viz[0], viz[1])
+        var = raw_input(text + ">")
+        if var == "q":
+            return None
+        else:
+            try:
+                n = int(var)
+                test = VISUALIZATIONS_LIST[n - 1]  # throw exception if number wrong
+                return n
+            except:
+                printDebug("Invalid selection. Please try again.", "important")
+                continue
+
+
+
+
+# ===========
+# DYNAMIC RUNNER FUN
+# ===========
 
 def run_viz(g, viztype, save_gist):
     """
     Main fun calling the visualizations
+
+    Note: dependent on VISUALIZATIONS_LIST
 
     :param g: graph instance
     :param viztype: a number passed from the user
     :param save_gist: a flag (just to extra info printed on template)
     :return: string contents of html file (the viz)
     """
-    # @todo modify when new viz are created
-    from . import viz_d3tree
-    from . import viz_html
-
-    if viztype == 1:
-        contents = viz_html.main(g, save_gist)
-
-    elif viztype == 2:
-        contents = viz_d3tree.main(g, save_gist)
+    for tupl in VISUALIZATIONS_LIST:
+        if viztype == tupl[0]:
+            contents = tupl[2](g, save_gist)
 
     return contents
 
@@ -90,55 +134,30 @@ def run_viz(g, viztype, save_gist):
 
 
 
+def saveVizLocally(contents, filename="index.html"):
+    filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
 
-def ask_visualization():
-	"""
-	ask user which viz output to use
-	"""
-	while True:
-		text = "Please select an output format for the ontology visualization: (q=quit)\n"
-		for viz in RENDER_OPTIONS:
-			text += "%d) %s\n" % (viz[0], viz[1])
-		var = raw_input(text + ">")
-		if var == "q":
-			return None
-		else:
-			try:
-				n = int(var)
-				test = RENDER_OPTIONS[n-1]  #throw exception if number wrong
-				return n
-			except:
-				printDebug("Invalid selection. Please try again.", "important")
-				continue
+    f = open(filename, 'w')
+    f.write(contents)  # python will convert \n to os.linesep
+    f.close()  # you can omit in most cases as the destructor will call it
 
-
-
-def saveVizLocally(contents, filename = "index.html"):
-	filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
-
-	f = open(filename,'w')
-	f.write(contents) # python will convert \n to os.linesep
-	f.close() # you can omit in most cases as the destructor will call it
-
-	url = "file://" + filename
-	return url
-
-
+    url = "file://" + filename
+    return url
 
 
 def saveVizGithub(contents, ontouri):
-	title = "OntoSpy: ontology export"
-	readme = """This ontology documentation was automatically generated with OntoSpy (https://github.com/lambdamusic/OntoSpy).
+    title = "OntoSpy: ontology export"
+    readme = """This ontology documentation was automatically generated with OntoSpy (https://github.com/lambdamusic/OntoSpy).
 	The graph URI is: %s""" % str(ontouri)
-	files = {
-	    'index.html' : {
-	        'content': contents
-	        },
-	    'README.txt' : {
-	        'content': readme
-	        },
-	    'LICENSE.txt' : {
-	        'content': """The MIT License (MIT)
+    files = {
+        'index.html': {
+            'content': contents
+        },
+        'README.txt': {
+            'content': readme
+        },
+        'LICENSE.txt': {
+            'content': """The MIT License (MIT)
 
 Copyright (c) 2016 OntoSpy project [http://ontospy.readthedocs.org/]
 
@@ -159,10 +178,33 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
-	        }
-	    }
-	urls = save_anonymous_gist(title, files)
-	return urls
+        }
+    }
+    urls = save_anonymous_gist(title, files)
+    return urls
 
 
+def run_test_viz(func):
+    """
+    2016-06-20: wrapper for command line usage
+    # script for testing - must launch as module for each viz eg
+    # >python -m ontospy.viz.viz_packh
+    """
 
+    import webbrowser, random
+    ontouri = ontospy.get_localontologies()[random.randint(0, 10)]
+    print("Testing with URI: %s" % ontouri)
+
+    g = ontospy.get_pickled_ontology(ontouri)
+    if not g:
+        g = ontospy.do_pickle_ontology(ontouri)
+
+    # getting main func dynamically
+    contents = func(g, False)
+
+    url = saveVizLocally(contents)
+    if url:  # open browser
+        import webbrowser
+        webbrowser.open(url)
+
+    return True
