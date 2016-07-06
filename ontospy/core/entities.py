@@ -9,6 +9,8 @@ from itertools import count
 from colorama import Fore, Back, Style
 
 
+
+
 from .util import *
 
 
@@ -231,6 +233,15 @@ class OntoClass(RDF_Entity):
 	"""
 	Python representation of a generic class within an ontology.
 	Includes methods for representing and querying RDFS/OWL classes
+
+
+	domain_of_inferred: a list of dict
+			[{<Class *http://xmlns.com/foaf/0.1/Person*>:
+			[<Property *http://xmlns.com/foaf/0.1/currentProject*>,<Property *http://xmlns.com/foaf/0.1/familyName*>,
+   				etc....]},
+ 		{<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>:
+ 			[<Property *http://xmlns.com/foaf/0.1/based_near*>, etc...]},
+ 			]
 	"""
 
 	def __init__(self, uri, rdftype=None, namespaces=None):
@@ -287,20 +298,8 @@ class OntoClass(RDF_Entity):
 		self.printStats()
 		# self.printGenericTree()
 
-    #
-	# def getDomainOfRecursive(self):
-	# 	"""returns all properties valid for this class (as they have it in their domain)
-	# 	recursively ie traveling up the descendants tree
-	# 	Note: results in a nexted list [[class1, props], [class2, props]] including itself
-	# 	Note: all properties with no domain info are added at the top as [None, props]
-	# 	"""
-	# 	_list = []
-	# 	_list.append({self :  self.domain_of})
-	# 	for x in self.ancestors():
-	# 		if x.domain_of:
-	# 			_list.append({x :  x.domain_of})
-	# 	return _list
-    #
+
+
 
 
 class OntoProperty(RDF_Entity):

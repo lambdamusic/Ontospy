@@ -99,7 +99,7 @@ class Sketch(object):
 		print("Multi-line input. Enter ### when finished.")
 		temp = ""
 		sentinel = "###"
-		for line in iter(raw_input, sentinel):
+		for line in iter(input, sentinel):
 			if line.strip() == sentinel:
 				break
 			if not line.strip().endswith("."):

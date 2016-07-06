@@ -4,14 +4,11 @@
 from . import *  # imports __init__
 from .. import ontospy
 import json
-
 from .utils import build_D3treeStandard
 
 
-# TEMPLATE: D3 PACK HIERARCHY
-# http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
-# https://github.com/d3/d3/wiki/Pack-Layout
-# http://bl.ocks.org/nilanjenator/4950148
+# TEMPLATE: D3 ROTATING CLUSTER
+# original source: ...
 
 
 
@@ -33,19 +30,14 @@ def run(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_cluster.html", "r")
 	t = Template(ontotemplate.read())
 
-	jsontree_classes = build_D3treeStandard(0, 99, 1, graph.toplayer)
 	c_total = len(graph.classes)
 
+	mylist = build_D3treeStandard(0, 99, 1, graph.toplayer)
 
-	if len(graph.toplayer) == 1:
-		# the first element can be the single top level
-		JSON_DATA_CLASSES = json.dumps(jsontree_classes[0])
-	else:
-		# hack to make sure that we have a default top level object
-		JSON_DATA_CLASSES = json.dumps({'children': jsontree_classes, 'name': 'OWL:Thing',})
+	JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'OWL:Thing',})
 
 	c = Context({
 					"ontology": ontology,
@@ -59,8 +51,6 @@ def run(graph, save_on_github=False):
 	rnd = t.render(c)
 
 	return safe_str(rnd)
-
-
 
 
 

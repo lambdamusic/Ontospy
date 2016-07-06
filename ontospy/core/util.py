@@ -19,8 +19,11 @@ import sys, os, subprocess, random, platform
 from colorama import Fore, Back, Style
 
 
-
-
+# Fix Python 2.x.
+try:
+	UNICODE_EXISTS = bool(type(unicode))
+except NameError:
+    unicode = lambda s: str(s)
 
 
 
@@ -143,8 +146,8 @@ def pprint2columns(llist, max_length=60):
 		for el in llist:
 			print(el)
 	else:
-		column1 = llist[:len(llist)/2]
-		column2 = llist[len(llist)/2:]
+		column1 = llist[:int(len(llist)/2)]
+		column2 = llist[int(len(llist)/2):]
 		for c1, c2 in zip(column1, column2):
 			space = " " * (col_width - len(c1))
 			print("%s%s%s" % (c1, space, c2))

@@ -165,7 +165,7 @@ def main():
 		printDebug("Please provide two arguments, or use -h for more options.")
 		sys.exit(0)
 
-	var = raw_input("Match classes or properties? [c|p, c=default]:")
+	var = input("Match classes or properties? [c|p, c=default]:")
 	if var == "c":
 		class_or_prop = "classes"
 	elif var == "p":
@@ -175,7 +175,7 @@ def main():
 
 	print(class_or_prop)
 
-	var = raw_input("Degree of confidence? [1-10, 5=default]: ")
+	var = input("Degree of confidence? [1-10, 5=default]: ")
 	try:
 		confidence = int(var)
 		if not (confidence <= 10 and confidence >= 1):

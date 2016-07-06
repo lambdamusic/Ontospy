@@ -19,6 +19,12 @@ try:
 except ImportError:
 	import pickle as cPickle
 
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
+
 from colorama import Fore, Style
 
 
@@ -103,7 +109,7 @@ def get_or_create_home_repo(reset=False):
 
 		if reset:
 			import shutil
-			var = raw_input("Delete the local library and all of its contents? (y/n) ")
+			var = input("Delete the local library and all of its contents? (y/n) ")
 			if var == "y":
 				shutil.rmtree(ONTOSPY_LOCAL)
 				dosetup = True
@@ -246,5 +252,5 @@ def do_pickle_ontology(filename, g=None):
 		except Exception as e:
 			print(Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL)
 			print(str(e))
-		sys.setrecursionlimit(sys.getrecursionlimit()/10)
+		sys.setrecursionlimit(int(sys.getrecursionlimit()/10))
 	return g

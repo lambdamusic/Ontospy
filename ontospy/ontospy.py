@@ -28,6 +28,12 @@ try:
 except ImportError:
 	import urllib as urllib2
 
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
+
 from colorama import Fore, Style
 
 
@@ -150,7 +156,7 @@ def main():
 
 	# -s launch shell
 	if opts._shell:
-		from shell import Shell, STARTUP_MESSAGE
+		from .shell import Shell, STARTUP_MESSAGE
 		Shell()._clear_screen()
 		print(STARTUP_MESSAGE)
 		Shell().cmdloop()
@@ -198,9 +204,9 @@ def main():
 			sys.exit(0)
 		_location = args[0]
 		if os.path.isdir(_location):
-			res = action_save_folder(_location)
+			res = action_import_folder(_location)
 		else:
-			res = action_save(_location)
+			res = action_import(_location)
 		if res:
 			printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")
 		# continue and print(timing at bottom)

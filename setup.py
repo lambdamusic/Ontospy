@@ -88,6 +88,7 @@ setup(
 		'readline',  # for shell autocomplete
 		'rdflib',
         'rdflib-jsonld',
+        'SPARQLWrapper',
 		'colorama',
 		'django',
 		'github3.py',

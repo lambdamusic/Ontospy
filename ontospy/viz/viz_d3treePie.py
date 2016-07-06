@@ -5,13 +5,10 @@ from . import *  # imports __init__
 from .. import ontospy
 import json
 
-from .utils import build_D3treeStandard
 
 
-# TEMPLATE: D3 PACK HIERARCHY
-# http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
-# https://github.com/d3/d3/wiki/Pack-Layout
-# http://bl.ocks.org/nilanjenator/4950148
+# TEMPLATE: D3 TREE PIE
+# original source: ...
 
 
 
@@ -33,19 +30,16 @@ def run(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_treePie.html", "r")
 	t = Template(ontotemplate.read())
 
-	jsontree_classes = build_D3treeStandard(0, 99, 1, graph.toplayer)
 	c_total = len(graph.classes)
+	c_toplayer = len(graph.toplayer)
 
+	mydict = build_D3treepie(0, 99, 1, graph.toplayer)
 
-	if len(graph.toplayer) == 1:
-		# the first element can be the single top level
-		JSON_DATA_CLASSES = json.dumps(jsontree_classes[0])
-	else:
-		# hack to make sure that we have a default top level object
-		JSON_DATA_CLASSES = json.dumps({'children': jsontree_classes, 'name': 'OWL:Thing',})
+	# JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'OWL:Thing',})
+	JSON_DATA_CLASSES = json.dumps(["OWL:Thing", [c_toplayer, c_toplayer], mydict])
 
 	c = Context({
 					"ontology": ontology,
@@ -63,10 +57,36 @@ def run(graph, save_on_github=False):
 
 
 
+def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
+	"""
+	Create the JSON needed by the treePie viz
+	http://bl.ocks.org/adewes/4710330/94a7c0aeb6f09d681dbfdd0e5150578e4935c6ae
 
+	Eg
 
+	['origin' , [n1, n2],
+			{ 'name1' :
+				['name1', [n1, n2],
+					{'name1-1' : ...}
+				] ,
+			} ,
+	]
 
+	"""
+	d = {}
+	if not old:
+		old = toplayer
+	for x in old:
+		label = x.bestLabel(quotes=False).replace("_", " ")
+		if x.children() and level < MAX_DEPTH:
+			size = len(x.children())
+			d[x.qname] = [label, [size, size],
+						  build_D3treepie(x.children(), MAX_DEPTH, level + 1)]
+		else:
+			size = 1
+			d[x.qname] = [label, [size, size], {}]
 
+	return d
 
 
 

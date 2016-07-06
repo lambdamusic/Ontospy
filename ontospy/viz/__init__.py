@@ -12,7 +12,11 @@ from .. import ontospy
 from ..core.util import *
 
 
-
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
 
 
 
@@ -66,17 +70,25 @@ else:
 # ===========
 # @todo modify here in order to add new viz
 
-from .viz_html import run as fun1
-from .viz_d3tree import run as fun2
-from .viz_d3packhierarchy import run as fun3
+from .viz_html import run as html
+from .viz_d3tree import run as tree
+# from .viz_d3packHierarchy import run as packH
+# from .viz_d3bubblechart import run as bubble
+# from .viz_d3cluster import run as cluster
+# from .viz_d3barHierarchy import run as barH
+# from .viz_d3partitionTable import run as partitionT
+# from .viz_d3treePie import run as treeP
 
 
-VISUALIZATIONS_LIST = [
-    (1, "JavaDoc (static)", fun1),
-    (2, "Dendogram (interactive)", fun2),
-    (3, "Pack Hierarchy (interactive / experimental)", fun3),
-]
-#
+VISUALIZATIONS_LIST =  [("JavaDoc", html)]
+VISUALIZATIONS_LIST += [("Dendogram", tree)]
+# VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH)]
+# VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble)]
+# VISUALIZATIONS_LIST += [("Cluster Tree (experimental)", cluster)]
+# VISUALIZATIONS_LIST += [("Bar Hierarchy (experimental)", barH)]
+# VISUALIZATIONS_LIST += [("Partition Table (experimental)", partitionT)]
+# VISUALIZATIONS_LIST += [("Tree Pie (buggy)", treeP)]
+
 # ============
 # =END CATALOGUE
 # ============
@@ -92,14 +104,14 @@ def ask_visualization():
     while True:
         text = "Please select an output format for the ontology visualization: (q=quit)\n"
         for viz in VISUALIZATIONS_LIST:
-            text += "%d) %s\n" % (viz[0], viz[1])
-        var = raw_input(text + ">")
+            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz[0])
+        var = input(text + ">")
         if var == "q":
-            return None
+            return ""
         else:
             try:
-                n = int(var)
-                test = VISUALIZATIONS_LIST[n - 1]  # throw exception if number wrong
+                n = int(var) - 1
+                test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
                 return n
             except:
                 printDebug("Invalid selection. Please try again.", "important")
@@ -112,7 +124,7 @@ def ask_visualization():
 # DYNAMIC RUNNER FUN
 # ===========
 
-def run_viz(g, viztype, save_gist):
+def run_viz(g, viz_index, save_gist):
     """
     Main fun calling the visualizations
 
@@ -123,10 +135,7 @@ def run_viz(g, viztype, save_gist):
     :param save_gist: a flag (just to extra info printed on template)
     :return: string contents of html file (the viz)
     """
-    for tupl in VISUALIZATIONS_LIST:
-        if viztype == tupl[0]:
-            contents = tupl[2](g, save_gist)
-
+    contents = VISUALIZATIONS_LIST[viz_index][1](g, save_gist)
     return contents
 
 
@@ -137,7 +146,7 @@ def run_viz(g, viztype, save_gist):
 def saveVizLocally(contents, filename="index.html"):
     filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
 
-    f = open(filename, 'w')
+    f = open(filename, 'wb')
     f.write(contents)  # python will convert \n to os.linesep
     f.close()  # you can omit in most cases as the destructor will call it
 
@@ -192,7 +201,7 @@ def run_test_viz(func):
     """
 
     import webbrowser, random
-    ontouri = ontospy.get_localontologies()[random.randint(0, 10)]
+    ontouri = ontospy.get_localontologies()[random.randint(0, 10)]  # [0]
     print("Testing with URI: %s" % ontouri)
 
     g = ontospy.get_pickled_ontology(ontouri)

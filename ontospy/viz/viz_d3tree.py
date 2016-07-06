@@ -5,6 +5,9 @@ from . import *  # imports __init__
 from .. import ontospy
 import json
 
+from .utils import build_D3treeStandard
+
+
 # TEMPLATE: D3 INTERACTIVE TREE
 
 #
@@ -42,13 +45,12 @@ def run(graph, save_on_github=False):
 
 	t = Template(ontotemplate.read())
 
-	c_mylist = _buildJSON_standardTree(graph.toplayer, MAX_DEPTH=99)
+	c_mylist = build_D3treeStandard(0, 99, 1, graph.toplayer)
+	p_mylist = build_D3treeStandard(0, 99, 1, graph.toplayerProperties)
+	s_mylist = build_D3treeStandard(0, 99, 1, graph.toplayerSkosConcepts)
+
 	c_total = len(graph.classes)
-
-	p_mylist = _buildJSON_standardTree(graph.toplayerProperties, MAX_DEPTH=99)
 	p_total = len(graph.properties)
-
-	s_mylist = _buildJSON_standardTree(graph.toplayerSkosConcepts, MAX_DEPTH=99)
 	s_total = len(graph.skosConcepts)
 
 	# hack to make sure that we have a default top level object
@@ -80,55 +82,6 @@ def run(graph, save_on_github=False):
 
 	return safe_str(rnd)
 
-
-
-
-
-
-
-
-
-# ===========
-# Utilities
-# ===========
-
-
-
-
-def _buildJSON_standardTree(old, MAX_DEPTH, level=1):
-	"""
-	  For d3s viz like the expandable tree
-	  all we need is a json with name, children and size .. eg
-
-	  {
-	 "name": "flare",
-	 "children": [
-	  {
-	   "name": "analytics",
-	   "children": [
-		{
-		 "name": "cluster",
-		 "children": [
-		  {"name": "AgglomerativeCluster", "size": 3938},
-		  {"name": "CommunityStructure", "size": 3812},
-		  {"name": "HierarchicalCluster", "size": 6714},
-		  {"name": "MergeEdge", "size": 743}
-		 ]
-		},
-		etc...
-	"""
-	out = []
-	for x in old:
-		d = {}
-		# print "*" * level, x.label
-		d['name'] = x.bestLabel(quotes=False)
-		d['id'] = x.id
-		# d['size'] = x.npgarticlestot or 10	 # setting 10 as default size
-		if x.children() and level < MAX_DEPTH:
-			d['children'] = _buildJSON_standardTree(x.children(), MAX_DEPTH, level+1)
-		out += [d]
-
-	return out
 
 
 
