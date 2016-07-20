@@ -257,7 +257,7 @@ class Graph(object):
 			self.__loadRDF(source, text, endpoint, rdf_format)
 
 		if verbose:
-			printDebug("started scanning...", "green")
+			printDebug("Scanning entities...", "green")
 			printDebug("----------", "comment")
 
 		self.__extractNamespaces()

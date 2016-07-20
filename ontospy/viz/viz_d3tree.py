@@ -41,7 +41,7 @@ def run(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3tree.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_tree.html", "r")
 
 	t = Template(ontotemplate.read())
 

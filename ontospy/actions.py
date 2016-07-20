@@ -79,7 +79,7 @@ def action_listlocal():
                     _id = int(var)
                     ontouri = options[_id - 1]
                     printDebug("\nYou selected:", "comment")
-                    printDebug("---------\n" + ontouri + "\n---------", "red")
+                    printDebug("---------\n" + ontouri + "\n---------", "green")
                     return ontouri
                 except:
                     printDebug("Please enter a valid option.", "comment")
@@ -427,7 +427,7 @@ def action_visualize(args, save_gist, fromshell=False):
     # once viz contents are generated, save file locally or on github
     if save_gist:
         urls = saveVizGithub(contents, ontouri)
-        printDebug("...documentation saved on GitHub:\n", "comment")
+        printDebug("Documentation saved on GitHub:\n", "green")
         # printDebug("----------")
         printDebug("Gist (source code)           :  " + urls['gist'], "important")
         printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
@@ -435,7 +435,7 @@ def action_visualize(args, save_gist, fromshell=False):
         url = urls['blocks'] # defaults to full win
     else:
         url = saveVizLocally(contents)
-        printDebug("...documentation generated!\n[%s]" % url, "comment")
+        printDebug("Documentation generated: <%s>" % url, "green")
 
     return url
 

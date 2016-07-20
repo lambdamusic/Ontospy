@@ -248,7 +248,7 @@ def do_pickle_ontology(filename, g=None):
 		try:
 			sys.setrecursionlimit(sys.getrecursionlimit()*10)
 			cPickle.dump(g, open(pickledpath, "wb"))
-			print(Style.DIM + "... cached <%s>" % pickledpath + Style.RESET_ALL)
+			print(Fore.GREEN + "Cached <%s>" % pickledpath + "..." + Style.RESET_ALL)
 		except Exception as e:
 			print(Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL)
 			print(str(e))
