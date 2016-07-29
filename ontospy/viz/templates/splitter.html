@@ -2,39 +2,18 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Language" content="en" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>jQuery 3-Column Splitter</title>
-<script type="text/javascript" src="{{STATIC_PATH}}jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="{{STATIC_PATH}}splitter.js"></script>
-
-<!-- General page styles (not critical to the demos) -->
-
-{% include "splitter_css.html" %}
+	<meta http-equiv="Content-Language" content="en" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{main_uri}} - Schema Map - OntoSpy</title>
+	<script type="text/javascript" src="{{STATIC_PATH}}jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="{{STATIC_PATH}}splitter.js"></script>
 
 
 
-<script type="text/javascript">
-$().ready(function() {
+	{% include "splitter_css.html" %}
 
-	// Main vertical splitter, anchored to the browser window
-	$("#MySplitter").splitter({
-		type: "v",
-		outline: true,
-		minLeft: 100, sizeLeft: 300, maxLeft: 400,
-		anchorToWindow: true,
-		accessKey: "L"
-	});
-	// Second vertical splitter, nested in the right pane of the main one.
-	$("#CenterAndRight").splitter({
-		type: "v",
-		outline: true,
-		minRight: 100, sizeRight: 200, maxRight: 300,
-		accessKey: "R"
-	});
-});
-</script>
 </head>
+
 <body>
 
 <div id="header">
@@ -52,19 +31,33 @@ $().ready(function() {
   <div class="SplitterPane">
 {#		<p>This is the left pane of the 3-column splitter. It has been limited to a range of 100 to 250 pixels wide by inline styles. It starts at 150 pixels wide.</p>#}
 
+	{% if classes or skosConcepts %}
+	<input type="text" class="search-input" placeholder="Type to search">
+	{% else %}
+	<div style="padding: 15px;"><small>No classes of concepts defined</small></div>
+	{% endif %}	
+
+
 	{% if classes %}
-		<fieldset> <legend>Classes ({{classes|length}})</legend> 
-			{% for each in classes  %}<span><a href="#{{each.qname}}">{{each.qname}}</a></span> 
-			{% if not forloop.last %}<br>{% endif %} 
+		<fieldset id="classes_list"> <legend>Classes ({{classes|length}})</legend> 
+
+			<div class="entities-list">
+			{% for each in classes  %}
+				<div><a href="#{{each.qname}}">{{each.qname}}</a></div>
 			{% endfor %}
+			</div>
 		</fieldset>	
 	{% endif %}	
 
   	{% if skosConcepts %}
 
-		<fieldset> <legend>SKOS Concepts ({{skosConcepts|length}})</legend>
-			{% for each in skosConcepts  %}<a href="#{{each.qname}}">{{each.qname}}</a>
-			{% if not forloop.last %}<br>{% endif %}  {% endfor %}
+		<fieldset id="concepts_list"> <legend>SKOS Concepts ({{skosConcepts|length}})</legend>
+
+			<div class="entities-list">
+			{% for each in skosConcepts  %}
+				<div><a href="#{{each.qname}}">{{each.qname}}</a></div>
+			{% endfor %}
+			</div>
 		</fieldset>
 
 	{% endif %}
@@ -127,445 +120,7 @@ $().ready(function() {
 
 
 
-	{# CLASSES SECTION #}
-
-
-    {% if classes %}
-
-		<hr class="margintop">
-		<h1 class="margintop" ><a name="classes">&nbsp;</a>Classes</h1>
-
-			{% for each in classes  %}
-
-			<div class="entity-div">
-
-
-
-				<h3 class="entity-section">Class: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small>&nbsp;&nbsp;<a href="#toc" class="backlink">back to top</a></small>
-				</h3>
-				<hr>
-
-
-                <div class="tree">
-                    <ul>
-                        {% if each.parents %}
-                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
-
-                            <ul>
-
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                              {% if each.children  %}
-                                  <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
-                                  </ul>
-                              {% endif %}
-                                </li>
-
-                            </ul>
-
-                            </li>
-                            {% endfor %}
-
-                        {% else %}
-
-                            <li href="#"><a>OWL:Thing</a>
-
-                            <ul>
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                              {% if each.children  %}
-                                  <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
-                                  </ul>
-                              {% endif %}
-                                </li>
-
-                            </ul>
-
-                            </li>
-                        {% endif %}
-
-                    </ul>
-                </div>
-
-
-                {% if not each.children  %}
-                <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
-                {% endif %}
-
-				<p class="section-desc"><b>Description:</b>
-                    <br>
-                    {{each.bestDescription|default:"--"}}
-                </p>
-
-                {% if each.ancestors %}
-					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                        <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                    </p>
-				{% else %}
-                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
-				{% endif %}
-
-
-
-				{% if each.domain_of %}
-					<p class="section-desc"><b>Property Domain of:</b>
-                        <br>
-                        {% for s in each.domain_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-				{% if each.range_of %}
-					<p class="section-desc"><b>Property Range of:</b>
-                        <br>
-                        {% for s in each.range_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-
-                <small class="implementation_title">Implementation:</small>
-				<div class="implementation">
-					<code>{{each.serialize|linebreaks}}</code>
-				</div>
-
-			</div>
-
-
-			{% endfor %}
-
-	{% endif %}
-
-
-
-
-
-{# OBJECT PROPERTIES SECTION #}
-
-	{% if objproperties %}
-
-		<hr class="margintop">
-		<h1 class="margintop"><a name="objproperties">&nbsp;</a>Object Properties</h1>
-
-			{% for each in objproperties  %}
-
-			<div class="entity-div">
-
-				<h3 class="entity-section">Object Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small>&nbsp;&nbsp;<a href="#toc" class="backlink">back to top</a></small>
-				</h3>
-				<hr>
-
-                {% if not each.children  %}
-                <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
-                {% endif %}
-
-				<p class="section-desc"><b>Description:</b>
-                    <br>
-                    {{each.bestDescription|default:"--"}}
-                </p>
-
-                {% if each.ancestors %}
-					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                        <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% else %}
-
-				{% endif %}
-
-
-
-				{% if each.children %}
-					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
-                        <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.domains %}
-					<p class="section-desc"><b>Class Domain for:</b>
-                        <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.ranges %}
-					<p class="section-desc"><b>Class Range for:</b>
-                        <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-
-                <small class="implementation_title">Implementation:</small>
-				<div class="implementation">
-					<code>{{each.serialize|linebreaks}}</code>
-				</div>
-
-			</div>
-
-			{% endfor %}
-
-	{% endif %}
-
-
-
-
-
-
-
-{# DATATYPE PROPERTIES SECTION #}
-
-	{% if dataproperties %}
-
-		<hr class="margintop">
-		<h1 class="margintop"><a name="dataproperties">&nbsp;</a>Datatype Properties</h1>
-
-			{% for each in dataproperties  %}
-
-			<div class="entity-div">
-
-				<h3 class="entity-section">Datatype Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small>&nbsp;&nbsp;<a href="#toc" class="backlink">back to top</a></small>
-				</h3>
-				<hr>
-
-                {% if not each.children  %}
-                <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
-                {% endif %}
-
-				<p class="section-desc"><b>Description:</b>
-                    <br>
-                    {{each.bestDescription|default:"--"}}
-                </p>
-
-                {% if each.ancestors %}
-					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                        <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% else %}
-
-				{% endif %}
-
-
-
-				{% if each.children %}
-					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
-                        <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.domains %}
-					<p class="section-desc"><b>Class Domain for:</b>
-                        <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.ranges %}
-					<p class="section-desc"><b>Class Range for:</b>
-                        <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-
-                <small class="implementation_title">Implementation:</small>
-				<div class="implementation">
-					<code>{{each.serialize|linebreaks}}</code>
-				</div>
-
-
-			</div>
-			{% endfor %}
-
-	{% endif %}
-
-
-
-
-
-
-
-	{# ANNOTATION PROPERTIES SECTION #}
-
-	{% if annotationproperties %}
-
-		<hr class="margintop">
-		<h1 class="margintop"><a name="annotationproperties">&nbsp;</a>Annotation Properties</h1>
-
-			{% for each in annotationproperties  %}
-
-			<div class="entity-div">
-
-				<h3 class="entity-section">Annotation Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small>&nbsp;&nbsp;<a href="#toc" class="backlink">back to top</a></small>
-				</h3>
-				<hr>
-
-                {% if not each.children  %}
-                <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
-                {% endif %}
-
-				<p class="section-desc"><b>Description:</b>
-                    <br>
-                    {{each.bestDescription|default:"--"}}
-                </p>
-
-                {% if each.ancestors %}
-					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                        <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% else %}
-
-				{% endif %}
-
-
-
-				{% if each.children %}
-					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
-                        <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.domains %}
-					<p class="section-desc"><b>Class Domain for:</b>
-                        <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-				{% if each.ranges %}
-					<p class="section-desc"><b>Class Range for:</b>
-                        <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-				{% endif %}
-
-
-                <small class="implementation_title">Implementation:</small>
-				<div class="implementation">
-					<code>{{each.serialize|linebreaks}}</code>
-				</div>
-
-
-			</div>
-			{% endfor %}
-
-	{% endif %}
-
-
-
-
-	{# SKOS CONCEPTS SECTION #}
-
-
-	{% if skosConcepts %}
-
-
-		<hr class="margintop">
-		<h1 class="margintop"><a  name="skosconcepts">&nbsp;</a>SKOS Concepts</h1>
-
-			{% for each in skosConcepts  %}
-
-			<div class="entity-div">
-
-				<h3 class="entity-section">Concept: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
-					<small>&nbsp;&nbsp;<a href="#toc" class="backlink">back to top</a></small>
-				</h3>
-				<hr>
-
-                <div class="tree">
-                    <ul>
-                        {% if each.parents %}
-                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
-
-                            <ul>
-
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                              {% if each.children  %}
-                                  <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
-                                  </ul>
-                              {% endif %}
-                                </li>
-
-                            </ul>
-
-                            </li>
-                            {% endfor %}
-
-                        {% else %}
-
-                            <li href="#"><a>skos:Concept</a>
-
-                            <ul>
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                              {% if each.children  %}
-                                  <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
-                                  </ul>
-                              {% endif %}
-                                </li>
-
-                            </ul>
-
-                            </li>
-                        {% endif %}
-
-                    </ul>
-                </div>
-
-
-                {% if not each.children  %}
-                <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
-                {% endif %}
-
-				<p class="section-desc"><b>Description:</b>
-                    <br>
-                    {{each.bestDescription|default:"--"}}
-                </p>
-
-                {% if each.ancestors %}
-					<p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
-                        <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                    </p>
-				{% endif %}
-
-
-                <small class="implementation_title">Implementation:</small>
-				<div class="implementation">
-					<code>{{each.serialize|linebreaks}}</code>
-				</div>
-
-			</div>
-
-			{% endfor %}
-
-	{% endif %}
-
-
+	{% include "splitter_entities_data.html" %}
 
 
 
@@ -590,27 +145,50 @@ $().ready(function() {
 	<div class="SplitterPane">
 {#		<p>This is the right pane of the 3-column splitter. It has been limited to a range of 100 to 250 pixels wide by inline styles. It starts at 150 pixels wide.</p>#}
 
+
+	
+	{% if objproperties or dataproperties or annotationproperties %}
+	<input type="text" class="search-input" placeholder="Type to search">
+	{% else %}
+	<div style="padding: 15px;"><small>No properties defined</small></div>
+	{% endif %}	
+
+
      {% if objproperties %}
 
 	<fieldset> <legend>Object Properties ({{objproperties|length}})</legend>
-		{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
-		{% if not forloop.last %}<br>{% endif %}{% endfor %}
+
+		<div class="entities-list">
+		{% for each in objproperties  %}
+			<div><a href="#{{each.qname}}">{{each.qname}}</a></div>
+		{% endfor %}
+		</div>
+
 	</fieldset>
 
 	{% endif %}
 
 	{% if dataproperties %}
 	<fieldset> <legend>Datatype Properties ({{dataproperties|length}})</legend>
-		{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
-		{% if not forloop.last %}<br>{% endif %}{% endfor %}
+
+		<div class="entities-list">
+			{% for each in dataproperties  %}
+				<div><a href="#{{each.qname}}">{{each.qname}}</a></div>
+			{% endfor %}
+		</div>
 	</fieldset>
 	{% endif %}
 
 	{% if annotationproperties %}
 
-		<fieldset> <legend>Annotation Properties ({{annotationproperties|length}})</legend>
-			{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
-			{% if not forloop.last %}<br>{% endif %}{% endfor %}
+		<fieldset><legend>Annotation Properties ({{annotationproperties|length}})</legend>
+
+			<div class="entities-list">
+				{% for each in annotationproperties  %}
+					<div><a href="#{{each.qname}}">{{each.qname}}</a></div>
+				{% endfor %}
+			</div>
+
 		</fieldset>
 
 	{% endif %}
@@ -621,6 +199,48 @@ $().ready(function() {
   </div> <!-- #CenterAndRight -->
 
 </div> <!-- #MySplitter -->
+
+
+
+<script type="text/javascript">
+$().ready(function() {
+
+	// Main vertical splitter, anchored to the browser window
+	$("#MySplitter").splitter({
+		type: "v",
+		outline: true,
+		minLeft: 100, sizeLeft: 300, maxLeft: 400,
+		anchorToWindow: true,
+		accessKey: "L"
+	});
+	// Second vertical splitter, nested in the right pane of the main one.
+	$("#CenterAndRight").splitter({
+		type: "v",
+		outline: true,
+		minRight: 100, sizeRight: 200, maxRight: 300,
+		accessKey: "R"
+	});
+});
+
+
+// http://stackoverflow.com/questions/9127498/how-to-perform-a-real-time-search-and-filter-on-a-html-table
+
+  $('.search-input').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    // var $rows = $(this).next(".entities-list").find("div");
+    var $rows = $(this).parent().find(".entities-list div");
+
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+</script>
+
+
 
 </body>
 </html>

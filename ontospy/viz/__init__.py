@@ -82,7 +82,7 @@ from .viz_splitter import run as splitter
 
 
 VISUALIZATIONS_LIST =  [("JavaDoc", html)]
-VISUALIZATIONS_LIST += [("Splitter (buggy)", splitter)]
+VISUALIZATIONS_LIST += [("Splitted Columns", splitter)]
 VISUALIZATIONS_LIST += [("Dendogram", tree)]
 VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH)]
 VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble)]

@@ -44,7 +44,8 @@ h6 { font: small-caps 100% sans-serif }
 }
 .vsplitbar {
 	width: 6px;
-	background: #669 url(img/vgrabber.gif) no-repeat center;
+	background: #669 no-repeat center;
+	/* background: #669 url(img/vgrabber.gif) no-repeat center; */
 }
 .vsplitbar.active, .vsplitbar:hover {
 	background-color: #c66;
@@ -55,7 +56,10 @@ h6 { font: small-caps 100% sans-serif }
 
 
 
-.ontolink {color: darkblue;}
+a.ontolink {
+    background: gold;
+    color: darkblue;
+}
 .linksign {font-size: 65%; text-decoration: none;}
 
 
@@ -100,7 +104,7 @@ dd {
 	margin: 0.25em 2em 0.5em;
 }
 
-
+input {margin: 15px 0px 5px 5px; padding: 2px 3px; width: 209px;}
 
 
 :link { color: #00C; background: transparent }
@@ -173,18 +177,22 @@ a.greylink {
 
 
 
+.tree-container {
+    width: 3000em;
+    overflow-x: auto;
+    white-space: nowrap;
+}
 
 
-{#      CSS FOR FAMILY TREE   2016-07-26   #}
+{#      CSS FOR FAMILY TREE   http://thecodeplayer.com/experiment/css3-family-tree/2   #}
 
-.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
 
 .tree ul {
     padding-top: 20px; position: relative;
 
-    transition: all 0.5s;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
+    transition: all 0.5s;
 }
 
 .tree li {
@@ -193,9 +201,9 @@ a.greylink {
     position: relative;
     padding: 20px 5px 0 5px;
 
-    transition: all 0.5s;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
+    transition: all 0.5s;
 }
 
 /*We will use ::before and ::after to draw the connectors*/
@@ -204,7 +212,8 @@ a.greylink {
     content: '';
     position: absolute; top: 0; right: 50%;
     border-top: 1px solid #ccc;
-    width: 50%; height: 20px;
+    width: 50%; height: 45px;
+    z-index: -1;
 }
 .tree li::after{
     right: auto; left: 50%;
@@ -229,8 +238,14 @@ right connector from last child*/
 .tree li:last-child::before{
     border-right: 1px solid #ccc;
     border-radius: 0 5px 0 0;
+
+    -webkit-transform: translateX(1px);
+    -moz-transform: translateX(1px);
+    transform: translateX(1px);
+
     -webkit-border-radius: 0 5px 0 0;
     -moz-border-radius: 0 5px 0 0;
+    border-radius: 0 5px 0 0;
 }
 .tree li:first-child::after{
     border-radius: 5px 0 0 0;
@@ -241,9 +256,10 @@ right connector from last child*/
 /*Time to add downward connectors from parents*/
 .tree ul ul::before{
     content: '';
-    position: absolute; top: 0; left: 50%;
+    position: absolute; top: -12px; left: 50%;
     border-left: 1px solid #ccc;
-    width: 0; height: 20px;
+    width: 0; height: 32px;
+    z-index: -1;
 }
 
 .tree li a{
@@ -254,61 +270,41 @@ right connector from last child*/
     font-family: arial, verdana, tahoma;
     font-size: 11px;
     display: inline-block;
+    background: white;
 
-    border-radius: 5px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
+    border-radius: 5px;
 
-    transition: all 0.5s;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
+    transition: all 0.5s;
+}
+.tree li a+a {
+    margin-left: 20px;
+    position: relative;
+}
+.tree li a+a::before {
+    content: '';
+    position: absolute;
+    border-top: 1px solid #ccc;
+    top: 50%; left: -21px;
+    width: 20px;
 }
 
 /*Time for some hover effects*/
 /*We will apply the hover effect the the lineage of the element also*/
-.tree li a:hover, .tree li a:hover+ul li a {
+.tree li a:hover, .tree li a:hover~ul li a {
     background: #c8e4f8; color: #000; border: 1px solid #94a0b4;
 }
 /*Connector styles on hover*/
-.tree li a:hover+ul li::after,
-.tree li a:hover+ul li::before,
-.tree li a:hover+ul::before,
-.tree li a:hover+ul ul::before{
-    border-color:  #94a0b4;
+.tree li a:hover~ul li::after,
+.tree li a:hover~ul li::before,
+.tree li a:hover~ul::before,
+.tree li a:hover~ul ul::before
+{
+    border-color: #94a0b4;
 }
-
-
-
-
-    {% if 0 %}
-
-  body {
-	  margin-left: 6em;
-	  margin-right: 12em;
-	  text-align: justify;
-    padding: 2em 1em 2em 70px;
-    margin: 0;
-    font-family: sans-serif;
-    color: black;
-    background: white;
-    background-position: top left;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-  }
-
-
-  dt, dd { margin-top: 10px; margin-bottom: 0 } /* opera 3.50 */
-  dt { font-weight: bold }
-
-
-
-
-		/*Thats all. I hope you enjoyed it.
-		Thanks :)*/
-
-
-
-        {% endif %}
 
 
   </style>
