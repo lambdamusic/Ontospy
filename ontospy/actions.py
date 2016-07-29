@@ -383,7 +383,7 @@ def action_bootstrap():
 
 
 
-def action_visualize(args, save_gist, fromshell=False):
+def action_visualize(args, save_gist, fromshell=False, path=None):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
@@ -434,7 +434,7 @@ def action_visualize(args, save_gist, fromshell=False):
         printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
         url = urls['blocks'] # defaults to full win
     else:
-        url = saveVizLocally(contents)
+        url = saveVizLocally(contents, "ontospy-viz.html", path)
         printDebug("Documentation generated: <%s>" % url, "green")
 
     return url

@@ -10,7 +10,7 @@
 
 
 
-__version__ = "1.6.7.4"  #  1.6.7.3 on pypy on 2016-07-06
+__version__ = "1.6.7.4.2"  #  1.6.7.4.1 on pypy on 2016-07-20
 __copyright__ = "CopyRight (C) 2015-2016 by Michele Pasin"
 __license__ = "GNU"
 __author__ = "Michele Pasin"

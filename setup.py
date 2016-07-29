@@ -109,8 +109,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-         'ontospy': ['viz/static/*.*', 'viz/templates/d3tree/*.*',
-                     'viz/templates/html/*.*', 'viz/templates/shared/*.*'],
+         'ontospy': ['viz/static/*.*', 'viz/templates/*.*', 'viz/templates/shared/*.*'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

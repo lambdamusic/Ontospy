@@ -72,15 +72,17 @@ else:
 
 from .viz_html import run as html
 from .viz_d3tree import run as tree
-from .viz_d3packHierarchy import run as packH
+from .viz_d3packhierarchy import run as packH
 from .viz_d3bubblechart import run as bubble
 from .viz_d3cluster import run as cluster
 from .viz_d3barHierarchy import run as barH
 from .viz_d3partitionTable import run as partitionT
 from .viz_d3treePie import run as treeP
+from .viz_splitter import run as splitter
 
 
 VISUALIZATIONS_LIST =  [("JavaDoc", html)]
+VISUALIZATIONS_LIST += [("Splitter (buggy)", splitter)]
 VISUALIZATIONS_LIST += [("Dendogram", tree)]
 VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH)]
 VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble)]
@@ -88,6 +90,7 @@ VISUALIZATIONS_LIST += [("Cluster Tree (experimental)", cluster)]
 VISUALIZATIONS_LIST += [("Bar Hierarchy (experimental)", barH)]
 VISUALIZATIONS_LIST += [("Partition Table (experimental)", partitionT)]
 VISUALIZATIONS_LIST += [("Tree Pie (buggy)", treeP)]
+
 
 # ============
 # =END CATALOGUE
@@ -143,8 +146,11 @@ def run_viz(g, viz_index, save_gist):
 
 
 
-def saveVizLocally(contents, filename="index.html"):
-    filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
+def saveVizLocally(contents, filename="index.html", path=None):
+    if not path:
+        filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
+    else:
+        filename = os.path.join(path,filename)
 
     f = open(filename, 'wb')
     f.write(contents)  # python will convert \n to os.linesep

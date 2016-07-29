@@ -118,6 +118,10 @@ def parse_options():
 			action="store_true", default=False, dest="_export",
 			help="VISUALIZE: create a graphical representation of a vocabulary.")
 
+	parser.add_option("-o", "",
+			action="store", default="", dest="_path",
+			help="OUTPUT: a valid output path for the visualization file.")
+
 	parser.add_option("-g", "",
 			action="store_true", default=False, dest="_gist",
 			help="EXPORT-AS-GIST: save visualization online as a Github Gist.")
@@ -172,8 +176,12 @@ def main():
 		# if opts._gist and not opts._export:
 		# 	printDebug("WARNING: the -g option must be used in combination with -e (=export)")
 		# 	sys.exit(0)
+		if opts._path:
+			if not(os.path.exists(opts._path)) or not (os.path.isdir(opts._path)):
+				printDebug("WARNING: the -o option must include a valid directory path.")
+				sys.exit(0)
 		import webbrowser
-		url = action_visualize(args, opts._gist)
+		url = action_visualize(args, opts._gist, False, opts._path)
 		if url:# open browser
 			webbrowser.open(url)
 
