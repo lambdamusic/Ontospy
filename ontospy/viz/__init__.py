@@ -36,6 +36,7 @@ if django.get_version() > '1.7':
             'DIRS': [
                 # insert your TEMPLATE_DIRS here
                 ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
+                ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -78,11 +79,11 @@ from .viz_d3cluster import run as cluster
 from .viz_d3barHierarchy import run as barH
 from .viz_d3partitionTable import run as partitionT
 from .viz_d3treePie import run as treeP
-from .viz_splitter import run as splitter
+# from .viz_splitter import run as splitter
 
 
 VISUALIZATIONS_LIST =  [("JavaDoc", html)]
-VISUALIZATIONS_LIST += [("Splitted Columns", splitter)]
+# VISUALIZATIONS_LIST += [("Splitted Columns", splitter)]
 VISUALIZATIONS_LIST += [("Dendogram", tree)]
 VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH)]
 VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble)]

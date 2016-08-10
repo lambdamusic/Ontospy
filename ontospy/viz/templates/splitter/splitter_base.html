@@ -1,0 +1,231 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Language" content="en" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>{{main_uri}} - Ontology Docs - OntoSpy</title>
+	<script type="text/javascript" src="{{STATIC_PATH}}jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="{{STATIC_PATH}}splitter.js"></script>
+
+
+
+	{% include "splitter_css.html" %}
+
+</head>
+
+<body>
+
+<div id="header">
+
+	<h1 class="title">Vocabulary:&nbsp;
+        <a class="ontolink" href="#">{{main_uri}}</a>&nbsp;<a href="{{main_uri}}" target="_blank" class="linksign">&nearr;</a></h1>
+{#	<h3>{{ontology.bestDescription}}</h3>#}
+
+	<p><small class="ontospy_credits">Documentation automatically generated with <a class="greylink" href="http://ontospy.readthedocs.org/">OntoSpy</a> on {% now "jS F Y H:i" %}</small></p>
+
+</div>
+
+<div id="MySplitter">
+
+  <div class="SplitterPane">
+{#		<p>This is the left pane of the 3-column splitter. It has been limited to a range of 100 to 250 pixels wide by inline styles. It starts at 150 pixels wide.</p>#}
+
+	{% if ontograph.classes or ontograph.skosConcepts %}
+	<input type="text" class="search-input" placeholder="Type to search">
+	{% else %}
+	<div style="padding: 15px;"><small>No classes defined</small></div>
+	{% endif %}	
+
+
+	{% if ontograph.classes %}
+		<fieldset id="classes_list"> <legend>Classes ({{ontograph.classes|length}})</legend> 
+
+			<div class="entities-list">
+			{% for each in ontograph.classes  %}
+				<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+			{% endfor %}
+			</div>
+		</fieldset>	
+	{% endif %}	
+
+  	{% if ontograph.skosConcepts %}
+
+		<fieldset id="concepts_list"> <legend>SKOS Concepts ({{ontograph.skosConcepts|length}})</legend>
+
+			<div class="entities-list">
+			{% for each in ontograph.skosConcepts  %}
+				<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+			{% endfor %}
+			</div>
+		</fieldset>
+
+	{% endif %}
+
+  </div>
+
+  <div id="CenterAndRight">
+
+	<div class="SplitterPane">
+
+
+
+    {% block main_column %}
+
+
+    {% endblock main_column %}
+
+
+
+
+
+
+{#	{% include "splitter_entities_data.html" %}#}
+
+
+
+
+	<div style="margin-bottom: 50px;">&nbsp;</div>
+
+	{% if 0 %}
+		<hr>
+		<small class="ontospy_credits">Ontology documentation automatically generated with <a class="greylink"  href="http://ontospy.readthedocs.org/">OntoSpy</a> on {% now "jS F Y H:i" %}</small>
+	{% endif %}
+
+
+
+
+	</div>  {#end of SplitterPane#}
+
+
+
+
+
+
+
+
+
+
+
+	<div class="SplitterPane">
+{#		<p>This is the right pane of the 3-column splitter. It has been limited to a range of 100 to 250 pixels wide by inline styles. It starts at 150 pixels wide.</p>#}
+
+
+	
+	{% if ontograph.properties %}
+		<input type="text" class="search-input" placeholder="Type to search">
+	{% else %}
+		<div style="padding: 15px;"><small>No properties defined</small></div>
+	{% endif %}	
+
+
+     {% if ontograph.objectProperties %}
+
+	<fieldset> <legend>Object Properties ({{ontograph.objectProperties|length}})</legend>
+
+		<div class="entities-list">
+		{% for each in ontograph.objectProperties  %}
+			<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+		{% endfor %}
+		</div>
+
+	</fieldset>
+
+	{% endif %}
+
+	{% if ontograph.datatypeProperties %}
+	<fieldset> <legend>Datatype Properties ({{ontograph.datatypeProperties|length}})</legend>
+
+		<div class="entities-list">
+			{% for each in ontograph.datatypeProperties  %}
+				<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+			{% endfor %}
+		</div>
+	</fieldset>
+	{% endif %}
+
+	{% if ontograph.annotationProperties %}
+
+		<fieldset><legend>Annotation Properties ({{ontograph.annotationProperties|length}})</legend>
+
+			<div class="entities-list">
+				{% for each in ontograph.annotationProperties  %}
+					<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+				{% endfor %}
+			</div>
+
+		</fieldset>
+
+	{% endif %}
+
+
+	{% if not ontograph.objectProperties and not ontograph.dataProperties and not ontograph.annotationProperties %}
+
+		{% if ontograph.properties %}
+			
+			<fieldset><legend>Properties ({{ontograph.properties|length}})</legend>
+
+			<div class="entities-list">
+				{% for each in ontograph.properties  %}
+					<div><a href="{{each.slug}}.html">{{each.qname}}</a></div>
+				{% endfor %}
+			</div>
+
+		</fieldset>
+
+		{% endif %}
+
+	{% endif %}
+
+
+
+	</div>
+
+  </div> <!-- #CenterAndRight -->
+
+</div> <!-- #MySplitter -->
+
+
+
+<script type="text/javascript">
+$().ready(function() {
+
+	// Main vertical splitter, anchored to the browser window
+	$("#MySplitter").splitter({
+		type: "v",
+		outline: true,
+		minLeft: 100, sizeLeft: 300, maxLeft: 400,
+		anchorToWindow: true,
+		accessKey: "L"
+	});
+	// Second vertical splitter, nested in the right pane of the main one.
+	$("#CenterAndRight").splitter({
+		type: "v",
+		outline: true,
+		minRight: 100, sizeRight: 300, maxRight: 400,
+		accessKey: "R"
+	});
+});
+
+
+// http://stackoverflow.com/questions/9127498/how-to-perform-a-real-time-search-and-filter-on-a-html-table
+
+  $('.search-input').keyup(function() {
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    // var $rows = $(this).next(".entities-list").find("div");
+    var $rows = $(this).parent().find(".entities-list div");
+
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+</script>
+
+
+
+</body>
+</html>

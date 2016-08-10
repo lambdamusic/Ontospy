@@ -70,6 +70,7 @@
   fieldset {
 	  margin-top: 20px;
 	  padding: 13px;
+      text-align: left;
   }
   
   legend {
@@ -109,7 +110,12 @@
 
 {#      CSS FOR TREE   2016-07-26   #}
 
-      		/*Now the CSS*/
+        .tree-container {
+            width: 3000em;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
 		.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
 
 		.tree ul {
@@ -355,6 +361,7 @@
 				<hr>
 
 
+                <div class="tree-container">
                 <div class="tree">
                     <ul>
                         {% if each.parents %}
@@ -396,6 +403,7 @@
                         {% endif %}
 
                     </ul>
+                </div>
                 </div>
 
 

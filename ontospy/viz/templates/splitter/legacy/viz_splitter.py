@@ -41,7 +41,7 @@ def run(graph, save_on_github=False):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter.html", "r")
+	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_single_page.html", "r")
 
 	t = Template(ontotemplate.read())
 

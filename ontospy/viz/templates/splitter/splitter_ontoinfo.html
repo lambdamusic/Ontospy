@@ -1,0 +1,109 @@
+{% extends "splitter_base.html" %}
+
+
+
+{% block main_column %}
+
+
+
+{% if 0 %}
+        
+    <h1><a name="toc">&nbsp;</a>Table of Contents</h1>
+
+    <ul>
+        {% if ontology.annotations %}<li><a href="#annotations">Ontology Annotations</a></li>{% endif %}
+        <li><a href="#metrics">Metrics</a></li>
+        {% if ontograph.namespaces %}
+        <li><a href="#namespaces">Namespaces</a></li>
+        {% endif %}
+
+
+    </ul>
+
+
+{% endif %}
+
+
+
+	{# ANNOTATIONS SECTION #}
+
+	{% if ontology.annotations %}
+
+	<!-- <hr class="margintop"> -->
+
+	<h1><a name="annotations">&nbsp;</a>Metadata</h1>
+        <div class="entity-div">
+            {% for each in ontology.annotations %}
+
+                {% ifchanged each.1 %}
+
+                    {% if not forloop.first %}</dl>{% endif %}
+                    <dl>
+                      <dt>{{each.1}}</dt>
+
+                {% endifchanged %}
+                        <dd>{{each.2}}</dd>
+
+            {% endfor %}
+        </div>
+	{% endif %}
+
+
+
+    {# Metrics SECTION #}
+
+
+    <hr class="margintop">
+
+    <h1><a name="metrics">&nbsp;</a>Metrics</h1>
+    
+    <div class="entity-div">
+        {% for each in ontograph.stats %}
+
+                <dl>
+                  <dt>{{each.0}}</dt>
+                  <dd>{{each.1}}</dd>
+                </dl>
+
+
+        {% endfor %}
+    </div>
+
+
+
+    {# Namespaces SECTION #}
+
+
+    {% if ontograph.namespaces %}
+
+    <hr class="margintop">
+
+    <h1><a name="namespaces">&nbsp;</a>Namespaces</h1>
+    <div class="entity-div">
+
+        <table border="0" cellspacing="5" cellpadding="10" style="margin-left: -0.5%;">
+            {# <tr><th>Prefix</th><th>Full url</th></tr> #}
+        
+            {% for x, y in ontograph.namespaces  %}
+            <tr>
+                <td style="padding: 5px;"><code>{{x|default:":"}}</code></td>
+                <td><a href="{{y}}" target="_blank" class="text-info">{{y}}</a></td>
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+
+    </div>
+
+    {% endif %}
+
+
+
+
+
+
+
+{% endblock main_column %}
+

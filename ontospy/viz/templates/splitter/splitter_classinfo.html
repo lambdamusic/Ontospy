@@ -1,0 +1,120 @@
+{% extends "splitter_base.html" %}
+{% block main_column %}
+
+
+{% ifequal main_entity_type "class"  %}
+    
+        {% with main_entity as each  %}
+
+        <div class="entity-div">
+
+
+
+            <h1 class="entity-section">Class: <a name="{{each.qname}}">{{each.qname}}</a>
+                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
+            </h1>
+            <hr>
+
+
+            <div class="tree-container">
+            <div class="tree">
+                <ul>
+                    {% if each.parents %}
+
+                        <li>
+                        {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
+
+                        <ul>
+
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <li href="#"><a>OWL:Thing</a>
+
+                        <ul>
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            </div>
+
+
+            {% if not each.children  %}
+            <p class="section-desc">
+                <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+            {% endif %}
+
+            <p class="section-desc"><b>Description:</b>
+                <br>
+                {{each.bestDescription|default:"--"}}
+            </p>
+
+            {% if each.ancestors %}
+                <p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                    <br />
+                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                </p>
+            {% else %}
+                <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+            {% endif %}
+
+
+
+            {% if each.domain_of %}
+                <p class="section-desc"><b>Property Domain of:</b>
+                    <br>
+                    {% for s in each.domain_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                </p>
+            {% endif %}
+
+            {% if each.range_of %}
+                <p class="section-desc"><b>Property Range of:</b>
+                    <br>
+                    {% for s in each.range_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                </p>
+            {% endif %}
+
+
+            <small class="implementation_title">Implementation:</small>
+            <div class="implementation">
+                <code>{{each.serialize|linebreaks}}</code>
+            </div>
+
+        </div>
+
+
+        {% endwith %}
+
+
+
+{% endifequal %}
+
+
+
+
+{% endblock main_column %}
