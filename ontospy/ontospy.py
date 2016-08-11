@@ -119,8 +119,8 @@ def parse_options():
 			help="VISUALIZE: create a graphical representation of a vocabulary.")
 
 	parser.add_option("-o", "",
-			action="store", default="", dest="_path",
-			help="OUTPUT: a valid output path for the visualization file.")
+			action="store", default=False, dest="_path",
+			help="OUTPUT: specify an output path for the visualization file.")
 
 	parser.add_option("-g", "",
 			action="store_true", default=False, dest="_gist",

@@ -389,7 +389,8 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
     <fromshell> : the local name is being passed from ontospy shell
     """
 
-    from .viz import ask_visualization, run_viz, saveVizGithub, saveVizLocally
+    from .viz import ask_visualization, run_viz, saveVizGithub, \
+        saveVizLocally, VISUALIZATIONS_LIST
 
     # get argument
     if not(args):
@@ -405,6 +406,13 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
         ontouri = args[0]
         islocal = False
 
+    # put on home folder by default
+    if not path:
+        from os.path import expanduser
+        home = expanduser("~")
+        path = os.path.join(home, "ontospy-viz")
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     # select a visualization
     viztype = ask_visualization()
@@ -420,23 +428,39 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
     else:
         g = Graph(ontouri)
 
-    # viz DISPATCHER
-    contents = run_viz(g, viztype, save_gist)
 
+    if VISUALIZATIONS_LIST[viztype][2] == "single-file":
+        # simple  viz DISPATCHER
+        contents = run_viz(g, viztype, save_gist)
+        # once viz contents are generated, save file locally or on github
+        if save_gist:
+            urls = saveVizGithub(contents, ontouri)
+            printDebug("Documentation saved on GitHub:\n", "green")
+            # printDebug("----------")
+            printDebug("Gist (source code)           :  " + urls['gist'], "important")
+            printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
+            printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
+            url = urls['blocks'] # defaults to full win
+        else:
+            url = saveVizLocally(contents, slugify(unicode(ontouri)) + ".html", path)
+            printDebug("Documentation generated: <%s>" % url, "green")
 
-    # once viz contents are generated, save file locally or on github
-    if save_gist:
-        urls = saveVizGithub(contents, ontouri)
-        printDebug("Documentation saved on GitHub:\n", "green")
-        # printDebug("----------")
-        printDebug("Gist (source code)           :  " + urls['gist'], "important")
-        printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
-        printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
-        url = urls['blocks'] # defaults to full win
-    else:
-        url = saveVizLocally(contents, "ontospy-viz.html", path)
-        printDebug("Documentation generated: <%s>" % url, "green")
+    elif VISUALIZATIONS_LIST[viztype][2] == "multi-file":
+        # splitter viz
+        # main index page for graph
+        contents = run_viz(g, viztype, save_gist, None)
+        index_url = saveVizLocally(contents, "index.html", path)
 
+        entities = [g.classes, g.properties, g.skosConcepts]
+        for group in entities:
+            for c in group:
+                # getting main func dynamically
+                contents = run_viz(g, viztype, save_gist, c)
+                _filename = c.slug + ".html"
+                url = saveVizLocally(contents, _filename, path)
+        
+        url = index_url
+    
     return url
 
 

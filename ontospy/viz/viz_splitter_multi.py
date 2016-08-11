@@ -20,13 +20,20 @@ from ..core.entities import OntoClass, OntoProperty, OntoSKOSConcept, Ontology
 
 
 
-def run(graph, ontology, uri, main_entity):
+def run(graph, save_on_github=False, main_entity=None):
     """
     From a graph instance outputs a nicely formatted html documentation file.
     
     2016-08-07: hacked for multi file save
     """
 
+    try:
+        ontology = graph.ontologies[0]
+        uri = ontology.uri
+    except:
+        ontology = None
+        uri = graph.graphuri
+        
     context = {
                     "ontology": ontology,
                     "main_uri" : uri,
@@ -34,6 +41,22 @@ def run(graph, ontology, uri, main_entity):
                     "STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
                 }
     
+
+    # Pygments CSS
+    try:
+        from pygments import highlight
+        from pygments.lexers.rdf import TurtleLexer
+        from pygments.formatters import HtmlFormatter
+
+        pygments_code = highlight(main_entity.serialize(), TurtleLexer(), HtmlFormatter())
+        pygments_code_css = HtmlFormatter().get_style_defs('.highlight')
+        context.update({ "pygments_code" : pygments_code,
+                         "pygments_code_css": pygments_code_css
+                         })
+    except Exception, e:
+        pass
+
+
         
     if type(main_entity) == OntoClass:
         ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_classinfo.html", "r")
@@ -75,7 +98,7 @@ if __name__ == '__main__':
     2016-08-04: # testing bypassing the usual abstract routine so to generate multiple files
 
     """
-    import sys
+    import os, sys
     try:
 
         # script for testing - must launch this module direclty eg
@@ -87,7 +110,7 @@ if __name__ == '__main__':
 
         import webbrowser, random
 
-        ontouri = ontospy.get_localontologies()[random.randint(0, 10)] # [0] #
+        ontouri = ontospy.get_localontologies()[random.randint(0, 10)] # [13]=foaf #
         print("Testing with URI: %s" % ontouri)
 
         g = ontospy.get_pickled_ontology(ontouri)
@@ -108,38 +131,23 @@ if __name__ == '__main__':
             url = "file://" + filename
             return url
 
-        try:
-            ontology = g.ontologies[0]
-            uri = ontology.uri
-        except:
-            ontology = None
-            uri = g.graphuri
-            
-        DEST_FOLDER = "/Users/michele.pasin/Desktop/test/"
+        from os.path import expanduser
+        home = expanduser("~")
+        DEST_FOLDER = os.path.join(home, "ontospy-viz")
+        if not os.path.exists(DEST_FOLDER):
+            os.makedirs(DEST_FOLDER)
 
         # main index page for graph
-        contents = func(g, ontology, uri, None)
+        contents = func(g, False, None)
         index_url = _saveVizLocally(contents, "index.html", DEST_FOLDER)
-            
-        for c in g.classes:
-            # getting main func dynamically
-            contents = func(g, ontology, uri, c)
-            _filename = c.slug + ".html"
-            url = _saveVizLocally(contents, _filename, DEST_FOLDER)
-            
-        for c in g.properties:
-            # getting main func dynamically
-            contents = func(g, ontology, uri, c)
-            _filename = c.slug + ".html"
-            url = _saveVizLocally(contents, _filename, DEST_FOLDER)
-
-
-        for c in g.skosConcepts:
-            # getting main func dynamically
-            contents = func(g, ontology, uri, c)
-            _filename = c.slug + ".html"
-            url = _saveVizLocally(contents, _filename, DEST_FOLDER)
-
+        
+        entities = [g.classes, g.properties, g.skosConcepts]
+        for group in entities:
+            for c in group:
+                # getting main func dynamically
+                contents = func(g, False, c)
+                _filename = c.slug + ".html"
+                url = _saveVizLocally(contents, _filename, DEST_FOLDER)
 
         if index_url:  # open browser
             import webbrowser

@@ -57,10 +57,15 @@ h6 { font: small-caps 100% sans-serif }
 
 
 a.ontolink {
-    background: gold;
+    background: antiquewhite;
     color: darkblue;
 }
 .linksign {font-size: 65%; text-decoration: none;}
+.highlight_entity {
+  background: antiquewhite;
+  color: darkblue;
+}
+
 
 
 pre { margin-left: 2em }
@@ -310,6 +315,18 @@ right connector from last child*/
 {
     border-color: #94a0b4;
 }
+
+
+
+
+/*pygments css*/
+{{pygments_code_css}}
+
+/*overloading this class from pygments*/
+.highlight {
+  overflow: auto;
+}
+
 
 
   </style>

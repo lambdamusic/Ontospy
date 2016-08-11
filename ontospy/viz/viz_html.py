@@ -21,7 +21,7 @@ from .. import ontospy
 
 
 
-def run(graph, save_on_github=False):
+def run(graph, save_on_github=False, main_entity=None):
 	"""
 	From a graph instance outputs a nicely formatted html documentation file.
 	2015-10-21: mainly used with w3c template

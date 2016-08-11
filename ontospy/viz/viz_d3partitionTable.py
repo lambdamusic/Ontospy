@@ -19,7 +19,7 @@ from .utils import build_D3treeStandard
 
 
 
-def run(graph, save_on_github=False):
+def run(graph, save_on_github=False, main_entity=None):
 	"""
 	"""
 	try:

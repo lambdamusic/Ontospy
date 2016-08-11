@@ -17,7 +17,7 @@
             <div class="tree">
                 <ul>
                     {% if each.parents %}
-                        <li> {% for s in each.parents %}<a href="#{{s.qname}}">{{s.qname}}</a>
+                        <li> {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
 
                         <ul>
 
@@ -26,7 +26,7 @@
                           {% if each.children  %}
                               <ul>
                                 {% for s in each.children %}
-                                <li><a href="#{{s.qname}}">{{s.qname}}</a></li>
+                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
                                 {% endfor %}
                               </ul>
                           {% endif %}
@@ -47,7 +47,7 @@
                           {% if each.children  %}
                               <ul>
                                 {% for s in each.children %}
-                                <li><a href="#{{s.qname}}">{{s.qname}}</a></li>
+                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
                                 {% endfor %}
                               </ul>
                           {% endif %}
@@ -65,8 +65,13 @@
 
             {% if not each.children  %}
             <p class="section-desc">
-                <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                <small>NOTE</small> this is a leaf node.</p>
             {% endif %}
+
+            <p class="section-desc"><b>URI:</b>
+                <br>
+                {{each.uri}}
+            </p>
 
             <p class="section-desc"><b>Description:</b>
                 <br>
@@ -76,15 +81,19 @@
             {% if each.ancestors %}
                 <p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
                     <br />
-                    {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                 </p>
             {% endif %}
 
 
             <small class="implementation_title">Implementation:</small>
-            <div class="implementation">
-                <code>{{each.serialize|linebreaks}}</code>
-            </div>
+            {% if pygments_code %}
+                {{pygments_code|safe}}
+            {% else %}
+                 <div class="implementation">
+                    <code>{{each.serialize|linebreaks}}</code>
+                </div>               
+            {% endif %}
 
         </div>
 

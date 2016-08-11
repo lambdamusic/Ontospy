@@ -19,7 +19,7 @@ import json
 
 
 
-def run(graph, save_on_github=False):
+def run(graph, save_on_github=False, main_entity=None):
 	"""
 	"""
 	try:

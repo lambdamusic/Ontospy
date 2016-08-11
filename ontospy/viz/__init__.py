@@ -73,24 +73,24 @@ else:
 
 from .viz_html import run as html
 from .viz_d3tree import run as tree
-from .viz_d3packhierarchy import run as packH
+from .viz_d3packHierarchy import run as packH
 from .viz_d3bubblechart import run as bubble
 from .viz_d3cluster import run as cluster
 from .viz_d3barHierarchy import run as barH
 from .viz_d3partitionTable import run as partitionT
 from .viz_d3treePie import run as treeP
-# from .viz_splitter import run as splitter
+from .viz_splitter_multi import run as splitter
 
 
-VISUALIZATIONS_LIST =  [("JavaDoc", html)]
-# VISUALIZATIONS_LIST += [("Splitted Columns", splitter)]
-VISUALIZATIONS_LIST += [("Dendogram", tree)]
-VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH)]
-VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble)]
-VISUALIZATIONS_LIST += [("Cluster Tree (experimental)", cluster)]
-VISUALIZATIONS_LIST += [("Bar Hierarchy (experimental)", barH)]
-VISUALIZATIONS_LIST += [("Partition Table (experimental)", partitionT)]
-VISUALIZATIONS_LIST += [("Tree Pie (buggy)", treeP)]
+VISUALIZATIONS_LIST =  [("JavaDoc", html, "single-file")]
+VISUALIZATIONS_LIST += [("Splitted Columns", splitter, "multi-file")]
+VISUALIZATIONS_LIST += [("Dendogram", tree, "single-file")]
+VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH, "single-file")]
+VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble, "single-file")]
+VISUALIZATIONS_LIST += [("Cluster Tree (experimental)", cluster, "single-file")]
+VISUALIZATIONS_LIST += [("Bar Hierarchy (experimental)", barH, "single-file")]
+VISUALIZATIONS_LIST += [("Partition Table (experimental)", partitionT, "single-file")]
+VISUALIZATIONS_LIST += [("Tree Pie (buggy)", treeP, "single-file")]
 
 
 # ============
@@ -125,12 +125,12 @@ def ask_visualization():
 
 
 # ===========
-# DYNAMIC RUNNER FUN
+# DYNAMIC RUNNER FUNCTION
 # ===========
 
-def run_viz(g, viz_index, save_gist):
+def run_viz(g, viz_index, save_gist=False, main_entity=None):
     """
-    Main fun calling the visualizations
+    Main wrapper function for calling the visualizations
 
     Note: dependent on VISUALIZATIONS_LIST
 
@@ -139,7 +139,7 @@ def run_viz(g, viz_index, save_gist):
     :param save_gist: a flag (just to extra info printed on template)
     :return: string contents of html file (the viz)
     """
-    contents = VISUALIZATIONS_LIST[viz_index][1](g, save_gist)
+    contents = VISUALIZATIONS_LIST[viz_index][1](g, save_gist, main_entity)
     return contents
 
 
@@ -159,6 +159,8 @@ def saveVizLocally(contents, filename="index.html", path=None):
 
     url = "file://" + filename
     return url
+
+
 
 
 def saveVizGithub(contents, ontouri):
