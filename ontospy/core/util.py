@@ -802,7 +802,7 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 
 
-def shellPrintOverview(g, opts):
+def shellPrintOverview(g, opts={'labels' : False}):
     """
     overview of graph invoked from command line
     """

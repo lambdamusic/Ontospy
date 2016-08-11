@@ -460,6 +460,7 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
                 url = saveVizLocally(contents, _filename, path)
         
         url = index_url
+        printDebug("Documentation generated: <%s>" % url, "green")
     
     return url
 
