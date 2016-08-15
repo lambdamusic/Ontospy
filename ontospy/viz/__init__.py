@@ -24,10 +24,14 @@ except NameError:
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
 
-if django.get_version() > '1.7':
+#http://stackoverflow.com/questions/1714027/version-number-comparison
+from distutils.version import StrictVersion
+
+if StrictVersion(django.get_version()) > StrictVersion('1.7'):
     from django.conf import settings
     from django.template import Context, Template
 
+    print "====="
     settings.configure()
     django.setup()
     settings.TEMPLATES = [
@@ -37,6 +41,7 @@ if django.get_version() > '1.7':
                 # insert your TEMPLATE_DIRS here
                 ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
                 ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter",
+                ontospy.ONTOSPY_VIZ_TEMPLATES + "markdown",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -72,6 +77,7 @@ else:
 # @todo modify here in order to add new viz
 
 from .viz_html import run as html
+from .viz_markdown import run as markdown
 from .viz_d3tree import run as tree
 from .viz_d3packHierarchy import run as packH
 from .viz_d3bubblechart import run as bubble
@@ -84,6 +90,7 @@ from .viz_splitter_multi import run as splitter
 
 VISUALIZATIONS_LIST =  [("JavaDoc", html, "single-file")]
 VISUALIZATIONS_LIST += [("Splitted Columns", splitter, "multi-file")]
+VISUALIZATIONS_LIST += [("Markdown (experimental)", markdown, "multi-file")]
 VISUALIZATIONS_LIST += [("Dendogram", tree, "single-file")]
 VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH, "single-file")]
 VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble, "single-file")]

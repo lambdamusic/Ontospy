@@ -1,0 +1,201 @@
+{% extends "markdown_base.md" %}
+{% block main_column %}
+
+
+{% ifequal main_entity_type "class"  %}
+    
+        {% with main_entity as each  %}
+
+        <div class="entity-div">
+
+
+
+            <h1 class="entity-section">Class: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
+                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
+            </h1>
+            <hr>
+
+
+            <div class="tree-container">
+            <div class="tree">
+                <ul>
+                    {% if each.parents %}
+
+                        <li>
+                        {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
+
+                        <ul>
+
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <li href="#"><a>OWL:Thing</a>
+
+                        <ul>
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            </div>
+
+
+            {% if not each.children  %}
+            <p class="section-desc">
+                <small>NOTE</small> this is a leaf node.</p>
+            {% endif %}
+
+            <p class="section-desc"><b>URI:</b>
+                <br>
+                {{each.uri}}
+            </p>
+
+            <p class="section-desc"><b>Description:</b>
+                <br>
+                {{each.bestDescription|default:"--"}}
+            </p>
+
+            {% if each.ancestors %}
+                <p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                    <br />
+                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                </p>
+            {% else %}
+                <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+            {% endif %}
+
+
+            {% if 0 %}
+
+                {# HIDDEN AFTER ADDING THE PROPERTIES TABLE #}
+
+                {% if each.domain_of %}
+                    <p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        {% for s in each.domain_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                    </p>
+                {% endif %}
+
+                {% if each.range_of %}
+                    <p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        {% for s in each.range_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
+                    </p>
+                {% endif %}
+
+
+            {% endif %}
+
+
+
+            <small class="implementation_title">Implementation:</small>
+            {% if pygments_code %}
+ 
+                {{pygments_code|safe}}
+
+            {% else %}
+                 <div class="implementation">
+                    <code>{{each.serialize|linebreaks}}</code>
+                </div>               
+            {% endif %}
+
+
+            
+
+
+        {% if each.domain_of_inferred %}
+    
+            
+            <br />
+            <b class="text-muted">
+                Instances of {{each.qname}} can have the following properties:
+            </b>
+    
+            <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover col-md-12">
+        
+                <tr>
+                    <th height="40">Property</th><th>Description</th><th>Expected Type</th>
+                </tr>
+        
+                {% for group in each.domain_of_inferred  %}      
+        
+                    {% for k,v in group.items  %}
+                        
+                    
+                    <tr style="background: lightcyan;text-align: left;">
+                        <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
+                        From <a title="{{k.qname}}" href="{{k.slug}}.html" class="rdfclass">{{k.qname}}</a></span>
+                        </th>
+                    </tr>       
+            
+                        {% for prop in v  %}
+                        <tr>
+                            <td class="firsttd">
+                                <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>         
+                            </td>
+                            <td class="thirdtd">
+                                <span>{{prop.bestDescription}}</span>
+                            </td>
+                            <td class="secondtd">
+                                {% if  prop.ranges %}
+                                {% for range in prop.ranges  %}
+
+                                    <a title="{{range.qname}}" href="{{range.slug}}.html" class="rdfclass">{{range.qname}}</a>
+
+                                {% endfor %}
+                                {% else %}
+                                    <i>owl:Thing</i>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+            
+                    {% endfor %}
+
+                {% endfor %}
+
+            </table>
+    
+    
+        {% endif %}
+    
+
+
+        </div>
+
+
+        {% endwith %}
+
+
+
+{% endifequal %}
+
+
+
+
+{% endblock main_column %}

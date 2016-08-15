@@ -406,14 +406,6 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
         ontouri = args[0]
         islocal = False
 
-    # put on home folder by default
-    if not path:
-        from os.path import expanduser
-        home = expanduser("~")
-        path = os.path.join(home, "ontospy-viz")
-        if not os.path.exists(path):
-            os.makedirs(path)
-
     # select a visualization
     viztype = ask_visualization()
     if viztype == "":
@@ -428,6 +420,20 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
     else:
         g = Graph(ontouri)
 
+    # put in home folder by default: <ontouri>/<viztype>/files..
+    if not path:
+        from os.path import expanduser
+        home = expanduser("~")
+        onto_path = slugify(unicode(ontouri))
+        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype][0]))
+        path = os.path.join(home, "ontospy-viz/" + onto_path + "/" + viz_path )
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    if "markdown" in VISUALIZATIONS_LIST[viztype][0].lower():
+        extension = ".md"
+    else:
+        extension = ".html"
 
     if VISUALIZATIONS_LIST[viztype][2] == "single-file":
         # simple  viz DISPATCHER
@@ -442,21 +448,21 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
             printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
             url = urls['blocks'] # defaults to full win
         else:
-            url = saveVizLocally(contents, slugify(unicode(ontouri)) + ".html", path)
+            url = saveVizLocally(contents, slugify(unicode(ontouri)) + extension, path)
             printDebug("Documentation generated: <%s>" % url, "green")
 
     elif VISUALIZATIONS_LIST[viztype][2] == "multi-file":
         # splitter viz
         # main index page for graph
         contents = run_viz(g, viztype, save_gist, None)
-        index_url = saveVizLocally(contents, "index.html", path)
+        index_url = saveVizLocally(contents, "index" + extension, path)
 
         entities = [g.classes, g.properties, g.skosConcepts]
         for group in entities:
             for c in group:
                 # getting main func dynamically
                 contents = run_viz(g, viztype, save_gist, c)
-                _filename = c.slug + ".html"
+                _filename = c.slug + extension
                 url = saveVizLocally(contents, _filename, path)
         
         url = index_url
