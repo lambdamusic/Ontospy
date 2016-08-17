@@ -4,95 +4,68 @@
 
 {% ifequal main_entity_type "property"  %}
     
-        {% with main_entity as each  %}
+{% with main_entity as each  %}
+
+## Property {{each.qname}}
 
 
-        <div class="entity-div">
+### Tree
+{% if each.parents %}
+{% for s in each.parents %}
+* [{{s.qname}}]({{s.slug}}.md)
+{% endfor %}
+    * {{each.qname}}
+{% if each.children  %}
+{% for s in each.children %}
+        * [{{s.qname}}]({{s.slug}}.md) 
+{% endfor %}        
+{% endif %}
 
-            <h1 class="entity-section">Property: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
-                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
-            </h1>
-            <hr>
+{% else %}
+* rdfs:Property
+    * {{each.qname}}
+{% if each.children  %}
+{% for s in each.children %}
+        * [{{s.qname}}]({{s.slug}}.md) 
+{% endfor %}        
+{% endif %}
 
+{% endif %}
 
-            {% if not each.children  %}
-            <p class="section-desc">
-                <small>NOTE</small> this is a leaf node.</p>
-            {% endif %}
+{% if not each.children  %}
+*NOTE* this is a leaf node.
+{% endif %}
 
-            <p class="section-desc"><b>URI:</b>
-                <br>
-                {{each.uri}}
-            </p>
- 
-            <p class="section-desc"><b>Description:</b>
-                <br>
-                {{each.bestDescription|default:"--"}}
-            </p>
+### URI
+{{each.uri}}
 
-            {% if each.ancestors %}
-                <p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                    <br />
-                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
-            {% else %}
+### Description
+{{each.bestDescription|default:"--"}}
 
-            {% endif %}
-
-
-
-            {% if each.children %}
-                <p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
-                    <br />
-                    {% for s in each.children %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
-            {% endif %}
-
-            {% if 0 and each.descendants and each.descendants|length > each.children|length %}
-                <p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-            {% endif %}
+{% if each.ancestors %}
+### Inherits from ({{ each.ancestors|length }})
+{% for s in each.ancestors %}
+- [{{s.qname}}]({{s.slug}}.md)
+{% endfor %}
+{% else %}
+### Inherits from:
+owl:Thing
+{% endif %}
 
 
+### Usage
+{% if each.domains %}
+{% for s in each.domains %}
+[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %} 
+{% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.qname}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
 
-            <p class="section-desc"><b>Usage:</b>
-                <br>
-                {% if each.domains %}
-                    {% for s in each.domains %}
-                    <a href="{{s.slug}}.html">{{s.qname|default:s}}</a> {% if not forloop.last %} &amp;&amp; {% endif %} 
-                    {% endfor %}
-                {% else %}
-                    owl:Thing
-                {% endif %}
-                =&gt;&nbsp;<span class="highlight_entity">{{each.qname}}</span>&nbsp;=&gt;&nbsp;
-                {% if each.ranges %}
-                    {% for s in each.ranges %}
-                    <a href="{{s.slug}}.html">{{s.qname|default:s}}</a> {% if not forloop.last %} &amp;&amp; {% endif %} 
-                    {% endfor %}
-                {% else %}
-                    owl:Thing
-                {% endif %}
-            
-
-            </p>
+### Implementation
+```
+{{each.serialize|linebreaks}}
+```
 
 
-
-
-            <small class="implementation_title">Implementation:</small>
-            {% if pygments_code %}
-                {{pygments_code|safe}}
-            {% else %}
-                 <div class="implementation">
-                    <code>{{each.serialize|linebreaks}}</code>
-                </div>               
-            {% endif %}
-
-        </div>
-
-        {% endwith %}
-
-
-
+{% endwith %}
 {% endifequal %}
 
 

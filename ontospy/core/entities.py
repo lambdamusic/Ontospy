@@ -81,6 +81,8 @@ class RDF_Entity(object):
         transforms the triples list into a proper rdflib graph
         (which can be used later for querying)
         """
+        for n in self.namespaces:
+            self.rdfgraph.bind(n[0], rdflib.Namespace(n[1]))
         if self.triples:
             for terzetto in self.triples:
                 self.rdfgraph.add(terzetto)

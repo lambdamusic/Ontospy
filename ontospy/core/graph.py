@@ -228,9 +228,10 @@ class Graph(object):
 
         else:
 
-            if self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
+            # deprecated cause local file path uRIs seemed counterintuitive
+            if False and self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
                 # if not base namespace is set, try to simulate one
-                self.rdfgraph.bind("_ns0_", rdflib.Namespace(self.graphuri))
+                self.rdfgraph.bind("temp", rdflib.Namespace(self.graphuri))
 
 
             self.namespaces = sorted(self.rdfgraph.namespaces())
@@ -285,9 +286,17 @@ class Graph(object):
 
 
     def stats(self):
-        """ shotcut to pull out useful info for a graph """
+        """ shotcut to pull out useful info for a graph 
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph lenght on cached Graph objects..
+        TODO: investigate what's going on..
+        """
         out = []
-        out += [("Triples", len(self.rdfgraph))]
+        try:
+            out += [("Triples", len(self.rdfgraph))]
+        except:
+            pass
         out += [("Classes", len(self.classes))]
         out += [("Properties", len(self.properties))]
         out += [("Annotation Properties", len(self.annotationProperties))]

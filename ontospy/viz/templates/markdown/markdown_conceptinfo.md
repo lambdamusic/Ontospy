@@ -4,104 +4,62 @@
 
 {% ifequal main_entity_type "concept"  %}
     
-        {% with main_entity as each  %}
+{% with main_entity as each  %}
 
-       <div class="entity-div">
-
-            <h1 class="entity-section">Concept: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
-                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
-            </h1>
-            <hr>
-
-            <div class="tree-container">
-            <div class="tree">
-                <ul>
-                    {% if each.parents %}
-                        <li> {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
-
-                        <ul>
-
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}
-                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
-                                {% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
-
-                        </ul>
-
-                        </li>
-                        {% endfor %}
-
-                    {% else %}
-
-                        <li href="#"><a>skos:Concept</a>
-
-                        <ul>
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
-
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}
-                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
-                                {% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
-
-                        </ul>
-
-                        </li>
-                    {% endif %}
-
-                </ul>
-            </div>
-            </div>
+## SKOS Concept {{each.qname}}
 
 
-            {% if not each.children  %}
-            <p class="section-desc">
-                <small>NOTE</small> this is a leaf node.</p>
-            {% endif %}
+### Tree
+{% if each.parents %}
+{% for s in each.parents %}
+* [{{s.qname}}]({{s.slug}}.md)
+{% endfor %}
+    * {{each.qname}}
+{% if each.children  %}
+{% for s in each.children %}
+        * [{{s.qname}}]({{s.slug}}.md) 
+{% endfor %}        
+{% endif %}
 
-            <p class="section-desc"><b>URI:</b>
-                <br>
-                {{each.uri}}
-            </p>
+{% else %}
+* skos:Concept
+    * {{each.qname}}
+{% if each.children  %}
+{% for s in each.children %}
+        * [{{s.qname}}]({{s.slug}}.md) 
+{% endfor %}        
+{% endif %}
 
-            <p class="section-desc"><b>Description:</b>
-                <br>
-                {{each.bestDescription|default:"--"}}
-            </p>
+{% endif %}
 
-            {% if each.ancestors %}
-                <p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
-                    <br />
-                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
-            {% endif %}
+{% if not each.children  %}
+*NOTE* this is a leaf node.
+{% endif %}
 
+### URI
+{{each.uri}}
 
-            <small class="implementation_title">Implementation:</small>
-            {% if pygments_code %}
-                {{pygments_code|safe}}
-            {% else %}
-                 <div class="implementation">
-                    <code>{{each.serialize|linebreaks}}</code>
-                </div>               
-            {% endif %}
-
-        </div>
-
-
-        {% endwith %}
+### Description
+{{each.bestDescription|default:"--"}}
 
 
+{% if each.ancestors %}
+### Inherits from ({{ each.ancestors|length }})
+{% for s in each.ancestors %}
+- [{{s.qname}}]({{s.slug}}.md)
+{% endfor %}
+{% else %}
+### Inherits from:
+skos:Concept
+{% endif %}
 
+
+### Implementation
+```
+{{each.serialize|linebreaks}}
+```
+
+{% endwith %}
 {% endifequal %}
 
 
