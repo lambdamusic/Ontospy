@@ -43,7 +43,7 @@ from .core.util import printDebug
 # ===========
 
 
-GLOBAL_DISABLE_CACHE = False  # set to True for testing
+GLOBAL_DISABLE_CACHE = True  # set to True for testing
 
 
 

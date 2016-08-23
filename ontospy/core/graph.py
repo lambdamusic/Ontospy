@@ -45,7 +45,7 @@ class Graph(object):
 
     """
 
-    def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True):
+    def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -84,7 +84,7 @@ class Graph(object):
         # finally
         self.__loadRDF(source, text, endpoint, rdf_format, verbose)
         # extract entities into
-        self._scan(verbose=verbose)
+        self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
 
 
     def __repr__(self):
@@ -113,7 +113,9 @@ class Graph(object):
 
 
         else:
-            if type(source) == type("string"):
+
+            if type(source) == type("string") or type(source) == type(u"unicode"):
+
                 if source.startswith("www."): #support for lazy people
                     source = "http://%s" % str(source)
                 if source.startswith("http://"):
@@ -142,40 +144,40 @@ class Graph(object):
 
         #FINALLY, TRY LOADING:
 
-        printDebug("----------")
+        if verbose:printDebug("----------")
         if self.IS_ENDPOINT:
-            printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
-            printDebug("(note: support for sparql endpoints is still experimental)")
+            if verbose:printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
+            if verbose:printDebug("(note: support for sparql endpoints is still experimental)")
             successflag = True
 
         else:
 
             if not rdf_format:
-                rdf_format_opts = ['xml', 'n3', 'nt', 'trix', 'rdfa']
+                rdf_format_opts = ['xml', 'turtle', 'n3', 'nt', 'trix', 'rdfa']
             else:
                 rdf_format_opts = [rdf_format]
 
             successflag = False
             for f in rdf_format_opts:
-
-                printDebug(".. trying rdf serialization: <%s>" % f)
+    
+                if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
 
                 try:
                     if self.IS_TEXT:
                         self.rdfgraph.parse(data=source, format=f)
-                        printDebug("..... success!")
+                        if verbose:printDebug("..... success!")
                         successflag = True
-                        printDebug("----------\nLoading %d triples from text" % len(self.rdfgraph))
+                        if verbose:printDebug("----------\nLoading %d triples from text" % len(self.rdfgraph))
                     else:
                         self.rdfgraph.parse(source, format=f)
-                        printDebug("..... success!")
+                        if verbose:printDebug("..... success!")
                         successflag = True
-                        printDebug("----------\nLoading %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
+                        if verbose:printDebug("----------\nLoading %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
                     # set up the query helper too
                     self.queryHelper = QueryHelper(self.rdfgraph)
 
                 except:
-                    printDebug("..... failed")
+                    if verbose:printDebug("..... failed")
 
                 if successflag == True:
                     break
@@ -243,7 +245,7 @@ class Graph(object):
     # === main method === #
     # ------------
 
-    def _scan(self, source=None, text=False, endpoint=False, rdf_format=None, verbose=True):
+    def _scan(self, source=None, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
         """
         scan a source of RDF triples
         build all the objects to deal with the ontology/ies pythonically
@@ -266,7 +268,7 @@ class Graph(object):
         self.__extractOntologies()
         if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
 
-        self.__extractClasses()
+        self.__extractClasses(hide_base_schemas)
         if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
 
         self.__extractProperties()
@@ -382,7 +384,7 @@ class Graph(object):
     ##################
 
 
-    def __extractClasses(self):
+    def __extractClasses(self, hide_base_schemas=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -397,7 +399,7 @@ class Graph(object):
 
         self.classes = [] # @todo: keep adding?
 
-        qres = self.queryHelper.getAllClasses()
+        qres = self.queryHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
         for class_tuple in qres:
             
