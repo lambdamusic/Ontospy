@@ -89,7 +89,7 @@ from .viz_splitter_multi import run as splitter
 
 VISUALIZATIONS_LIST =  [("JavaDoc", html, "single-file")]
 VISUALIZATIONS_LIST += [("Markdown ", markdown, "multi-file")]
-VISUALIZATIONS_LIST += [("Splitted Columns", splitter, "multi-file")]
+VISUALIZATIONS_LIST += [("Split Columns", splitter, "multi-file")]
 VISUALIZATIONS_LIST += [("Dendogram", tree, "single-file")]
 VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH, "single-file")]
 VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble, "single-file")]
