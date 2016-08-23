@@ -53,7 +53,7 @@ def run(graph, save_on_github=False, main_entity=None):
         context.update({ "pygments_code" : pygments_code,
                          "pygments_code_css": pygments_code_css
                          })
-    except Exception, e:
+    except Exception as e:
         pass
 
 
