@@ -106,20 +106,21 @@ class Shell(cmd.Cmd):
     VISUALIZE_OPTS = ['gist']
 
 
-    def __init__(self):
-         """
-         self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
-         self.currentEntity = {'name' : obj.locale or obj.uri, 'object' : obj, 'type' : 'class'}
-                                                                        # or 'property' or 'concept'
-         """
-         # useful vars
-         self.LOCAL = ontospy.ONTOSPY_LOCAL
-         self.LOCAL_MODELS = ontospy.get_home_location()
-         self.ontologies = ontospy.get_localontologies()
-         self.current = None
-         self.currentEntity = None
-
-         cmd.Cmd.__init__(self)
+    def __init__(self, uri=None):
+        """
+        self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+        self.currentEntity = {'name' : obj.locale or obj.uri, 'object' : obj, 'type' : 'class'}
+                                                                    # or 'property' or 'concept'
+        """
+        # useful vars
+        self.LOCAL = ontospy.ONTOSPY_LOCAL
+        self.LOCAL_MODELS = ontospy.get_home_location()
+        self.ontologies = ontospy.get_localontologies()
+        self.current = None
+        self.currentEntity = None
+        if uri:
+            self._load_ontology(uri, preview_mode=True)
+        cmd.Cmd.__init__(self)
 
 
 
@@ -537,14 +538,24 @@ class Shell(cmd.Cmd):
     # --------
 
 
-    def _load_ontology(self, filename):
-        """ loads an ontology from the local repository
-            note: if the ontology does not have a cached version, it is created
+    def _load_ontology(self, filename, preview_mode=False):
         """
-        fullpath = self.LOCAL_MODELS + filename
-        g = ontospy.get_pickled_ontology(filename)
-        if not g:
-            g = ontospy.do_pickle_ontology(filename)
+        Loads an ontology
+
+        Unless preview_mode=True, it is always loaded from the local repository
+        note: if the ontology does not have a cached version, it is created
+
+        preview_mode: used to pass a URI/path to be inspected without saving it locally
+        """
+        if not preview_mode:
+            fullpath = self.LOCAL_MODELS + filename
+            g = ontospy.get_pickled_ontology(filename)
+            if not g:
+                g = ontospy.do_pickle_ontology(filename)
+        else:
+            fullpath = filename
+            filename = os.path.basename(os.path.normpath(fullpath))
+            g = ontospy.Graph(fullpath)
         self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
         self.currentEntity = None
         self._print_entity_intro(g)
