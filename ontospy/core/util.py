@@ -837,3 +837,19 @@ def slugify(value):
     value = unicode(re.sub('[^\w\s-]', '', value.decode()).strip().lower())
     value = re.sub('[-\s]+', '-', value)
     return value
+
+
+
+def get_files_with_extensions(folder, extensions):
+    """walk dir and return .* files as a list"""
+    out = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            filename, file_extension = os.path.splitext(file)
+            if file_extension.replace(".", "") in extensions:
+                out += [os.path.join(root, file)]
+                # break
+
+    return out
+
+

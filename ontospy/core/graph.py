@@ -28,30 +28,51 @@ from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 
 from .util import *
+from .loader import load
 from .entities import *
 from .queryHelper import QueryHelper
 
 
-class Graph(object):
+class Graph(object):  # Ontospy
     """
     Object that scan an rdf graph for schema definitions (aka 'ontologies')
 
-    In [1]: import ontospy2
+    In [1]: import ontospy
     INFO:rdflib:RDFLib Version: 4.2.0
 
-    In [2]: g = ontospy2.Graph("npgcore_latest.ttl")
+    In [2]: g = ontospy.Graph("foaf.ttl")
     Loaded 3478 triples
     Ontologies found: 1
+    
+    2016-08-27: refactoring..
+    ---------------------------------
+    problem is that Graph has a Graph (rdflib).. so really this class is like
+     a loader, or inspector, or factory.. or model, parser, analyzer, probe, explorer,
+     entities catalog, directory, register, index, list, listing, record, archive, inventory.
+     snooper, scout, worker
+     
+     an approach could be:
+     
+     g = ontospy.load("some graph", opts) # returns an OntoGraph or Inspector or similar
+
+
+     da2016-09-04: rationale
+     this onject (Ontospy) should only get a graph (or endpoint) and materialize entities
+     All loading related stuff should happen outside!
+    
 
     """
 
-    def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
+    # NEW:
+    def __init__(self, rdfgraph=None, endpoint=None, verbose=True, hide_base_schemas=True):
+
+    # def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
-        super(Graph, self).__init__()
+        super(Ontospy, self).__init__()
 
-        self.rdfgraph = rdflib.Graph()
+        self.rdfgraph = rdfgraph or rdflib.Graph()
 
         self.graphuri = None
         self.queryHelper = None # instantiated after we have a graph
