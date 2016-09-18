@@ -41,7 +41,7 @@ from colorama import Fore, Style
 from . import *  # imports __init__
 from ._version import *
 from .core.graph import Graph
-from .core.util import *
+from .shared.utils import *
 
 
 

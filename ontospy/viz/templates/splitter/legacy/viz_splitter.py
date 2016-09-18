@@ -6,7 +6,7 @@ from . import *  # imports __init__
 from .. import ontospy
 
 # from .. import ontospy
-# from ..core.util import *
+# from ..shared.utils import *
 
 # TEMPLATE: HTML SPLITTER
 

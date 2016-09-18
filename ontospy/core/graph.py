@@ -27,7 +27,7 @@ import rdflib
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 
-from .util import *
+from ..shared.utils import *
 from .loader import load
 from .entities import *
 from .queryHelper import QueryHelper

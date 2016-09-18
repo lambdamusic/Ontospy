@@ -18,6 +18,7 @@ DEFAULT_LANGUAGE = "en"
 import sys, os, subprocess, random, platform
 from colorama import Fore, Back, Style
 
+import click
 
 # Fix Python 2.x.
 try:
@@ -102,7 +103,42 @@ def remove_duplicates(seq, idfun=None):
 
 
 
-def printDebug(s, style=None):
+def printDebug(text, mystyle="", **kwargs):
+    """
+    util for printing in colors using click.secho()
+    http://click.pocoo.org/5/api/#click.style
+
+    :kwargs = you can do printDebug("s", bold=True)
+    
+    """
+    
+    if mystyle == "comment":
+        click.secho(text, fg='green')
+    elif mystyle == "important":
+        click.secho(text, bold=True)
+    elif mystyle == "normal":
+        click.secho(text, reset=True)
+    elif mystyle == "red" or mystyle=="error":
+        click.secho(text, fg='red')
+    elif mystyle == "green":
+        click.secho(text, fg='green')
+    else:
+        click.secho(text, **kwargs)
+
+
+def printComment(text, mystyle="comment", **kwargs):
+    """
+    wrapper around click.secho()
+    .. same as printDebug, but just one option
+    [for backward compatibility]
+    """
+    
+    click.secho(text, fg='green', **kwargs)
+
+
+
+
+def OLD_printDebug(s, style=None):
     """
     util for printing in colors to sys.stderr stream
     """

@@ -9,9 +9,7 @@ Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>. All rig
 """
 
 from __future__ import print_function
-
 import sys, os, time, optparse
-
 try:
     import urllib2
 except ImportError:
@@ -20,10 +18,12 @@ except ImportError:
 import rdflib
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
+import click
 
-from .util import *
+from ..shared.utils import *
+
 from .graph import *
-from .queryHelper import QueryHelper
+# from .queryHelper import QueryHelper
 
 
 
@@ -36,6 +36,10 @@ def load(uri=None, text="", file_obj=None, endpoint=None, rdf_format=None, verbo
     will be a union of the rdf data contained in each of the arguments 
 
     @todo: real_uri, graphuri - needed?
+
+    @clarify: does this return an rdflib object or an ontospy one???? 
+    in the first case it could go into 'shared' ..
+
     """
 
     rdfgraph = rdflib.Graph()
@@ -192,7 +196,7 @@ def load_text(text, rdf_format_opts, verbose, rdfgraph):
             success = True
             break
         except:
-            if verbose: printDebug("..... failed")
+            if verbose: printDebug("..... failed", "error")
 
     if not success == True:
         loading_failed(rdf_format_opts)
@@ -228,7 +232,7 @@ def load_file(file_obj, rdf_format_opts, verbose):
 if __name__ == '__main__':
     """
     simple test: python -m ontospy.core.loader
-    """
+    """   
     # load(["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"], verbose=True)
     # load(["/Users/michele.pasin/Dropbox/code/scigraph/scigraph-core-ontology/data"], verbose=True)
     load(["/Users/michele.pasin/Dropbox/code/scigraph/scigraph-core-ontology/data/review/legacy/properties.ttl"], verbose=True)

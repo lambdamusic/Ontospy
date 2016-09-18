@@ -42,7 +42,8 @@ from . import *
 from . import ontospy
 from . import _version
 from .extras import *  # quotes
-from .core.util import *
+
+from .shared.utils import *
 
 
 

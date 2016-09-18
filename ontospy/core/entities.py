@@ -11,7 +11,7 @@ from colorama import Fore, Back, Style
 
 
 
-from .util import *
+from ..shared.utils import *
 
 
 class RDF_Entity(object):

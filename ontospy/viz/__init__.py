@@ -9,7 +9,7 @@
 
 
 from .. import ontospy
-from ..core.util import *
+from ..shared.utils import *
 
 
 # Fix Python 2.x.

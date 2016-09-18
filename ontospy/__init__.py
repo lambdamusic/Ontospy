@@ -31,7 +31,7 @@ from colorama import Fore, Style
 from .core.graph import Graph, SparqlEndpoint
 # this allows to load with 'import ontospy', and using 'ontospy.Graph'
 
-from .core.util import printDebug
+from .shared.utils import printDebug
 
 
 

@@ -21,7 +21,7 @@ from prompt_toolkit.token import Token
 from .. import ontospy
 from .. import _version
 from ..core.graph import Graph
-from ..core.util import *
+from ..shared.utils import *
 
 
 test_style = style_from_dict({

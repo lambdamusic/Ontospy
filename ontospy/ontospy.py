@@ -41,7 +41,8 @@ from . import *  # imports __init__
 from ._version import *
 from .actions import *
 from .core.graph import Graph
-from .core.util import *
+
+from .shared.utils import *
 
 
 

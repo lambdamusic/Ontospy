@@ -21,7 +21,8 @@ from ConfigParser import SafeConfigParser
 from . import *
 from . import ontospy
 from .core.graph import Graph
-from .core.util import *
+
+from .shared.utils import *
 
 
 
