@@ -27,23 +27,22 @@ from .utils import *
 class RDFLoader(object):
     """
     Utility to Load any RDF source into an RDFLIB graph instance.
-    The RDFlib graph instance can then be parsed by Ontospy
     
     Note: arguments can be lists, with the effect that the resulting graph
     will be a union of the rdf data contained in each of the arguments 
 
-    @todo: real_uri, graphuri - needed?
+    The resulting rdflib graph instance can then be parsed by Ontospy
 
-    @clarify: does this return an rdflib object or an ontospy one???? 
-    in the first case it could go into 'shared' ..
-
+    :rdfgraph > in theory we could load onto an already existing graph
+    :all_sources > registry of all locations RDF is succesfully loaded from
     """
 
     def __init__(self, rdfgraph=None):
         super(RDFLoader, self).__init__()
         
         self.rdfgraph = rdfgraph or rdflib.Graph()
-
+        self.sources_valid = []
+        self.sources_invalid = []
 
     def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False):
         
@@ -89,13 +88,95 @@ class RDFLoader(object):
         else:
             raise Exception("You must specify where to load RDF from.")
 
-        
-        if verbose: printDebug("----------\nLoaded %d triples from: <%s>" %
-                               (len(self.rdfgraph), uri), "comment")
+    
 
+        if verbose: self.print_summary()
 
         return self.rdfgraph
         
+
+
+
+    def load_uri(self, uri, verbose, rdfgraph):
+        """
+        
+        :param uri:
+        :param rdf_format_opts:
+        :param verbose:
+        :return:
+        """
+
+        if verbose: printDebug("----------")
+        if verbose: printDebug("Reading: <%s>" % uri)
+        success = False
+        for f in self.rdf_format_opts:
+            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
+            try:
+                self.rdfgraph.parse(uri, format=f)
+                if verbose: printDebug("..... success!", bold=True)
+                success = True
+                self.sources_valid += [uri]
+                break
+            except:
+                if verbose: printDebug("..... failed")
+
+        if not success == True:
+            self.loading_failed(self.rdf_format_opts)
+            self.sources_invalid += [uri]
+            
+        return self.rdfgraph
+                
+                
+                
+
+    def load_text(self, text, verbose, rdfgraph):
+        """
+        
+        :param text:
+        :param rdf_format_opts:
+        :param verbose:
+        :return:
+        """
+        if verbose: printDebug("----------")
+        if verbose: printDebug("Reading: '%s ...'" % text[:10])
+        success = False
+        for f in self.rdf_format_opts:
+            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
+            try:
+                self.rdfgraph.parse(data=text, format=f)
+                if verbose: printDebug("..... success!")
+                success = True
+                self.all_sources += ["Text: '%s ...'" % text[:10]]
+                break
+            except:
+                if verbose: printDebug("..... failed", "error")
+
+        if not success == True:
+            self.loading_failed(self.rdf_format_opts)
+            self.sources_invalid += ["Text: '%s ...'" % text[:10]]
+
+        return self.rdfgraph
+
+
+
+    def load_file(file_obj, verbose, rdfgraph):
+        """
+        The type of open file objects such as sys.stdout; alias of the built-in file.
+        @TODO: when is this used? 
+        """
+        if verbose: printDebug("----------")
+        if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
+
+        if type(file_obj) == file:
+            rdfgraph = rdfgraph + file_obj
+            self.all_sources += [file_obj.NAME]    
+        else:
+            self.loading_failed(self.rdf_format_opts)
+            self.sources_invalid += [file_obj.NAME]
+
+        # TODO: are we merging file contents here?    
+        return rdfgraph
+
 
 
 
@@ -124,80 +205,6 @@ class RDFLoader(object):
 
 
 
-    def load_uri(self, uri, verbose, rdfgraph):
-        """
-        
-        :param uri:
-        :param rdf_format_opts:
-        :param verbose:
-        :return:
-        """
-
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: <%s>" % uri)
-        success = False
-        for f in self.rdf_format_opts:
-            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
-            try:
-                self.rdfgraph.parse(uri, format=f)
-                if verbose: printDebug("..... success!", bold=True)
-                success = True
-                break
-            except:
-                if verbose: printDebug("..... failed")
-
-        if not success == True:
-            self.loading_failed(self.rdf_format_opts)
-            
-        return self.rdfgraph
-                
-                
-                
-
-    def load_text(self, text, verbose, rdfgraph):
-        """
-        
-        :param text:
-        :param rdf_format_opts:
-        :param verbose:
-        :return:
-        """
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: '%s ...'" % text[:10])
-        success = False
-        for f in self.rdf_format_opts:
-            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
-            try:
-                self.rdfgraph.parse(data=text, format=f)
-                if verbose: printDebug("..... success!")
-                success = True
-                break
-            except:
-                if verbose: printDebug("..... failed", "error")
-
-        if not success == True:
-            self.loading_failed(self.rdf_format_opts)
-
-        return self.rdfgraph
-
-
-
-    def load_file(file_obj, verbose):
-        """
-        The type of open file objects such as sys.stdout; alias of the built-in file.
-        @TODO: when is this used? 
-        """
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
-        # if type(file_obj) == file:
-        #     graphuri = file_obj.name  # default uri is filename       
-        if not success == True:
-            self.loading_failed(self.rdf_format_opts)
-            
-        return self.rdfgraph
-
-
-
     def loading_failed(self, rdf_format_opts):
         """default message if we need to abort loading"""
         printDebug(
@@ -205,30 +212,57 @@ class RDFLoader(object):
         printDebug(
             "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
 
-        sys.exit(0)
+        return
+
+
+    def print_summary(self):
+        """
+        print out stats about loading operation
+        """
+        if self.sources_valid:
+            printDebug("----------\nLoaded %d triples.\n----------" % 
+                len(self.rdfgraph), fg='green')
+            printDebug("RDF sources loaded successfully = %d:" % 
+                (len(self.sources_valid)), fg='green')
+            for s in self.sources_valid:
+                printDebug("-> " + s, bold=True)
+        else:
+            printDebug("Sorry - no valid RDF was found", fg='red')
+
+        if self.sources_invalid:
+            printDebug("----------\nRDF sources failed to load = %d:" % 
+                (len(self.sources_invalid)), fg='red')
+            for s in self.sources_invalid:
+                printDebug("-> " + s, fg="red")        
 
 
 
 
 
+##
+# testing
+##
+
+
+@click.command()
+@click.argument('uri_or_path', type=click.STRING)
+@click.option('--noverbose', is_flag=True, help='Turn off verbose mode.')
+@click.option('--trylist', is_flag=True, help='Try loading a predefined list of files.')
+def test(uri_or_path, noverbose, trylist):
+    l = RDFLoader()
+    if trylist:
+        l.load(["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"], verbose=not(noverbose))
+    else:
+        l.load(uri_or_path, verbose=not(noverbose))
 
 
 
 
 if __name__ == '__main__':
     """
-    simple test: python -m ontospy.core.loader
-
-    eg:
-
-    l.load(["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"], verbose=True)
-    l.load(["/Users/michele.pasin/Dropbox/code/scigraph/scigraph-core-ontology/data"], verbose=True)
-    l.load(["/Users/michele.pasin/Dropbox/Ontologies/_bitbucket/ontologies"], verbose=True)
+    simple test: python -m ontospy.core.loader [PATH] [OPTIONS]
     """
-
-    l = RDFLoader()
-
-    l.load(["/Users/michele.pasin/Dropbox/code/scigraph/scigraph-core-ontology/data/review/legacy/properties.ttl"], verbose=True)
-
+    test()
+    printDebug("Finished")
 
 

@@ -877,7 +877,8 @@ def slugify(value):
 
 
 def get_files_with_extensions(folder, extensions):
-    """walk dir and return .* files as a list"""
+    """walk dir and return .* files as a list
+    Note: directories are walked recursively"""
     out = []
     for root, dirs, files in os.walk(folder):
         for file in files:
