@@ -24,6 +24,18 @@ See also: https://pypi.python.org/pypi/ontospy
 
 Changelog
 ---------------
+v 1.6.9
+- ontospy -r `uri` => loads an interactive session only with that URI
+- improved visualizations; markdown exports bug fix
+
+
+v 1.6.8
+- fixed bugs with Python3
+- more visualizations outputs (3 columns, markdown)
+- turtle lexer for nice printouts of source code 
+- ontospy -o option for exporting viz to a file
+
+
 v 1.6.7
 - added support for Python 3.0 (via pull request)
 

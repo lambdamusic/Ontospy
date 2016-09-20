@@ -91,11 +91,11 @@ setup(
         'SPARQLWrapper',
 		'colorama',
 		'django',
-		'github3.py',
         'requests',
         'pyfiglet',
         'colorama', 
-        'pygments'
+        'pygments',
+        'github3.py',
 	],
 
     # List additional groups of dependencies here (e.g. development dependencies).
