@@ -17,7 +17,9 @@ from prompt_toolkit.contrib.completers import WordCompleter
 from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.styles import style_from_dict
 
+from pygments import highlight
 from pygments.lexers.rdf import TurtleLexer
+from pygments.formatters import Terminal256Formatter
 from pygments.style import Style
 from pygments.styles.default import DefaultStyle
 from pygments.token import Token
@@ -27,15 +29,25 @@ from .vocabsturtleprompt import rdfschema, rdfsschema, owlschema
 
 
 
+def clear_screen():
+    import os, platform
+    """ http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
+    if platform.system() == "Windows":
+        tmp = os.system('cls') #for window
+    else:
+        tmp = os.system('clear') #for Linux
+    return True
+
+
 def get_default_preds():
     """dynamically build autocomplete options based on an external file"""
     g = ontospy.Graph(rdfsschema, text=True, verbose=False, hide_base_schemas=False)
     classes = [(x.qname, x.bestDescription()) for x in g.classes]
     properties = [(x.qname, x.bestDescription()) for x in g.properties]
-    
-    return rdfschema + owlschema + classes + properties
+    commands = [('exit', 'exits the terminal'), ('show', 'show current buffer')]
+    return rdfschema + owlschema + classes + properties + commands
 
-turtle_completer = WordCompleter([x[0] for x in get_default_preds()], ignore_case=True)
+turtle_completer = WordCompleter([x[0] for x in get_default_preds()], ignore_case=True, WORD=True)
 
 
 # BOTTOM TOOLBAR
@@ -43,7 +55,7 @@ turtle_completer = WordCompleter([x[0] for x in get_default_preds()], ignore_cas
 def get_bottom_toolbar_tokens(cli):
     # TIP: in order to analyze current text:
     # t = cli.current_buffer.document.current_line
-    return [(Token.Toolbar, "Please enter some Turtle. [TIP: esc|meta + enter to submit / Control-D to exit]" )]
+    return [(Token.Toolbar, "Please enter some Turtle. [TIP: esc|meta + enter to submit / 'exit' = exit]" )]
 
 style = style_from_dict({
     Token.Toolbar: '#ffffff bg:#333333',
@@ -64,32 +76,33 @@ class DocumentStyle(Style):
 def main(database):
     history = InMemoryHistory()
     # connection = sqlite3.connect(database)
-    
+    buffer = ""
+
     while True:
         try:
             text = prompt('> ', lexer=TurtleLexer, completer=turtle_completer,
                           display_completions_in_columns=False,
                           complete_while_typing=False,
-                          multiline=True,
+                          # multiline=True,
                           get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
                           style=DocumentStyle, history=history,
                           on_abort=AbortAction.RETRY)
         except EOFError:
             break  # Control-D pressed.
 
-        print("You said \n---\n" + text + "\n---")
-        # with connection:
-        #     try:
-        #         messages = connection.execute(text)
-        #     except Exception as e:
-        #         print(repr(e))
-        #     else:
-        #         for message in messages:
-        #             print(message)
+        if text == "exit":
+            break
+        elif text == "show":
+            # print highlight(code, PythonLexer())
+            print("You said \n---\n" + highlight(buffer, TurtleLexer(), Terminal256Formatter()) + "---")
+        else:
+            buffer += text + "\n"
+
         
     print('GoodBye!')
 
 if __name__ == '__main__':
+    clear_screen()
     print("Initiating...")
     if len(sys.argv) < 2:
         # not relevant anymore.. but left here for ideas..
