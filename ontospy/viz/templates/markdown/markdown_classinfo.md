@@ -9,7 +9,7 @@
 ## Class {{each.qname}}
 
 
-### Tree
+#### Tree
 {% if each.parents %}
 {% for s in each.parents %}
 * [{{s.qname}}]({{s.slug}}.md)
@@ -36,34 +36,34 @@
 *NOTE* this is a leaf node.
 {% endif %}
 
-### URI
+#### URI
 {{each.uri}}
 
-### Description
+#### Description
 {{each.bestDescription|default:"--"}}
 
 
 {% if each.ancestors %}
-### Inherits from ({{ each.ancestors|length }})
+#### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
 - [{{s.qname}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
-### Inherits from:
+#### Inherits from:
 owl:Thing
 {% endif %}
 
 
 
-### Implementation
+#### Implementation
 ```
-{{each.serialize|linebreaks}}
+{{each.serialize|safe}}
 ```
 
 
 
 {% if each.domain_of_inferred %}
-### Instances of {{each.qname}} can have the following properties:
+#### Instances of {{each.qname}} can have the following properties:
 
 <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover ">
 

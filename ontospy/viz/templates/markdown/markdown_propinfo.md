@@ -9,7 +9,7 @@
 ## Property {{each.qname}}
 
 
-### Tree
+#### Tree
 {% if each.parents %}
 {% for s in each.parents %}
 * [{{s.qname}}]({{s.slug}}.md)
@@ -36,32 +36,32 @@
 *NOTE* this is a leaf node.
 {% endif %}
 
-### URI
+#### URI
 {{each.uri}}
 
-### Description
+#### Description
 {{each.bestDescription|default:"--"}}
 
 {% if each.ancestors %}
-### Inherits from ({{ each.ancestors|length }})
+#### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
 - [{{s.qname}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
-### Inherits from:
+#### Inherits from:
 owl:Thing
 {% endif %}
 
 
-### Usage
+#### Usage
 {% if each.domains %}
 {% for s in each.domains %}
 [{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %} 
 {% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.qname}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
 
-### Implementation
+#### Implementation
 ```
-{{each.serialize|linebreaks}}
+{{each.serialize|safe}}
 ```
 
 

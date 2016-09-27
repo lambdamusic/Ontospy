@@ -37,6 +37,7 @@ def run(graph, save_on_github=False, main_entity=None):
     context = {
                     "ontology": ontology,
                     "main_uri" : uri,
+                    "ontospy_version" : ontospy.VERSION,
                     "ontograph": graph,
                     "STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
                 }
