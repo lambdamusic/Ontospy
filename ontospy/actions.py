@@ -40,7 +40,7 @@ from colorama import Fore, Style
 
 from . import *  # imports __init__
 from ._version import *
-from .core.graph import Graph
+from .core.ontospy import Ontospy
 from .shared.utils import *
 
 
@@ -175,7 +175,7 @@ def action_import(location, verbose=True, lock=None):
         return None
 
     try:
-        g = Graph(fullpath, verbose=verbose)
+        g = Ontospy(fullpath, verbose=verbose)
         # printDebug("----------")
     except:
         g = None
@@ -311,7 +311,7 @@ def _import_PREFIXCC(keyword=""):
     options = []
 
     printDebug("----------\nReading source...")
-    g = Graph(SOURCE, verbose=False)
+    g = Ontospy(SOURCE, verbose=False)
 
     for x in g.ontologies:
         if keyword:
@@ -418,7 +418,7 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
         if not g:
             g = do_pickle_ontology(ontouri)
     else:
-        g = Graph(ontouri)
+        g = Ontospy(ontouri)
 
     # put in home folder by default: <ontouri>/<viztype>/files..
     if not path:
@@ -584,7 +584,7 @@ def action_cache():
             try:
                 print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
                 print("Loading graph...")
-                g = Graph(fullpath)
+                g = Ontospy(fullpath)
                 print("Loaded ", fullpath)
             except:
                 g = None

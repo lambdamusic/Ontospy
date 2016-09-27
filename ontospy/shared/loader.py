@@ -97,6 +97,28 @@ class RDFLoader(object):
 
 
 
+    def print_summary(self):
+        """
+        print out stats about loading operation
+        """
+        if self.sources_valid:
+            printDebug("----------\nLoaded %d triples.\n----------" % 
+                len(self.rdfgraph), fg='green')
+            printDebug("RDF sources loaded successfully = %d.\n----------" % 
+                (len(self.sources_valid)), fg='green')
+            for s in self.sources_valid:
+                printDebug("-> " + s, fg='green')
+        else:
+            printDebug("Sorry - no valid RDF was found", fg='red')
+
+        if self.sources_invalid:
+            printDebug("----------\nRDF sources failed to load = %d.\n----------" % 
+                (len(self.sources_invalid)), fg='red')
+            for s in self.sources_invalid:
+                printDebug("-> " + s, fg="red")        
+
+
+
     def load_uri(self, uri, verbose, rdfgraph):
         """
         
@@ -213,27 +235,6 @@ class RDFLoader(object):
             "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
 
         return
-
-
-    def print_summary(self):
-        """
-        print out stats about loading operation
-        """
-        if self.sources_valid:
-            printDebug("----------\nLoaded %d triples.\n----------" % 
-                len(self.rdfgraph), fg='green')
-            printDebug("RDF sources loaded successfully = %d:" % 
-                (len(self.sources_valid)), fg='green')
-            for s in self.sources_valid:
-                printDebug("-> " + s, bold=True)
-        else:
-            printDebug("Sorry - no valid RDF was found", fg='red')
-
-        if self.sources_invalid:
-            printDebug("----------\nRDF sources failed to load = %d:" % 
-                (len(self.sources_invalid)), fg='red')
-            for s in self.sources_invalid:
-                printDebug("-> " + s, fg="red")        
 
 
 

@@ -25,7 +25,7 @@ import sys, os, time, os.path, webbrowser
 from . import *  # imports __init__
 from ._version import *
 from .actions import *
-from .core.graph import Graph
+from .core.ontospy import Ontospy
 
 from .shared.utils import *
 

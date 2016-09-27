@@ -20,7 +20,7 @@ from ConfigParser import SafeConfigParser
 
 from . import *
 from . import ontospy
-from .core.graph import Graph
+from .core.ontospy import Ontospy
 
 from .shared.utils import *
 

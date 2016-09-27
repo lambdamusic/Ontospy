@@ -28,12 +28,13 @@ from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 
 from ..shared.utils import *
-from .loader import load
+from ..shared.loader import RDFLoader
+
 from .entities import *
 from .queryHelper import QueryHelper
 
 
-class Graph(object):  # Ontospy
+class Ontospy(object):  # Graph
     """
     Object that scan an rdf graph for schema definitions (aka 'ontologies')
 
@@ -63,155 +64,41 @@ class Graph(object):  # Ontospy
 
     """
 
-    # NEW:
-    def __init__(self, rdfgraph=None, endpoint=None, verbose=True, hide_base_schemas=True):
-
-    # def __init__(self, source, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=True, hide_base_schemas=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
         super(Ontospy, self).__init__()
 
-        self.rdfgraph = rdfgraph or rdflib.Graph()
-
-        self.graphuri = None
-        self.queryHelper = None # instantiated after we have a graph
+        self.rdfgraph = None
+        self.graphuri = None # needed?
+        self.queryHelper = None 
 
         self.ontologies = []
         self.classes = []
         self.namespaces = []
-
         self.properties = []
         self.annotationProperties = []
         self.objectProperties = []
         self.datatypeProperties = []
-
         self.skosConcepts = []
-
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
-
-        # keep track of the rdf source
-        self.IS_URL = False
-        self.IS_LOCALPATH = False
-        self.IS_ENDPOINT = False
-        self.IS_FILEOBJECT = False
-        self.IS_TEXT = False
-
-        # global var
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
         # finally
-        self.__loadRDF(source, text, endpoint, rdf_format, verbose)
-        # extract entities into
+        self.load(uri_or_path, text, file_obj, rdf_format, verbose)
+ 
+        # extract entities 
         self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
 
 
-    def __repr__(self):
-        return "<OntoSpy Graph (%d triples)>" % (len(self.rdfgraph))
-
-
-
-
-    def __loadRDF(self, source, text, endpoint, rdf_format, verbose):
-        """
-        Determine what kind of graph we have and load it accordingly
-        """
-
-        # LOAD THE GRAPH
-
-        if text:
-            self.IS_TEXT = True
-            rdf_format = rdf_format or "turtle"  # only turtle is accepted as text!
-
-
-        elif endpoint:
-            self.IS_ENDPOINT = True
-            # replace graph with ConjunctiveGraph
-            self.rdfgraph = rdflib.ConjunctiveGraph(store=SPARQLStore(source))
-            self.graphuri = source	# default uri is www location
-
-
-        else:
-
-            if type(source) == type("string") or type(source) == type(u"unicode"):
-
-                if source.startswith("www."): #support for lazy people
-                    source = "http://%s" % str(source)
-                if source.startswith("http://"):
-                    self.IS_URL = True
-                    # headers = "Accept: application/rdf+xml"
-                    headers = {'Accept': "application/rdf+xml"}
-                    req = urllib2.Request(source, headers=headers)
-                    res = urllib2.urlopen(req)
-                    source = res.geturl()  # after 303 redirects
-                    self.graphuri = source	# default uri is www location
-                else:
-                    self.IS_LOCALPATH = True
-                    self.graphuri = "file://" + source	# default uri is www location
-
-
-                rdf_format = rdf_format or guess_fileformat(source)
-
-            elif type(source) == file:
-                # The type of open file objects such as sys.stdout; alias of the built-in file.
-                self.IS_FILEOBJECT = True
-                self.graphuri = source.name # default uri is filename
-                rdf_format = rdf_format or guess_fileformat(source.name)
-
-            else:
-                raise Exception("You passed an unknown object. Only URIs and files are accepted.")
-
-        #FINALLY, TRY LOADING:
-
-        if verbose:printDebug("----------")
-        if self.IS_ENDPOINT:
-            if verbose:printDebug("Accessing SPARQL Endpoint <%s>" % self.graphuri)
-            if verbose:printDebug("(note: support for sparql endpoints is still experimental)")
-            successflag = True
-
-        else:
-
-            if not rdf_format:
-                rdf_format_opts = ['xml', 'turtle', 'n3', 'nt', 'trix', 'rdfa']
-            else:
-                rdf_format_opts = [rdf_format]
-
-            successflag = False
-            for f in rdf_format_opts:
-    
-                if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
-
-                try:
-                    if self.IS_TEXT:
-                        self.rdfgraph.parse(data=source, format=f)
-                        if verbose:printDebug("..... success!")
-                        successflag = True
-                        if verbose:printDebug("----------\nLoading %d triples from text" % len(self.rdfgraph))
-                    else:
-                        self.rdfgraph.parse(source, format=f)
-                        if verbose:printDebug("..... success!")
-                        successflag = True
-                        if verbose:printDebug("----------\nLoading %d triples from <%s>" % (len(self.rdfgraph), self.graphuri))
-                    # set up the query helper too
-                    self.queryHelper = QueryHelper(self.rdfgraph)
-
-                except:
-                    if verbose:printDebug("..... failed")
-
-                if successflag == True:
-                    break
-
-
-        if not successflag == True:
-            # abort loading
-
-            printDebug("----------\nFatal error parsing graph (tried using RDF serialization: %s)\n" % (str(rdf_format_opts)))
-            printDebug("----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
-            sys.exit(0)
-
-
+    def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False):
+        l = RDFLoader()
+        self.rdfgraph = l.load(uri_or_path, text, file_obj, rdf_format, verbose)
+        self.queryHelper = QueryHelper(self.rdfgraph)
+        self.namespaces = sorted(self.rdfgraph.namespaces())
 
 
     def serialize(self, format="turtle"):
@@ -227,38 +114,8 @@ class Graph(object):  # Ontospy
         return list(qres)
 
 
-    def __extractNamespaces(self):
-        """
-        Extract graph namespaces.
-        Namespaces are given in this format:
-
-            In [01]: for x in graph.namespaces():
-                    ....:			print x
-            ('xml', rdflib.URIRef('http://www.w3.org/XML/1998/namespace'))
-            ('', rdflib.URIRef('http://cohereweb.net/ontology/cohere.owl#'))
-            (u'owl', rdflib.URIRef('http://www.w3.org/2002/07/owl#'))
-            ('rdfs', rdflib.URIRef('http://www.w3.org/2000/01/rdf-schema#'))
-            ('rdf', rdflib.URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'))
-            (u'xsd', rdflib.URIRef('http://www.w3.org/2001/XMLSchema#'))
-
-        We assume that a base namespace is implied by an empty prefix
-        """
-
-        exit = []
-
-        if self.IS_ENDPOINT==True:
-            return False
-
-        else:
-
-            # deprecated cause local file path uRIs seemed counterintuitive
-            if False and self.graphuri not in [y for x,y in self.rdfgraph.namespaces()]:
-                # if not base namespace is set, try to simulate one
-                self.rdfgraph.bind("temp", rdflib.Namespace(self.graphuri))
-
-
-            self.namespaces = sorted(self.rdfgraph.namespaces())
-
+    def __repr__(self):
+        return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
 
 
 
@@ -266,25 +123,15 @@ class Graph(object):  # Ontospy
     # === main method === #
     # ------------
 
-    def _scan(self, source=None, text=False, endpoint=False, rdf_format=None, verbose=True, hide_base_schemas=True):
+    def _scan(self, verbose=True, hide_base_schemas=True):
         """
         scan a source of RDF triples
         build all the objects to deal with the ontology/ies pythonically
 
-        In [1]: g.scan("npgcore_latest.ttl")
-        Ontologies found: 1
-        Out[3]: [<OntoSpy: Ontology object for uri *http://ns.nature.com/terms/*>]
-
         """
-
-        if source: # add triples dynamically
-            self.__loadRDF(source, text, endpoint, rdf_format)
-
         if verbose:
             printDebug("Scanning entities...", "green")
             printDebug("----------", "comment")
-
-        self.__extractNamespaces()
 
         self.__extractOntologies()
         if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
@@ -330,19 +177,6 @@ class Graph(object):  # Ontospy
         return out
 
         
-    def printStats(self, hrlinetop=False):
-        """ DEPRECATED"""
-        if hrlinetop:
-            printDebug("----------------", "comment")
-        printDebug("Ontologies......: %d" % len(self.ontologies), "comment")
-        printDebug("Classes.........: %d" % len(self.classes), "comment")
-        printDebug("Properties......: %d" % len(self.properties), "comment")
-        printDebug("..annotation....: %d" % len(self.annotationProperties), "comment")
-        printDebug("..datatype......: %d" % len(self.datatypeProperties), "comment")
-        printDebug("..object........: %d" % len(self.objectProperties), "comment")
-        printDebug("Concepts(SKOS)..: %d" % len(self.skosConcepts), "comment")
-        printDebug("----------------", "comment")
-
 
     def __extractOntologies(self, exclude_BNodes = False, return_string=False):
         """
@@ -1003,7 +837,7 @@ class Graph(object):  # Ontospy
 
 
 
-class SparqlEndpoint(Graph):
+class SparqlEndpoint(Ontospy):
     """
     A remote graph accessible via a sparql endpoint
     """

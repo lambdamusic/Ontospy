@@ -40,7 +40,7 @@ from colorama import Fore, Style
 from . import *  # imports __init__
 from ._version import *
 from .actions import *
-from .core.graph import Graph
+from .core.ontospy import Ontospy
 
 from .shared.utils import *
 
@@ -234,7 +234,7 @@ def main():
     # load the ontology when a uri is passed manually
     elif args:
         printDebug("You passed the argument: <%s>" % str(args[0]), "comment")
-        g = Graph(args[0])
+        g = Ontospy(args[0])
         shellPrintOverview(g, print_opts)
 
     # finally: print(some stats.... )

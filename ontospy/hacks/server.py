@@ -18,7 +18,7 @@ import time, optparse, os, rdflib, sys, webbrowser
 import SimpleHTTPServer, SocketServer
 
 from .. import ontospy
-from ..core.graph import Graph
+from ..core.ontospy import Ontospy
 from ..shared.utils import *
 
 DEFAULT_PORT = 7899

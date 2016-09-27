@@ -20,7 +20,7 @@ from prompt_toolkit.token import Token
 
 from .. import ontospy
 from .. import _version
-from ..core.graph import Graph
+from ..core.ontospy import Ontospy
 from ..shared.utils import *
 
 

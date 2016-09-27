@@ -28,8 +28,8 @@ except NameError:
 from colorama import Fore, Style
 
 
-from .core.graph import Graph, SparqlEndpoint
-# this allows to load with 'import ontospy', and using 'ontospy.Graph'
+from .core.ontospy import Ontospy
+# this allows to load with 'import ontospy', and using 'ontospy.Ontospy'
 
 from .shared.utils import printDebug
 
@@ -241,7 +241,7 @@ def do_pickle_ontology(filename, g=None):
 	ONTOSPY_LOCAL_MODELS = get_home_location()
 	pickledpath = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if not g:
-		g = Graph(ONTOSPY_LOCAL_MODELS + "/" + filename)
+		g = Ontospy(ONTOSPY_LOCAL_MODELS + "/" + filename)
 
 	if not GLOBAL_DISABLE_CACHE:
 		try:
