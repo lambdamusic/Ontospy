@@ -22,7 +22,7 @@ from ..core.entities import OntoClass, OntoProperty, OntoSKOSConcept, Ontology
 
 def run(graph, save_on_github=False, main_entity=None):
     """
-    From a graph instance outputs a nicely formatted html documentation file.
+    From a graph instance outputs some nicely formatted html text.
     
     2016-08-07: hacked for multi file save
     """
