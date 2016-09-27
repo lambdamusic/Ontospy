@@ -256,7 +256,7 @@ class OntoClass(RDF_Entity):
         ...
         """
         super(OntoClass, self).__init__(uri, rdftype, namespaces)
-        self.slug = "class-" + str(self.id) + "-" + slugify(self.qname)
+        self.slug = "class-" + slugify(self.qname)
         
         self.domain_of = []
         self.range_of = []
@@ -328,7 +328,7 @@ class OntoProperty(RDF_Entity):
         """
         super(OntoProperty, self).__init__(uri, rdftype, namespaces)
 
-        self.slug = "prop-" + str(self.id) + "-" + slugify(self.qname)
+        self.slug = "prop-" + slugify(self.qname)
         self.rdftype = inferMainPropertyType(rdftype)
 
         self.domains = []
@@ -378,7 +378,7 @@ class OntoSKOSConcept(RDF_Entity):
         ...
         """
         super(OntoSKOSConcept, self).__init__(uri, rdftype, namespaces)
-        self.slug = "concept-" + str(self.id) + "-" + slugify(self.qname)
+        self.slug = "concept-" + slugify(self.qname)
         self.instance_of = []
         self.ontology = None
         self.queryHelper = None	 # the original graph the class derives from
