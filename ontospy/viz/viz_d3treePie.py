@@ -38,8 +38,8 @@ def run(graph, save_on_github=False, main_entity=None):
 
 	mydict = build_D3treepie(0, 99, 1, graph.toplayer)
 
-	# JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'OWL:Thing',})
-	JSON_DATA_CLASSES = json.dumps(["OWL:Thing", [c_toplayer, c_toplayer], mydict])
+	# JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'owl:Thing',})
+	JSON_DATA_CLASSES = json.dumps(["owl:Thing", [c_toplayer, c_toplayer], mydict])
 
 	c = Context({
 					"ontology": ontology,

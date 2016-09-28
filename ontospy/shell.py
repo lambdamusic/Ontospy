@@ -293,7 +293,7 @@ class Shell(cmd.Cmd):
 
         if not parents:
             if self.currentEntity['type'] == 'class':
-                self._print("OWL:Thing")
+                self._print("owl:Thing")
             elif self.currentEntity['type'] == 'property':
                 self._print("RDF:Property")
             elif self.currentEntity['type'] == 'concept':
@@ -327,7 +327,7 @@ class Shell(cmd.Cmd):
                 if i.ranges:
                     ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges ])
                 else:
-                    ranges = "OWL:Thing"
+                    ranges = "owl:Thing"
                     # print( Style.RESET_ALL + " => " + Fore.MAGENTA +
                 print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                       i.qname + Style.RESET_ALL + " => " + Style.DIM + ranges +
@@ -345,7 +345,7 @@ class Shell(cmd.Cmd):
                             if i.ranges:
                                 ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges])
                             else:
-                                ranges = "OWL:Thing"
+                                ranges = "owl:Thing"
                                 # print(Style.RESET_ALL + " => " + Fore.MAGENTA +
                             print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                                   i.qname + Style.RESET_ALL + " => " + Style.DIM +
@@ -373,7 +373,7 @@ class Shell(cmd.Cmd):
                 if i.domains:
                     domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains ])
                 else:
-                    domains = "OWL:Thing"
+                    domains = "owl:Thing"
                 print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname +
                       Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
@@ -389,7 +389,7 @@ class Shell(cmd.Cmd):
                             if i.domains:
                                 domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
                             else:
-                                domains = "OWL:Thing"
+                                domains = "owl:Thing"
                             print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname  + Style.RESET_ALL + " => " + Fore.GREEN +     								x.qname + Style.RESET_ALL)
 
             self._print("----------------")
@@ -418,7 +418,7 @@ class Shell(cmd.Cmd):
                         _name = str(d)
                     self._print(_name)
             else:
-                self._print("OWL:Thing")
+                self._print("owl:Thing")
             self._print("  " + x.qname , "TEXT")
             if x.ranges:
                 for d in x.ranges:
@@ -429,7 +429,7 @@ class Shell(cmd.Cmd):
                         _name = str(d)
                     self._print("  " + "   => " + _name)
             else:
-                self._print("  " + "   => " + "OWL:Thing")
+                self._print("  " + "   => " + "owl:Thing")
             self._print("----------------")
         return
 

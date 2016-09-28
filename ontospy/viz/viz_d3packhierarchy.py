@@ -45,7 +45,7 @@ def run(graph, save_on_github=False, main_entity=None ):
 		JSON_DATA_CLASSES = json.dumps(jsontree_classes[0])
 	else:
 		# hack to make sure that we have a default top level object
-		JSON_DATA_CLASSES = json.dumps({'children': jsontree_classes, 'name': 'OWL:Thing',})
+		JSON_DATA_CLASSES = json.dumps({'children': jsontree_classes, 'name': 'owl:Thing',})
 
 	c = Context({
 					"ontology": ontology,

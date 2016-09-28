@@ -34,9 +34,9 @@ def run(graph, save_on_github=False, main_entity=None):
 	c_total = len(graph.classes)
 
 	mylist = build_D3bubbleChart(0, 99, 1, graph)
-	# mydict = {'children': mylist, 'name': 'OWL:Thing'}
+	# mydict = {'children': mylist, 'name': 'owl:Thing'}
 
-	JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'OWL:Thing',})
+	JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'owl:Thing',})
 
 	c = Context({
 					"ontology": ontology,

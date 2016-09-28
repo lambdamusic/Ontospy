@@ -22,7 +22,7 @@
 {% endif %}
 
 {% else %}
-* OWL:Thing
+* owl:Thing
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}

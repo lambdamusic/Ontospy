@@ -37,7 +37,7 @@ def run(graph, save_on_github=False, main_entity=None):
 
 	mylist = build_D3treeStandard(0, 99, 1, graph.toplayer)
 
-	JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'OWL:Thing',})
+	JSON_DATA_CLASSES = json.dumps({'children': mylist, 'name': 'owl:Thing',})
 
 	c = Context({
 					"ontology": ontology,
