@@ -21,7 +21,7 @@ DATA_FOLDER = ontospy.get_home_location()
 
 
 # sanity check
-print("-------------------\nOntoSpy ",  ontospy.VERSION, "\n-------------------")
+print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):
@@ -37,7 +37,7 @@ class TestLoadOntologies(unittest.TestCase):
 			if not f.startswith('.'):
 				print("\nLoading... >", f)
 
-				o = ontospy.Graph(DATA_FOLDER + f)
+				o = ontospy.Ontospy(DATA_FOLDER + f)
 
 				o.printClassTree()
 				for c in o.classes:

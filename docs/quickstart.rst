@@ -15,7 +15,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	In [1]: import ontospy
 	INFO:rdflib:RDFLib Version: 4.2.0
 
-	In [2]: g = ontospy.Graph("http://xmlns.com/foaf/0.1/")
+	In [2]: g = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
 	----------
 	Loaded 631 triples from <http://xmlns.com/foaf/0.1/>
 	started scanning...

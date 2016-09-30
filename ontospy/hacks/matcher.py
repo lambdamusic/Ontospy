@@ -197,8 +197,8 @@ def main():
 		except:
 			opts.outputfile = "ontospy_matching_%s.csv" % (class_or_prop)
 
-	g1 = ontospy.Graph(args[0])
-	g2 = ontospy.Graph(args[1])
+	g1 = ontospy.Ontospy(args[0])
+	g2 = ontospy.Ontospy(args[1])
 
 	matcher(g1, g2, confidence, opts.outputfile, class_or_prop, opts.verbose)
 

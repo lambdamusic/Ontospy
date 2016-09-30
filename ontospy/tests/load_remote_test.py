@@ -44,7 +44,7 @@ class TestLoadOntologies(unittest.TestCase):
 		for f in BOOTSTRAP_ONTOLOGIES:
 			print("\nLoading... >", f)
 
-			o = ontospy.Graph(f)
+			o = ontospy.Ontospy(f)
 
 			o.printClassTree()
 			for c in o.classes:

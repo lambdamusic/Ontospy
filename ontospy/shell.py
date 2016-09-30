@@ -556,7 +556,7 @@ class Shell(cmd.Cmd):
         else:
             fullpath = filename
             filename = os.path.basename(os.path.normpath(fullpath))
-            g = ontospy.Graph(fullpath)
+            g = ontospy.Ontospy(fullpath)
         self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
         self.currentEntity = None
         self._print_entity_intro(g)

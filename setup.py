@@ -124,7 +124,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'ontospy-sketch=ontospy.extras.sketch:main',
+            # 'ontospy-sketch=ontospy.extras.sketch:main',
             'ontospy-manager=ontospy.manager:main',
             'ontospy=ontospy.ontospy:main'
         ],

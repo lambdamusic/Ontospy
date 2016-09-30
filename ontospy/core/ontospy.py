@@ -41,7 +41,7 @@ class Ontospy(object):  # Graph
     In [1]: import ontospy
     INFO:rdflib:RDFLib Version: 4.2.0
 
-    In [2]: g = ontospy.Graph("foaf.ttl")
+    In [2]: g = ontospy.Ontospy("foaf.ttl")
     Loaded 3478 triples
     Ontologies found: 1
     
