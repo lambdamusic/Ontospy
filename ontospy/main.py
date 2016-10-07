@@ -5,13 +5,6 @@ ONTOSPY
 Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
-Run it from the command line by passing it an ontology URI,
-or check out the help:
-
->>> python ontospy.py -h
-
-More info in the README file.
-
 """
 
 from __future__ import print_function
@@ -34,13 +27,12 @@ try:
 except NameError:
     pass
 
-from colorama import Fore, Style
-
-
 from . import *  # imports __init__
 from ._version import *
-from .actions import *
+
+from .core.actions import *
 from .core.ontospy import Ontospy
+from .core.manager import *
 
 from .shared.utils import *
 
@@ -142,7 +134,6 @@ def parse_options():
 
 
 
-
 def main():
     """ command line script """
 
@@ -161,7 +152,7 @@ def main():
 
     # -s launch shell
     if opts._shell:
-        from .shell import Shell, STARTUP_MESSAGE
+        from .core.shell import Shell, STARTUP_MESSAGE
         Shell()._clear_screen()
         print(STARTUP_MESSAGE)
         uri = args[0] if args else None

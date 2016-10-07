@@ -37,10 +37,10 @@ import time, optparse, os, rdflib, sys, datetime
 
 from colorama import Fore, Style
 
-from . import *  # imports __init__
-from ._version import *
-from .core.ontospy import Ontospy
-from .shared.utils import *
+from .. import *  # imports __init__
+from .._version import *
+from .ontospy import Ontospy
+from ..shared.utils import *
 
 
 
@@ -388,7 +388,7 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
     <fromshell> : the local name is being passed from ontospy shell
     """
 
-    from .viz import ask_visualization, build_viz, VISUALIZATIONS_LIST
+    from ..viz import ask_visualization, build_viz, VISUALIZATIONS_LIST
 
     # get argument
     if not(args):

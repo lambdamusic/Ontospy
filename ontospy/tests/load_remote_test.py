@@ -13,7 +13,7 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
-from .. import ontospy
+from .. import main
 from ..shared.utils import *
 
 DATA_FOLDER = ontospy.get_home_location()

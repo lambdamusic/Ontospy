@@ -8,7 +8,7 @@
 
 
 
-from .. import ontospy
+from .. import main
 from ..shared.utils import *
 
 

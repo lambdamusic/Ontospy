@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 
 from . import *  # imports __init__
-from .. import ontospy
+from .. import main
 import json
 
 

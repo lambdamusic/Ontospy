@@ -58,7 +58,7 @@ from difflib import SequenceMatcher
 
 # from ontospy import ontospy
 
-from .. import ontospy
+from .. import main
 from ..shared.utils import *
 
 

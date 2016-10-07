@@ -11,7 +11,7 @@ python test_remoteload.py
 
 import unittest, os, sys
 
-from .. import ontospy
+from .. import main
 
 
 ENDPOINTS = [

@@ -13,11 +13,11 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
-from .. import ontospy
+from ..core import manager
 from ..shared.utils import *
 
 
-DATA_FOLDER = ontospy.get_home_location()
+DATA_FOLDER = manager.get_home_location()
 
 
 # sanity check
@@ -37,7 +37,7 @@ class TestLoadOntologies(unittest.TestCase):
 			if not f.startswith('.'):
 				print("\nLoading... >", f)
 
-				o = ontospy.Ontospy(DATA_FOLDER + f)
+				o = Ontospy(DATA_FOLDER + f)
 
 				o.printClassTree()
 				for c in o.classes:

@@ -18,7 +18,7 @@ from prompt_toolkit import prompt
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
-from .. import ontospy
+from .. import main
 from .. import _version
 from ..core.ontospy import Ontospy
 from ..shared.utils import *

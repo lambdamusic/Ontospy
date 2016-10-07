@@ -3,7 +3,7 @@
 
 
 from . import *  # imports __init__
-from .. import ontospy
+from .. import main
 from ..core.entities import OntoClass, OntoProperty, OntoSKOSConcept, Ontology
 
 

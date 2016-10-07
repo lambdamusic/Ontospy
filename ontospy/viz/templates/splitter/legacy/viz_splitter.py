@@ -3,9 +3,9 @@
 
 
 from . import *  # imports __init__
-from .. import ontospy
+from .. import main
 
-# from .. import ontospy
+# from .. import main
 # from ..shared.utils import *
 
 # TEMPLATE: HTML SPLITTER

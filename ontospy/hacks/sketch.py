@@ -25,7 +25,7 @@ from rdflib import exceptions, URIRef, RDFS, RDF, BNode, OWL
 from rdflib.namespace import Namespace, NamespaceManager
 
 
-from .. import ontospy
+from .. import main
 
 
 

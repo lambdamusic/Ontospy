@@ -17,7 +17,7 @@ USAGE = "@todo"
 import time, optparse, os, rdflib, sys, webbrowser
 import SimpleHTTPServer, SocketServer
 
-from .. import ontospy
+from .. import main
 from ..core.ontospy import Ontospy
 from ..shared.utils import *
 
@@ -110,7 +110,7 @@ def main():
 
 if __name__ == '__main__':
 
-	# from .. import ontospy
+	# from .. import main
 	try:
 		main()
 		sys.exit(0)
