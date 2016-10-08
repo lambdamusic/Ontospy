@@ -59,7 +59,7 @@ from difflib import SequenceMatcher
 # from ontospy import ontospy
 
 from .. import main
-from ..shared.utils import *
+from ..core.utils import *
 
 
 def similar(a, b):

@@ -25,7 +25,7 @@ from collections import namedtuple
 import rdflib	 # so we have it available as a namespace
 
 from ontospy import *
-from ..shared.utils import *
+from ..core.utils import *
 
 
 

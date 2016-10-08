@@ -31,7 +31,7 @@ from colorama import Fore, Style
 from .core.ontospy import Ontospy
 # this allows to load with 'import ontospy', and using 'ontospy.Ontospy'
 
-from .shared.utils import printDebug
+from .core.utils import printDebug
 
 
 

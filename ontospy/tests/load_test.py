@@ -13,8 +13,7 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
-from ..core import manager
-from ..shared.utils import *
+from ..core.utils import *
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

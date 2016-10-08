@@ -28,13 +28,20 @@ class RDFLoader(object):
     """
     Utility to Load any RDF source into an RDFLIB graph instance.
     
-    Note: arguments can be lists, with the effect that the resulting graph
+    Accepts: [single item or list]
+    :: uri_or_path = a uri or local path 
+    :: text = a string containing rdf 
+    :: file_obj = a python file objecy 
+
+    Returns: rdflib graph instance. 
+
+    Other options:
+    :: rdf_format = one of ['xml', 'turtle', 'n3', 'nt', 'trix', 'rdfa']
+    :: verbose = if True, prints out a summary of loading operations
+
+    Note : you can pass lists, with the effect that the resulting graph
     will be a union of the rdf data contained in each of the arguments 
 
-    The resulting rdflib graph instance can then be parsed by Ontospy
-
-    :rdfgraph > in theory we could load onto an already existing graph
-    :all_sources > registry of all locations RDF is succesfully loaded from
     """
 
     def __init__(self, rdfgraph=None):

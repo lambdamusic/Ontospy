@@ -21,7 +21,7 @@ from prompt_toolkit.token import Token
 from .. import main
 from .. import _version
 from ..core.ontospy import Ontospy
-from ..shared.utils import *
+from ..core.utils import *
 
 
 test_style = style_from_dict({

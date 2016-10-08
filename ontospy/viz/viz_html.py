@@ -6,7 +6,7 @@ from . import *  # imports __init__
 from .. import main
 
 # from .. import main
-# from ..shared.utils import *
+# from ..core.utils import *
 
 # TEMPLATE: HTML BASIC
 

@@ -27,7 +27,7 @@ from ._version import *
 from .actions import *
 from .core.ontospy import Ontospy
 
-from .shared.utils import *
+from .core.utils import *
 
 import click
 

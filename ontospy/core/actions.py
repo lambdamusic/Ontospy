@@ -40,7 +40,7 @@ from colorama import Fore, Style
 from .. import *  # imports __init__
 from .._version import *
 from .ontospy import Ontospy
-from ..shared.utils import *
+from .utils import *
 
 
 

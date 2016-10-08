@@ -22,7 +22,7 @@ from . import *
 from . import ontospy
 from .core.ontospy import Ontospy
 
-from .shared.utils import *
+from .core.utils import *
 
 
 

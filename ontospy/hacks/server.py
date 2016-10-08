@@ -19,7 +19,7 @@ import SimpleHTTPServer, SocketServer
 
 from .. import main
 from ..core.ontospy import Ontospy
-from ..shared.utils import *
+from ..core.utils import *
 
 DEFAULT_PORT = 7899
 

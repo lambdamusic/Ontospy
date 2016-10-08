@@ -38,14 +38,15 @@ WINDOWS = os.name == 'nt'
 EOL = '\r\n' if WINDOWS and not PY2 else '\n'
 
 
-from . import *
-from . import ontospy
-from . import _version
+from .. import * # load top level __init__
+from .._version import VERSION
 
-from .shared.quotes import *  # quotes
-from .shared.utils import *
+from ..core.ontospy import Ontospy
+from ..core import manager
+from ..core import actions 
+from ..core.utils import *
 
-
+from .quotes import *  # quotes
 
 
 
@@ -55,7 +56,7 @@ _intro_ = """***
 The Command Line Ontology Browser (%s)
 ***											  """
 
-STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % _version.VERSION + Style.RESET_ALL
+STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % VERSION + Style.RESET_ALL
 
 
 
@@ -114,9 +115,9 @@ class Shell(cmd.Cmd):
                                                                     # or 'property' or 'concept'
         """
         # useful vars
-        self.LOCAL = ontospy.ONTOSPY_LOCAL
-        self.LOCAL_MODELS = ontospy.get_home_location()
-        self.ontologies = ontospy.get_localontologies()
+        self.LOCAL = ONTOSPY_LOCAL
+        self.LOCAL_MODELS = manager.get_home_location()
+        self.ontologies = manager.get_localontologies()
         self.current = None
         self.currentEntity = None
         if uri:
@@ -550,13 +551,13 @@ class Shell(cmd.Cmd):
         """
         if not preview_mode:
             fullpath = self.LOCAL_MODELS + filename
-            g = ontospy.get_pickled_ontology(filename)
+            g = manager.get_pickled_ontology(filename)
             if not g:
-                g = ontospy.do_pickle_ontology(filename)
+                g = manager.do_pickle_ontology(filename)
         else:
             fullpath = filename
             filename = os.path.basename(os.path.normpath(fullpath))
-            g = ontospy.Ontospy(fullpath)
+            g = Ontospy(fullpath)
         self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
         self.currentEntity = None
         self._print_entity_intro(g)
@@ -683,9 +684,9 @@ class Shell(cmd.Cmd):
                     var = input()
                     if var == "y" or var == "Y":
                         os.remove(fullpath)
-                        ontospy.del_pickled_ontology(choice)
+                        manager.del_pickled_ontology(choice)
                         self._print("<%s> was deleted succesfully." % choice)
-                        self.ontologies = ontospy.get_localontologies()
+                        self.ontologies = manager.get_localontologies()
                     else:
                         return
 
@@ -724,9 +725,9 @@ class Shell(cmd.Cmd):
                     if var:
                         try:
                             os.rename(fullpath, self.LOCAL_MODELS + "/" + var)
-                            ontospy.rename_pickled_ontology(choice, var)
+                            manager.rename_pickled_ontology(choice, var)
                             self._print("<%s> was renamed succesfully." % choice)
-                            self.ontologies = ontospy.get_localontologies()
+                            self.ontologies = manager.get_localontologies()
                         except:
                             self._print("Not a valid name. An error occurred.")
                             return
@@ -967,7 +968,7 @@ class Shell(cmd.Cmd):
             _gist = True
 
         import webbrowser
-        url = ontospy.action_visualize(args=self.current['file'], save_gist=_gist, fromshell=True)
+        url = actions.action_visualize(args=self.current['file'], save_gist=_gist, fromshell=True)
         if url:
             webbrowser.open(url)
         return
@@ -979,7 +980,7 @@ class Shell(cmd.Cmd):
         line = line.split()
 
         if line and line[0] == "starter-pack":
-            ontospy.action_bootstrap()
+            actions.action_bootstrap()
 
 
         elif line and line[0] == "uri":
@@ -988,7 +989,7 @@ class Shell(cmd.Cmd):
             if var:
                 if var.startswith("http"):
                     try:
-                        ontospy.action_import(var)
+                        actions.action_import(var)
                     except:
                         self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
                 else:
@@ -999,19 +1000,19 @@ class Shell(cmd.Cmd):
             var = input()
             if var:
                 try:
-                    ontospy.action_import(var)
+                    actions.action_import(var)
                 except:
                     self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
 
 
         elif line and line[0] == "repo":
-            ontospy.action_webimport()
+            actions.action_webimport()
 
 
         else:
             self.help_import()
 
-        self.ontologies = ontospy.get_localontologies()
+        self.ontologies = manager.get_localontologies()
         return
 
 
@@ -1307,11 +1308,11 @@ class Shell(cmd.Cmd):
 def main():
     """ standalone line script """
 
-    print("OntoSpy " + ontospy.VERSION)
+    print("OntoSpy " + VERSION)
 
     Shell()._clear_screen()
-    print(Style.BRIGHT + "** OntoSpy Interactive Ontology Browser " + ontospy.VERSION + " **" + Style.RESET_ALL)
-    ontospy.get_or_create_home_repo()
+    print(Style.BRIGHT + "** OntoSpy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
+    manager.get_or_create_home_repo()
     Shell().cmdloop()
     raise SystemExit(1)
 

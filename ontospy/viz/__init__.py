@@ -9,7 +9,7 @@
 
 
 from .. import main
-from ..shared.utils import *
+from ..core.utils import *
 
 
 # Fix Python 2.x.

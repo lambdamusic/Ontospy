@@ -34,7 +34,7 @@ from .core.actions import *
 from .core.ontospy import Ontospy
 from .core.manager import *
 
-from .shared.utils import *
+from .core.utils import *
 
 
 
@@ -152,7 +152,7 @@ def main():
 
     # -s launch shell
     if opts._shell:
-        from .core.shell import Shell, STARTUP_MESSAGE
+        from .shell.shell import Shell, STARTUP_MESSAGE
         Shell()._clear_screen()
         print(STARTUP_MESSAGE)
         uri = args[0] if args else None
