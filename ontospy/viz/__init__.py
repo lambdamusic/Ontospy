@@ -38,9 +38,9 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [
                 # insert your TEMPLATE_DIRS here
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter",
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "markdown",
+                main.ONTOSPY_VIZ_TEMPLATES + "shared",
+                main.ONTOSPY_VIZ_TEMPLATES + "splitter",
+                main.ONTOSPY_VIZ_TEMPLATES + "markdown",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -224,7 +224,7 @@ def _copyStaticFiles(files_list, path):
 
 def saveVizLocally(contents, filename="index.html", path=None):
     if not path:
-        filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
+        filename = main.ONTOSPY_LOCAL_VIZ + "/" + filename
     else:
         filename = os.path.join(path,filename)
 
@@ -285,12 +285,12 @@ def run_test_viz(func):
     """
 
     import webbrowser, random
-    ontouri = ontospy.get_localontologies()[random.randint(0, 10)]  # [0]
+    ontouri = main.get_localontologies()[random.randint(0, 10)]  # [0]
     print("Testing with URI: %s" % ontouri)
 
-    g = ontospy.get_pickled_ontology(ontouri)
+    g = main.get_pickled_ontology(ontouri)
     if not g:
-        g = ontospy.do_pickle_ontology(ontouri)
+        g = main.do_pickle_ontology(ontouri)
 
     # getting main func dynamically
     contents = func(g, False)

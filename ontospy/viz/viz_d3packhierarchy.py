@@ -33,7 +33,7 @@ def run(graph, save_on_github=False, main_entity=None ):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
+	ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
 	t = Template(ontotemplate.read())
 
 	jsontree_classes = build_D3treeStandard(0, 99, 1, graph.toplayer)
@@ -50,7 +50,7 @@ def run(graph, save_on_github=False, main_entity=None ):
 	c = Context({
 					"ontology": ontology,
 					"main_uri" : uri,
-					"STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
+					"STATIC_PATH": main.ONTOSPY_VIZ_STATIC,
 					"save_on_github" : save_on_github,
 					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
 					"TOTAL_CLASSES": c_total,
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 	import sys
 	try:
 		# script for testing - must launch this module
-		# >python -m ontospy.viz.viz_packh
+		# >python -m main.viz.viz_packh
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)

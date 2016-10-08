@@ -41,7 +41,7 @@ def run(graph, save_on_github=False, main_entity=None):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "d3_tree.html", "r")
+	ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "d3_tree.html", "r")
 
 	t = Template(ontotemplate.read())
 
@@ -62,7 +62,7 @@ def run(graph, save_on_github=False, main_entity=None):
 	c = Context({
 					"ontology": ontology,
 					"main_uri" : uri,
-					"STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
+					"STATIC_PATH": main.ONTOSPY_VIZ_STATIC,
 					"save_on_github" : save_on_github,
 					"classes": graph.classes,
 					"classes_TOPLAYER": len(graph.toplayer),
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 	try:
 
 		# script for testing - must launch this module
-		# >python -m ontospy.viz.viz_d3tree
+		# >python -m main.viz.viz_d3tree
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)

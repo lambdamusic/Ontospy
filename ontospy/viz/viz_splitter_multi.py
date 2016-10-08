@@ -38,7 +38,7 @@ def run(graph, save_on_github=False, main_entity=None):
                     "ontology": ontology,
                     "main_uri" : uri,
                     "ontograph": graph,
-                    "STATIC_PATH": ontospy.ONTOSPY_VIZ_STATIC,
+                    "STATIC_PATH": main.ONTOSPY_VIZ_STATIC,
                 }
     
 
@@ -59,23 +59,23 @@ def run(graph, save_on_github=False, main_entity=None):
 
         
     if type(main_entity) == OntoClass:
-        ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_classinfo.html", "r")
+        ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_classinfo.html", "r")
         context.update({ "main_entity" : main_entity,
                          "main_entity_type": "class"
                          })
     elif type(main_entity) == OntoProperty:
-        ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_propinfo.html", "r")
+        ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_propinfo.html", "r")
         context.update({ "main_entity" : main_entity,
                          "main_entity_type": "property"
                          })
     elif type(main_entity) == OntoSKOSConcept:
-        ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_conceptinfo.html", "r")
+        ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_conceptinfo.html", "r")
         context.update({ "main_entity" : main_entity,
                          "main_entity_type": "concept"
                          })
     else:
             # if type(main_entity) == Ontology:
-        ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_ontoinfo.html", "r")
+        ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_ontoinfo.html", "r")
 
 
     t = Template(ontotemplate.read())
@@ -93,7 +93,7 @@ def run(graph, save_on_github=False, main_entity=None):
 
 if __name__ == '__main__':
     """
-    > python -m ontospy.viz.viz_splitter_multi
+    > python -m main.viz.viz_splitter_multi
 
     2016-08-04: # testing bypassing the usual abstract routine so to generate multiple files
 
@@ -103,24 +103,24 @@ if __name__ == '__main__':
 
         # script for testing - must launch this module direclty eg
 
-        # > python -m ontospy.viz.viz_splitter_multi
+        # > python -m main.viz.viz_splitter_multi
 
         func = locals()["run"] # main func dynamically
         # run_test_viz(func)
 
         import webbrowser, random
 
-        ontouri = ontospy.get_localontologies()[random.randint(0, 10)] # [13]=foaf #
+        ontouri = main.get_localontologies()[random.randint(0, 10)] # [13]=foaf #
         print("Testing with URI: %s" % ontouri)
 
-        g = ontospy.get_pickled_ontology(ontouri)
+        g = main.get_pickled_ontology(ontouri)
         if not g:
-            g = ontospy.do_pickle_ontology(ontouri)
+            g = main.do_pickle_ontology(ontouri)
 
 
         def _saveVizLocally(contents, filename="index.html", path=None):
             if not path:
-                filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
+                filename = main.ONTOSPY_LOCAL_VIZ + "/" + filename
             else:
                 filename = os.path.join(path, filename)
 
