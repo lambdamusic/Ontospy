@@ -8,7 +8,7 @@
 
 
 
-from .. import main
+from .. import *
 from ..core.utils import *
 
 
@@ -38,9 +38,9 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [
                 # insert your TEMPLATE_DIRS here
-                main.ONTOSPY_VIZ_TEMPLATES + "shared",
-                main.ONTOSPY_VIZ_TEMPLATES + "splitter",
-                main.ONTOSPY_VIZ_TEMPLATES + "markdown",
+                ONTOSPY_VIZ_TEMPLATES + "shared",
+                ONTOSPY_VIZ_TEMPLATES + "splitter",
+                ONTOSPY_VIZ_TEMPLATES + "markdown",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -190,7 +190,6 @@ def _copyStaticFiles(files_list, path):
     if not os.path.exists(static_path):
         os.makedirs(static_path)
     for x in files_list:
-        from .. import *
         source_f = os.path.join(ONTOSPY_VIZ_STATIC, x)
         dest_f = os.path.join(static_path, x)
         copyfile(source_f, dest_f)
@@ -224,7 +223,7 @@ def _copyStaticFiles(files_list, path):
 
 def saveVizLocally(contents, filename="index.html", path=None):
     if not path:
-        filename = main.ONTOSPY_LOCAL_VIZ + "/" + filename
+        filename = ONTOSPY_LOCAL_VIZ + "/" + filename
     else:
         filename = os.path.join(path,filename)
 
@@ -285,12 +284,12 @@ def run_test_viz(func):
     """
 
     import webbrowser, random
-    ontouri = main.get_localontologies()[random.randint(0, 10)]  # [0]
+    ontouri = get_localontologies()[random.randint(0, 10)]  # [0]
     print("Testing with URI: %s" % ontouri)
 
-    g = main.get_pickled_ontology(ontouri)
+    g = get_pickled_ontology(ontouri)
     if not g:
-        g = main.do_pickle_ontology(ontouri)
+        g = do_pickle_ontology(ontouri)
 
     # getting main func dynamically
     contents = func(g, False)

@@ -41,6 +41,7 @@ from .. import *  # imports __init__
 from .._version import *
 from .ontospy import Ontospy
 from .utils import *
+from .manager import *
 
 
 

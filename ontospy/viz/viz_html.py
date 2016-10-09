@@ -3,7 +3,7 @@
 
 
 from . import *  # imports __init__
-from .. import main
+from .. import *
 
 # from .. import main
 # from ..core.utils import *
@@ -41,7 +41,7 @@ def run(graph, save_on_github=False, main_entity=None):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "javadoc.html", "r")
+	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "javadoc.html", "r")
 
 	t = Template(ontotemplate.read())
 
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 	try:
 
 		# script for testing - must launch this module
-		# >python -m main.viz.viz_html
+		# >python -m viz.viz_html
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)

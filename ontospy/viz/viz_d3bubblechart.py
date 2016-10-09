@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 
 from . import *  # imports __init__
-from .. import main
+from .. import *
 import json
 
 # TEMPLATE: D3 BUBBLE CHART
@@ -28,7 +28,7 @@ def run(graph, save_on_github=False, main_entity=None):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(main.ONTOSPY_VIZ_TEMPLATES + "d3_bubblechart.html", "r")
+	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "d3_bubblechart.html", "r")
 	t = Template(ontotemplate.read())
 
 	c_total = len(graph.classes)
@@ -41,7 +41,7 @@ def run(graph, save_on_github=False, main_entity=None):
 	c = Context({
 					"ontology": ontology,
 					"main_uri" : uri,
-					"STATIC_PATH": main.ONTOSPY_VIZ_STATIC,
+					"STATIC_PATH": ONTOSPY_VIZ_STATIC,
 					"save_on_github" : save_on_github,
 					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
 					"TOTAL_CLASSES": c_total,
@@ -123,7 +123,7 @@ if __name__ == '__main__':
 	import sys
 	try:
 		# script for testing - must launch this module
-		# >python -m main.viz.viz_packh
+		# >python -m viz.viz_packh
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)
