@@ -24,7 +24,7 @@ from pygments.style import Style
 from pygments.styles.default import DefaultStyle
 from pygments.token import Token
 
-from .. import main
+from ..core import ontospy
 from .vocabsturtleprompt import rdfschema, rdfsschema, owlschema
 
 
