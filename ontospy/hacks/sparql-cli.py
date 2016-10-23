@@ -10,16 +10,28 @@ Idea:
 either pass a sparql endpoint / or a graph URI which is loaded in memory using RDFLib
 = useful to test things out quickly!
 
+REQUIREMENTS
+- click
+- colorama
+- rdflib
+
 
 @todo
 - export results as html / web
-- allow passing an endpoint
+- allow passing an endpoint @done
 - add more saved queries 
-- store endpoints?
+- store endpoints? eg via an extra command line
+- add meta level cli eg .show or .info etc..
 - namespaces and shortened URIs
 
 - when 2.2 release of  Sparql Lexer is released, update!
 https://bitbucket.org/birkenfeld/pygments-main/issues/1236/sparql-lexer-error
+
+
+October 22, 2016
+---------------------------------
+- various improvements to print out
+- added Endpoint connection and tested with DBpedia
 
 
 October 22, 2016
@@ -48,6 +60,7 @@ from __future__ import unicode_literals
 import sys
 import pygments
 import rdflib
+from rdflib.plugins.stores.sparqlstore import SPARQLStore
 import click
 # http://click.pocoo.org/5/python3/
 click.disable_unicode_literals_warning = True
@@ -74,8 +87,10 @@ from pygments.token import Token
 
 
 sparql_completer = WordCompleter(['select', 'insert', 'distinct', 'count', 
-                                  'delete', 'where', 
-                                  'select distinct ?c where {?a a ?c}',
+                                  'delete', 'where', 'limit',
+                                  'select ?class where {?class a owl:Class}',
+                                  'select distinct ?class where {?a a ?class}',
+                                  'select ?instance ?class where {?instance a ?class}',
                                   'select ?a ?b ?c where {?a ?b ?c}',
                                   ], ignore_case=True)
 
@@ -90,28 +105,6 @@ class DocumentStyle(Style):
     styles.update(DefaultStyle.styles)
 
 
-
-
-def load_db(source):
-    _db = RDFLoader()
-    try:
-        return _db.load(source) 
-    except:
-        e = sys.exc_info()[0]
-        print "--error--->", e   
-        return None 
-
-
-def run_query(q, db):
-    """ """
-    try:
-        qres = db.query(
-            """%s""" % q)
-        return qres
-    except:
-        e = sys.exc_info()[0]
-        print "--error--->", e
-        return None
 
 
 def add_ns(db):
@@ -133,13 +126,59 @@ def print_results(res):
             # click.echo(el1 + el2)
             click.secho("%d -----" % counter, fg='green')
             for v in res.vars:
-                el1 = click.style("[%s] " % str(v), fg='red')
-                el2 = click.style(row[str(v)])   
+                el1 = click.style("[?%s] " % str(v), fg='red')
+                try:
+                    el2 = click.style(row[str(v)])  
+                except:
+                    el2 = click.style("Error: variable <?%s> not bound" % str(v))
                 click.echo(el1 + el2)             
 
             # print " ,".join([unicode(x) for x in row])
     else:
         click.secho("No results", fg='red')
+
+
+
+def run_query(q, db):
+    """ """
+    if len(db):
+        try:
+            qres = db.query(
+                """%s""" % q)
+            return qres
+        except:
+            e = sys.exc_info()[0]
+            print "--error--->", e
+            return None
+
+
+
+def load_file_or_uri(source):
+    """wrapper around RDFLoader class"""
+    _db = RDFLoader()
+    try:       
+        db = _db.load(source) 
+        add_ns(db)
+        return db
+    except:
+        e = sys.exc_info()[0]
+        print "--error--->", e   
+        return None 
+
+
+def load_endpoint(url):
+    """ eg "http://dbpedia.org/sparql" """
+    try:       
+        click.secho("...Connecting to %s" % url, fg="green")
+        store = SPARQLStore(url)
+        db = rdflib.ConjunctiveGraph(store=store)
+        add_ns(db)
+        return db
+    except:
+        e = sys.exc_info()[0]
+        print "--error--->", e   
+        return None 
+
 
 
 
@@ -154,14 +193,12 @@ def main(source=None, endpoint=None):
     db = None
 
     if source:
-        db = load_db(source)
-    
-    if endpoint:
-        click.secho("Not implemented yet", fg='red')
-        sys.exit(0) 
+        db = load_file_or_uri(source)
+    elif endpoint:
+        db = load_endpoint(endpoint)
 
     if not db:
-        click.secho("Note: the source to query has not been specified", fg='red')
+        click.secho("Note: the database to query has not been specified", fg='red')
         db = rdflib.Graph()
 
 
@@ -173,16 +210,25 @@ def main(source=None, endpoint=None):
         except EOFError:
             break  # Control-D pressed.
 
-        if text:
-            print("You said \"" + text + "\" (triples in DB: %d)" % len(db))
 
+        if text:
+
+            click.secho("You said \"" + text + "\" (triples in DB: %d)" % len(db), bg='white', fg='black')
+
+            ## == THE QUERY ====
+            
             res = run_query(text, db)
             
-            try:
-                print_results(res)
-            except:
-                e = sys.exc_info()[0]
-                print "--error--->", e
+            print_results(res)
+
+            # SUPPRESS THE FOLLOWING?
+            # try:
+            #     print_results(res)
+            # except:
+            #     e = sys.exc_info()[0]
+            #     print "--error--->", e
+
+            ## ================
 
     print('GoodBye!')
 
