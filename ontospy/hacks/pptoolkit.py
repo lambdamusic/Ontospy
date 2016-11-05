@@ -19,7 +19,7 @@ from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
 
 from .. import main
-from .. import _version
+from .. import VERSION
 from ..core.ontospy import Ontospy
 from ..core.utils import *
 
@@ -33,7 +33,7 @@ def main():
     def get_bottom_toolbar_tokens(cli):
         print cli.__class__
         print cli.current_buffer_name
-        return [(Token.Toolbar, ' OntoSpy ' + _version.VERSION)]
+        return [(Token.Toolbar, ' OntoSpy ' + VERSION.VERSION)]
 
     text = prompt('Say something: ',
                   get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,

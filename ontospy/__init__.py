@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 
-from ._version import __version__, VERSION
+from .VERSION import __version__, VERSION
 
 import logging
 logging.basicConfig()

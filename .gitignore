@@ -40,5 +40,6 @@ nosetests.xml
 .DS_Store
 
 dev
+venv
 
 .idea

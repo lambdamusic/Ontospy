@@ -38,7 +38,7 @@ import time, optparse, os, rdflib, sys, datetime
 from colorama import Fore, Style
 
 from .. import *  # imports __init__
-from .._version import *
+from ..VERSION import *
 from .ontospy import Ontospy
 from .utils import *
 from .manager import *
