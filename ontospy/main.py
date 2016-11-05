@@ -280,14 +280,13 @@ def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=F
     
     else:
         if not sources:
-            click.secho("Note: please specify a data source or -l for local library (-h for more help).", fg='red')
+            click.secho("Note: please specify a data source (-h for more options).", fg='red')
             raise SystemExit(1)
         else:
-            print(sources)
-            # @TODO
-        # printDebug("You passed the argument: <%s>" % str(args[0]), "comment")
-        # g = Ontospy(args[0])
-        # shellPrintOverview(g, print_opts)
+            t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
+            click.secho(str(t), fg='green')
+            g = Ontospy(uri_or_path=sources)
+            shellPrintOverview(g, verbose=verbose)
 
 
     # finally: print(some stats.... )
