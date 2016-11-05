@@ -111,15 +111,15 @@ class RDFLoader(object):
         if self.sources_valid:
             printDebug("----------\nLoaded %d triples.\n----------" % 
                 len(self.rdfgraph), fg='green')
-            printDebug("RDF sources loaded successfully = %d.\n----------" % 
-                (len(self.sources_valid)), fg='green')
+            printDebug("RDF sources loaded successfully: %d of %d.\n----------" %
+                (len(self.sources_valid), len(self.sources_valid) + len(self.sources_invalid)), fg='green')
             for s in self.sources_valid:
                 printDebug("-> " + s, fg='green')
         else:
             printDebug("Sorry - no valid RDF was found", fg='red')
 
         if self.sources_invalid:
-            printDebug("----------\nRDF sources failed to load = %d.\n----------" % 
+            printDebug("----------\nRDF sources failed to load: %d.\n----------" %
                 (len(self.sources_invalid)), fg='red')
             for s in self.sources_invalid:
                 printDebug("-> " + s, fg="red")        

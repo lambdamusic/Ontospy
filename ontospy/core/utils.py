@@ -837,8 +837,7 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 
 
 
-
-def shellPrintOverview(g, opts={'labels' : False}):
+def shellPrintOverview(g, verbose=False):
     """
     overview of graph invoked from command line
     """
@@ -849,13 +848,33 @@ def shellPrintOverview(g, opts={'labels' : False}):
         o.printTriples()
     if g.classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
-        g.printClassTree(showids=False, labels=opts['labels'])
+        g.printClassTree(showids=False, labels=verbose)
     if g.properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
-        g.printPropertyTree(showids=False, labels=opts['labels'])
+        g.printPropertyTree(showids=False, labels=verbose)
     if g.skosConcepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
-        g.printSkosTree(showids=False, labels=opts['labels'])
+        g.printSkosTree(showids=False, labels=verbose)
+
+#
+# def shellPrintOverview(g, opts={'labels' : False}):
+#     """
+#     overview of graph invoked from command line
+#     """
+#     ontologies = g.ontologies
+#
+#     for o in ontologies:
+#         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
+#         o.printTriples()
+#     if g.classes:
+#         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
+#         g.printClassTree(showids=False, labels=opts['labels'])
+#     if g.properties:
+#         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
+#         g.printPropertyTree(showids=False, labels=opts['labels'])
+#     if g.skosConcepts:
+#         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
+#         g.printSkosTree(showids=False, labels=opts['labels'])
 
 
 
