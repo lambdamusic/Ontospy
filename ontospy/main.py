@@ -64,198 +64,44 @@ More info: <ontospy.readthedocs.org>
 
 
 
-
-
-
-def parse_options():
-    """
-    parse_options() -> opts, args
-
-    Parse any command-line options given returning both
-    the parsed options and arguments.
-
-    https://docs.python.org/2/library/optparse.html
-
-    note: invoke help with `parser.print_help()`
-
-    """
-
-    class MyParser(optparse.OptionParser):
-        def format_epilog(self, formatter):
-            return self.epilog
-
-    parser = MyParser(usage=USAGE, version=VERSION, epilog=SHELL_EXAMPLES)
-
-    parser.add_option("-r", "",
-            action="store_true", default=False, dest="_shell",
-            help="REPL: launch the interactive shell.")
-
-    parser.add_option("-l", "",
-            action="store_true", default=False, dest="_library",
-            help="LIBRARY: list ontologies saved in the local library.")
-
-    parser.add_option("-e", "",
-            action="store_true", default=False, dest="labels",
-            help="VERBOSE: show entities labels as well as URIs.")
-
-    parser.add_option("-b", "",
-            action="store_true", default=False, dest="_bootstrap",
-            help="BOOTSTRAP: get started with some widely used ontologies.")
-
-    parser.add_option("-s", "",
-            action="store_true", default=False, dest="_save",
-            help="SAVE: save a file/folder/url into the local library.")
-
-    parser.add_option("-i", "",
-            action="store_true", default=False, dest="_web",
-            help="IMPORT: import a vocabulary from an online directory.")
-
-    parser.add_option("-v", "",
-            action="store_true", default=False, dest="_export",
-            help="VISUALIZE: create a graphical representation of a vocabulary.")
-
-    parser.add_option("-o", "",
-            action="store", default=False, dest="_path",
-            help="OUTPUT: specify an output path for the visualization file.")
-
-    parser.add_option("-g", "",
-            action="store_true", default=False, dest="_gist",
-            help="EXPORT-AS-GIST: save visualization online as a Github Gist.")
-
-
-    opts, args = parser.parse_args()
-
-    if not args and not (opts._bootstrap or opts._export or opts._gist or opts._save
-                         or opts._library or opts._shell or opts._web):
-        parser.print_help()
-        sys.exit(0)
-
-    return opts, args, parser
-
-
-
-
-
-
-def main():
-    """ command line script """
-
-    printDebug("OntoSpy " + VERSION, "important")
-    printDebug("Local library: '%s'" % get_home_location())
-    printDebug("------------")
-
-    opts, args, parser = parse_options()
-    sTime = time.time()
-
-    get_or_create_home_repo()
-
-    print_opts = {
-                    'labels' : opts.labels,
-                }
-
-    # -s launch shell
-    if opts._shell:
-        from .shell.shell import Shell, STARTUP_MESSAGE
-        Shell()._clear_screen()
-        print(STARTUP_MESSAGE)
-        uri = args[0] if args else None
-        Shell(uri).cmdloop()
-        raise SystemExit(1)
-
-    #
-    # if not (args or opts._library or opts._save or opts._web or opts._export or opts._gist) and not opts._bootstrap:
-    #
-
-
-    # select a model from the local ontologies
-    elif opts._export or opts._gist:
-        # if opts._gist and not opts._export:
-        # 	printDebug("WARNING: the -g option must be used in combination with -e (=export)")
-        # 	sys.exit(0)
-        if opts._path:
-            if not(os.path.exists(opts._path)) or not (os.path.isdir(opts._path)):
-                printDebug("WARNING: the -o option must include a valid directory path.")
-                sys.exit(0)
-        import webbrowser
-        url = action_visualize(args, opts._gist, False, opts._path)
-        if url:# open browser
-            webbrowser.open(url)
-
-        # continue and print(timing at bottom )
-
-
-
-    # select a model from the local ontologies (assuming it's not opts._export)
-    elif opts._library:
-        filename = action_listlocal()
-        if filename:
-            g = get_pickled_ontology(filename)
-            if not g:
-                g = do_pickle_ontology(filename)
-            shellPrintOverview(g, print_opts)
-            # printDebug("----------\n" + "Completed", "comment")
-        # continue and print(timing at bottom )
-
-
-    # bootstrap local repo
-    elif opts._bootstrap:
-        action_bootstrap()
-
-    # import an ontology (ps implemented in both .ontospy and .extras)
-    elif opts._save:
-        if not args:
-            printDebug("WARNING: please specify a file/folder/url to import into local library.")
-            sys.exit(0)
-        _location = args[0]
-        if os.path.isdir(_location):
-            res = action_import_folder(_location)
-        else:
-            res = action_import(_location)
-        if res:
-            printDebug("----------\n" + "Completed (note: load a local model by typing `ontospy -l`)", "comment")
-        # continue and print(timing at bottom)
-
-
-
-    elif opts._web:
-        action_webimport()
-        raise SystemExit(1)
-
-
-
-
-    # last case: a new URI/path is passed
-    # load the ontology when a uri is passed manually
-    elif args:
-        printDebug("You passed the argument: <%s>" % str(args[0]), "comment")
-        g = Ontospy(args[0])
-        shellPrintOverview(g, print_opts)
-
-    # finally: print(some stats.... )
-    eTime = time.time()
-    tTime = eTime - sTime
-    printDebug("\n----------\n" + "Time:	   %0.2fs" %  tTime, "comment")
-
-
-
-
-
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('sources', nargs=-1)
+@click.option('--bootstrap', '-b', is_flag=True, help='BOOTSTRAP: bootstrap the local library.')
 @click.option('--library', '-l', is_flag=True, help='LIBRARY: list ontologies saved in the local library.')
-@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
 @click.option('--save', '-s', is_flag=True, help='SAVE: save a file/folder/url into the local library.')
-@click.option('--bootstrap', '-b', is_flag=True, help='BOOTSTRAP: load widely used ontologies.')
+@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import a vocabulary from an online directory.')
 def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False):
-    """Command line interface for ontospy"""
+    """
+Ontospy is a command line inspector for RDF/OWL knowledge models.
+
+Examples:
+
+Inspect a local RDF file:
+
+> ontospy /path/to/mymodel.rdf
+
+List ontologies available in the local library:
+
+> ontospy -l
+
+Open FOAF vocabulary and save it to the local library:
+
+> ontospy http://xmlns.com/foaf/spec/ -s
+
+More info: <ontospy.readthedocs.org>
+    
+    
+    """
 
     sTime = time.time()
     get_or_create_home_repo()
-
-    if False:
+    print_opts = {
+                    'labels' : verbose,
+                }
+    if False: #debug
         print(sources, library, verbose, save, bootstrap, web)
 
     click.secho("OntoSpy " + VERSION,  bold=True)
@@ -271,6 +117,7 @@ def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=F
         # raise SystemExit(1)
     
     elif library:
+        click.secho("Local library: '%s'" % get_home_location(), fg='white')
         filename = action_listlocal()
         if filename:
             g = get_pickled_ontology(filename)
@@ -286,7 +133,7 @@ def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=F
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')
             g = Ontospy(uri_or_path=sources)
-            shellPrintOverview(g, verbose=verbose)
+            shellPrintOverview(g, print_opts)
 
 
     # finally: print(some stats.... )
@@ -295,17 +142,6 @@ def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=F
     printDebug("\n----------\n" + "Time:	   %0.2fs" %  tTime, "comment")
 
 
-
-
-#
-# if __name__ == '__main__':
-#     import sys
-#     try:
-#         main()
-#         sys.exit(0)
-#     except KeyboardInterrupt as e: # Ctrl-C
-#         raise e
-#
 
 
 if __name__ == '__main__':
