@@ -842,6 +842,12 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 def shellPrintOverview(g, opts={'labels' : False}):
     """
     overview of graph invoked from command line
+    
+    @todo
+    add pagination via something like this
+    # import pydoc
+    # pydoc.pager("SOME_VERY_LONG_TEXT")
+    
     """
     ontologies = g.ontologies
 

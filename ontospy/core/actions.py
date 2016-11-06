@@ -56,7 +56,7 @@ from .manager import *
 
 
 
-def action_listlocal():
+def action_listlocal(all_details=True):
     " select a file from the local repo "
 
     options = get_localontologies()
@@ -64,11 +64,14 @@ def action_listlocal():
     counter = 1
     # printDebug("------------------", 'comment')
     if not options:
-        printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
+        printDebug("Your local library is empty. Use 'ontospy -s <uri>' to add more ontologies to it.")
         return
     else:
-        _print_table_ontologies()
-
+        if all_details:
+            _print_table_ontologies()
+        else:
+            _print2cols_ontologies()
+       
         while True:
             printDebug("------------------\nSelect a model by typing its number: (enter=quit)", "important")
             var = input()
@@ -87,7 +90,18 @@ def action_listlocal():
 
 
 
+def _print2cols_ontologies():
+    ontologies = get_localontologies()
+    ONTOSPY_LOCAL_MODELS = get_home_location()
 
+    if ontologies:
+        printDebug("------------", "tip")
+        counter = 0
+        out = []
+        for x in ontologies:
+            counter += 1
+            out += ["[%s] %s" % (str(counter), x)]
+        pprint2columns(out, max_length=60)
 
 
 def _print_table_ontologies():

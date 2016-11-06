@@ -69,11 +69,15 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('sources', nargs=-1)
 @click.option('--bootstrap', '-b', is_flag=True, help='BOOTSTRAP: bootstrap the local library.')
+@click.option('--cache', '-c', is_flag=True, help='CACHE: force caching of the local library (for faster loading).')
+@click.option('--delete', '-d', is_flag=True, help='DELETE: remove an ontology from the local library.')
 @click.option('--library', '-l', is_flag=True, help='LIBRARY: list ontologies saved in the local library.')
 @click.option('--save', '-s', is_flag=True, help='SAVE: save a file/folder/url into the local library.')
+@click.option('--reset', '-r', is_flag=True, help='RESET: delete all files in the local library.')
+@click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
 @click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
-@click.option('--web', '-w', is_flag=True, help='WEB: import a vocabulary from an online directory.')
-def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False):
+@click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
+def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False):
     """
 Ontospy is a command line inspector for RDF/OWL knowledge models.
 
@@ -97,12 +101,11 @@ More info: <ontospy.readthedocs.org>
     """
 
     sTime = time.time()
-    get_or_create_home_repo()
+    if not update:
+        get_or_create_home_repo()
     print_opts = {
                     'labels' : verbose,
                 }
-    if False: #debug
-        print(sources, library, verbose, save, bootstrap, web)
 
     click.secho("OntoSpy " + VERSION,  bold=True)
     # click.secho("Local library: '%s'" % get_home_location(), fg='white')
@@ -111,24 +114,63 @@ More info: <ontospy.readthedocs.org>
     if bootstrap:
         action_bootstrap()
         # raise SystemExit(1)
+
+    elif cache:
+        action_cache()
     
-    elif web:
-        action_webimport()
+    elif delete:
+        res = actions_delete()
         # raise SystemExit(1)
-    
+       
     elif library:
         click.secho("Local library: '%s'" % get_home_location(), fg='white')
-        filename = action_listlocal()
+        filename = action_listlocal(all_details=True)
         if filename:
             g = get_pickled_ontology(filename)
             if not g:
                 g = do_pickle_ontology(filename)
             shellPrintOverview(g, print_opts)
+
+    # save?? missing
     
+    elif reset:
+        action_erase()
+        # raise SystemExit(1)
+    
+    elif update:
+        if not sources:
+            printDebug("Please specify a new location for the local library.", 'important')
+            printDebug("E.g. 'ontospy -u /Users/john/ontologies'", 'tip')
+            sys.exit(0)
+        else:
+            _location = sources[0]
+            if _location.endswith("/"):
+                # dont need the final slash
+                _location = _location[:-1]
+            output = action_update_library_location(_location)
+            if output:
+                printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")
+                printDebug("----------\n" + "New location: '%s'" % _location, "important")
+    
+            else:
+                printDebug("----------\n" + "Please specify an existing folder path.", "important")
+            raise SystemExit(1)
+
+
+
+    elif web:
+        action_webimport()
+        # raise SystemExit(1)
+        
     else:
         if not sources:
-            click.secho("Note: please specify a data source (-h for more options).", fg='red')
-            raise SystemExit(1)
+            click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='white')
+            filename = action_listlocal(all_details=False)
+            if filename:
+                g = get_pickled_ontology(filename)
+                if not g:
+                    g = do_pickle_ontology(filename)
+                shellPrintOverview(g, print_opts)
         else:
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')
