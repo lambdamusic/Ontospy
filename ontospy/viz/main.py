@@ -30,8 +30,6 @@ def cli_run_viz(source=None, outputpath="", savegist=False):
     # @todo: savegist should be a boolean
     #revise anyways
 
-    print source ,outputpath, savegist
-
     if outputpath:
         if not(os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
             printDebug("WARNING: the -o option must include a valid directory path.")

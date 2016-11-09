@@ -2,7 +2,7 @@
 # trick to manage package versions in one place only
 # http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 import re
-VERSIONFILE="ontospy/_version.py"
+VERSIONFILE="ontospy/VERSION.py"
 verstrline = open(VERSIONFILE, "rt").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)
@@ -34,7 +34,7 @@ setup(
     # https://packaging.python.org/en/latest/distributing.html#version
     version=VERSIONSTRING,
 
-    description='A Python project for working with RDF/OWL ontologies',
+    description='A Python package for working with RDF/OWL ontologies',
     long_description=long_description,
 
     # The project's main homepage.
@@ -74,7 +74,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='ontology engineering semantic web linked data',
+    keywords='ontology semantic web linked data rdf owl',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -84,16 +84,19 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
+    # NOTE: packages are installed in reverse order
     install_requires=[
 		'readline',  # for shell autocomplete
-		'rdflib',
         'rdflib-jsonld',
+        'rdflib',
         'SPARQLWrapper',
 		'colorama',
 		'django',
 		'github3.py',
+        'uritemplate.py', # 2016-11-09: needed by github3
         'requests',
         'pyfiglet',
+        'click',
         'colorama', 
         'pygments'
 	],
@@ -125,10 +128,9 @@ setup(
     entry_points={
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
-            # 'ontospy-manager=ontospy.manager:main',
-            'ontospy-manager=ontospy.core.main-manager:main',
-            # 'ontospy=ontospy.ontospy:main'
-            'ontospy=ontospy.core.main:main'
+            'ontospy-shell=ontospy.shell.main:cli_run_shell',
+            'ontospy-viz=ontospy.viz.main:cli_run_viz',
+            'ontospy=ontospy.main:main_cli'
         ],
     },
 )

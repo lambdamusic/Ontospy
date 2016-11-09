@@ -68,18 +68,13 @@ else:
 import os
 from shutil import copyfile
 
-import json
+
 try:
-    _dirname, _filename = os.path.split(os.path.abspath(__file__))
-    viz_config = json.loads(open(_dirname + "/config.json").read())
-    VISUALIZATIONS_LIST = viz_config['Visualizations']
+    from .CONFIG import VISUALIZATIONS_LIST
+    VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
-    print("Visualizations configuration file not found.")
+    click.secho("Visualizations configuration file not found.", fg="red")
     raise
-
-
-
-
 
 def ask_visualization():
     """
