@@ -33,7 +33,7 @@ def run(graph, save_on_github=False, main_entity=None ):
 		uri = graph.graphuri
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "d3_packhierarchy.html", "r")
+	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "d3_packHierarchy.html", "r")
 	t = Template(ontotemplate.read())
 
 	jsontree_classes = build_D3treeStandard(0, 99, 1, graph.toplayer)
