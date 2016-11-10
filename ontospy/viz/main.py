@@ -21,20 +21,28 @@ from ..core import actions
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--source', '-s',  multiple=True, help='Load the visualizer with a specific graph (uri or file)')
-@click.option('--outputpath', '-o',  help='Output path')
-@click.option('--savegist', '-g',  help='Save as anonymous gist')
+@click.argument('source', nargs=-1)
+@click.option('--outputpath', '-o',  help='Output path (default: home folder)')
+@click.option('--savegist', '-g', is_flag=True, help='Save output as anonymous github gist (experimental)')
 def cli_run_viz(source=None, outputpath="", savegist=False):
-    """This application ........."""
+    """
+This application launches the OntoSpy visualization tool.
 
-    # @todo: savegist should be a boolean
-    #revise anyways
+Example:
+    
+> ontospy-viz path/to/mymodel.rdf
+
+Note: if the location of an RDF model is not provided, a selection can be made from the contents of the local ontospy library folder.
+
+"""
 
     if outputpath:
         if not(os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
-            printDebug("WARNING: the -o option must include a valid directory path.")
+            click.secho("WARNING: the -o option must include a valid directory path.", fg="red")
             sys.exit(0)        
 
+    if source and len(source) > 1:
+        click.secho('Note: currently only one argument can be passed', fg='red')
 
     url = actions.action_visualize(source, savegist, False, outputpath)
 
@@ -43,8 +51,6 @@ def cli_run_viz(source=None, outputpath="", savegist=False):
         webbrowser.open(url)
 
         # continue and print(timing at bottom )
-
-
 
     raise SystemExit(1)
 

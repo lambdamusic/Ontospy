@@ -22,14 +22,23 @@ from .shell import Shell, STARTUP_MESSAGE
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+# @click.option('--source', '-s',  multiple=True, help='Load the shell with a specific graph (uri or file)')
+
 @click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--source', '-s',  multiple=True, help='Load the shell with a specific graph (uri or file)')
-def cli_run_shell(source):
-    """This application launches the OntoSpy interactive shell."""
+@click.argument('source', nargs=-1)
+def cli_run_shell(source=None):
+    """
+This application launches the OntoSpy interactive shell.
+
+Note: if a local path or URI of an RDF model is provided, that gets loaded into the shell by default. E.g.:
+
+> ontospy-shell path/to/mymodel.rdf
+
+"""
     Shell()._clear_screen()
     print(STARTUP_MESSAGE)
     if source and len(source) > 1:
-        click.secho('Currenlty only first argument can be read', fg='green')
+        click.secho('Note: currently only one argument can be passed', fg='red')
     uri = source[0] if source else None
     Shell(uri).cmdloop()
     raise SystemExit(1)

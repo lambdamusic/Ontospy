@@ -407,7 +407,7 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
 
     # get argument
     if not(args):
-        ontouri = action_listlocal()
+        ontouri = action_listlocal(all_details=False)
         if ontouri:
             islocal = True
         else:
