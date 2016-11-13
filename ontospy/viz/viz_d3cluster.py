@@ -27,7 +27,7 @@ def run(graph, save_on_github=False, main_entity=None):
 		uri = ontology.uri
 	except:
 		ontology = None
-		uri = graph.graphuri
+		uri = ";".join([s for s in graph.sources])
 
 	# ontotemplate = open("template.html", "r")
 	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "d3_cluster.html", "r")

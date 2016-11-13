@@ -32,7 +32,7 @@ def run(graph, save_on_github=False, main_entity=None):
         uri = ontology.uri
     except:
         ontology = None
-        uri = graph.graphuri
+        uri = ";".join([s for s in graph.sources])
         
     context = {
                     "ontology": ontology,

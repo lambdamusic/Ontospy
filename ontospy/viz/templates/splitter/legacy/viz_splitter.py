@@ -38,7 +38,7 @@ def run(graph, save_on_github=False):
 		uri = ontology.uri
 	except:
 		ontology = None
-		uri = graph.graphuri
+		uri = ";".join([s for s in graph.sources])
 
 	# ontotemplate = open("template.html", "r")
 	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_single_page.html", "r")

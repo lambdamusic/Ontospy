@@ -38,28 +38,11 @@ class Ontospy(object):  # Graph
     Object that scan an rdf graph for schema definitions (aka 'ontologies')
 
     In [1]: import ontospy
-    INFO:rdflib:RDFLib Version: 4.2.0
 
     In [2]: g = ontospy.Ontospy("foaf.ttl")
     Loaded 3478 triples
     Ontologies found: 1
-    
-    2016-08-27: refactoring..
-    ---------------------------------
-    problem is that Graph has a Graph (rdflib).. so really this class is like
-     a loader, or inspector, or factory.. or model, parser, analyzer, probe, explorer,
-     entities catalog, directory, register, index, list, listing, record, archive, inventory.
-     snooper, scout, worker
-     
-     an approach could be:
-     
-     g = ontospy.load("some graph", opts) # returns an OntoGraph or Inspector or similar
-
-
-     da2016-09-04: rationale
-     this onject (Ontospy) should only get a graph (or endpoint) and materialize entities
-     All loading related stuff should happen outside!
-    
+    [etc...]
 
     """
 
@@ -70,9 +53,8 @@ class Ontospy(object):  # Graph
         super(Ontospy, self).__init__()
 
         self.rdfgraph = None
-        self.graphuri = None # needed?
-        self.queryHelper = None 
-
+        self.sources = None
+        self.queryHelper = None
         self.ontologies = []
         self.classes = []
         self.namespaces = []
@@ -86,19 +68,20 @@ class Ontospy(object):  # Graph
         self.toplayerSkosConcepts = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
-        # finally
-        self.load(uri_or_path, text, file_obj, rdf_format, verbose)
- 
-        # extract entities 
-        self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
+        # finally:
+        if uri_or_path or text or file_obj:
+            self.load(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
 
 
-    def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False):
-        l = RDFLoader()
-        self.rdfgraph = l.load(uri_or_path, text, file_obj, rdf_format, verbose)
+    def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+        loader = RDFLoader()
+        loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
+        self.rdfgraph = loader.rdfgraph
+        self.sources = loader.sources_valid
         self.queryHelper = QueryHelper(self.rdfgraph)
         self.namespaces = sorted(self.rdfgraph.namespaces())
-
+        # extract entities
+        self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
 
     def serialize(self, format="turtle"):
         """ Shortcut that outputs the graph
@@ -114,7 +97,10 @@ class Ontospy(object):  # Graph
 
 
     def __repr__(self):
-        return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        if self.rdfgraph:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        else:
+            return "<Ontospy object created but not initialized (use the `load` method to load an rdf schema)>"
 
 
 

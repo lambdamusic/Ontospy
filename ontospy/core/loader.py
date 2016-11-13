@@ -73,7 +73,7 @@ class RDFLoader(object):
                 # finally:
                 for each in temp:
                     uri = self.resolve_redirects_if_needed(each)
-                    self.rdfgraph = self.load_uri(uri, verbose, self.rdfgraph)
+                    self.load_uri(uri, verbose)
 
 
         # TEXT STRING
@@ -81,7 +81,7 @@ class RDFLoader(object):
             if not type(text) in [list,tuple]:
                 text = [text]
             for each in text:
-                self.rdfgraph = self.load_text(each, verbose, self.rdfgraph)
+                self.load_text(each, verbose)
 
 
         # FILE OBJECT
@@ -89,7 +89,7 @@ class RDFLoader(object):
             if not type(file_obj) in [list,tuple]:
                 file_obj = [file_obj]
             for each in file_obj:
-                self.rdfgraph = self.load_file(each, verbose, self.rdfgraph)
+                self.load_file(each, verbose)
 
 
         else:
@@ -126,7 +126,7 @@ class RDFLoader(object):
 
 
 
-    def load_uri(self, uri, verbose, rdfgraph):
+    def load_uri(self, uri, verbose):
         """
         
         :param uri:
@@ -152,13 +152,10 @@ class RDFLoader(object):
         if not success == True:
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += [uri]
-            
-        return self.rdfgraph
-                
-                
+      
                 
 
-    def load_text(self, text, verbose, rdfgraph):
+    def load_text(self, text, verbose):
         """
         
         :param text:
@@ -175,7 +172,7 @@ class RDFLoader(object):
                 self.rdfgraph.parse(data=text, format=f)
                 if verbose: printDebug("..... success!")
                 success = True
-                self.all_sources += ["Text: '%s ...'" % text[:10]]
+                self.sources_valid += ["Text: '%s ...'" % text[:10]]
                 break
             except:
                 if verbose: printDebug("..... failed", "error")
@@ -184,11 +181,10 @@ class RDFLoader(object):
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += ["Text: '%s ...'" % text[:10]]
 
-        return self.rdfgraph
 
 
 
-    def load_file(file_obj, verbose, rdfgraph):
+    def load_file(file_obj, verbose):
         """
         The type of open file objects such as sys.stdout; alias of the built-in file.
         @TODO: when is this used? 
@@ -197,14 +193,12 @@ class RDFLoader(object):
         if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
 
         if type(file_obj) == file:
-            rdfgraph = rdfgraph + file_obj
-            self.all_sources += [file_obj.NAME]    
+            self.rdfgraph = self.rdfgraph + file_obj
+            self.sources_valid += [file_obj.NAME]
         else:
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += [file_obj.NAME]
 
-        # TODO: are we merging file contents here?    
-        return rdfgraph
 
 
 
@@ -253,12 +247,12 @@ class RDFLoader(object):
 
 
 @click.command()
-@click.argument('uri_or_path', type=click.STRING)
+@click.argument('uri_or_path', nargs=-1, type=click.STRING)
 @click.option('--noverbose', is_flag=True, help='Turn off verbose mode.')
 @click.option('--trylist', is_flag=True, help='Try loading a predefined list of files.')
 def test(uri_or_path, noverbose, trylist):
     l = RDFLoader()
-    if trylist:
+    if trylist or not uri_or_path:
         l.load(["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"], verbose=not(noverbose))
     else:
         l.load(uri_or_path, verbose=not(noverbose))
