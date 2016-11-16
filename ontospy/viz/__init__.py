@@ -23,6 +23,7 @@ except NameError:
 # django loading requires different steps based on version
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
+import click
 
 #http://stackoverflow.com/questions/1714027/version-number-comparison
 from distutils.version import StrictVersion
@@ -104,12 +105,11 @@ def ask_visualization():
 # ===========
 
 
-def build_viz(ontouri, g, viz_index, path=None, save_gist=False):
+def build_viz(ontouri, g, viz_index, path=None):
     """
     
     :param g:
     :param viz_index:
-    :param save_gist:
     :param main_entity:
     :return:
     """
@@ -125,10 +125,10 @@ def build_viz(ontouri, g, viz_index, path=None, save_gist=False):
     
 
     if this_viz['Type'] == "single-file":
-        url = _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path, save_gist)
+        url = _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path)
 
     elif this_viz['Type'] == "multi-file":
-        url = _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path, save_gist)
+        url = _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path)
 
     # save static files too
     if this_viz['Static-files']:
@@ -138,37 +138,28 @@ def build_viz(ontouri, g, viz_index, path=None, save_gist=False):
 
 
 
-def _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path, save_gist):
+def _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path):
     # simple  viz DISPATCHER
-    contents = VIZ_WORKER(g, save_gist)
+    contents = VIZ_WORKER(g, False)
     # once viz contents are generated, save file locally or on github
-    if save_gist:
-        urls = saveVizGithub(contents, ontouri)
-        printDebug("Documentation saved on GitHub:\n", "green")
-        # printDebug("----------")
-        printDebug("Gist (source code)           :  " + urls['gist'], "important")
-        printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
-        printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
-        url = urls['blocks']  # defaults to full win
-    else:
-        url = saveVizLocally(contents, slugify(unicode(ontouri)) + extension, path)
-        printDebug("Documentation generated: <%s>" % url, "green")
+    url = saveVizLocally(contents, slugify(unicode(ontouri)) + extension, path)
+    printDebug("Documentation generated: <%s>" % url, "green")
     return url
 
 
 
-def _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path, save_gist):
+def _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path):
     """
     one file per entity in ontology
     """
-    contents = VIZ_WORKER(g, save_gist, None)
+    contents = VIZ_WORKER(g, False, None)
     index_url = saveVizLocally(contents, "index" + extension, path)
     
     entities = [g.classes, g.properties, g.skosConcepts]
     for group in entities:
         for c in group:
             # getting main func dynamically
-            contents = VIZ_WORKER(g, save_gist, c)
+            contents = VIZ_WORKER(g, False, c)
             _filename = c.slug + extension
             url = saveVizLocally(contents, _filename, path)
     
@@ -233,6 +224,10 @@ def saveVizLocally(contents, filename="index.html", path=None):
 
 
 def saveVizGithub(contents, ontouri):
+    """
+    DEPRECATED on 2016-11-16
+    Was working but had a dependecies on package 'uritemplate.py' which caused problems at installation time
+    """
     title = "OntoSpy: ontology export"
     readme = """This ontology documentation was automatically generated with OntoSpy (https://github.com/lambdamusic/OntoSpy).
 	The graph URI is: %s""" % str(ontouri)

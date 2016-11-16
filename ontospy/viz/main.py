@@ -23,8 +23,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('source', nargs=-1)
 @click.option('--outputpath', '-o',  help='Output path (default: home folder)')
-@click.option('--savegist', '-g', is_flag=True, help='Save output as anonymous github gist (experimental)')
-def cli_run_viz(source=None, outputpath="", savegist=False):
+def cli_run_viz(source=None, outputpath=""):
     """
 This application launches the OntoSpy visualization tool.
 
@@ -44,7 +43,7 @@ Note: if the location of an RDF model is not provided, a selection can be made f
     if source and len(source) > 1:
         click.secho('Note: currently only one argument can be passed', fg='red')
 
-    url = actions.action_visualize(source, savegist, False, outputpath)
+    url = actions.action_visualize(source, fromshell=False, path=outputpath)
 
     if url:# open browser
         import webbrowser

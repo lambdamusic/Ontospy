@@ -397,7 +397,7 @@ def action_bootstrap():
 
 
 
-def action_visualize(args, save_gist, fromshell=False, path=None):
+def action_visualize(args, fromshell=False, path=None):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
@@ -443,7 +443,7 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    url  = build_viz(ontouri, g, viztype, path, save_gist)
+    url  = build_viz(ontouri, g, viztype, path)
     
     return url
 
