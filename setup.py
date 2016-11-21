@@ -92,13 +92,11 @@ setup(
         'SPARQLWrapper',
 		'colorama',
 		'django',
-		#'github3.py',
-        #'uritemplate.py', # 2016-11-09: needed by github3
         'requests',
         'pyfiglet',
         'click',
         'colorama', 
-        'pygments'
+        'pygments',
 	],
 
     # List additional groups of dependencies here (e.g. development dependencies).

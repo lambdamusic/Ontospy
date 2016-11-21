@@ -206,7 +206,7 @@ class Ontology(RDF_Entity):
         super(Ontology, self).__init__(uri, rdftype, namespaces)
         # self.uri = uri # rdflib.Uriref
         self.prefix = prefPrefix
-        self.slug = "ontology-" + str(self.id) + "-" + slugify(self.qname)
+        self.slug = "ontology-" + slugify(self.qname)
         self.classes = []
         self.properties = []
         self.skosConcepts = []

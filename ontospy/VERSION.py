@@ -11,6 +11,7 @@
 
 
 __version__ = "1.7.0"
+
 __copyright__ = "CopyRight (C) 2015-2016 by Michele Pasin"
 __license__ = "GNU"
 __author__ = "Michele Pasin"

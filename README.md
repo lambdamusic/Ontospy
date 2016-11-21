@@ -24,21 +24,24 @@ See also: https://pypi.python.org/pypi/ontospy
 
 Changelog
 ---------------
+
 v 1.7.0
 - complete code refactoring
 - added dependency to 'click' library
 - added ability to load RDF by padding a folder path (recursively)
 - removed dependency on github3.py
 
-
 v 1.6.9
+- ontospy-shell `uri` => loads an interactive session only with that URI
+- improved visualizations
 - added Mardown export
 
 
 v 1.6.8
-- improved visualizations algorithms
-- added -o option for exporting to a file
-- added pygments to dependencies
+- fixed bugs with Python3
+- more visualizations outputs (3 columns, markdown)
+- turtle lexer for nice printouts of source code 
+- ontospy -o option for exporting viz to a file
 
 
 v 1.6.7
