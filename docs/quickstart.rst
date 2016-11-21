@@ -15,7 +15,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	In [1]: import ontospy
 	INFO:rdflib:RDFLib Version: 4.2.0
 
-	In [2]: g = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
+	In [2]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
 	----------
 	Loaded 631 triples from <http://xmlns.com/foaf/0.1/>
 	started scanning...
@@ -29,7 +29,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	SKOS Concepts......: 0
 	----------
 
-	In [3]: g.classes
+	In [3]: model.classes
 	Out[3]: 
 	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
 	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
@@ -46,7 +46,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
 	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
-	In [4]: g.properties
+	In [4]: model.properties
 	Out[4]: 
 	[<Property *http://xmlns.com/foaf/0.1/account*>,
 	 <Property *http://xmlns.com/foaf/0.1/accountName*>,
@@ -116,7 +116,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Property *http://xmlns.com/wot/0.1/assurance*>,
 	 <Property *http://xmlns.com/wot/0.1/src_assurance*>]
 
-	In [5]: g.printClassTree()
+	In [5]: model.printClassTree()
 	[1]    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
 	[12]   ----_file_:Person
 	[2]    _file_:Agent
@@ -134,7 +134,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	[14]   _file_:Project
 
 
-	In [6]: g.toplayer
+	In [6]: model.toplayer
 	Out[6]: 
 	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
 	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
@@ -143,7 +143,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
 	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
-	In [7]: g.getClass("document")
+	In [7]: model.getClass("document")
 	Out[7]: 
 	[<Class *http://xmlns.com/foaf/0.1/Document*>,
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
@@ -178,3 +178,7 @@ Loading and querying the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	[<Class *http://xmlns.com/foaf/0.1/Image*>,
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 
+
+
+.. note::
+	The Ontospy object can be instantiated by passing a single file location or a folder path. In the second case it'll try to load any RDF file found in that path (recursively). For example, the second option can be handy if you have a knowledge model which is split into multiple files.

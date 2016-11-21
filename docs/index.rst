@@ -26,10 +26,10 @@ See also:
 In a nutshell
 --------------
 
-OntoSpy can be used either as an interactive language shell (a 
+OntoSpy can be used either as an interactive command line interface (a
 `repl <https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>`_ ) or as a Python package. 
 
-Calling the ``ontospy`` command from a terminal window launches the interactive shell. If you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSpy will attempt to extract and print out any ontology-related information contained in that graph. 
+Calling the ``ontospy`` command from a terminal window launches a utility for scanning a knowledge model encoded in RDF (or any of its dialects e.g. RDFS, OWL or SKOS). For example, if you pass a valid graph URI (e.g. ``ontospy`` ``http://purl.org/spar/frbr``) then OntoSpy will attempt to extract and print out any ontology-related information contained in that graph.
 
 Many other options are available, in particular OntoSpy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
@@ -38,15 +38,15 @@ Many other options are available, in particular OntoSpy allows to load/save onto
 
 Here are some reasons why you should use it:
 
-- You love the command line and would never leave it no matter what.
-
 - You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.
 
 - You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization. 
 
+- You love the command line and would never leave it no matter what.
+
 - You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary. 
 
-.. note:: OntoSpy offers no ontology editing functionalities, nor it can be used to interrogate a triplestore.
+.. note:: OntoSpy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
 
 
 Quick example
@@ -58,7 +58,7 @@ Here's how it works from the command line (`video link <https://vimeo.com/169707
 
 	<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 
-If used as a Python package, the basic workflow is the following: load a graph by instantiating the ``Graph`` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
+If used as a Python package, the basic workflow is the following: load a graph by instantiating the ``Ontospy`` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
 
 Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`_ vocabulary. 
 
@@ -67,7 +67,7 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	In [1]: import ontospy
 	INFO:rdflib:RDFLib Version: 4.2.0
 
-	In [2]: g = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
+	In [2]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
 	----------
 	Loaded 631 triples from <http://xmlns.com/foaf/0.1/>
 	started scanning...
@@ -81,7 +81,7 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	SKOS Concepts......: 0
 	----------
 
-	In [3]: g.classes
+	In [3]: model.classes
 	Out[3]: 
 	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
 	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
@@ -98,7 +98,7 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
 	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
-	In [4]: g.properties
+	In [4]: model.properties
 	Out[4]: 
 	[<Property *http://xmlns.com/foaf/0.1/account*>,
 	 <Property *http://xmlns.com/foaf/0.1/accountName*>,
@@ -112,7 +112,7 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 		### etc....
 		]
 
-	In [5]: g.printClassTree()
+	In [5]: model.printClassTree()
 	[1]    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
 	[12]   ----_file_:Person
 	[2]    _file_:Agent
@@ -130,7 +130,7 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	[14]   _file_:Project
 
 
-	In [6]: g.toplayer
+	In [6]: model.toplayer
 	Out[6]: 
 	[<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
 	 <Class *http://xmlns.com/foaf/0.1/Agent*>,
@@ -139,14 +139,14 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 	 <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
 	 <Class *http://xmlns.com/foaf/0.1/Project*>]
 
-	In [7]: g.getClass("document")
+	In [7]: model.getClass("document")
 	Out[7]: 
 	[<Class *http://xmlns.com/foaf/0.1/Document*>,
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 
-	In [8]: d = _[0]
+	In [8]: a_class = _[0]
 
-	In [9]: print(d.serialize())
+	In [9]: print(a_class.serialize())
 	@prefix ns1: <http://www.w3.org/2002/07/owl#> .
 	@prefix ns2: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
 	@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -166,10 +166,10 @@ Let's take a look at the `Friend Of A Friend <http://semanticweb.org/wiki/FOAF>`
 
 
 
-	In [10]: d.parents()
+	In [10]: a_class.parents()
 	Out[10]: []
 
-	In [11]: d.children()
+	In [11]: a_class.children()
 	Out[11]: 
 	[<Class *http://xmlns.com/foaf/0.1/Image*>,
 	 <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]

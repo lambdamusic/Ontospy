@@ -3,7 +3,7 @@ Installation
 
 Prerequisites
 --------------
-- Python (2.x and 3.x)
+- Python (tested on 2.x or 3.x)
 - A python package manager: `setuptools <https://pypi.python.org/pypi/setuptools>`_ or `pip <https://pip.pypa.io/en/stable/installing/>`_.
 
 
@@ -16,12 +16,10 @@ Once you have a package manager installed, get OntoSpy from the Python Package I
 
 The python library, its dependencies and all of its command-line executables will be installed. 
 
-Note: if you're upgrading from an older version, make sure you use the -U flag:
-
-``pip install ontospy -U``
+.. note:: if you're upgrading from an older version, make sure you use the -U flag: ``pip install ontospy -U``
 
 
-Dependencies
+Credits
 --------------
 OntoSpy couldn't exist without the following libraries. 
 
@@ -29,10 +27,9 @@ OntoSpy couldn't exist without the following libraries.
 - `colorama <https://pypi.python.org/pypi/colorama>`_
 - `readline <https://pypi.python.org/pypi/readline>`_
 - `django <https://www.djangoproject.com/>`_
-- `github3 <https://github3py.readthedocs.org/en/master/>`_
+- `requests <https://github.com/kennethreitz/requests>`_
+- `click <https://pypi.python.org/pypi/click>`_
+- `pygments <https://pypi.python.org/pypi/Pygments>`_
 - `pyfiglet <https://github.com/pwaller/pyfiglet>`_
 
 **Note**: all of the above will install automatically when you install OntoSpy.
-        
-
-

@@ -28,10 +28,25 @@
     <link rel="prev" title="Welcome to OntoSpy’s documentation!" href="index.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
-  <body role="document">  
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to OntoSpy’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSpy 1.6.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -43,7 +58,7 @@
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Python (2.x and 3.x)</li>
+<li>Python (tested on 2.x or 3.x)</li>
 <li>A python package manager: <a class="reference external" href="https://pypi.python.org/pypi/setuptools">setuptools</a> or <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a>.</li>
 </ul>
 </div>
@@ -52,18 +67,22 @@
 <p>Once you have a package manager installed, get OntoSpy from the Python Package Index:</p>
 <p><code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">ontospy</span></code> or <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span></code></p>
 <p>The python library, its dependencies and all of its command-line executables will be installed.</p>
-<p>Note: if you&#8217;re upgrading from an older version, make sure you use the -U flag:</p>
-<p><code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span> <span class="pre">-U</span></code></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">if you&#8217;re upgrading from an older version, make sure you use the -U flag: <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">ontospy</span> <span class="pre">-U</span></code></p>
 </div>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="credits">
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h2>
 <p>OntoSpy couldn&#8217;t exist without the following libraries.</p>
 <ul class="simple">
 <li><a class="reference external" href="https://github.com/RDFLib/rdflib">rdflib</a></li>
 <li><a class="reference external" href="https://pypi.python.org/pypi/colorama">colorama</a></li>
 <li><a class="reference external" href="https://pypi.python.org/pypi/readline">readline</a></li>
 <li><a class="reference external" href="https://www.djangoproject.com/">django</a></li>
-<li><a class="reference external" href="https://github3py.readthedocs.org/en/master/">github3</a></li>
+<li><a class="reference external" href="https://github.com/kennethreitz/requests">requests</a></li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/click">click</a></li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/Pygments">pygments</a></li>
 <li><a class="reference external" href="https://github.com/pwaller/pyfiglet">pyfiglet</a></li>
 </ul>
 <p><strong>Note</strong>: all of the above will install automatically when you install OntoSpy.</p>
@@ -95,29 +114,25 @@
 </p>
 
 
-
-
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">Installation:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart_cmdline.html">Command Line Usage</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to OntoSpy&#8217;s documentation!</a></li>
-      <li>Next: <a href="quickstart.html" title="next chapter">Quick Start</a></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to OntoSpy&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="next chapter">Quick Start</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -139,12 +154,12 @@
       &copy;2015-2016, Michele Pasin.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
       
       |
       <a href="_sources/installation.txt"
-          rel="nofollow">Page source</a>
+          rel="nofollow">Page source</a></li>
     </div>
 
     
