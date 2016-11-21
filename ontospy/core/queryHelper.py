@@ -10,7 +10,7 @@ Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>. All rig
 
 
 import rdflib
-from .util import *
+from .utils import *
 
 DEFAULT_LANGUAGE = "en"
 

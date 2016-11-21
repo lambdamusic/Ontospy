@@ -37,11 +37,11 @@ import time, optparse, os, rdflib, sys, datetime
 
 from colorama import Fore, Style
 
-
-from . import *  # imports __init__
-from ._version import *
-from .core.graph import Graph
-from .core.util import *
+from .. import *  # imports __init__
+from ..VERSION import *
+from .ontospy import Ontospy
+from .utils import *
+from .manager import *
 
 
 
@@ -56,7 +56,7 @@ from .core.util import *
 
 
 
-def action_listlocal():
+def action_listlocal(all_details=True):
     " select a file from the local repo "
 
     options = get_localontologies()
@@ -64,11 +64,14 @@ def action_listlocal():
     counter = 1
     # printDebug("------------------", 'comment')
     if not options:
-        printDebug("Your local library is empty. Use 'ontospy -i <uri>' to add more ontologies to it.")
+        printDebug("Your local library is empty. Use 'ontospy -s <uri>' to add more ontologies to it.")
         return
     else:
-        _print_table_ontologies()
-
+        if all_details:
+            _print_table_ontologies()
+        else:
+            _print2cols_ontologies()
+       
         while True:
             printDebug("------------------\nSelect a model by typing its number: (enter=quit)", "important")
             var = input()
@@ -87,7 +90,18 @@ def action_listlocal():
 
 
 
+def _print2cols_ontologies():
+    ontologies = get_localontologies()
+    ONTOSPY_LOCAL_MODELS = get_home_location()
 
+    if ontologies:
+        printDebug("------------", "tip")
+        counter = 0
+        out = []
+        for x in ontologies:
+            counter += 1
+            out += ["[%s] %s" % (str(counter), x)]
+        pprint2columns(out, max_length=60)
 
 
 def _print_table_ontologies():
@@ -175,7 +189,7 @@ def action_import(location, verbose=True, lock=None):
         return None
 
     try:
-        g = Graph(fullpath, verbose=verbose)
+        g = Ontospy(fullpath, verbose=verbose)
         # printDebug("----------")
     except:
         g = None
@@ -311,7 +325,7 @@ def _import_PREFIXCC(keyword=""):
     options = []
 
     printDebug("----------\nReading source...")
-    g = Graph(SOURCE, verbose=False)
+    g = Ontospy(SOURCE, verbose=False)
 
     for x in g.ontologies:
         if keyword:
@@ -383,18 +397,17 @@ def action_bootstrap():
 
 
 
-def action_visualize(args, save_gist, fromshell=False, path=None):
+def action_visualize(args, fromshell=False, path=None):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
     """
 
-    from .viz import ask_visualization, run_viz, saveVizGithub, \
-        saveVizLocally, VISUALIZATIONS_LIST
+    from ..viz import ask_visualization, build_viz, VISUALIZATIONS_LIST
 
     # get argument
     if not(args):
-        ontouri = action_listlocal()
+        ontouri = action_listlocal(all_details=False)
         if ontouri:
             islocal = True
         else:
@@ -418,55 +431,19 @@ def action_visualize(args, save_gist, fromshell=False, path=None):
         if not g:
             g = do_pickle_ontology(ontouri)
     else:
-        g = Graph(ontouri)
+        g = Ontospy(ontouri)
 
     # put in home folder by default: <ontouri>/<viztype>/files..
     if not path:
         from os.path import expanduser
         home = expanduser("~")
         onto_path = slugify(unicode(ontouri))
-        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype][0]))
+        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype]['Title']))
         path = os.path.join(home, "ontospy-viz/" + onto_path + "/" + viz_path )
         if not os.path.exists(path):
             os.makedirs(path)
 
-    if "markdown" in VISUALIZATIONS_LIST[viztype][0].lower():
-        extension = ".md"
-    else:
-        extension = ".html"
-
-    if VISUALIZATIONS_LIST[viztype][2] == "single-file":
-        # simple  viz DISPATCHER
-        contents = run_viz(g, viztype, save_gist)
-        # once viz contents are generated, save file locally or on github
-        if save_gist:
-            urls = saveVizGithub(contents, ontouri)
-            printDebug("Documentation saved on GitHub:\n", "green")
-            # printDebug("----------")
-            printDebug("Gist (source code)           :  " + urls['gist'], "important")
-            printDebug("Gist (interactive)           :  " + urls['blocks'], "important")
-            printDebug("Gist (interactive+fullscreen):  " + urls['blocks_fullwin'], "important")
-            url = urls['blocks'] # defaults to full win
-        else:
-            url = saveVizLocally(contents, slugify(unicode(ontouri)) + extension, path)
-            printDebug("Documentation generated: <%s>" % url, "green")
-
-    elif VISUALIZATIONS_LIST[viztype][2] == "multi-file":
-        # splitter viz
-        # main index page for graph
-        contents = run_viz(g, viztype, save_gist, None)
-        index_url = saveVizLocally(contents, "index" + extension, path)
-
-        entities = [g.classes, g.properties, g.skosConcepts]
-        for group in entities:
-            for c in group:
-                # getting main func dynamically
-                contents = run_viz(g, viztype, save_gist, c)
-                _filename = c.slug + extension
-                url = saveVizLocally(contents, _filename, path)
-        
-        url = index_url
-        printDebug("Documentation generated: <%s>" % url, "green")
+    url  = build_viz(ontouri, g, viztype, path)
     
     return url
 
@@ -584,7 +561,7 @@ def action_cache():
             try:
                 print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
                 print("Loading graph...")
-                g = Graph(fullpath)
+                g = Ontospy(fullpath)
                 print("Loaded ", fullpath)
             except:
                 g = None

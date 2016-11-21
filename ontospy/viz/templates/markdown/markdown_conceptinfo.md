@@ -6,10 +6,10 @@
     
 {% with main_entity as each  %}
 
-## SKOS Concept {{each.qname}}
+# SKOS Concept {{each.qname}}
 
 
-### Tree
+#### Tree
 {% if each.parents %}
 {% for s in each.parents %}
 * [{{s.qname}}]({{s.slug}}.md)
@@ -36,27 +36,27 @@
 *NOTE* this is a leaf node.
 {% endif %}
 
-### URI
+#### URI
 {{each.uri}}
 
-### Description
+#### Description
 {{each.bestDescription|default:"--"}}
 
 
 {% if each.ancestors %}
-### Inherits from ({{ each.ancestors|length }})
+#### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
 - [{{s.qname}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
-### Inherits from:
+#### Inherits from:
 skos:Concept
 {% endif %}
 
 
-### Implementation
+#### Implementation
 ```
-{{each.serialize|linebreaks}}
+{{each.serialize|safe}}
 ```
 
 {% endwith %}

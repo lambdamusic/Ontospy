@@ -3,10 +3,10 @@
 
 
 from . import *  # imports __init__
-from .. import ontospy
+from .. import *
 
-# from .. import ontospy
-# from ..core.util import *
+# from .. import main
+# from ..core.utils import *
 
 # TEMPLATE: HTML BASIC
 
@@ -38,10 +38,10 @@ def run(graph, save_on_github=False, main_entity=None):
 		uri = ontology.uri
 	except:
 		ontology = None
-		uri = graph.graphuri
+		uri = ";".join([s for s in graph.sources])
 
 	# ontotemplate = open("template.html", "r")
-	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "javadoc.html", "r")
+	ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "javadoc.html", "r")
 
 	t = Template(ontotemplate.read())
 
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 	try:
 
 		# script for testing - must launch this module
-		# >python -m ontospy.viz.viz_html
+		# >python -m viz.viz_html
 
 		func = locals()["run"] # main func dynamically
 		run_test_viz(func)

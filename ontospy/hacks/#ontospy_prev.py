@@ -361,7 +361,7 @@ class Ontology(object):
 
 		It uses RDFS and OWL predicate by default; also, we extract non explicitly declared classes.
 		
-		OWL:Thing is added by default as the class of all OWL classes.
+		owl:Thing is added by default as the class of all OWL classes.
 
 		classPredicate: 'rdfs' or 'owl' (defaults to "" = both)
 		includeDomainRange: boolean (defaults to False)
@@ -579,7 +579,7 @@ class Ontology(object):
 	def classDirectSupers(self, aClass, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of direct superclasses
-		Note: it always avoid returning OWL:Thing as that is the implicit superclass of all classes
+		Note: it always avoid returning owl:Thing as that is the implicit superclass of all classes
 		"""
 		returnlist = []
 		for o in self.rdfGraph.objects(aClass, RDFS.subClassOf):
@@ -994,7 +994,7 @@ class Ontology(object):
 	def propertyDirectSupers(self, aProp, excludeBnodes = True, sortUriName = False):
 		"""
 		Return a list of direct superclasses
-		Note: it always avoid returning OWL:Thing as that is the implicit superclass of all classes
+		Note: it always avoid returning owl:Thing as that is the implicit superclass of all classes
 		"""
 		returnlist = []
 		for o in self.rdfGraph.objects(aProp, RDFS.subPropertyOf):

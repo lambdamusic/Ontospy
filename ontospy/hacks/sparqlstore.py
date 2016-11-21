@@ -8,14 +8,14 @@ import rdflib
 
 store = SPARQLStore("http://dbpedia.org/sparql")
 g = rdflib.ConjunctiveGraph(store=store)
-r = g.query("select distinct ?Concept where {[] a ?Concept} LIMIT 100")
+r = g.query("select distinct ?Caoncept where {[] a ?Concept} LIMIT 100")
 list(r)
 # [(rdflib.term.URIRef(u'http://w...
 #
 # In order to serialize the result as JSON, you can do
 #
 serialized=r.serialize(format='json')
-serialized
+print serialized
 # '{"head": {"vars"...
 
 

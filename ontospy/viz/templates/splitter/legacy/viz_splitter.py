@@ -3,10 +3,10 @@
 
 
 from . import *  # imports __init__
-from .. import ontospy
+from .. import main
 
-# from .. import ontospy
-# from ..core.util import *
+# from .. import main
+# from ..core.utils import *
 
 # TEMPLATE: HTML SPLITTER
 
@@ -38,7 +38,7 @@ def run(graph, save_on_github=False):
 		uri = ontology.uri
 	except:
 		ontology = None
-		uri = graph.graphuri
+		uri = ";".join([s for s in graph.sources])
 
 	# ontotemplate = open("template.html", "r")
 	ontotemplate = open(ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter/splitter_single_page.html", "r")

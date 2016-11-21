@@ -17,9 +17,9 @@ USAGE = "@todo"
 import time, optparse, os, rdflib, sys, webbrowser
 import SimpleHTTPServer, SocketServer
 
-from .. import ontospy
-from ..core.graph import Graph
-from ..core.util import *
+from .. import main
+from ..core.ontospy import Ontospy
+from ..core.utils import *
 
 DEFAULT_PORT = 7899
 
@@ -110,7 +110,7 @@ def main():
 
 if __name__ == '__main__':
 
-	# from .. import ontospy
+	# from .. import main
 	try:
 		main()
 		sys.exit(0)

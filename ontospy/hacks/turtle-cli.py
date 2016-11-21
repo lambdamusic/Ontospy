@@ -24,7 +24,7 @@ from pygments.style import Style
 from pygments.styles.default import DefaultStyle
 from pygments.token import Token
 
-from .. import ontospy
+from ..core import ontospy
 from .vocabsturtleprompt import rdfschema, rdfsschema, owlschema
 
 
@@ -41,7 +41,7 @@ def clear_screen():
 
 def get_default_preds():
     """dynamically build autocomplete options based on an external file"""
-    g = ontospy.Graph(rdfsschema, text=True, verbose=False, hide_base_schemas=False)
+    g = ontospy.Ontospy(rdfsschema, text=True, verbose=False, hide_base_schemas=False)
     classes = [(x.qname, x.bestDescription()) for x in g.classes]
     properties = [(x.qname, x.bestDescription()) for x in g.properties]
     commands = [('exit', 'exits the terminal'), ('show', 'show current buffer')]

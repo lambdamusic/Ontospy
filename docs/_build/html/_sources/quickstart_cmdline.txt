@@ -4,9 +4,9 @@ This page shows how to use Ontospy from the command line.
 
 These are the commands available: 
 
-- ``ontospy``: used to launch the interactive ontospy shell, or to query a graph.
-- ``ontospy-manager``: used to manage your local ontospy installation.
-- ``ontospy-sketch``: (experimental) sketch a turtle model interactively.
+- ``ontospy``: used to launch the Ontospy parser.
+- ``ontospy-shell``: used to launch the Ontospy command line interface.
+- ``ontospy-viz``: used to the launch the Ontospy visualization library.
 
 
 .. note::
@@ -26,35 +26,40 @@ A good place to start is the -h option:
 
 .. code-block:: shell
 
-	> ontospy -h
-	Ontospy v1.6.7
-	Usage: ontospy.py [graph-uri-or-location] [options]
+	Usage: ontospy [OPTIONS] [SOURCES]...
+
+	  Ontospy is a command line inspector for RDF/OWL knowledge models.
+
+	  Examples:
+
+	  Inspect a local RDF file:
+
+	  > ontospy /path/to/mymodel.rdf
+
+	  List ontologies available in the local library:
+
+	  > ontospy -l
+
+	  Open FOAF vocabulary and save it to the local library:
+
+	  > ontospy http://xmlns.com/foaf/spec/ -s
+
+	  More info: <ontospy.readthedocs.org>
 
 	Options:
-	  --version   show program's version number and exit
-	  -h, --help  show this help message and exit
-	  -l          LIBRARY: select ontologies saved in the local library
-	  -v          VERBOSE: show entities labels as well as URIs
-	  -b          BOOTSTRAP: save some sample ontologies into the local library
-	  -i          IMPORT: save a file/folder/url into the local library
-	  -w          IMPORT-FROM-REPO: import from an online directory
-	  -e          EXPORT: export a model into another format (e.g. html)
-	  -g          EXPORT-AS-GIST: export output as a Github Gist.
+	  -b, --bootstrap  BOOTSTRAP: bootstrap the local library.
+	  -c, --cache      CACHE: force caching of the local library (for faster
+					   loading).
+	  -d, --delete     DELETE: remove an ontology from the local library.
+	  -l, --library    LIBRARY: list ontologies saved in the local library.
+	  -s, --save       SAVE: save a file/folder/url into the local library.
+	  -r, --reset      RESET: delete all files in the local library.
+	  -u, --update     UPDATE: enter new path for the local library.
+	  -v, --verbose    VERBOSE: show entities labels as well as URIs.
+	  -w, --web        WEB: import ontologies from remote repositories.
+	  -h, --help       Show this message and exit.
 
-	Quick Examples:
-	  > ontospy http://xmlns.com/foaf/spec/    # ==> prints info about FOAF
-	  > ontospy http://xmlns.com/foaf/spec/ -i # ==> prints info and save local copy
-	  > ontospy http://xmlns.com/foaf/spec/ -g # ==> exports ontology data into a github gist
-
-	  For more, visit ontospy.readthedocs.org
- 
- 				  
-Just calling ``ontospy`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this `video <https://vimeo.com/169707591>`_:
-
-.. raw:: html 
-
-	<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-
+Just calling ``ontospy`` without any argument has the effect of listing out all RDF models saved in the local library. The first time you run it, there are none obviously so you might want to run the ``ontospy -b`` option to get started.
 
 Alternatively, you can also pass a valid graph URI as an argument to the ``ontospy`` command in order to print out useful ontology information:					
 
@@ -64,7 +69,7 @@ Alternatively, you can also pass a valid graph URI as an argument to the ``ontos
 
 	# prints info about BFO resolving redirects etc..
 	
-	Ontospy v1.6.5.1
+	Ontospy v1.7
 	Local library: </Users/michele.pasin/Dropbox/ontologies/ontospy-library/>
 	----------
 	.. trying rdf serialization: <xml>
@@ -154,33 +159,70 @@ Alternatively, you can also pass a valid graph URI as an argument to the ``ontos
 	----------
 	Time:	   3.42s
 
+.. note::
+	You can pass the Ontospy command either  a single file or a folder path. In the second case it'll try to load any RDF file found in that path (recursively). For example, the second option can be handy if you have a knowledge model which is split into multiple files.
 
 
-
-
-
-
-
-The ``ontospy-manager`` command
+The ``ontospy-shell`` command
 ------------------------
-
-This utility allows to run management operations on a local ontospy library installation. 
 
 .. code-block:: shell
 
-	> ontospy-manager 
-	Ontospy v1.6.7
-	Usage: ontospy-manager [options]
+	> ontospy-shell -h
+	Usage: ontospy-shell [OPTIONS] [SOURCE]...
+
+	  This application launches the OntoSpy interactive shell.
+
+	  Note: if a local path or URI of an RDF model is provided, that gets loaded
+	  into the shell by default. E.g.:
+
+	  > ontospy-shell path/to/mymodel.rdf
 
 	Options:
-	  --version   show program's version number and exit
-	  -h, --help  show this help message and exit
-	  -l          LIST: show ontologies saved in the local library.
-	  -c          CACHE: force caching of the local library (for faster loading)
-	  -u          UPDATE: enter new path for the local library.
-	  -d          DELETE: remove a single ontology file from the local library.
-	  -e          ERASE: reset the local library (delete all files)
+	  -h, --help  Show this message and exit.
+
+Calling ``ontospy-shell`` without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this `video <https://vimeo.com/169707591>`_:
+
+.. raw:: html
+
+	<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+
+Note: you can pass an argument in order to pre-load an RDF graph into the interactive session.
 
 
 
+The ``ontospy-viz`` command
+------------------------
 
+This utility allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
+
+.. code-block:: shell
+
+	> ontospy-viz -h
+	Usage: ontospy-viz [OPTIONS] [SOURCE]...
+
+	  This application launches the OntoSpy visualization tool.
+
+	  Example:      > ontospy-viz path/to/mymodel.rdf
+
+	  Note: if the location of an RDF model is not provided, a selection can be
+	  made from the contents of the local ontospy library folder.
+
+	Options:
+	  -o, --outputpath TEXT  Output path (default: home folder)
+	  -h, --help             Show this message and exit.
+
+Some of the export options are still quite experimental, so it's advisable to try out more than one if you're not happy with the results.
+
+.. code-block:: shell
+
+	1) Javadoc
+	2) Markdown
+	3) Split Columns
+	4) Dendogram
+	5) Pack Hierarchy
+	6) Bubble Chart
+	7) Cluster Tree
+	8) Bar Hierarchy
+	9) Partition Table
+	10) Tree Pie

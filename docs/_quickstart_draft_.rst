@@ -162,7 +162,7 @@ Getting data from multiple ontologies
 
 .. code-block:: python
 
-    In [30]: g2 = ontospy.Graph("data/schemas/npgmusic_mix.ttl")
+    In [30]: g2 = ontospy.Ontospy("data/schemas/npgmusic_mix.ttl")
     ----------
     Loaded 3225 triples from <data/schemas/npgmusic_mix.ttl>
     started scanning...
@@ -187,7 +187,7 @@ Querying a SPARQL endpoint
 
 .. code-block:: python
 
-    In [12]: g = ontospy.Graph("http://data.semanticweb.org/sparql", endpoint=True)
+    In [12]: g = ontospy.Ontospy("http://data.semanticweb.org/sparql", endpoint=True)
     started scanning...
     ----------
     Ontologies found: 20
@@ -222,7 +222,7 @@ Note: this returns raw URIRef instances (from rdflib), not OntoSPY ones!
 
 .. code-block:: python
 
-    In [2]: g = ontospy.Graph("data/foaf.rdf")
+    In [2]: g = ontospy.Ontospy("data/foaf.rdf")
     Loaded 630 triples
     started scanning...
     Ontologies found: 1

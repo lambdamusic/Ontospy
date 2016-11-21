@@ -8,8 +8,8 @@
 
 
 
-from .. import ontospy
-from ..core.util import *
+from .. import *
+from ..core.utils import *
 
 
 # Fix Python 2.x.
@@ -23,6 +23,7 @@ except NameError:
 # django loading requires different steps based on version
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
+import click
 
 #http://stackoverflow.com/questions/1714027/version-number-comparison
 from distutils.version import StrictVersion
@@ -38,9 +39,9 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [
                 # insert your TEMPLATE_DIRS here
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "shared",
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "splitter",
-                ontospy.ONTOSPY_VIZ_TEMPLATES + "markdown",
+                ONTOSPY_VIZ_TEMPLATES + "shared",
+                ONTOSPY_VIZ_TEMPLATES + "splitter",
+                ONTOSPY_VIZ_TEMPLATES + "markdown",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -65,47 +66,16 @@ else:
 
     settings.configure()
 
+import os
+from shutil import copyfile
 
 
-
-
-
-# ===========
-# MAIN CATALOGUE
-# ===========
-# @todo modify here in order to add new viz
-
-from .viz_html import run as html
-from .viz_markdown import run as markdown
-from .viz_d3tree import run as tree
-from .viz_d3packHierarchy import run as packH
-from .viz_d3bubblechart import run as bubble
-from .viz_d3cluster import run as cluster
-from .viz_d3barHierarchy import run as barH
-from .viz_d3partitionTable import run as partitionT
-from .viz_d3treePie import run as treeP
-from .viz_splitter_multi import run as splitter
-
-
-VISUALIZATIONS_LIST =  [("JavaDoc", html, "single-file")]
-VISUALIZATIONS_LIST += [("Markdown ", markdown, "multi-file")]
-VISUALIZATIONS_LIST += [("Split Columns", splitter, "multi-file")]
-VISUALIZATIONS_LIST += [("Dendogram", tree, "single-file")]
-VISUALIZATIONS_LIST += [("Pack Hierarchy (experimental)", packH, "single-file")]
-VISUALIZATIONS_LIST += [("Bubble Chart (experimental)", bubble, "single-file")]
-VISUALIZATIONS_LIST += [("Cluster Tree (experimental)", cluster, "single-file")]
-VISUALIZATIONS_LIST += [("Bar Hierarchy (experimental)", barH, "single-file")]
-VISUALIZATIONS_LIST += [("Partition Table (experimental)", partitionT, "single-file")]
-VISUALIZATIONS_LIST += [("Tree Pie (buggy)", treeP, "single-file")]
-
-
-# ============
-# =END CATALOGUE
-# ============
-
-
-
-
+try:
+    from .CONFIG import VISUALIZATIONS_LIST
+    VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
+except:  # Mother of all exceptions
+    click.secho("Visualizations configuration file not found.", fg="red")
+    raise
 
 def ask_visualization():
     """
@@ -114,7 +84,7 @@ def ask_visualization():
     while True:
         text = "Please select an output format for the ontology visualization: (q=quit)\n"
         for viz in VISUALIZATIONS_LIST:
-            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz[0])
+            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz['Title'])
         var = input(text + ">")
         if var == "q":
             return ""
@@ -134,20 +104,104 @@ def ask_visualization():
 # DYNAMIC RUNNER FUNCTION
 # ===========
 
-def run_viz(g, viz_index, save_gist=False, main_entity=None):
+
+def build_viz(ontouri, g, viz_index, path=None):
     """
-    Main wrapper function for calling the visualizations
-
-    Note: dependent on VISUALIZATIONS_LIST
-
-    :param g: graph instance
-    :param viztype: a number passed from the user
-    :param save_gist: a flag (just to extra info printed on template)
-    :return: string contents of html file (the viz)
+    
+    :param g:
+    :param viz_index:
+    :param main_entity:
+    :return:
     """
-    contents = VISUALIZATIONS_LIST[viz_index][1](g, save_gist, main_entity)
-    return contents
+    
+    this_viz = VISUALIZATIONS_LIST[viz_index]
+    
+    extension = "." + this_viz["File-extension"]
 
+    import importlib
+    module_name = this_viz['ID']
+    viz_module = importlib.import_module(".viz_" + module_name, "ontospy.viz")
+    VIZ_WORKER = viz_module.run  # dynamically referenced
+    
+
+    if this_viz['Type'] == "single-file":
+        url = _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path)
+
+    elif this_viz['Type'] == "multi-file":
+        url = _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path)
+
+    # save static files too
+    if this_viz['Static-files']:
+        _copyStaticFiles(this_viz['Static-files'], path)
+           
+    return url
+
+
+
+def _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path):
+    # simple  viz DISPATCHER
+    contents = VIZ_WORKER(g, False)
+    # once viz contents are generated, save file locally or on github
+    url = saveVizLocally(contents, slugify(unicode(ontouri)) + extension, path)
+    printDebug("Documentation generated: <%s>" % url, "green")
+    return url
+
+
+
+def _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path):
+    """
+    one file per entity in ontology
+    """
+    contents = VIZ_WORKER(g, False, None)
+    index_url = saveVizLocally(contents, "index" + extension, path)
+    
+    entities = [g.classes, g.properties, g.skosConcepts]
+    for group in entities:
+        for c in group:
+            # getting main func dynamically
+            contents = VIZ_WORKER(g, False, c)
+            _filename = c.slug + extension
+            url = saveVizLocally(contents, _filename, path)
+    
+    url = index_url
+    printDebug("Documentation generated: <%s>" % url, "green")
+    return url
+
+
+
+
+def _copyStaticFiles(files_list, path):
+    """ move over static files so that relative imports work """
+    static_path = os.path.join(path, "static")
+    if not os.path.exists(static_path):
+        os.makedirs(static_path)
+    for x in files_list:
+        source_f = os.path.join(ONTOSPY_VIZ_STATIC, x)
+        dest_f = os.path.join(static_path, x)
+        copyfile(source_f, dest_f)
+
+
+#
+# def run_viz(g, viz_index, save_gist=False, main_entity=None):
+#     """
+#     Main wrapper function for calling the visualizations
+#
+#     Note: dependent on VISUALIZATIONS_LIST
+#
+#     :param g: graph instance
+#     :param viztype: a number passed from the user
+#     :param save_gist: a flag (just to extra info printed on template)
+#     :return: string contents of html file (the viz)
+#     """
+#
+#     # import module dynamically based on ID field in config
+#     import importlib
+#     module_name = VISUALIZATIONS_LIST[viz_index]['ID']
+#     i = importlib.import_module(".viz_" + module_name, "ontospy.viz")
+#
+#     contents = i.run(g, save_gist, main_entity)
+#     return contents
+#
 
 
 
@@ -155,7 +209,7 @@ def run_viz(g, viz_index, save_gist=False, main_entity=None):
 
 def saveVizLocally(contents, filename="index.html", path=None):
     if not path:
-        filename = ontospy.ONTOSPY_LOCAL_VIZ + "/" + filename
+        filename = ONTOSPY_LOCAL_VIZ + "/" + filename
     else:
         filename = os.path.join(path,filename)
 
@@ -170,6 +224,10 @@ def saveVizLocally(contents, filename="index.html", path=None):
 
 
 def saveVizGithub(contents, ontouri):
+    """
+    DEPRECATED on 2016-11-16
+    Was working but had a dependecies on package 'uritemplate.py' which caused problems at installation time
+    """
     title = "OntoSpy: ontology export"
     readme = """This ontology documentation was automatically generated with OntoSpy (https://github.com/lambdamusic/OntoSpy).
 	The graph URI is: %s""" % str(ontouri)
@@ -216,12 +274,12 @@ def run_test_viz(func):
     """
 
     import webbrowser, random
-    ontouri = ontospy.get_localontologies()[random.randint(0, 10)]  # [0]
+    ontouri = get_localontologies()[random.randint(0, 10)]  # [0]
     print("Testing with URI: %s" % ontouri)
 
-    g = ontospy.get_pickled_ontology(ontouri)
+    g = get_pickled_ontology(ontouri)
     if not g:
-        g = ontospy.do_pickle_ontology(ontouri)
+        g = do_pickle_ontology(ontouri)
 
     # getting main func dynamically
     contents = func(g, False)

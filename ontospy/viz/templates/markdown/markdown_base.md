@@ -1,6 +1,4 @@
-Vocabulary: [{{main_uri}}](index.md) 
-
-
+_Vocabulary: [{{main_uri}}](index.md)_ 
 
 ---	
 	
@@ -13,4 +11,4 @@ Vocabulary: [{{main_uri}}](index.md)
 
 ---
 
-Documentation automatically generated with [OntoSpy](http://ontospy.readthedocs.org/ "Open") on {% now "jS F Y H:i" %}
+_Documentation automatically generated on {% now "jS F Y" %} with [OntoSpy](http://ontospy.readthedocs.org/ "Open") ({{ontospy_version}})_

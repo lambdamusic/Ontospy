@@ -1,3 +1,5 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.py[cod]
 
 # C extensions
@@ -38,5 +40,6 @@ nosetests.xml
 .DS_Store
 
 dev
+venv
 
 .idea

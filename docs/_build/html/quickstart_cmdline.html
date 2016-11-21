@@ -27,10 +27,22 @@
     <link rel="prev" title="Quick Start" href="quickstart.html" />
    
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
 
   </head>
-  <body role="document">  
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">OntoSpy 1.6.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
@@ -42,9 +54,9 @@
 <p>This page shows how to use Ontospy from the command line.</p>
 <p>These are the commands available:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">ontospy</span></code>: used to launch the interactive ontospy shell, or to query a graph.</li>
-<li><code class="docutils literal"><span class="pre">ontospy-manager</span></code>: used to manage your local ontospy installation.</li>
-<li><code class="docutils literal"><span class="pre">ontospy-sketch</span></code>: (experimental) sketch a turtle model interactively.</li>
+<li><code class="docutils literal"><span class="pre">ontospy</span></code>: used to launch the Ontospy parser.</li>
+<li><code class="docutils literal"><span class="pre">ontospy-shell</span></code>: used to launch the Ontospy command line interface.</li>
+<li><code class="docutils literal"><span class="pre">ontospy-viz</span></code>: used to the launch the Ontospy visualization library.</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -53,36 +65,47 @@
 <div class="section" id="the-ontospy-command">
 <h2>The <code class="docutils literal"><span class="pre">ontospy</span></code> command<a class="headerlink" href="#the-ontospy-command" title="Permalink to this headline">¶</a></h2>
 <p>A good place to start is the -h option:</p>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy -h
-Ontospy v1.6.7
-Usage: ontospy.py [graph-uri-or-location] [options]
+<div class="highlight-shell"><div class="highlight"><pre><span></span>Usage: ontospy <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SOURCES<span class="o">]</span>...
+
+  Ontospy is a <span class="nb">command</span> line inspector <span class="k">for</span> RDF/OWL knowledge models.
+
+  Examples:
+
+  Inspect a <span class="nb">local</span> RDF file:
+
+  &gt; ontospy /path/to/mymodel.rdf
+
+  List ontologies available in the <span class="nb">local</span> library:
+
+  &gt; ontospy -l
+
+  Open FOAF vocabulary and save it to the <span class="nb">local</span> library:
+
+  &gt; ontospy http://xmlns.com/foaf/spec/ -s
+
+  More info: &lt;ontospy.readthedocs.org&gt;
 
 Options:
-  --version   show program&#39;s version number and exit
-  -h, --help  show this help message and exit
-  -l          LIBRARY: select ontologies saved in the local library
-  -v          VERBOSE: show entities labels as well as URIs
-  -b          BOOTSTRAP: save some sample ontologies into the local library
-  -i          IMPORT: save a file/folder/url into the local library
-  -w          IMPORT-FROM-REPO: import from an online directory
-  -e          EXPORT: export a model into another format (e.g. html)
-  -g          EXPORT-AS-GIST: export output as a Github Gist.
-
-Quick Examples:
-  &gt; ontospy http://xmlns.com/foaf/spec/    # ==&gt; prints info about FOAF
-  &gt; ontospy http://xmlns.com/foaf/spec/ -i # ==&gt; prints info and save local copy
-  &gt; ontospy http://xmlns.com/foaf/spec/ -g # ==&gt; exports ontology data into a github gist
-
-  For more, visit ontospy.readthedocs.org
+  -b, --bootstrap  BOOTSTRAP: bootstrap the <span class="nb">local</span> library.
+  -c, --cache      CACHE: force caching of the <span class="nb">local</span> library <span class="o">(</span><span class="k">for</span> faster
+                                   loading<span class="o">)</span>.
+  -d, --delete     DELETE: remove an ontology from the <span class="nb">local</span> library.
+  -l, --library    LIBRARY: list ontologies saved in the <span class="nb">local</span> library.
+  -s, --save       SAVE: save a file/folder/url into the <span class="nb">local</span> library.
+  -r, --reset      RESET: delete all files in the <span class="nb">local</span> library.
+  -u, --update     UPDATE: enter new path <span class="k">for</span> the <span class="nb">local</span> library.
+  -v, --verbose    VERBOSE: show entities labels as well as URIs.
+  -w, --web        WEB: import ontologies from remote repositories.
+  -h, --help       Show this message and exit.
 </pre></div>
 </div>
-<p>Just calling <code class="docutils literal"><span class="pre">ontospy</span></code> without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this <a class="reference external" href="https://vimeo.com/169707591">video</a>:</p>
-<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><p>Alternatively, you can also pass a valid graph URI as an argument to the <code class="docutils literal"><span class="pre">ontospy</span></code> command in order to print out useful ontology information:</p>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy http://www.ifomis.org/bfo/1.1
+<p>Just calling <code class="docutils literal"><span class="pre">ontospy</span></code> without any argument has the effect of listing out all RDF models saved in the local library. The first time you run it, there are none obviously so you might want to run the <code class="docutils literal"><span class="pre">ontospy</span> <span class="pre">-b</span></code> option to get started.</p>
+<p>Alternatively, you can also pass a valid graph URI as an argument to the <code class="docutils literal"><span class="pre">ontospy</span></code> command in order to print out useful ontology information:</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>&gt; ontospy http://www.ifomis.org/bfo/1.1
 
-<span class="c"># prints info about BFO resolving redirects etc..</span>
+<span class="c1"># prints info about BFO resolving redirects etc..</span>
 
-Ontospy v1.6.5.1
+Ontospy v1.7
 Local library: &lt;/Users/michele.pasin/Dropbox/ontologies/ontospy-library/&gt;
 ----------
 .. trying rdf serialization: &lt;xml&gt;
@@ -111,7 +134,7 @@ http://www.ifomis.org/bfo/1.1
 .... Basic Formal Ontology <span class="o">(</span>BFO<span class="o">)</span>
 <span class="o">=</span>&gt; http://www.w3.org/1999/02/22-rdf-syntax-ns#type
 .... http://www.w3.org/2002/07/owl#Ontology
-<span class="c">### ...etc....</span>
+<span class="c1">### ...etc....</span>
 
 
 
@@ -173,22 +196,59 @@ dc:title
 Time:      3.42s
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can pass the Ontospy command either  a single file or a folder path. In the second case it&#8217;ll try to load any RDF file found in that path (recursively). For example, the second option can be handy if you have a knowledge model which is split into multiple files.</p>
 </div>
-<div class="section" id="the-ontospy-manager-command">
-<h2>The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command<a class="headerlink" href="#the-ontospy-manager-command" title="Permalink to this headline">¶</a></h2>
-<p>This utility allows to run management operations on a local ontospy library installation.</p>
-<div class="highlight-shell"><div class="highlight"><pre>&gt; ontospy-manager
-Ontospy v1.6.7
-Usage: ontospy-manager [options]
+</div>
+<div class="section" id="the-ontospy-shell-command">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command<a class="headerlink" href="#the-ontospy-shell-command" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>&gt; ontospy-shell -h
+Usage: ontospy-shell <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SOURCE<span class="o">]</span>...
+
+  This application launches the OntoSpy interactive shell.
+
+  Note: <span class="k">if</span> a <span class="nb">local</span> path or URI of an RDF model is provided, that gets loaded
+  into the shell by default. E.g.:
+
+  &gt; ontospy-shell path/to/mymodel.rdf
 
 Options:
-  --version   show program&#39;s version number and exit
-  -h, --help  show this help message and exit
-  -l          LIST: show ontologies saved in the local library.
-  -c          CACHE: force caching of the local library (for faster loading)
-  -u          UPDATE: enter new path for the local library.
-  -d          DELETE: remove a single ontology file from the local library.
-  -e          ERASE: reset the local library (delete all files)
+  -h, --help  Show this message and exit.
+</pre></div>
+</div>
+<p>Calling <code class="docutils literal"><span class="pre">ontospy-shell</span></code> without any argument launches the shell. The shell is an interactive environment that lets you import, load and inspect vocabularies. For more examples on how that works, take a look at this <a class="reference external" href="https://vimeo.com/169707591">video</a>:</p>
+<iframe src="https://player.vimeo.com/video/169707591" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><p>Note: you can pass an argument in order to pre-load an RDF graph into the interactive session.</p>
+</div>
+<div class="section" id="the-ontospy-viz-command">
+<h2>The <code class="docutils literal"><span class="pre">ontospy-viz</span></code> command<a class="headerlink" href="#the-ontospy-viz-command" title="Permalink to this headline">¶</a></h2>
+<p>This utility allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>&gt; ontospy-viz -h
+Usage: ontospy-viz <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>SOURCE<span class="o">]</span>...
+
+  This application launches the OntoSpy visualization tool.
+
+  Example:      &gt; ontospy-viz path/to/mymodel.rdf
+
+  Note: <span class="k">if</span> the location of an RDF model is not provided, a selection can be
+  made from the contents of the <span class="nb">local</span> ontospy library folder.
+
+Options:
+  -o, --outputpath TEXT  Output path <span class="o">(</span>default: home folder<span class="o">)</span>
+  -h, --help             Show this message and exit.
+</pre></div>
+</div>
+<p>Some of the export options are still quite experimental, so it&#8217;s advisable to try out more than one if you&#8217;re not happy with the results.</p>
+<div class="highlight-shell"><div class="highlight"><pre><span></span>1<span class="o">)</span> Javadoc
+2<span class="o">)</span> Markdown
+3<span class="o">)</span> Split Columns
+4<span class="o">)</span> Dendogram
+5<span class="o">)</span> Pack Hierarchy
+6<span class="o">)</span> Bubble Chart
+7<span class="o">)</span> Cluster Tree
+8<span class="o">)</span> Bar Hierarchy
+9<span class="o">)</span> Partition Table
+10<span class="o">)</span> Tree Pie
 </pre></div>
 </div>
 </div>
@@ -219,27 +279,22 @@ Options:
 </p>
 
 
-
-
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Command Line Usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#the-ontospy-command">The <code class="docutils literal"><span class="pre">ontospy</span></code> command</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-ontospy-manager-command">The <code class="docutils literal"><span class="pre">ontospy-manager</span></code> command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-ontospy-shell-command">The <code class="docutils literal"><span class="pre">ontospy-shell</span></code> command</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-ontospy-viz-command">The <code class="docutils literal"><span class="pre">ontospy-viz</span></code> command</a></li>
 </ul>
 </li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="quickstart.html" title="previous chapter">Quick Start</a></li>
-  </ul></li>
-</ul>
-</div>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">Quick Start</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
@@ -261,12 +316,12 @@ Options:
       &copy;2015-2016, Michele Pasin.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
       
       |
       <a href="_sources/quickstart_cmdline.txt"
-          rel="nofollow">Page source</a>
+          rel="nofollow">Page source</a></li>
     </div>
 
     
