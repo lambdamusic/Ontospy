@@ -99,9 +99,10 @@ class Shell(cmd.Cmd):
     ruler = '-'
     maxcol = 80
 
-    INFO_OPTS = ['toplayer', 'parents', 'children', 'ancestors', 'descendants', 'inferred_usage']
+    INFO_OPTS = [ 'namespaces', 'toplayer', 'parents', 'children', 'ancestors', 'descendants', 'inferred_usage']
     SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
-    LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts', 'namespaces']
+    LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
+    TREE_OPTS = ['classes', 'properties', 'concepts']
     GET_OPTS = ['ontology', 'class', 'property', 'concept']
     FILE_OPTS = ['rename', 'delete']
     IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack',]
@@ -785,45 +786,74 @@ class Shell(cmd.Cmd):
             self._help_noontology()
             return
 
-        elif line[0] == "namespaces":
-            for x in self.current['graph'].namespaces:
-                self._print("@prefix %s: <%s> ." % (x[0], x[1]))
-
         elif line[0] == "classes":
             g = self.current['graph']
 
             if g.classes:
-                if len(line) > 1 and line[1] == "tree":
-                    g.printClassTree(showids=False, labels=False, showtype=True)
-                    self._print("----------------", "TIP")
-                else:
-                    self._select_class(_pattern)
+                self._select_class(_pattern)
             else:
                 self._print("No classes available.")
 
         elif line[0] == "properties":
             g = self.current['graph']
             if g.properties:
-                if len(line) > 1 and line[1] == "tree":
-                    g.printPropertyTree(showids=False, labels=False, showtype=True)
-                else:
-                    self._select_property(_pattern)
+                self._select_property(_pattern)
             else:
                 self._print("No properties available.")
 
         elif line[0] == "concepts":
             g = self.current['graph']
             if g.skosConcepts:
-                if len(line) > 1 and line[1] == "tree":
-                    g.printSkosTree(showids=False, labels=False, showtype=True)
-                else:
-                    self._select_concept(_pattern)
+                self._select_concept(_pattern)
             else:
                 self._print("No concepts available.")
 
         else: # should never arrive here
             pass
 
+
+    def do_tree(self, line):
+        """Shows entities of a given kind."""
+        opts = self.TREE_OPTS
+        line = line.split()
+        _pattern = ""
+
+        if not self.current:
+            self._help_noontology()
+            return
+            
+        if len(line) == 0:
+            # default contextual behaviour [2016-03-01]
+            line = ["classes"]
+
+        if line[0] not in opts:
+            self.help_tree()
+            return
+
+        elif line[0] == "classes":
+            g = self.current['graph']
+            if g.classes:
+                g.printClassTree(showids=False, labels=False, showtype=True)
+                self._print("----------------", "TIP")
+            else:
+                self._print("No classes available.")
+
+        elif line[0] == "properties":
+            g = self.current['graph']
+            if g.properties:
+                g.printPropertyTree(showids=False, labels=False, showtype=True)
+            else:
+                self._print("No properties available.")
+
+        elif line[0] == "concepts":
+            g = self.current['graph']
+            if g.skosConcepts:
+                g.printSkosTree(showids=False, labels=False, showtype=True)
+            else:
+                self._print("No concepts available.")
+
+        else: # should never arrive here
+            pass
 
     def do_get(self, line):
         """Finds entities matching a given string pattern. \nOptions: [ ontologies | classes | properties | concepts ]"""
@@ -922,6 +952,10 @@ class Shell(cmd.Cmd):
                 for x in g.toplayerSkosConcepts:
                     self._print(x.qname)
 
+        elif line[0] == "namespaces":
+            for x in self.current['graph'].namespaces:
+                self._print("@prefix %s: <%s> ." % (x[0], x[1]))
+                
         elif line[0] == "parents":
             if self.currentEntity and self.currentEntity['object'].parents():
                 for x in self.currentEntity['object'].parents():
@@ -1101,7 +1135,7 @@ class Shell(cmd.Cmd):
             self.current = None
             self.prompt = _get_prompt()
 
-    def do_q(self, line):
+    def do_quit(self, line):
         "Quit: exit the OntoSpy shell"
         self._clear_screen()
         return True
@@ -1149,11 +1183,15 @@ class Shell(cmd.Cmd):
     def help_ls(self):
         txt = "List available graphs or entities .\n"
         txt += "==> Usage: ls [%s]" % "|".join([x for x in self.LS_OPTS])
-        txt += "\n\nUsing the *tree* keyword allows to list the taxonomical relationships for a selected entity type .\n"
-        txt += "==> Usage: ls [%s] tree" % "|".join([x for x in self.LS_OPTS if x in ["classes", "properties", "concepts"]])
         txt += "\n\nNote: ls is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
         self._print(txt)
 
+    def help_tree(self):
+        txt = "Print the type hierarchy for an entity type.\n"
+        txt += "==> Usage: tree [%s]" % "|".join([x for x in self.TREE_OPTS])
+        # txt += "\n\nNote: tree is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
+        self._print(txt)
+        
     def help_import(self):
         txt = "Import an ontology from a remote repository or directory.\n"
         txt += "==> Usage: import [%s]" % "|".join([x for x in self.IMPORT_OPTS])
@@ -1215,6 +1253,20 @@ class Shell(cmd.Cmd):
                             ]
         return completions
 
+    def complete_tree(self, text, line, begidx, endidx):
+        """completion for ls command"""
+
+        options = self.TREE_OPTS
+
+        if not text:
+            completions = options
+        else:
+            completions = [ f
+                            for f in options
+                            if f.startswith(text)
+                            ]
+        return completions
+    
     def complete_get(self, text, line, begidx, endidx):
         """completion for find command"""
 
