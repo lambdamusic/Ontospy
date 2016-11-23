@@ -115,6 +115,8 @@ class Shell(cmd.Cmd):
         self.currentEntity = {'name' : obj.locale or obj.uri, 'object' : obj, 'type' : 'class'}
                                                                     # or 'property' or 'concept'
         """
+        # init repo if necessary
+        manager.get_or_create_home_repo()
         # useful vars
         self.LOCAL = ONTOSPY_LOCAL
         self.LOCAL_MODELS = manager.get_home_location()
@@ -1364,7 +1366,7 @@ def main():
 
     Shell()._clear_screen()
     print(Style.BRIGHT + "** OntoSpy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
-    manager.get_or_create_home_repo()
+    # manager.get_or_create_home_repo()
     Shell().cmdloop()
     raise SystemExit(1)
 

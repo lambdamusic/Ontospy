@@ -32,6 +32,7 @@ def get_or_create_home_repo(reset=False):
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL)):
 		os.mkdir(ONTOSPY_LOCAL)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)):
+		# print "HERE"
 		os.mkdir(ONTOSPY_LOCAL_CACHE)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):
 		os.mkdir(ONTOSPY_LOCAL_VIZ)
