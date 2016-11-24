@@ -113,6 +113,7 @@ More info: <ontospy.readthedocs.org>
     
     if bootstrap:
         action_bootstrap()
+        printDebug("Tip: you can now load an ontology by typing `ontospy -l`", "important")
         # raise SystemExit(1)
 
     elif cache:
@@ -164,7 +165,7 @@ More info: <ontospy.readthedocs.org>
         
     else:
         if not sources:
-            click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='white')
+            click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
             filename = action_listlocal(all_details=False)
             if filename:
                 g = get_pickled_ontology(filename)

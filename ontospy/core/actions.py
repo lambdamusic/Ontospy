@@ -64,7 +64,7 @@ def action_listlocal(all_details=True):
     counter = 1
     # printDebug("------------------", 'comment')
     if not options:
-        printDebug("Your local library is empty. Use 'ontospy -s <uri>' to add more ontologies to it.")
+        printDebug("Your local library is empty. Use 'ontospy --bootstrap' to add some ontologies to it.")
         return
     else:
         if all_details:
@@ -383,7 +383,7 @@ def action_bootstrap():
                 action_import(uri, verbose=False)
             except:
                 printDebug("OPS... An Unknown Error Occurred - Aborting Installation")
-        printDebug("----------\n" + "Completed (note: you can load an ontology by typing `ontospy -l`)", "comment")
+        printDebug("\n==========\n" + "Bootstrap command completed.", "important")
         return True
     else:
         printDebug("--------------")

@@ -84,12 +84,16 @@ ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
 BOOTSTRAP_ONTOLOGIES = [
 	"http://xmlns.com/foaf/spec/" ,
 	"http://purl.org/dc/terms/" ,
-	"http://purl.uniprot.org/core/" ,
-	"http://purl.org/spar/cito/" ,
-	"http://ns.nature.com/terms/" ,
-
+	"http://rdfs.org/sioc/ns#",
+	"http://www.w3.org/2008/05/skos#",
+	"http://rdfs.org/ns/void#",
+	"http://purl.org/goodrelations/v1",
 	"http://www.ontologydesignpatterns.org/ont/dul/DUL.owl",
 	"http://www.ifomis.org/bfo/1.1",
-	"http://topbraid.org/schema/schema.ttl",
-	"http://www.cidoc-crm.org/rdfs/cidoc_crm_v6.0-draft-2015January.rdfs",
+	#
+	# "http://topbraid.org/schema/schema.ttl",
+	# "http://www.cidoc-crm.org/rdfs/cidoc_crm_v6.0-draft-2015January.rdfs",
+	# "http://purl.uniprot.org/core/",
+	# "http://purl.org/spar/cito/",
+	# "http://ns.nature.com/terms/",
 ]
