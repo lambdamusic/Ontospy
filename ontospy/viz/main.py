@@ -16,7 +16,7 @@ import click
 # http://click.pocoo.org/5/options/
 from .. import *  # imports __init__
 from ..core import actions
-
+from ..core.manager import get_home_location
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -42,6 +42,9 @@ Note: if the location of an RDF model is not provided, a selection can be made f
 
     if source and len(source) > 1:
         click.secho('Note: currently only one argument can be passed', fg='red')
+
+    if not source:
+        click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
 
     url = actions.action_visualize(source, fromshell=False, path=outputpath)
 

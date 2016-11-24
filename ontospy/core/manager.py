@@ -27,12 +27,13 @@ def get_or_create_home_repo(reset=False):
 				shutil.rmtree(ONTOSPY_LOCAL)
 				dosetup = True
 			else:
-				var == "n"
+				pass
 
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL)):
 		os.mkdir(ONTOSPY_LOCAL)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)):
-		os.mkdir(ONTOSPY_LOCAL_CACHE)
+		# print "HERE"
+		os.makedirs(ONTOSPY_LOCAL_CACHE)
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):
 		os.mkdir(ONTOSPY_LOCAL_VIZ)
 	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)):
@@ -96,8 +97,6 @@ def get_localontologies():
 			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
 				if not f.startswith(".") and not f.endswith(".pickle"):
 					res += [f]
-	else:
-		print("No local library found. Use the --reset command")
 	return res
 
 
@@ -161,7 +160,7 @@ def do_pickle_ontology(filename, g=None):
 		try:
 			sys.setrecursionlimit(sys.getrecursionlimit()*10)
 			cPickle.dump(g, open(pickledpath, "wb"))
-			print(Fore.GREEN + "Cached <%s>" % pickledpath + "..." + Style.RESET_ALL)
+			# print(Fore.GREEN + "Cached <%s>" % pickledpath + "..." + Style.RESET_ALL)
 		except Exception as e:
 			print(Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL)
 			print(str(e))

@@ -108,7 +108,7 @@ class Ontospy(object):  # Graph
     # === main method === #
     # ------------
 
-    def _scan(self, verbose=True, hide_base_schemas=True):
+    def _scan(self, verbose=False, hide_base_schemas=True):
         """
         scan a source of RDF triples
         build all the objects to deal with the ontology/ies pythonically
