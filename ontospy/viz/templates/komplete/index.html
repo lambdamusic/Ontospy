@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+    {% with thispage="home" %}
+
+    {% include "navbar.html" %}
+
+    {% endwith %}
+
+{% endblock navbar %}
+
+
+  {% block bodycontent %}
+
+        <div class="page-header">
+
+        <div class="row">
+
+            <div class="col-md-10">
+                <h1>Ontospy Viz  <small><code>{{ main_uri }}</code></small></h1>
+            </div>
+            <div class="col-md-2">
+
+
+            </div>
+
+
+        </div></div>
+
+
+
+      	<div class="row">
+
+			<div class="col-md-6">
+
+
+				<div class="well">
+					<h4>About</h4>
+					<p class="lead">This site hosts a number of experimental tools and visualizations of the content available on nature.com.</p>
+
+					<p>If you have questions or comments you can get in touch with <a href="https://twitter.com/lambdaman">Michele Pasin</a>.</p>
+
+
+
+					<br />
+
+
+				</div>
+			</div>
+
+			<div class="col-md-6">
+
+				<p class="alert alert-warning" role="alert">
+					<b>Disclaimer</b>: The prototypes listed below haven't been tested extensively nor are guaranteed to always work. For the best results, it is advised to use a modern browser like <a href="https://www.google.com/chrome/browser/">Google Chrome</a>.
+				</p>
+
+
+			</div>
+		</div>
+
+
+
+
+
+    {% include "viz_list.html" %}
+
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
