@@ -62,8 +62,7 @@ def run(graph, save_on_github=False, main_entity=None):
 if __name__ == '__main__':
     import sys
     try:
-        # script for testing - must launch this module
-        # >python -m viz.viz_packh
+        # TESTING THIS MODULE WITH A FEW HARDWIRED PATHS
 
         TEST_PATH = "/Users/michele.pasin/Desktop/temp/"
         # if False:
@@ -81,13 +80,12 @@ if __name__ == '__main__':
         import shutil
         print("..cleaning up")
         os.remove(TEST_PATH+"static_komplete.zip")
-        shutil.rmtree(TEST_PATH+"__MACOSX")  # http://superuser.com/questions/104500/what-is-macosx-folder
+        # http://superuser.com/questions/104500/what-is-macosx-folder
+        shutil.rmtree(TEST_PATH+"__MACOSX")
         
         func = locals()["run"] # main func dynamically
         run_test_viz(func, filename="index.html", path=TEST_PATH)
-        
-
-            
+   
         sys.exit(0)
 
     except KeyboardInterrupt as e: # Ctrl-C
