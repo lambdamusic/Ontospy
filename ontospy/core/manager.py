@@ -3,6 +3,7 @@
 
 from .. import *
 from colorama import Fore, Style
+import random
 
 
 # ===========
@@ -98,6 +99,16 @@ def get_localontologies():
 				if not f.startswith(".") and not f.endswith(".pickle"):
 					res += [f]
 	return res
+
+
+def get_random_ontology(TOP_RANGE=10):
+	"""for testing purposes. Returns a random ontology/graph"""
+	ontouri = get_localontologies()[random.randint(0, TOP_RANGE)]  # [0]
+	print("Testing with URI: %s" % ontouri)
+	g = get_pickled_ontology(ontouri)
+	if not g:
+		g = do_pickle_ontology(ontouri)
+	return ontouri, g
 
 
 def get_pickled_ontology(filename):

@@ -174,31 +174,6 @@ def _copyStaticFiles(files_list, path, folder="static"):
         copyfile(source_f, dest_f)
 
 
-#
-# def run_viz(g, viz_index, save_gist=False, main_entity=None):
-#     """
-#     Main wrapper function for calling the visualizations
-#
-#     Note: dependent on VISUALIZATIONS_LIST
-#
-#     :param g: graph instance
-#     :param viztype: a number passed from the user
-#     :param save_gist: a flag (just to extra info printed on template)
-#     :return: string contents of html file (the viz)
-#     """
-#
-#     # import module dynamically based on ID field in config
-#     import importlib
-#     module_name = VISUALIZATIONS_LIST[viz_index]['ID']
-#     i = importlib.import_module(".viz_" + module_name, "ontospy.viz")
-#
-#     contents = i.run(g, save_gist, main_entity)
-#     return contents
-#
-
-
-
-
 
 def saveVizLocally(contents, filename="index.html", path=None):
     if not path:
