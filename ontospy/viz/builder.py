@@ -41,6 +41,7 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
                 ONTOSPY_VIZ_TEMPLATES + "splitter",
                 ONTOSPY_VIZ_TEMPLATES + "markdown",
                 ONTOSPY_VIZ_TEMPLATES + "komplete",
+                ONTOSPY_VIZ_TEMPLATES + "dashboard",
             ],
             'APP_DIRS': True,
             'OPTIONS': {

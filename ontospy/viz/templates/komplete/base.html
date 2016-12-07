@@ -17,10 +17,10 @@
 	{% endblock pagetitle %}
 
     <!-- Bootstrap core CSS -->
-    <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">  -->
     <!-- Bootswatch:  -->
     <!-- cerulean  | cyborg |  flatly |  lumen |  sandstone |   spacelab  |  yeti | cosmo |  darkly |  paper | simplex | superhero |  journal | readable  |   slate |  united -->
-{#    <link href="{{STATIC_URL}}libs/bootswatch3.2/flatly/bootstrap.min.css" rel="stylesheet">#}
+    <link href="{{STATIC_URL}}libs/bootswatch3.2/lumen/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -132,7 +132,8 @@
   <footer class="footer">
     <div class="container">
     {% block footer %}
-      <p class="text-muted">Ontospy export &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright Michele Pasin 2016.</p>
+      <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="http://ontospy.readthedocs.org/">OntoSpy</a> ({{ontospy_version}})</p>
+
     {% endblock footer %}  
     </div>
   </footer>

@@ -8,7 +8,7 @@
 
 
 
-# from .. import *
+from .. import *
 from ..core.utils import *
 from ..core.manager import *
 
@@ -113,16 +113,7 @@ class VizFactory(object):
     
         t = Template(ontotemplate.read())
     
-        c = Context({
-            "STATIC_URL": "static/",
-            "ontology": self.ontospy_graph.sources,
-            "classes": self.ontospy_graph.classes,
-            "objproperties": self.ontospy_graph.objectProperties,
-            "dataproperties": self.ontospy_graph.datatypeProperties,
-            "annotationproperties": self.ontospy_graph.annotationProperties,
-            "skosConcepts": self.ontospy_graph.skosConcepts,
-            "instances": []
-        })
+        c = self.get_basic_context()
     
         rnd = t.render(c)
         contents = safe_str(rnd)
@@ -147,7 +138,25 @@ class VizFactory(object):
             webbrowser.open(self.final_url)
         else:
             printDebug("Nothing to preview")
-    
+
+
+    def get_basic_context(self):
+        """util to return a standard context for a django template to render"""
+        c = Context({
+            "STATIC_URL": "static/",
+            "ontospy_version": VERSION,
+            "ontologies": self.ontospy_graph.ontologies,
+            "sources": self.ontospy_graph.sources,
+            "classes": self.ontospy_graph.classes,
+            "objproperties": self.ontospy_graph.objectProperties,
+            "dataproperties": self.ontospy_graph.datatypeProperties,
+            "annotationproperties": self.ontospy_graph.annotationProperties,
+            "skosConcepts": self.ontospy_graph.skosConcepts,
+            "instances": []
+        })
+        return c
+
+
     def _save2File(self, contents, filename, path):
         filename = os.path.join(path, filename)
         f = open(filename, 'wb')
@@ -193,7 +202,10 @@ import zipfile
 import os
 import shutil
 
-class TopLevelScaffolding(VizFactory):
+
+
+
+class BasicDashboard(VizFactory):
     """
 
     """
@@ -202,14 +214,48 @@ class TopLevelScaffolding(VizFactory):
         """
         Init
         """
-        super(TopLevelScaffolding, self).__init__(ontospy_graph)
-        self.template_name = "komplete/index.html"
-        self.main_file_name = "index.html"
-        self.static_files = ["static_komplete.zip" ]
+        super(BasicDashboard, self).__init__(ontospy_graph)
+        self.static_files = ["static_komplete.zip"]
 
-    # OVERRIDING THIS METHOD
+    def _buildTemplates(self):
+        """
+        OVERRIDING THIS METHOD
+        """
+
+        ontotemplate_index = open(ONTOSPY_VIZ_TEMPLATES + "komplete/index.html", "r")
+        FILE_NAME = "index.html"
+        t = Template(ontotemplate_index.read())
+        c = self.get_basic_context()
+        rnd = t.render(c)
+        contents = safe_str(rnd)
+        main_url = self._save2File(contents, FILE_NAME, self.output_path)
+
+        ontotemplate_dashboard = open(ONTOSPY_VIZ_TEMPLATES + "komplete/dashboard.html", "r")
+        FILE_NAME = "dashboard.html"
+        t = Template(ontotemplate_dashboard.read())
+        c = self.get_basic_context()
+        rnd = t.render(c)
+        contents = safe_str(rnd)
+        self._save2File(contents, FILE_NAME, self.output_path)
+
+
+        ontotemplate_vizlist = open(ONTOSPY_VIZ_TEMPLATES + "komplete/viz_list.html", "r")
+        FILE_NAME = "visualizations.html"
+        t = Template(ontotemplate_vizlist.read())
+        c = self.get_basic_context()
+        rnd = t.render(c)
+        contents = safe_str(rnd)
+        self._save2File(contents, FILE_NAME, self.output_path)
+
+        return main_url
+
+
+
     def _buildStaticFiles(self, static_folder=""):
-        """ move over static files so that relative imports work """
+        """
+        OVERRIDING THIS METHOD
+        so that the zip file is extracted too
+        """
         static_path = os.path.join(self.output_path, static_folder)
         if not os.path.exists(static_path):
             os.makedirs(static_path)
@@ -218,29 +264,16 @@ class TopLevelScaffolding(VizFactory):
             dest_f = os.path.join(static_path, x)
             copyfile(source_f, dest_f)
 
- 
         print("..unzipping")
         zip_ref = zipfile.ZipFile(os.path.join(static_path, "static_komplete.zip"), 'r')
         zip_ref.extractall(static_path)
         zip_ref.close()
-
 
         print("..cleaning up")
         os.remove(os.path.join(static_path, "static_komplete.zip"))
         # http://superuser.com/questions/104500/what-is-macosx-folder
         shutil.rmtree(os.path.join(static_path, "__MACOSX"))
         # shutil.rmtree(static_path + "__MACOSX")
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -252,7 +285,7 @@ if __name__ == '__main__':
     
         uri, g = get_random_ontology()
         
-        v = TopLevelScaffolding(g)
+        v = BasicDashboard(g)
         v.build()
         v.preview()
         

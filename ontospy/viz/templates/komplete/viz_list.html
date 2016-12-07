@@ -1,3 +1,52 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+    {% with thispage="visualizations" %}
+
+    {% include "navbar.html" %}
+
+    {% endwith %}
+
+{% endblock navbar %}
+
+
+  {% block bodycontent %}
+
+        <div class="page-header">
+
+        <div class="row">
+
+            <div class="col-md-10">
+                <h3>
+                <small><b>Ontolog{{ ontologies|pluralize:"y,ies" }}:</b></small>
+                    {% for foo in ontologies %}
+                        <br />
+                        <code>{{ foo.uri }}</code>
+                    {% endfor %}
+                </h3>
+
+                <h3>
+                <small><b>Data Source{{ sources|pluralize }}:</b></small>
+                    {% for foo in sources %}
+                        <br />
+                        <code>{{ foo }}</code>
+                    {% endfor %}
+                </h3>
+            </div>
+
+            <div class="col-md-2">
+            </div>
+
+
+        </div>
+        </div>
+
+
+
+
+
 
 
 
@@ -241,7 +290,24 @@
 
 
 
-
-
-
     </div>
+
+
+
+
+
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
