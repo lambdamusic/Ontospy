@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+    {% with thispage="dashboard" %}
+
+    {% include "navbar.html" %}
+
+    {% endwith %}
+
+{% endblock navbar %}
+
+
+  {% block bodycontent %}
+
+        <div class="page-header">
+
+{#            {% include "onto_header.html" %}#}
+
+        <h3>Dashboard</h3>
+
+        </div>
+
+
+
+
+
+
+
+
+
+        <div class="row">
+
+
+            {% if ontologies%}
+
+           {% for ontology in ontologies %}
+
+           <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Ontology Metadata</h3>
+            </div>
+            <div class="panel-body">
+              <h5><code>{{ ontology.uri }}</code></h5>
+              <br />
+
+                {% if ontology.annotations %}
+                    <dl>
+                        {% for each in ontology.annotations %}
+                            {% ifchanged each.1 %}<dt>{{each.1}}</dt>{% endifchanged %}
+                            <dd>{{each.2}}</dd>
+                        {% endfor %}
+                    </dl>
+                {% else %}
+                    <i>No metadata available</i>
+                {% endif %}
+            </div>
+          </div>
+          </div>
+           {% endfor %}
+        {% endif %}
+
+
+        {% if namespaces %}
+          <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Namespaces</h3>
+            </div>
+            <div class="panel-body" style="overflow: auto;">
+               <dl class="dl-horizontal" style="--margin-left: -100px;">
+
+               {% for x, y in namespaces  %}
+                   <dt><code>{{x|default:":"}}</code></dt>
+                   <dd><a href="{{y}}" target="_blank">{{y}}</a></dd>
+
+               {% endfor %}
+
+              </dl>
+            </div>
+          </div>
+          </div>
+          {% endif %}
+
+
+
+           <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Metrics</h3>
+            </div>
+            <div class="panel-body">
+                <dl>
+                 {% for each in stats %}
+
+
+                      <dt>{{each.0}}</dt>
+                      <dd>{{each.1}}</dd>
+
+
+                    {% endfor %}
+                </dl>
+            </div>
+          </div>
+          </div>
+
+
+
+
+
+           <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Entity Types</h3>
+            </div>
+            <div class="panel-body">
+
+
+                <div class="row">
+
+
+                    <div class="col-sm-3 col-md-3 ">
+
+
+                        <p id="chartsLegend">
+                            <span id="legendEntities" ></span>
+                        </p>
+
+                    </div>
+
+                    <canvas id="entitiesStats" height="300"></canvas>
+
+
+
+
+                </div>
+
+
+            </div>
+          </div>
+          </div>
+
+
+          <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Top Layer</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="col-sm-3 col-md-3 ">
+                    <p style="" id="chartsLegend">
+                        <span class="text-muted" style="text-transform: uppercase;">Top Classes</span> <span id="legendToplayer"></span>
+                    </p>
+
+                </div>
+
+                <div class="">
+                    <canvas id="toplayer" height="300"></canvas>
+                </div>
+            </div>
+          </div>
+          </div>
+
+
+
+           <div class="col-md-6">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Triples</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="col-sm-3 col-md-3 ">
+                    <p id="chartsLegend">
+                        <span class="text-muted" style="text-transform: uppercase;">Triples</span>
+                        <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount}}</span>
+                    </p>
+                </div>
+
+	        	<canvas id="triplesStats" height="300"></canvas>
+
+            </div>
+          </div>
+          </div>
+
+
+
+          </div>
+
+
+
+
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
+
+
+{# ONTO STATS have this format  @TODO CHECK #}
+{# 	 #}
+{# 	out += [("Triples", len(self.rdfGraph))] #}
+{# 	out += [("Classes", len(self.allclasses))] #}
+{# 	out += [("Object Properties", len(self.allobjproperties))] #}
+{# 	out += [("Datatype Properties", len(self.alldataproperties))] #}
+{# 	out += [("Individuals", len(self.allinstances))] #}
+
+
+
+
+
+{% block extrajs %}
+
+
+
+<script type="text/javascript">
+
+    // utility to assign colors dynamically at js level
+
+    function getColor(i) {
+        var colors = [["#F7464A", "#FF5A5E"],    // color , highlightColor
+                       ["#46BFBD", "#5AD3D1"],
+                       ["#FDB45C", "#FFC870"],
+                       ["#6588A8", "#CCD3FF"],
+                       ["#6960EC", "#736AFF"],
+                       ["#FFA62F", "#FBB917"],
+                       ["#7D0552", "#7E354D"],
+                       ["#FDB45C", "#FFC870"],
+                        ];
+        return colors[i]
+    }
+
+
+
+// FIRST CHART : types of entities
+
+
+	var ctx = document.getElementById("entitiesStats").getContext("2d");
+
+    var data = [
+            {% for each in stats %}
+                {% if each.0 != "Triples"  %}
+                {
+                    value: {{each.1}},
+                    color: getColor({{ forloop.counter0 }})[0],
+                    highlight: getColor({{ forloop.counter0 }})[1],
+                    label: "{{each.0}}"
+                }
+                {% if not forloop.last %} , {% endif %}
+                {% endif %}
+            {% endfor %}
+    ]
+
+	var myDoughnutChart = new Chart(ctx).Doughnut(data);
+
+	legend(document.getElementById('legendEntities'), data);
+
+
+
+
+// SECOND CHART: triples
+
+	var ctx2 = document.getElementById("triplesStats").getContext("2d");
+	var data2 = {
+	    labels: ["Triples"],
+	    datasets: [
+	        {
+	            label: "Triples",
+	            fillColor: "rgb(202, 203, 239)",
+	            strokeColor: "rgb(119, 160, 197)",
+	            highlightFill: "rgb(119, 160, 197)",
+	            highlightStroke: "rgb(30, 105, 173)",
+	            data: [{{ontospy_graph.triplesCount}}]
+
+	        }
+	    ]
+	};
+	var myBarChart = new Chart(ctx2).Bar(data2);
+
+
+
+
+// THIRD CHART : top layer
+
+	var ctx3 = document.getElementById("toplayer").getContext("2d");
+	var data3 = [
+
+		{% for class in ontospy_graph.toplayer %}
+
+		    {
+		        value: 1,
+		        color: "rgb(253, 130, 130)",
+		        highlight: "rgb(252, 177, 177)",
+		        label: "{{class.bestLabel|safe}}",
+		    }
+
+			{% if not forloop.last %} , {% endif %}
+
+		{% endfor %}
+
+	]
+
+
+	var myPieChart = new Chart(ctx3).Pie(data3);
+
+	legend(document.getElementById('legendToplayer'), data3);
+
+
+
+</script>
+
+
+
+{% endblock extrajs %}
