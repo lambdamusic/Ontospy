@@ -87,6 +87,28 @@
 		}
 
 
+        /* styles for chart.js */
+
+
+        #legendEntities.legend {
+        /*    width: 10em;*/
+        /*    border: 1px solid black;*/
+        }
+
+        #chartsLegend .legend .title {
+        /*    display: block;">{*/
+            margin: 0.5em;
+            border-style: solid;
+            border-width: 0 0 0 1em;
+            padding: 0 0.3em;
+        }
+
+        #chartsLegend span.title {
+            display:block ;
+        }
+
+
+
 </style>
 
   </head>
@@ -147,6 +169,9 @@
     
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script src="{{ STATIC_URL }}libs/chart.js-master/Chart.js"></script>
+	<script src="{{ STATIC_URL }}libs/chart.js.legend-master/src/legend.js"></script>
 
 
 

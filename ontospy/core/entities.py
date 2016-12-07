@@ -148,7 +148,7 @@ class RDF_Entity(object):
         return list(self.rdfgraph.objects(None, aPropURIRef))
 
 
-    def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=True):
+    def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=False):
         """
         facility for extrating the best available label for an entity
 

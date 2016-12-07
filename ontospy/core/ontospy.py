@@ -149,7 +149,7 @@ class Ontospy(object):  # Graph
         """
         out = []
         try:
-            out += [("Triples", len(self.rdfgraph))]
+            out += [("Triples", self.triplesCount())]
         except:
             pass
         out += [("Classes", len(self.classes))]
@@ -161,7 +161,9 @@ class Ontospy(object):  # Graph
         # out += [("Individuals", len(self.instances))]
         return out
 
-        
+    def triplesCount(self):
+        return len(self.rdfgraph)
+
 
     def __extractOntologies(self, exclude_BNodes = False, return_string=False):
         """

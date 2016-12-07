@@ -145,6 +145,9 @@ class VizFactory(object):
         c = Context({
             "STATIC_URL": "static/",
             "ontospy_version": VERSION,
+            "ontospy_graph": self.ontospy_graph,
+            "namespaces": self.ontospy_graph.namespaces,
+            "stats": self.ontospy_graph.stats,
             "ontologies": self.ontospy_graph.ontologies,
             "sources": self.ontospy_graph.sources,
             "classes": self.ontospy_graph.classes,

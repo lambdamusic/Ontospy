@@ -16,31 +16,8 @@
 
         <div class="page-header">
 
-        <div class="row">
+            {% include "onto_header.html" %}
 
-            <div class="col-md-10">
-                <h3>
-                <small><b>Ontolog{{ ontologies|pluralize:"y,ies" }}:</b></small>
-                    {% for foo in ontologies %}
-                        <br />
-                        <code>{{ foo.uri }}</code>
-                    {% endfor %}
-                </h3>
-
-                <h3>
-                <small><b>Data Source{{ sources|pluralize }}:</b></small>
-                    {% for foo in sources %}
-                        <br />
-                        <code>{{ foo }}</code>
-                    {% endfor %}
-                </h3>
-            </div>
-
-            <div class="col-md-2">
-            </div>
-
-
-        </div>
         </div>
 
 
