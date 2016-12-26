@@ -95,7 +95,6 @@ setup(
         'requests',
         'pyfiglet',
         'click',
-        'colorama', 
         'pygments',
 	],
 

@@ -33,7 +33,7 @@ from .entities import *
 from .queryHelper import QueryHelper
 
 
-class Ontospy(object):  # Graph
+class Ontospy(object):
     """
     Object that scan an rdf graph for schema definitions (aka 'ontologies')
 
