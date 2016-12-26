@@ -143,15 +143,9 @@ class Ontospy(object):
     def stats(self):
         """ shotcut to pull out useful info for a graph 
 
-        2016-08-18 the try/except is a dirty solution to a problem
-        emerging with counting graph lenght on cached Graph objects..
-        TODO: investigate what's going on..
         """
         out = []
-        try:
-            out += [("Triples", self.triplesCount())]
-        except:
-            pass
+        out += [("Triples", self.triplesCount())]
         out += [("Classes", len(self.classes))]
         out += [("Properties", len(self.properties))]
         out += [("Annotation Properties", len(self.annotationProperties))]
@@ -162,7 +156,18 @@ class Ontospy(object):
         return out
 
     def triplesCount(self):
-        return len(self.rdfgraph)
+        """
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph length on cached Graph objects..
+        """
+        # @todo  investigate what's going on..
+        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        try:
+            return len(self.rdfgraph)
+        except:
+            click.secho("Ontospy: error counting graph length..", fg="red")
+            return 0
 
 
     def __extractOntologies(self, exclude_BNodes = False, return_string=False):

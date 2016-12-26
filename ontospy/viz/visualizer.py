@@ -40,7 +40,6 @@ from shutil import copyfile
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST
-    
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
     click.secho("Visualizations configuration file not found.", fg="red")
@@ -79,8 +78,9 @@ MAYBE call them all 'RENDERER' or 'TRANSFORMER'
 
 class VizFactory(object):
     """
-    2016-12-01: attempt to rationalize the dataviz functions
+    Object encapsulating common methods for building HTML visualizations
 
+    Subclass and override as needed.
     """
     
     def __init__(self, ontospy_graph):
@@ -91,7 +91,9 @@ class VizFactory(object):
         self.output_path = None
         self.template_name = ""
         self.main_file_name = ""
-    
+        self.templates_root = ONTOSPY_VIZ_TEMPLATES
+        self.static_root = ONTOSPY_VIZ_STATIC
+
     def build(self, output_path=None):
         """method that should be inherited by all vis classes"""
         
@@ -109,7 +111,7 @@ class VizFactory(object):
         :return:
         """
         #  in this case we only have one
-        ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + self.template_name, "r")
+        ontotemplate = open(self.templates_root + self.template_name, "r")
     
         t = Template(ontotemplate.read())
     
@@ -128,7 +130,7 @@ class VizFactory(object):
         if not os.path.exists(static_path):
             os.makedirs(static_path)
         for x in self.static_files:
-            source_f = os.path.join(ONTOSPY_VIZ_STATIC, x)
+            source_f = os.path.join(self.static_root, x)
             dest_f = os.path.join(static_path, x)
             copyfile(source_f, dest_f)
     
@@ -147,7 +149,7 @@ class VizFactory(object):
             "ontospy_version": VERSION,
             "ontospy_graph": self.ontospy_graph,
             "namespaces": self.ontospy_graph.namespaces,
-            "stats": self.ontospy_graph.stats,
+            "stats": self.ontospy_graph.stats(),
             "ontologies": self.ontospy_graph.ontologies,
             "sources": self.ontospy_graph.sources,
             "classes": self.ontospy_graph.classes,
@@ -225,24 +227,24 @@ class BasicDashboard(VizFactory):
         OVERRIDING THIS METHOD
         """
 
-        ontotemplate_index = open(ONTOSPY_VIZ_TEMPLATES + "komplete/index.html", "r")
-        FILE_NAME = "index.html"
-        t = Template(ontotemplate_index.read())
-        c = self.get_basic_context()
-        rnd = t.render(c)
-        contents = safe_str(rnd)
-        main_url = self._save2File(contents, FILE_NAME, self.output_path)
+        # ontotemplate_index = open(self.templates_root + "komplete/index.html", "r")
+        # FILE_NAME = "index.html"
+        # t = Template(ontotemplate_index.read())
+        # c = self.get_basic_context()
+        # rnd = t.render(c)
+        # contents = safe_str(rnd)
+        # main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-        ontotemplate_dashboard = open(ONTOSPY_VIZ_TEMPLATES + "komplete/dashboard.html", "r")
+        ontotemplate_dashboard = open(self.templates_root + "komplete/dashboard.html", "r")
         FILE_NAME = "dashboard.html"
         t = Template(ontotemplate_dashboard.read())
         c = self.get_basic_context()
         rnd = t.render(c)
         contents = safe_str(rnd)
-        self._save2File(contents, FILE_NAME, self.output_path)
+        main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
 
-        ontotemplate_vizlist = open(ONTOSPY_VIZ_TEMPLATES + "komplete/viz_list.html", "r")
+        ontotemplate_vizlist = open(self.templates_root + "komplete/viz_list.html", "r")
         FILE_NAME = "visualizations.html"
         t = Template(ontotemplate_vizlist.read())
         c = self.get_basic_context()
@@ -263,7 +265,7 @@ class BasicDashboard(VizFactory):
         if not os.path.exists(static_path):
             os.makedirs(static_path)
         for x in self.static_files:
-            source_f = os.path.join(ONTOSPY_VIZ_STATIC, x)
+            source_f = os.path.join(self.static_root, x)
             dest_f = os.path.join(static_path, x)
             copyfile(source_f, dest_f)
 
