@@ -36,7 +36,7 @@ else:
 
 
 import os
-from shutil import copyfile
+import shutil
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST
@@ -125,14 +125,22 @@ class VizFactory(object):
         return main_url
 
     def _buildStaticFiles(self, static_folder="static"):
-        """ move over static files so that relative imports work """
+        """ move over static files so that relative imports work
+        Note: if a dir is passed, it is copied with all of its contents
+        """
         static_path = os.path.join(self.output_path, static_folder)
         if not os.path.exists(static_path):
             os.makedirs(static_path)
         for x in self.static_files:
             source_f = os.path.join(self.static_root, x)
             dest_f = os.path.join(static_path, x)
-            copyfile(source_f, dest_f)
+            if os.path.isdir(source_f):
+                if os.path.exists(dest_f):
+                    # delete first if exists, as copytree will throw an error otherwise
+                    shutil.rmtree(dest_f)
+                shutil.copytree(source_f, dest_f)
+            else:
+                shutil.copyfile(source_f, dest_f)
     
     def preview(self):
         if self.final_url:
@@ -220,20 +228,13 @@ class BasicDashboard(VizFactory):
         Init
         """
         super(BasicDashboard, self).__init__(ontospy_graph)
-        self.static_files = ["static_komplete.zip"]
+        self.static_files = ["static"]
 
     def _buildTemplates(self):
         """
-        OVERRIDING THIS METHOD
+        OVERRIDING THIS METHOD from Factory
         """
 
-        # ontotemplate_index = open(self.templates_root + "komplete/index.html", "r")
-        # FILE_NAME = "index.html"
-        # t = Template(ontotemplate_index.read())
-        # c = self.get_basic_context()
-        # rnd = t.render(c)
-        # contents = safe_str(rnd)
-        # main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
         ontotemplate_dashboard = open(self.templates_root + "komplete/dashboard.html", "r")
         FILE_NAME = "dashboard.html"
@@ -255,31 +256,31 @@ class BasicDashboard(VizFactory):
         return main_url
 
 
-
-    def _buildStaticFiles(self, static_folder=""):
-        """
-        OVERRIDING THIS METHOD
-        so that the zip file is extracted too
-        """
-        static_path = os.path.join(self.output_path, static_folder)
-        if not os.path.exists(static_path):
-            os.makedirs(static_path)
-        for x in self.static_files:
-            source_f = os.path.join(self.static_root, x)
-            dest_f = os.path.join(static_path, x)
-            copyfile(source_f, dest_f)
-
-        print("..unzipping")
-        zip_ref = zipfile.ZipFile(os.path.join(static_path, "static_komplete.zip"), 'r')
-        zip_ref.extractall(static_path)
-        zip_ref.close()
-
-        print("..cleaning up")
-        os.remove(os.path.join(static_path, "static_komplete.zip"))
-        # http://superuser.com/questions/104500/what-is-macosx-folder
-        shutil.rmtree(os.path.join(static_path, "__MACOSX"))
-        # shutil.rmtree(static_path + "__MACOSX")
-
+    #@todo add zip file logic to factory method (for dist release)
+    # def NOT_buildStaticFiles(self, static_folder=""):
+    #     """
+    #     OVERRIDING THIS METHOD
+    #     so that the zip file is extracted too
+    #     """
+    #     static_path = os.path.join(self.output_path, static_folder)
+    #     if not os.path.exists(static_path):
+    #         os.makedirs(static_path)
+    #     for x in self.static_files:
+    #         source_f = os.path.join(self.static_root, x)
+    #         dest_f = os.path.join(static_path, x)
+    #         shutil.copyfile(source_f, dest_f)
+    #
+    #     print("..unzipping")
+    #     zip_ref = zipfile.ZipFile(os.path.join(static_path, "static_komplete.zip"), 'r')
+    #     zip_ref.extractall(static_path)
+    #     zip_ref.close()
+    #
+    #     print("..cleaning up")
+    #     os.remove(os.path.join(static_path, "static_komplete.zip"))
+    #     # http://superuser.com/questions/104500/what-is-macosx-folder
+    #     shutil.rmtree(os.path.join(static_path, "__MACOSX"))
+    #     # shutil.rmtree(static_path + "__MACOSX")
+    #
 
 
 

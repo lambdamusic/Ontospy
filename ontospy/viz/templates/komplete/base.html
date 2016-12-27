@@ -13,7 +13,7 @@
     <link rel="icon" href="{{STATIC_URL}}libs/img/favicon.ico">
 
 	{% block pagetitle %}
-		<title>Ontospy Report</title>
+		<title>Ontospy{% if ontologies %}: {{ ontologies.0.uri }}{% endif %}</title>
 	{% endblock pagetitle %}
 
     <!-- Bootstrap core CSS -->
@@ -170,9 +170,11 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/ie10-viewport-bug-workaround.js"></script>
 
-    <script src="{{ STATIC_URL }}libs/chart.js-master/Chart.js"></script>
-	<script src="{{ STATIC_URL }}libs/chart.js.legend-master/src/legend.js"></script>
-
+    <script src="{{ STATIC_URL }}libs/Chart.js-2.4.0/Chart.bundle.js"></script>
+{##}
+{#    <script src="{{ STATIC_URL }}libs/chart.js-master/Chart.js"></script>#}
+{#	<script src="{{ STATIC_URL }}libs/chart.js.legend-master/src/legend.js"></script>#}
+{##}
 
 
     {% block extrajs %}
