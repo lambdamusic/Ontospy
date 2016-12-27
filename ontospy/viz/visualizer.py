@@ -35,8 +35,11 @@ else:
     from django.template import Context, Template
 
 
+import zipfile
 import os
 import shutil
+
+
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST
@@ -45,35 +48,6 @@ except:  # Mother of all exceptions
     click.secho("Visualizations configuration file not found.", fg="red")
     raise
 
-
-
-# @TODO
-
-"""
-- Visualizer class may return the basic scaffolding for all other visualizations
-    - eg header, footer, top level index.html
-    - page containing high level stats about the ontology
-    - maybe pages with common serializations too?
-- then other viz eg d3 would reuse Visualizer
-    - eg even if you have 1 only viz, you'd have all of the above each time
-    - with exceptions eg Markdown
-    
-    
-Visualizer() = reusable methods etc
-    Scaffolding() = basic boostrap page, header, footer and stats
-        ++ icons for subpages, which must be known
-        .. this ideally goes at top level, but user decides that
-    HTMLVisualizer() = eg the single page view
-        .. goes at first level or second level, but user decides that by passing path
-        .. if second level, normally you'd instantiate Scaffolding first
-    D3TreeVisualizer() = eg the d3 view
-
-.. running visualizer could be a way to run Scaffolding, plus all the others?
-
-IDEA: each Visualizer should be self-contained (can be run by itself) but also easily pluggable under a scaffolding eg by passing output path etc..
-
-MAYBE call them all 'RENDERER' or 'TRANSFORMER' 
-"""
 
 
 class VizFactory(object):
@@ -127,6 +101,7 @@ class VizFactory(object):
     def _buildStaticFiles(self, static_folder="static"):
         """ move over static files so that relative imports work
         Note: if a dir is passed, it is copied with all of its contents
+        If the file is a zip, it is copied and extracted too
         """
         static_path = os.path.join(self.output_path, static_folder)
         if not os.path.exists(static_path):
@@ -141,7 +116,18 @@ class VizFactory(object):
                 shutil.copytree(source_f, dest_f)
             else:
                 shutil.copyfile(source_f, dest_f)
-    
+                if x.endswith('.zip'):
+                    printDebug("..unzipping")
+                    zip_ref = zipfile.ZipFile(os.path.join(dest_f), 'r')
+                    zip_ref.extractall(static_path)
+                    zip_ref.close()
+                    printDebug("..cleaning up")
+                    os.remove(dest_f)
+                    # http://superuser.com/questions/104500/what-is-macosx-folder
+                    shutil.rmtree(os.path.join(static_path, "__MACOSX"))
+
+
+
     def preview(self):
         if self.final_url:
             import webbrowser
@@ -211,13 +197,6 @@ class HTMLVisualizer(VizFactory):
 
 
 
-import zipfile
-import os
-import shutil
-
-
-
-
 class BasicDashboard(VizFactory):
     """
 
@@ -230,57 +209,91 @@ class BasicDashboard(VizFactory):
         super(BasicDashboard, self).__init__(ontospy_graph)
         self.static_files = ["static"]
 
+
     def _buildTemplates(self):
         """
         OVERRIDING THIS METHOD from Factory
         """
 
-
+        # MAIN PAGE
         ontotemplate_dashboard = open(self.templates_root + "komplete/dashboard.html", "r")
         FILE_NAME = "dashboard.html"
         t = Template(ontotemplate_dashboard.read())
-        c = self.get_basic_context()
-        rnd = t.render(c)
-        contents = safe_str(rnd)
+        context = self.get_basic_context()
+        contents = safe_str(t.render(context))
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
 
         ontotemplate_vizlist = open(self.templates_root + "komplete/viz_list.html", "r")
         FILE_NAME = "visualizations.html"
         t = Template(ontotemplate_vizlist.read())
-        c = self.get_basic_context()
-        rnd = t.render(c)
-        contents = safe_str(rnd)
+        context = self.get_basic_context()
+        contents = safe_str(t.render(context))
         self._save2File(contents, FILE_NAME, self.output_path)
 
+
+        # BROWSER PAGES: creating top level folder
+        browser_output_path = os.path.join(self.output_path, "browser")
+        if not os.path.exists(browser_output_path):
+            os.makedirs(browser_output_path)
+
+        # main page
+        browser_index = open(self.templates_root + "splitter/splitter_ontoinfo.html", "r")
+        FILE_NAME = "index.html"
+        t = Template(browser_index.read())
+        context = self.get_basic_context()
+        # hack temp
+        context.update({"ontograph": self.ontospy_graph})
+        contents = safe_str(t.render(context))
+        self._save2File(contents, FILE_NAME, browser_output_path)
+
+        for entity in self.ontospy_graph.classes:
+            ontotemplate = open(self.templates_root + "splitter/splitter_classinfo.html", "r")
+            t = Template(browser_index.read())
+            context = self.get_basic_context()
+            context.update({"main_entity": entity,
+                            "main_entity_type": "class",
+                            "ontograph": self.ontospy_graph
+                            })
+            FILE_NAME = entity.slug + ".html"
+            contents = safe_str(t.render(context))
+            self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        for entity in self.ontospy_graph.properties:
+            ontotemplate = open(self.templates_root + "splitter/splitter_propinfo.html", "r")
+            t = Template(browser_index.read())
+            context = self.get_basic_context()
+            context.update({"main_entity": entity,
+                            "main_entity_type": "property",
+                            "ontograph": self.ontospy_graph
+                            })
+            FILE_NAME = entity.slug + ".html"
+            contents = safe_str(t.render(context))
+            self._save2File(contents, FILE_NAME, browser_output_path)
+
+        for entity in self.ontospy_graph.skosConcepts:
+            ontotemplate = open(self.templates_root + "splitter/splitter_conceptinfo.html", "r")
+            t = Template(browser_index.read())
+            context = self.get_basic_context()
+            context.update({"main_entity": entity,
+                            "main_entity_type": "concept",
+                            "ontograph": self.ontospy_graph
+                            })
+            FILE_NAME = entity.slug + ".html"
+            contents = safe_str(t.render(context))
+            self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        # entities = [g.classes, g.properties, g.skosConcepts]
+        # for group in entities:
+        #     for c in group:
+        #         # getting main func dynamically
+        #         contents = func(g, False, c)
+        #         _filename = c.slug + ".html"
+        #         url = _saveVizLocally(contents, _filename, DEST_FOLDER)
+
         return main_url
-
-
-    #@todo add zip file logic to factory method (for dist release)
-    # def NOT_buildStaticFiles(self, static_folder=""):
-    #     """
-    #     OVERRIDING THIS METHOD
-    #     so that the zip file is extracted too
-    #     """
-    #     static_path = os.path.join(self.output_path, static_folder)
-    #     if not os.path.exists(static_path):
-    #         os.makedirs(static_path)
-    #     for x in self.static_files:
-    #         source_f = os.path.join(self.static_root, x)
-    #         dest_f = os.path.join(static_path, x)
-    #         shutil.copyfile(source_f, dest_f)
-    #
-    #     print("..unzipping")
-    #     zip_ref = zipfile.ZipFile(os.path.join(static_path, "static_komplete.zip"), 'r')
-    #     zip_ref.extractall(static_path)
-    #     zip_ref.close()
-    #
-    #     print("..cleaning up")
-    #     os.remove(os.path.join(static_path, "static_komplete.zip"))
-    #     # http://superuser.com/questions/104500/what-is-macosx-folder
-    #     shutil.rmtree(os.path.join(static_path, "__MACOSX"))
-    #     # shutil.rmtree(static_path + "__MACOSX")
-    #
 
 
 
