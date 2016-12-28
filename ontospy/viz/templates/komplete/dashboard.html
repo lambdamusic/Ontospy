@@ -16,15 +16,19 @@
 
         <div class="page-header">
 
-            <h3>Dashboard</h3>
+            <h3>Dashboard
+{#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
+            </h3>
 
         </div>
 
 
         <div class="row">
+            <div class="container">
             <div class="col-md-12">
                 {% include "onto_header.html" %}
                 <hr>
+            </div>
             </div>
 
         </div>
@@ -158,8 +162,9 @@
 
 
                     <div class="col-md-12 ">
-                        <br />
+
                         <span class="text-muted">NOTE: size = number of sub-classes</span>
+                        <br />
                         <canvas id="toplayerChart" height="300"></canvas>
 
 
@@ -190,8 +195,8 @@
 
                     <div class="col-md-12 ">
 
-                        <br />
                         <span class="text-muted">NOTE: size = number of sub-classes</span>
+                        <br />
                         <canvas id="toplayerChartSKOS" height="300"></canvas>
                     </div>
 

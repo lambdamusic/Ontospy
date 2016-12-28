@@ -1,0 +1,38 @@
+
+
+<div id="sidebar-wrapper">
+    <ul class="sidebar-nav">
+        {% if 0%}<li class="sidebar-brand">
+            <a href="#">
+                Start Bootstrap
+            </a>
+        </li>{% endif %}
+
+        <li {% ifequal thispage "dashboard" %}class="active"{% endifequal %} style="margin-top: 20px;"><a href="dashboard.html">Dashboard</a>
+        </li>
+
+        <li {% ifequal thispage "browser" %}class="active"{% endifequal %} ><a href="browser/index.html">Entities</a>
+        </li>
+
+        <li {% ifequal thispage "visualizations" %}class="active"{% endifequal %} ><a href="visualizations.html">Visualizations</a>
+        </li>
+
+{#        <li>#}
+{#            <a href="#">Overview</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="#">Events</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="#">About</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="#">Services</a>#}
+{#        </li>#}
+{#        <li>#}
+{#            <a href="#">Contact</a>#}
+{#        </li>#}
+    </ul>
+</div>
+
+

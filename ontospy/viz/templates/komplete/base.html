@@ -21,6 +21,7 @@
     <!-- Bootswatch:  -->
     <!-- cerulean  | cyborg |  flatly |  lumen |  sandstone |   spacelab  |  yeti | cosmo |  darkly |  paper | simplex | superhero |  journal | readable  |   slate |  united -->
     <link href="{{STATIC_URL}}libs/bootswatch3.2/lumen/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/simple-sidebar.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
@@ -48,6 +49,8 @@
 
 
   .panel-body dt {margin-top: 5px;}
+  .page-header  {margin-top: 30px;}
+  #wrapper {margin-top: 50px;}
 
 		.mythumbnail {
 			display: block;
@@ -88,28 +91,6 @@
 		}
 
 
-        /* styles for chart.js */
-
-
-        #legendEntities.legend {
-        /*    width: 10em;*/
-        /*    border: 1px solid black;*/
-        }
-
-        #chartsLegend .legend .title {
-        /*    display: block;">{*/
-            margin: 0.5em;
-            border-style: solid;
-            border-width: 0 0 0 1em;
-            padding: 0 0.3em;
-        }
-
-        #chartsLegend span.title {
-            display:block ;
-        }
-
-
-
 </style>
 
   </head>
@@ -126,11 +107,17 @@
 
 
 
+<div id="wrapper">
+
+
+    <!-- Sidebar -->
+    {% include "sidebar.html" %}
+    <!-- /#sidebar-wrapper -->
 
 
 
     <!-- Begin page content -->
-    <div class="container">
+    <div class="container" id="page-content-wrapper">
 
 
 	{% block bodycontent %}
@@ -140,7 +127,7 @@
 	{% endblock bodycontent %}
 
 
-	</div>
+	</div><!-- /#page-content-wrapper -->
 
 
   {% block abovefooter %}
@@ -162,27 +149,37 @@
   </footer>
 
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{{STATIC_URL}}libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-    
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/ie10-viewport-bug-workaround.js"></script>
+</div><!-- /#wrapper -->
 
-    <script src="{{ STATIC_URL }}libs/Chart.js-2.4.0/Chart.bundle.js"></script>
-{##}
-{#    <script src="{{ STATIC_URL }}libs/chart.js-master/Chart.js"></script>#}
-{#	<script src="{{ STATIC_URL }}libs/chart.js.legend-master/src/legend.js"></script>#}
-{##}
 
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{{STATIC_URL}}libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/js/ie10-viewport-bug-workaround.js"></script>
+
+<script src="{{ STATIC_URL }}libs/Chart.js-2.4.0/Chart.bundle.js"></script>
+
+
+<!-- Menu Toggle Script -->
+<script>
+$("#menu-toggle").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+});
+</script>
 
     {% block extrajs %}
 
 
 
     {% endblock extrajs %}
+
+
+
 
 
   </body>
