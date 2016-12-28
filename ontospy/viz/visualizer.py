@@ -85,25 +85,35 @@ class VizFactory(object):
         :return:
         """
         #  in this case we only have one
-        ontotemplate = open(self.templates_root + self.template_name, "r")
-    
-        t = Template(ontotemplate.read())
-    
-        c = self.get_basic_context()
-    
-        rnd = t.render(c)
-        contents = safe_str(rnd)
+        contents = self._renderTemplate(self.template_name, extraContext=None)
         # the main url used for opening viz
         f = self.main_file_name
         main_url = self._save2File(contents, f, self.output_path)
         return main_url
+
+
+    def _renderTemplate(self, template_name, extraContext=None):
+        """
+
+        :param template_name: NOTE *relative* to templates folder
+        :param extraContext: a dict that can be loaded on demand
+        :return: the rendered template as a string
+        """
+
+        atemplate = open(self.templates_root + template_name, "r")
+        t = Template(atemplate.read())
+        context = self.get_basic_context()
+        if extraContext and type(extraContext) == dict:
+            context.update(extraContext)
+        contents = safe_str(t.render(context))
+        return contents
+
 
     def _buildStaticFiles(self, static_folder="static"):
         """ move over static files so that relative imports work
         Note: if a dir is passed, it is copied with all of its contents
         If the file is a zip, it is copied and extracted too
         """
-        print self.output_path, static_folder
         static_path = os.path.join(self.output_path, static_folder)
         if not os.path.exists(static_path):
             os.makedirs(static_path)
@@ -202,7 +212,7 @@ class HTMLVisualizer(VizFactory):
 
 
 
-class BasicDashboard(VizFactory):
+class KompleteViz(VizFactory):
     """
 
     """
@@ -211,7 +221,7 @@ class BasicDashboard(VizFactory):
         """
         Init
         """
-        super(BasicDashboard, self).__init__(ontospy_graph)
+        super(KompleteViz, self).__init__(ontospy_graph)
         self.static_files = ["static"]
 
 
@@ -220,22 +230,15 @@ class BasicDashboard(VizFactory):
         OVERRIDING THIS METHOD from Factory
         """
 
-        # MAIN PAGE
-        ontotemplate_dashboard = open(self.templates_root + "komplete/dashboard.html", "r")
+        # DASHBOARD - MAIN PAGE
+        contents = self._renderTemplate("komplete/dashboard.html", extraContext=None)
         FILE_NAME = "dashboard.html"
-        t = Template(ontotemplate_dashboard.read())
-        context = self.get_basic_context()
-        contents = safe_str(t.render(context))
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-
-        ontotemplate_vizlist = open(self.templates_root + "komplete/viz_list.html", "r")
+        # VIZ LIST
+        contents = self._renderTemplate("komplete/viz_list.html", extraContext=None)
         FILE_NAME = "visualizations.html"
-        t = Template(ontotemplate_vizlist.read())
-        context = self.get_basic_context()
-        contents = safe_str(t.render(context))
         self._save2File(contents, FILE_NAME, self.output_path)
-
 
         # BROWSER PAGES: creating top level folder
         browser_output_path = os.path.join(self.output_path, "browser")
@@ -243,50 +246,37 @@ class BasicDashboard(VizFactory):
             os.makedirs(browser_output_path)
 
         # main page
-        browser_index = open(self.templates_root + "splitter/splitter_ontoinfo.html", "r")
+        extra_context = {"ontograph": self.ontospy_graph}
+        contents = self._renderTemplate("splitter/splitter_ontoinfo.html", extraContext=extra_context)
         FILE_NAME = "index.html"
-        t = Template(browser_index.read())
-        context = self.get_basic_context()
-        # hack temp
-        context.update({"ontograph": self.ontospy_graph})
-        contents = safe_str(t.render(context))
         self._save2File(contents, FILE_NAME, browser_output_path)
 
         for entity in self.ontospy_graph.classes:
-            ontotemplate = open(self.templates_root + "splitter/splitter_classinfo.html", "r")
-            t = Template(browser_index.read())
-            context = self.get_basic_context()
-            context.update({"main_entity": entity,
+            extra_context = {"main_entity": entity,
                             "main_entity_type": "class",
                             "ontograph": self.ontospy_graph
-                            })
+                            }
+            contents = self._renderTemplate("splitter/splitter_classinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
-            contents = safe_str(t.render(context))
             self._save2File(contents, FILE_NAME, browser_output_path)
 
 
         for entity in self.ontospy_graph.properties:
-            ontotemplate = open(self.templates_root + "splitter/splitter_propinfo.html", "r")
-            t = Template(browser_index.read())
-            context = self.get_basic_context()
-            context.update({"main_entity": entity,
+            extra_context = {"main_entity": entity,
                             "main_entity_type": "property",
                             "ontograph": self.ontospy_graph
-                            })
+                            }
+            contents = self._renderTemplate("splitter/splitter_propinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
-            contents = safe_str(t.render(context))
             self._save2File(contents, FILE_NAME, browser_output_path)
 
         for entity in self.ontospy_graph.skosConcepts:
-            ontotemplate = open(self.templates_root + "splitter/splitter_conceptinfo.html", "r")
-            t = Template(browser_index.read())
-            context = self.get_basic_context()
-            context.update({"main_entity": entity,
+            extra_context = {"main_entity": entity,
                             "main_entity_type": "concept",
                             "ontograph": self.ontospy_graph
-                            })
+                            }
+            contents = self._renderTemplate("splitter/splitter_conceptinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
-            contents = safe_str(t.render(context))
             self._save2File(contents, FILE_NAME, browser_output_path)
 
 
@@ -309,7 +299,7 @@ if __name__ == '__main__':
     
         uri, g = get_random_ontology()
         
-        v = BasicDashboard(g)
+        v = KompleteViz(g)
         v.build()
         v.preview()
         

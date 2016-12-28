@@ -1,0 +1,110 @@
+{% extends "splitter_base.html" %}
+{% block main_column %}
+
+
+{% ifequal main_entity_type "concept"  %}
+    
+        {% with main_entity as each  %}
+
+       <div class="entity-div">
+
+            <h1 class="entity-section">Concept: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
+                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
+            </h1>
+            <hr>
+
+            <div class="tree-container">
+            <div class="tree">
+                <ul>
+                    {% if each.parents %}
+                        <li> {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
+
+                        <ul>
+
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}
+                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
+                                {% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <li href="#"><a>skos:Concept</a>
+
+                        <ul>
+                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                          {% if each.children  %}
+                              <ul>
+                                {% for s in each.children %}
+                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
+                                {% endfor %}
+                              </ul>
+                          {% endif %}
+                            </li>
+
+                        </ul>
+
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            </div>
+
+
+            {% if not each.children  %}
+            <p class="section-desc">
+                <small>NOTE</small> this is a leaf node.</p>
+            {% endif %}
+
+            <p class="section-desc"><b>URI:</b>
+                <br>
+                {{each.uri}}
+            </p>
+
+            <p class="section-desc"><b>Description:</b>
+                <br>
+                {{each.bestDescription|default:"--"}}
+            </p>
+
+            {% if each.ancestors %}
+                <p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
+                    <br />
+                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                </p>
+            {% endif %}
+
+
+            <small class="implementation_title">Implementation:</small>
+            {% if pygments_code %}
+                {{pygments_code|safe}}
+            {% else %}
+                 <div class="implementation">
+                    <code>{{each.serialize|linebreaks}}</code>
+                </div>               
+            {% endif %}
+
+        </div>
+
+
+        {% endwith %}
+
+
+
+{% endifequal %}
+
+
+
+
+{% endblock main_column %}

@@ -47,7 +47,7 @@
                <dl class="-dl-horizontal" style="--margin-left: -100px;">
 
                {% for x, y in namespaces  %}
-                   <dt><span class="label label-info">{{x|default:":"}}</span></dt>
+                   <dt><span class="label label-success">{{x|default:":"}}</span></dt>
                    <dd><a href="{{y}}" target="_blank">{{y}}</a></dd>
 
                {% endfor %}
@@ -69,9 +69,7 @@
               <h3 class="panel-title">Ontology Metadata</h3>
             </div>
             <div class="panel-body">
-              <h5><code>{{ ontology.uri }}</code></h5>
-              <br />
-
+              <h5 class="well"><code>{{ ontology.uri }}</code></h5>
                 {% if ontology.annotations %}
                     <dl>
                         {% for each in ontology.annotations %}
@@ -161,8 +159,9 @@
 
                     <div class="col-md-12 ">
                         <br />
-                        <canvas id="toplayerChart" height="300"></canvas>
                         <span class="text-muted">NOTE: size = number of sub-classes</span>
+                        <canvas id="toplayerChart" height="300"></canvas>
+
 
                     </div>
 
@@ -192,8 +191,8 @@
                     <div class="col-md-12 ">
 
                         <br />
+                        <span class="text-muted">NOTE: size = number of sub-classes</span>
                         <canvas id="toplayerChartSKOS" height="300"></canvas>
-                        <span class="text-muted">NOTE: size = number of sub-concepts</span>
                     </div>
 
 
