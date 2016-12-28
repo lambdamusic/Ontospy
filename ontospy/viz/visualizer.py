@@ -240,15 +240,19 @@ class KompleteViz(VizFactory):
         FILE_NAME = "visualizations.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 
-        # BROWSER PAGES: creating top level folder
-        browser_output_path = os.path.join(self.output_path, "browser")
-        if not os.path.exists(browser_output_path):
-            os.makedirs(browser_output_path)
+        # BROWSER PAGES
+        browser_output_path = self.output_path
 
-        # main page
+        # ENTITIES A-Z
         extra_context = {"ontograph": self.ontospy_graph}
-        contents = self._renderTemplate("splitter/splitter_ontoinfo.html", extraContext=extra_context)
-        FILE_NAME = "index.html"
+        contents = self._renderTemplate("komplete/browser/browser_entities_az.html", extraContext=extra_context)
+        FILE_NAME = "entities-az.html"
+        self._save2File(contents, FILE_NAME, browser_output_path)
+
+        # ENTITIES TREE
+        extra_context = {"ontograph": self.ontospy_graph}
+        contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+        FILE_NAME = "entities-tree.html"
         self._save2File(contents, FILE_NAME, browser_output_path)
 
         for entity in self.ontospy_graph.classes:

@@ -3,13 +3,20 @@
 
 {% block navbar %}
 
-    {% with thispage="visualizations" %}
-
     {% include "navbar.html" %}
 
+{% endblock navbar %}
+
+
+
+{% block sidebar %}
+
+    {% with thispage="visualizations" %}
+        {% include "sidebar.html" %}
     {% endwith %}
 
-{% endblock navbar %}
+{% endblock sidebar %}
+
 
 
   {% block bodycontent %}

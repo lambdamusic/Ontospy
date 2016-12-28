@@ -110,10 +110,11 @@
 <div id="wrapper">
 
 
-    <!-- Sidebar -->
-    {% include "sidebar.html" %}
-    <!-- /#sidebar-wrapper -->
+    {% block sidebar %}
 
+    {% include "sidebar.html" %}
+
+    {% endblock sidebar %}
 
 
     <!-- Begin page content -->

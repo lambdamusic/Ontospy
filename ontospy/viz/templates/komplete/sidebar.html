@@ -1,5 +1,5 @@
 
-
+<!-- Sidebar -->
 <div id="sidebar-wrapper">
     <ul class="sidebar-nav">
         {% if 0%}<li class="sidebar-brand">
@@ -11,7 +11,10 @@
         <li {% ifequal thispage "dashboard" %}class="active"{% endifequal %} style="margin-top: 20px;"><a href="dashboard.html">Dashboard</a>
         </li>
 
-        <li {% ifequal thispage "browser" %}class="active"{% endifequal %} ><a href="browser/index.html">Entities</a>
+        <li {% ifequal thispage "entities-az" %}class="active"{% endifequal %} ><a href="entities-az.html">Entities A-Z</a>
+        </li>
+
+        <li {% ifequal thispage "entities-tree" %}class="active"{% endifequal %} ><a href="entities-tree.html">Entities Tree</a>
         </li>
 
         <li {% ifequal thispage "visualizations" %}class="active"{% endifequal %} ><a href="visualizations.html">Visualizations</a>
@@ -34,5 +37,5 @@
 {#        </li>#}
     </ul>
 </div>
-
+<!-- /#sidebar-wrapper -->
 

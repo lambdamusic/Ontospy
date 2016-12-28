@@ -12,7 +12,16 @@
 {% endblock navbar %}
 
 
-  {% block bodycontent %}
+{% block sidebar %}
+
+    {% with thispage="dashboard" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+{% block bodycontent %}
 
         <div class="page-header">
 
