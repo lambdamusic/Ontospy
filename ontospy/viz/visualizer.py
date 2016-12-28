@@ -40,7 +40,6 @@ import os
 import shutil
 
 
-
 try:
     from .CONFIG import VISUALIZATIONS_LIST
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
@@ -63,6 +62,8 @@ class VizFactory(object):
         self.static_files = []
         self.final_url = None
         self.output_path = None
+        home = os.path.expanduser("~")
+        self.output_path_DEFAULT = os.path.join(home, "ontospy-viz-test")
         self.template_name = ""
         self.main_file_name = ""
         self.templates_root = ONTOSPY_VIZ_TEMPLATES
@@ -70,7 +71,6 @@ class VizFactory(object):
 
     def build(self, output_path=None):
         """method that should be inherited by all vis classes"""
-        
         self.output_path = self.checkOutputPath(output_path)
         self._buildStaticFiles(self.output_path)
         self.final_url = self._buildTemplates()
@@ -103,6 +103,7 @@ class VizFactory(object):
         Note: if a dir is passed, it is copied with all of its contents
         If the file is a zip, it is copied and extracted too
         """
+        print self.output_path, static_folder
         static_path = os.path.join(self.output_path, static_folder)
         if not os.path.exists(static_path):
             os.makedirs(static_path)
@@ -164,14 +165,18 @@ class VizFactory(object):
         url = "file://" + filename
         return url
     
-    def checkOutputPath(self, outputPath):
-        if not outputPath:
-            from os.path import expanduser
-            home = expanduser("~")
-            res = os.path.join(home, "ontospy-viz-test")
-        if not os.path.exists(res):
-            os.makedirs(res)
-        return res
+    def checkOutputPath(self, output_path):
+        """
+        Create or clean up output path
+        """
+        if not output_path:
+            output_path = self.output_path_DEFAULT
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+        os.makedirs(output_path)
+        return output_path
+
+
 
 
 
