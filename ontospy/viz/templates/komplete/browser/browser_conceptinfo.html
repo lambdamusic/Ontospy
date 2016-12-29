@@ -1,16 +1,49 @@
-{% extends "splitter_base.html" %}
-{% block main_column %}
+{% extends "base.html" %}
 
 
+{% block navbar %}
+
+    {% include "navbar.html" %}
+
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+
+    {% with thispage="entities-az" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+{% block bodycontent %}
 {% ifequal main_entity_type "concept"  %}
     
         {% with main_entity as each  %}
 
+
+        <ol class="breadcrumb">
+            <li>
+                <a href="entities-az.html">Entities</a>
+            </li>
+            <li>
+                <a href="entities-az.html">Classes</a>
+            </li>
+            <li class="active">{{each.qname}}</li>
+        </ol>
+
+
        <div class="entity-div">
 
-            <h1 class="entity-section">Concept: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
-                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
+            <h1 class="entity-section">
+{#                Concept: #}
+                {{each.qname}}
             </h1>
+
             <hr>
 
             <div class="tree-container">
@@ -107,4 +140,4 @@
 
 
 
-{% endblock main_column %}
+{% endblock bodycontent %}

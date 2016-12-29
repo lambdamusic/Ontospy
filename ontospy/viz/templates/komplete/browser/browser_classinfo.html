@@ -1,17 +1,47 @@
-{% extends "splitter_base.html" %}
-{% block main_column %}
+{% extends "base.html" %}
 
+
+{% block navbar %}
+
+    {% include "navbar.html" %}
+
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+
+    {% with thispage="" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+{% block bodycontent %}
 
 {% ifequal main_entity_type "class"  %}
     
         {% with main_entity as each  %}
 
-        <div class="entity-div">
+
+            <ol class="breadcrumb">
+            	<li>
+            		<a href="entities-az.html">Entities</a>
+            	</li>
+            	<li>
+                    <a href="entities-az.html">Classes</a>
+                </li>
+            	<li class="active">{{each.qname}}</li>
+            </ol>
 
 
 
-            <h1 class="entity-section">Class: <a name="{{each.qname}}" href="{{each.slug}}.html">{{each.qname}}</a>
-                <small>&nbsp;&nbsp;<a href="index.html" class="backlink">back to top</a></small>
+            <h1 class="entity-section">
+{#                Class: #}
+                {{each.qname}}
             </h1>
             <hr>
 
@@ -69,82 +99,96 @@
                 <small>NOTE</small> this is a leaf node.</p>
             {% endif %}
 
-            <p class="section-desc"><b>URI:</b>
-                <br>
-                {{each.uri}}
-            </p>
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">URI</h3>
+            </div>
+            <div class="panel-body">
 
-            <p class="section-desc"><b>Description:</b>
-                <br>
+                <code>{{each.uri}}</code>
+            </div>
+          </div>
+           </div></div>
+
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Description</h3>
+            </div>
+            <div class="panel-body">
+
                 {{each.bestDescription|default:"--"}}
-            </p>
+            </div>
+          </div>
+           </div></div>
+
+
+
+
+
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Inherits from</h3>
+            </div>
+            <div class="panel-body">
 
             {% if each.ancestors %}
-                <p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                    <br />
                     {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
                 </p>
             {% else %}
-                <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+                owl:Thing
             {% endif %}
 
+            </div>
+          </div>
+           </div></div>
 
-            {% if 0 %}
 
-                {# HIDDEN AFTER ADDING THE PROPERTIES TABLE #}
 
-                {% if each.domain_of %}
-                    <p class="section-desc"><b>Property Domain of:</b>
-                        <br>
-                        {% for s in each.domain_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                    </p>
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Implementation</h3>
+            </div>
+            <div class="panel-body">
+
+                {% if pygments_code %}
+
+                    {{pygments_code|safe}}
+
+                {% else %}
+                     <div class="implementation">
+                        <code>{{each.serialize|linebreaks}}</code>
+                    </div>
                 {% endif %}
-
-                {% if each.range_of %}
-                    <p class="section-desc"><b>Property Range of:</b>
-                        <br>
-                        {% for s in each.range_of %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                    </p>
-                {% endif %}
-
-
-            {% endif %}
+            </div>
+          </div>
+           </div></div>
 
 
 
-            <small class="implementation_title">Implementation:</small>
-            {% if pygments_code %}
- 
-                {{pygments_code|safe}}
-
-            {% else %}
-                 <div class="implementation">
-                    <code>{{each.serialize|linebreaks}}</code>
-                </div>               
-            {% endif %}
+         {% if each.domain_of_inferred %}
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Instances of {{each.qname}} can have the following properties:</h3>
+            </div>
+            <div class="panel-body" style="overflow: auto;">
 
 
-            
+             <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover col-md-12" style="overflow: auto;">
 
-
-        {% if each.domain_of_inferred %}
-    
-            
-            <br />
-            <b class="text-muted">
-                Instances of {{each.qname}} can have the following properties:
-            </b>
-    
-            <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover col-md-12">
-        
                 <tr>
                     <th height="40">Property</th><th>Description</th><th>Expected Type</th>
                 </tr>
-        
-                {% for group in each.domain_of_inferred  %}      
-        
+
+                {% for group in each.domain_of_inferred  %}
+
                     {% for k,v in group.items  %}
-                        
+
                     {% if v %}
 
                         <tr style="background: lightcyan;text-align: left;">
@@ -159,7 +203,7 @@
                                     <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
                                 </td>
                                 <td class="thirdtd">
-                                    <span>{{prop.bestDescription}}</span>
+                                    <span>{{prop.bestDescription|default:"--"}}</span>
                                 </td>
                                 <td class="secondtd">
                                     {% if  prop.ranges %}
@@ -177,19 +221,24 @@
                             {% endfor %}
 
                     {% endif %}
-            
+
                     {% endfor %}
 
                 {% endfor %}
 
             </table>
-    
-    
+
+
+
+
+            </div>
+          </div>
+           </div></div>
+
         {% endif %}
-    
 
 
-        </div>
+
 
 
         {% endwith %}
@@ -201,4 +250,4 @@
 
 
 
-{% endblock main_column %}
+{% endblock bodycontent %}

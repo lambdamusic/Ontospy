@@ -260,7 +260,7 @@ class KompleteViz(VizFactory):
                             "main_entity_type": "class",
                             "ontograph": self.ontospy_graph
                             }
-            contents = self._renderTemplate("splitter/splitter_classinfo.html", extraContext=extra_context)
+            contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -270,7 +270,7 @@ class KompleteViz(VizFactory):
                             "main_entity_type": "property",
                             "ontograph": self.ontospy_graph
                             }
-            contents = self._renderTemplate("splitter/splitter_propinfo.html", extraContext=extra_context)
+            contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -279,7 +279,7 @@ class KompleteViz(VizFactory):
                             "main_entity_type": "concept",
                             "ontograph": self.ontospy_graph
                             }
-            contents = self._renderTemplate("splitter/splitter_conceptinfo.html", extraContext=extra_context)
+            contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
