@@ -89,7 +89,7 @@ def get_home_location():
 
 
 
-def get_localontologies():
+def get_localontologies(pattern=""):
 	"returns a list of file names in the ontologies folder (not the full path)"
 	res = []
 	ONTOSPY_LOCAL_MODELS = get_home_location()
@@ -97,13 +97,21 @@ def get_localontologies():
 		for f in os.listdir(ONTOSPY_LOCAL_MODELS):
 			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
 				if not f.startswith(".") and not f.endswith(".pickle"):
-					res += [f]
+					if not pattern:
+						res += [f]
+					else:
+						if pattern in f:
+							res += [f]
 	return res
 
 
-def get_random_ontology(TOP_RANGE=10):
+def get_random_ontology(TOP_RANGE=10, pattern=""):
 	"""for testing purposes. Returns a random ontology/graph"""
-	ontouri = get_localontologies()[random.randint(0, TOP_RANGE)]  # [0]
+	choices = get_localontologies(pattern=pattern)
+	try:
+		ontouri = choices[random.randint(0, TOP_RANGE)]  # [0]
+	except:
+		ontouri = choices[0]
 	print("Testing with URI: %s" % ontouri)
 	g = get_pickled_ontology(ontouri)
 	if not g:
