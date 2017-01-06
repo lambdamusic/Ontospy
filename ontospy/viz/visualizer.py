@@ -60,7 +60,7 @@ class VizFactory(object):
     Subclass and override as needed.
     """
 
-    def __init__(self, ontospy_graph):
+    def __init__(self, ontospy_graph, title=""):
         self.title = 'Base Visualizer'
         self.ontospy_graph = ontospy_graph
         self.static_files = []
@@ -72,7 +72,17 @@ class VizFactory(object):
         self.main_file_name = ""
         self.templates_root = ONTOSPY_VIZ_TEMPLATES
         self.static_root = ONTOSPY_VIZ_STATIC
+        self.title = title or self.infer_best_title()
         self.basic_context_data = self._build_basic_context()
+
+    def infer_best_title(self):
+        """Selects something usable as a title for an ontospy graph"""
+        if self.ontospy_graph.ontologies:
+            return self.ontospy_graph.ontologies[0].uri
+        elif self.ontospy_graph.sources:
+            return self.ontospy_graph.sources[0]
+        else:
+            return "Untitled"
 
     def build(self, output_path=None):
         """method that should be inherited by all vis classes"""
@@ -165,6 +175,7 @@ class VizFactory(object):
             "STATIC_URL": "static/",
             "ontospy_version": VERSION,
             "ontospy_graph": self.ontospy_graph,
+            "docs_title": self.title,
             "namespaces": self.ontospy_graph.namespaces,
             "stats": self.ontospy_graph.stats(),
             "ontologies": self.ontospy_graph.ontologies,
@@ -244,11 +255,11 @@ class KompleteViz(VizFactory):
 
     """
 
-    def __init__(self, ontospy_graph):
+    def __init__(self, ontospy_graph, title=""):
         """
         Init
         """
-        super(KompleteViz, self).__init__(ontospy_graph)
+        super(KompleteViz, self).__init__(ontospy_graph, title)
         self.static_files = ["static"]
 
 
