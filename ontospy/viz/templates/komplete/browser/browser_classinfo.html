@@ -23,7 +23,7 @@
 {% block bodycontent %}
 
 {% ifequal main_entity_type "class"  %}
-    
+
         {% with main_entity as each  %}
 
 
@@ -32,18 +32,23 @@
             		<a href="entities-az.html">Entities</a>
             	</li>
             	<li>
-                    <a href="entities-az.html">Classes</a>
+                    <a href="entities-az.html#classes">Classes</a>
                 </li>
             	<li class="active">{{each.qname}}</li>
             </ol>
 
 
 
-            <h1 class="entity-section">
+            <h1>
 {#                Class: #}
                 {{each.qname}}
+                {% if not each.children  %}
+                    <small class="badge">leaf node</small>
+                  {% endif %}
+
             </h1>
             <hr>
+
 
 
             <div class="tree-container">
@@ -94,9 +99,9 @@
             </div>
 
 
-            {% if not each.children  %}
-            <p class="section-desc">
-                <small>NOTE</small> this is a leaf node.</p>
+            {% if 0 and not each.children  %}
+            <h5 style="margin-top: 20px; margin-bottom: 20px;">
+                <small>NOTE</small> This is a leaf node.</h5>
             {% endif %}
 
            <div class="row"><div class="col-md-12">
@@ -135,10 +140,9 @@
             <div class="panel-body">
 
             {% if each.ancestors %}
-                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}<br>{% endif %} {% endfor %}
-                </p>
+                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
             {% else %}
-                owl:Thing
+                <li>owl:Thing</li>
             {% endif %}
 
             </div>
@@ -161,7 +165,7 @@
 
                 {% else %}
                      <div class="implementation">
-                        <code>{{each.serialize|linebreaks}}</code>
+                        <code style="background-color: white;">{{each.serialize|linebreaks}}</code>
                     </div>
                 {% endif %}
             </div>
@@ -174,15 +178,16 @@
            <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Instances of {{each.qname}} can have the following properties:</h3>
+              <h3 class="panel-title">Instance properties</h3>
             </div>
             <div class="panel-body" style="overflow: auto;">
 
+                <p>Instances of {{each.qname}} can have the following properties:</p>
+            </div>
+             <table class="table table-bordered" style="overflow: auto;">
 
-             <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover col-md-12" style="overflow: auto;">
-
-                <tr>
-                    <th height="40">Property</th><th>Description</th><th>Expected Type</th>
+                <tr class="table-classproperties">
+                    <th>PROPERTY</th><th>DESCRIPTION</th><th>RANGE</th>
                 </tr>
 
                 {% for group in each.domain_of_inferred  %}
@@ -191,9 +196,8 @@
 
                     {% if v %}
 
-                        <tr style="background: lightcyan;text-align: left;">
-                            <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
-                            From <a title="{{k.qname}}" href="{{k.slug}}.html" class="rdfclass">{{k.qname}}</a></span>
+                        <tr class="table-inheritanceinfo">
+                            <th colspan="3" class="treeinfo"><span class="label label-default">From class <a title="{{k.qname}}" href="{{k.slug}}.html" style="color: darkslategray;">{{k.qname}}</a></span>
                             </th>
                         </tr>
 
@@ -229,9 +233,6 @@
             </table>
 
 
-
-
-            </div>
           </div>
            </div></div>
 

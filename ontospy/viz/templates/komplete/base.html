@@ -20,14 +20,15 @@
     <!-- <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">  -->
     <!-- Bootswatch:  -->
     <!-- cerulean  | cyborg |  flatly |  lumen |  sandstone |   spacelab  |  yeti | cosmo |  darkly |  paper | simplex | superhero |  journal | readable  |   slate |  united -->
-    <link href="{{STATIC_URL}}libs/bootswatch3.2/lumen/bootstrap.min.css" rel="stylesheet">
-    <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/simple-sidebar.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}libs/bootswatch3.2/paper/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/simple-sidebar.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/familytree.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/sticky-footer-navbar.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/sticky-footer-navbar.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -36,7 +37,7 @@
     <![endif]-->
 
 <style type="text/css">
-  
+
   .lead-plus {font-size: 26.5px;}
   .label-dark {background: #2c3e50; color: white; padding: 1px;}
   .margin50 {margin-top: 50px; margin-bottom: 50px;}
@@ -51,6 +52,30 @@
   .panel-body dt {margin-top: 5px;}
   .page-header  {margin-top: 30px;}
   #wrapper {margin-top: 50px;}
+
+
+  tr.table-classproperties {
+      background: #f5f5f5;
+  }
+  tr.table-classproperties th {
+      font-size: 80%;
+      font-weight: normal;
+  }
+
+
+  tr.table-inheritanceinfo {
+      background: #f5f5f5;
+      text-align: left;
+  }
+
+  tr.table-inheritanceinfo th {
+      font-size: 90%;
+      font-weight: normal;
+  }
+
+
+
+
 
 		.mythumbnail {
 			display: block;
@@ -91,7 +116,23 @@
 		}
 
 
+
+
+/*pygments css*/
+{{pygments_code_css}}
+
+/*overloading this class from pygments*/
+.highlight {
+  overflow: auto;
+}
+
+
+
 </style>
+
+
+
+
 
   </head>
 
@@ -102,7 +143,7 @@
 
     {% include "navbar.html" %}
 
-    
+
 {% endblock navbar %}
 
 
@@ -112,7 +153,7 @@
 
     {% block sidebar %}
 
-    {% include "sidebar.html" %}
+      {% include "sidebar.html" %}
 
     {% endblock sidebar %}
 
@@ -120,6 +161,7 @@
     <!-- Begin page content -->
     <div class="container" id="page-content-wrapper">
 
+      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-info margin-bottom-50" style="margin-top: 20px;">Toggle menu</button>
 
 	{% block bodycontent %}
 
@@ -145,7 +187,7 @@
     {% block footer %}
       <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="http://ontospy.readthedocs.org/">OntoSpy</a> ({{ontospy_version}})</p>
 
-    {% endblock footer %}  
+    {% endblock footer %}
     </div>
   </footer>
 
@@ -185,6 +227,3 @@ $("#menu-toggle").click(function(e) {
 
   </body>
 </html>
-
-
-

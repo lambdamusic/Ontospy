@@ -13,9 +13,10 @@
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li {% ifequal thispage "about" %}class="active"{% endifequal %} ><a href="#">About</a></li>
+        <li><a href="#"><code style="font-size: 115%;">{{ontologies.0.uri|default:"No title defined"}}</code></a></li>
+        {# <li {% ifequal thispage "about" %}class="active"{% endifequal %} ><a href="#">About</a></li>#}
 
-       <li><a href="#menu-toggle" id="menu-toggle">Toggle Menu</a></li>
+       {# <li><a href="#menu-toggle" id="menu-toggle">Toggle Menu</a></li>#}
 
 {% if 0 %}
         <li {% ifequal thispage "dashboard" %}class="active"{% endifequal %} ><a href="dashboard.html">Dashboard</a></li>

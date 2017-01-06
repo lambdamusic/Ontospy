@@ -159,7 +159,7 @@
                                     <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
                                 </td>
                                 <td class="thirdtd">
-                                    <span>{{prop.bestDescription}}</span>
+                                    <span>{{prop.bestDescription|truncatewords:20}}</span>
                                 </td>
                                 <td class="secondtd">
                                     {% if  prop.ranges %}

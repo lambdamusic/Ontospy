@@ -31,7 +31,7 @@
 
         </div>
 
-
+{% if  0 %}
         <div class="row">
             <div class="container">
             <div class="col-md-12">
@@ -41,7 +41,7 @@
             </div>
 
         </div>
-
+{% endif %}
 
 
       <div class="row">
@@ -82,7 +82,11 @@
               <h3 class="panel-title">Ontology Metadata</h3>
             </div>
             <div class="panel-body">
-              <h5 class="well"><code>{{ ontology.uri }}</code></h5>
+              {# <h5 class="well"><code>{{ ontology.uri }}</code></h5>#}
+              <dl>
+                <dt>URI</dt>
+                <dd><code>{{ ontology.uri }}</code></dd>
+              </dl>
                 {% if ontology.annotations %}
                     <dl>
                         {% for each in ontology.annotations %}
@@ -107,6 +111,7 @@
             </div>
             <div class="panel-body">
                 <dl>
+
                  {% for each in stats %}
 
 
@@ -115,6 +120,8 @@
 
 
                     {% endfor %}
+
+                    {% for foo in sources %}<li><small>{{ foo }}</small></li>{% endfor %}
                 </dl>
             </div>
           </div>
@@ -144,7 +151,7 @@
 
                     <div class="col-md-12 ">
                         <br />
-                        <canvas id="entitiesBarChart" height="300"></canvas>
+                        <canvas id="entitiesBarChart" ></canvas>
                     </div>
 
 
@@ -159,11 +166,11 @@
 
 
 
-        {% if ontospy_graph.toplayer %}
+        {% if topclasses %}
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Top Layer: Classes</h3>
+              <h3 class="panel-title">Top Classes</h3>
             </div>
             <div class="panel-body">
 
@@ -174,7 +181,7 @@
 
                         <span class="text-muted">NOTE: size = number of sub-classes</span>
                         <br />
-                        <canvas id="toplayerChart" height="300"></canvas>
+                        <canvas id="toplayerChart" ></canvas>
 
 
                     </div>
@@ -206,7 +213,7 @@
 
                         <span class="text-muted">NOTE: size = number of sub-classes</span>
                         <br />
-                        <canvas id="toplayerChartSKOS" height="300"></canvas>
+                        <canvas id="toplayerChartSKOS"></canvas>
                     </div>
 
 
@@ -237,7 +244,7 @@
                     </p>
                 </div>
 
-	        	<canvas id="triplesStats" height="300"></canvas>
+	        	<canvas id="triplesStats" ></canvas>
 
             </div>
           </div>
@@ -297,7 +304,7 @@
     // labels: ["January", "February", "March", "April", "May", "June", "July"],
     labels: [
              {% for each in stats %}
-                {% if each.0 != "Triples"  %}"{{each.0}}"
+                {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources"  %}"{{each.0}}"
                     {% if not forloop.last %} , {% endif %}
                 {% endif %}
             {% endfor %}
@@ -349,27 +356,54 @@
 
 // SECOND CHART : top layer Classes
 
-	{% if ontospy_graph.toplayer %}
+	{% if topclasses %}
 
     var ctx2 = document.getElementById("toplayerChart").getContext("2d");
 
     var data2 = {
             datasets: [{
                 data: [
-                    {% for class in ontospy_graph.toplayer %}{{ class.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
+                    {% for class in topclasses%}{{ class.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 ],
                 backgroundColor: [
-                    "#FF6384",
-                    "#4BC0C0",
-                    "#FFCE56",
-                    "#E7E9ED",
-                    "#36A2EB"
-                ],
+                  // navy
+                  "#000080",
+                  // blue
+                  "#0000FF",
+                  // teal
+                  "#008080",
+                  // aqua
+                  "#00FFFF",
+                    // maroon
+                    "#800000",
+                    // red
+                    "#FF0000",
+                    // purple
+                    "#800080",
+                    // fuchsia
+                    "#FF00FF",
+                    // green
+                    "#008000",
+                    // lime
+                    "#00FF00",
+                    // olive
+                    "#808000",
+                    // yellow
+                    "#FFFF00",
+                    // black
+                    "#000000",
+                    // silver
+                    "#C0C0C0",
+                    // gray
+                    "#808080",
+                    // white
+                    "#FFFFFF"
+                  ],
                 label: 'Top Layer' // for legend
             }],
             labels: [
-                {% for class in ontospy_graph.toplayer %}"{{class.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
+                {% for class in topclasses %}"{{class.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             ]
         };

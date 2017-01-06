@@ -39,6 +39,10 @@ import zipfile
 import os
 import shutil
 
+from pygments import highlight
+from pygments.lexers.rdf import TurtleLexer
+from pygments.formatters import HtmlFormatter
+
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST
@@ -55,7 +59,7 @@ class VizFactory(object):
 
     Subclass and override as needed.
     """
-    
+
     def __init__(self, ontospy_graph):
         self.title = 'Base Visualizer'
         self.ontospy_graph = ontospy_graph
@@ -68,6 +72,7 @@ class VizFactory(object):
         self.main_file_name = ""
         self.templates_root = ONTOSPY_VIZ_TEMPLATES
         self.static_root = ONTOSPY_VIZ_STATIC
+        self.basic_context_data = self._build_basic_context()
 
     def build(self, output_path=None):
         """method that should be inherited by all vis classes"""
@@ -102,7 +107,7 @@ class VizFactory(object):
 
         atemplate = open(self.templates_root + template_name, "r")
         t = Template(atemplate.read())
-        context = self.get_basic_context()
+        context = Context(self.basic_context_data)
         if extraContext and type(extraContext) == dict:
             context.update(extraContext)
         contents = safe_str(t.render(context))
@@ -147,9 +152,16 @@ class VizFactory(object):
             printDebug("Nothing to preview")
 
 
-    def get_basic_context(self):
-        """util to return a standard context for a django template to render"""
-        c = Context({
+    def _build_basic_context(self):
+        """util to return a standard dict used in django as a template context"""
+        # printDebug(str(self.ontospy_graph.toplayer))
+        topclasses = self.ontospy_graph.toplayer[:]
+        if len(topclasses) < 3: # massage the toplayer!
+            for topclass in self.ontospy_graph.toplayer:
+                for child in topclass.children():
+                    if child not in topclasses: topclasses.append(child)
+
+        context_data = {
             "STATIC_URL": "static/",
             "ontospy_version": VERSION,
             "ontospy_graph": self.ontospy_graph,
@@ -158,13 +170,15 @@ class VizFactory(object):
             "ontologies": self.ontospy_graph.ontologies,
             "sources": self.ontospy_graph.sources,
             "classes": self.ontospy_graph.classes,
+            "topclasses": topclasses,
             "objproperties": self.ontospy_graph.objectProperties,
             "dataproperties": self.ontospy_graph.datatypeProperties,
             "annotationproperties": self.ontospy_graph.annotationProperties,
             "skosConcepts": self.ontospy_graph.skosConcepts,
             "instances": []
-        })
-        return c
+        }
+
+        return context_data
 
 
     def _save2File(self, contents, filename, path):
@@ -174,7 +188,7 @@ class VizFactory(object):
         f.close()  # you can omit in most cases as the destructor will call it
         url = "file://" + filename
         return url
-    
+
     def checkOutputPath(self, output_path):
         """
         Create or clean up output path
@@ -187,14 +201,27 @@ class VizFactory(object):
         return output_path
 
 
-
+    def highlight_code(self, ontospy_entity):
+        """
+        produce an html version of Turtle code with syntax highlighted
+        using Pygments CSS
+        """
+        try:
+            pygments_code = highlight(ontospy_entity.serialize(), TurtleLexer(), HtmlFormatter())
+            pygments_code_css = HtmlFormatter().get_style_defs('.highlight')
+            return {"pygments_code": pygments_code,
+                    "pygments_code_css": pygments_code_css
+                            }
+        except Exception as e:
+            printDebug("Error: Pygmentize Failed", "red")
+            return {}
 
 
 
 
 class HTMLVisualizer(VizFactory):
     """
-    
+
 
     """
 
@@ -240,7 +267,7 @@ class KompleteViz(VizFactory):
         FILE_NAME = "visualizations.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 
-        # BROWSER PAGES
+
         browser_output_path = self.output_path
 
         # ENTITIES A-Z
@@ -255,42 +282,43 @@ class KompleteViz(VizFactory):
         FILE_NAME = "entities-tree.html"
         self._save2File(contents, FILE_NAME, browser_output_path)
 
+        # BROWSER PAGES - CLASSES ======
+
         for entity in self.ontospy_graph.classes:
             extra_context = {"main_entity": entity,
                             "main_entity_type": "class",
                             "ontograph": self.ontospy_graph
                             }
+            extra_context.update(self.highlight_code(entity))
             contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
+        # BROWSER PAGES - PROPERTIES ======
 
         for entity in self.ontospy_graph.properties:
             extra_context = {"main_entity": entity,
                             "main_entity_type": "property",
                             "ontograph": self.ontospy_graph
                             }
+            extra_context.update(self.highlight_code(entity))
             contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
+
+        # BROWSER PAGES - CONCEPTS ======
 
         for entity in self.ontospy_graph.skosConcepts:
             extra_context = {"main_entity": entity,
                             "main_entity_type": "concept",
                             "ontograph": self.ontospy_graph
                             }
+            extra_context.update(self.highlight_code(entity))
             contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
             FILE_NAME = entity.slug + ".html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
 
-        # entities = [g.classes, g.properties, g.skosConcepts]
-        # for group in entities:
-        #     for c in group:
-        #         # getting main func dynamically
-        #         contents = func(g, False, c)
-        #         _filename = c.slug + ".html"
-        #         url = _saveVizLocally(contents, _filename, DEST_FOLDER)
 
         return main_url
 
@@ -298,17 +326,22 @@ class KompleteViz(VizFactory):
 
 if __name__ == '__main__':
     import sys
-    
+
     try:
-    
-        uri, g = get_random_ontology()
-        
+
+        if True:
+            uri, g = get_random_ontology(30, pattern="foaf")
+
+        if False:
+            from ..core.ontospy import Ontospy
+            # g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
+            g = Ontospy("/Users/michele.pasin/Dropbox/code/scigraph/knowledge-graph/models/ontologies/core")
+
         v = KompleteViz(g)
         v.build()
         v.preview()
-        
+
         sys.exit(0)
-    
+
     except KeyboardInterrupt as e:  # Ctrl-C
         raise e
-
