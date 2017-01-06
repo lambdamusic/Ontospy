@@ -332,7 +332,7 @@
           // data: [65, 59, 80, 81, 56, 55, 40],
             data: [
              {% for each in stats %}
-                {% if each.0 != "Triples"  %}{{each.1}}
+                {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources" %}{{each.1}}
                     {% if not forloop.last %} , {% endif %}
                 {% endif %}
             {% endfor %}

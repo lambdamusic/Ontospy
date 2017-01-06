@@ -330,7 +330,7 @@ if __name__ == '__main__':
     try:
 
         if True:
-            uri, g = get_random_ontology(30, pattern="foaf")
+            uri, g = get_random_ontology(100, pattern="article")
 
         if False:
             from ..core.ontospy import Ontospy

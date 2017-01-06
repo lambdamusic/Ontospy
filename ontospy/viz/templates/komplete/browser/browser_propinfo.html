@@ -22,7 +22,7 @@
 
 {% block bodycontent %}
 {% ifequal main_entity_type "property"  %}
-    
+
         {% with main_entity as each  %}
 
            <ol class="breadcrumb">
@@ -35,89 +35,152 @@
             	<li class="active">{{each.qname}}</li>
             </ol>
 
-        <div class="entity-div">
 
-            <h1 class="entity-section">
+            <h1>
 {#                Property: #}
                 {{each.qname}}
+                {% if not each.children  %}
+                    <small class="badge">leaf node</small>
+                  {% endif %}
+
             </h1>
 
             <hr>
 
 
-            {% if not each.children  %}
-            <p class="section-desc">
-                <small>NOTE</small> this is a leaf node.</p>
-            {% endif %}
+            <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">URI</h3>
+             </div>
+             <div class="panel-body">
 
-            <p class="section-desc"><b>URI:</b>
-                <br>
-                {{each.uri}}
-            </p>
- 
-            <p class="section-desc"><b>Description:</b>
-                <br>
+                 <code>{{each.uri}}</code>
+             </div>
+           </div>
+            </div></div>
+
+
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Description</h3>
+            </div>
+            <div class="panel-body">
+
                 {{each.bestDescription|default:"--"}}
-            </p>
+            </div>
+          </div>
+           </div></div>
+
+
 
             {% if each.ancestors %}
-                <p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
-                    <br />
-                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
-            {% else %}
+
+                    <div class="row"><div class="col-md-12">
+                      <div class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">Inherits from</h3>
+                    </div>
+                    <div class="panel-body">
+
+                    {% if each.ancestors %}
+                            {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                    {% else %}
+                        <li>owl:Thing</li>
+                    {% endif %}
+
+                    </div>
+                  </div>
+                   </div></div>
 
             {% endif %}
 
 
 
             {% if each.children %}
-                <p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
-                    <br />
-                    {% for s in each.children %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
+
+                  <div class="row"><div class="col-md-12">
+                    <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Sub Property</h3>
+                  </div>
+                  <div class="panel-body">
+
+                      {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+
+
+                  </div>
+                </div>
+                 </div></div>
+
             {% endif %}
 
-            {% if 0 and each.descendants and each.descendants|length > each.children|length %}
-                <p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
-            {% endif %}
 
 
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Domain</h3>
+            </div>
+            <div class="panel-body">
 
-            <p class="section-desc"><b>Usage:</b>
-                <br>
                 {% if each.domains %}
                     {% for s in each.domains %}
-                    <a href="{{s.slug}}.html">{{s.qname|default:s}}</a> {% if not forloop.last %} &amp;&amp; {% endif %} 
+                      <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
                     {% endfor %}
                 {% else %}
-                    owl:Thing
+                    <a>owl:Thing</a> (inferred)
                 {% endif %}
-                =&gt;&nbsp;<span class="highlight_entity">{{each.qname}}</span>&nbsp;=&gt;&nbsp;
-                {% if each.ranges %}
-                    {% for s in each.ranges %}
-                    <a href="{{s.slug}}.html">{{s.qname|default:s}}</a> {% if not forloop.last %} &amp;&amp; {% endif %} 
-                    {% endfor %}
+
+            </div>
+          </div>
+           </div></div>
+
+
+
+           <div class="row"><div class="col-md-12">
+             <div class="panel panel-default">
+           <div class="panel-heading">
+             <h3 class="panel-title">Range</h3>
+           </div>
+           <div class="panel-body">
+
+               {% if each.ranges %}
+                   {% for s in each.ranges %}
+                     <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
+                   {% endfor %}
+               {% else %}
+                   <a>owl:Thing</a> (inferred)
+               {% endif %}
+
+           </div>
+         </div>
+          </div></div>
+
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Implementation</h3>
+            </div>
+            <div class="panel-body">
+
+                {% if pygments_code %}
+
+                    {{pygments_code|safe}}
+
                 {% else %}
-                    owl:Thing
+                     <div class="implementation">
+                        <code style="background-color: white;">{{each.serialize|linebreaks}}</code>
+                    </div>
                 {% endif %}
-            
-
-            </p>
-
-
+            </div>
+          </div>
+           </div></div>
 
 
-            <small class="implementation_title">Implementation:</small>
-            {% if pygments_code %}
-                {{pygments_code|safe}}
-            {% else %}
-                 <div class="implementation">
-                    <code>{{each.serialize|linebreaks}}</code>
-                </div>               
-            {% endif %}
 
-        </div>
 
         {% endwith %}
 

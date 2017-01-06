@@ -12,7 +12,7 @@
 
 {% block sidebar %}
 
-    {% with thispage="entities-az" %}
+    {% with thispage="" %}
         {% include "sidebar.html" %}
     {% endwith %}
 
@@ -22,7 +22,7 @@
 
 {% block bodycontent %}
 {% ifequal main_entity_type "concept"  %}
-    
+
         {% with main_entity as each  %}
 
 
@@ -31,7 +31,7 @@
                 <a href="entities-az.html">Entities</a>
             </li>
             <li>
-                <a href="entities-az.html">Classes</a>
+                <a href="entities-az.html">Concepts</a>
             </li>
             <li class="active">{{each.qname}}</li>
         </ol>
@@ -39,10 +39,14 @@
 
        <div class="entity-div">
 
-            <h1 class="entity-section">
+         <h1>
 {#                Concept: #}
-                {{each.qname}}
-            </h1>
+             {{each.qname}}
+             {% if not each.children  %}
+                 <small class="badge">leaf node</small>
+               {% endif %}
+
+         </h1>
 
             <hr>
 
@@ -96,39 +100,76 @@
             </div>
 
 
-            {% if not each.children  %}
-            <p class="section-desc">
-                <small>NOTE</small> this is a leaf node.</p>
-            {% endif %}
+            <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">URI</h3>
+             </div>
+             <div class="panel-body">
 
-            <p class="section-desc"><b>URI:</b>
-                <br>
-                {{each.uri}}
-            </p>
+                 <code>{{each.uri}}</code>
+             </div>
+           </div>
+            </div></div>
 
-            <p class="section-desc"><b>Description:</b>
-                <br>
-                {{each.bestDescription|default:"--"}}
-            </p>
+             <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">Description</h3>
+             </div>
+             <div class="panel-body">
+
+                 {{each.bestDescription|default:"--"}}
+             </div>
+           </div>
+            </div></div>
+
+
+
+
+
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Inherits from</h3>
+            </div>
+            <div class="panel-body">
 
             {% if each.ancestors %}
-                <p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
-                    <br />
-                    {% for s in each.ancestors %}<a href="{{s.slug}}.html">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
-                </p>
-            {% endif %}
-
-
-            <small class="implementation_title">Implementation:</small>
-            {% if pygments_code %}
-                {{pygments_code|safe}}
+                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
             {% else %}
-                 <div class="implementation">
-                    <code>{{each.serialize|linebreaks}}</code>
-                </div>               
+                <li>owl:Thing</li>
             {% endif %}
 
-        </div>
+            </div>
+          </div>
+           </div></div>
+
+
+
+
+          <div class="row"><div class="col-md-12">
+             <div class="panel panel-default">
+           <div class="panel-heading">
+             <h3 class="panel-title">Implementation</h3>
+           </div>
+           <div class="panel-body">
+
+               {% if pygments_code %}
+
+                   {{pygments_code|safe}}
+
+               {% else %}
+                    <div class="implementation">
+                       <code style="background-color: white;">{{each.serialize|linebreaks}}</code>
+                   </div>
+               {% endif %}
+           </div>
+         </div>
+          </div></div>
+
+
+
 
 
         {% endwith %}
