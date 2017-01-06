@@ -63,6 +63,7 @@ class Ontospy(object):
         self.objectProperties = []
         self.datatypeProperties = []
         self.skosConcepts = []
+        self.individuals = []
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
@@ -141,10 +142,9 @@ class Ontospy(object):
 
 
     def stats(self):
-        """ shotcut to pull out useful info for a graph 
-
-        """
+        """ shotcut to pull out useful info for a graph"""
         out = []
+        out += [("Ontologies", len(self.ontologies))]
         out += [("Triples", self.triplesCount())]
         out += [("Classes", len(self.classes))]
         out += [("Properties", len(self.properties))]
@@ -152,7 +152,8 @@ class Ontospy(object):
         out += [("Object Properties", len(self.objectProperties))]
         out += [("Datatype Properties", len(self.datatypeProperties))]
         out += [("Skos Concepts", len(self.skosConcepts))]
-        # out += [("Individuals", len(self.instances))]
+        # out += [("Individuals", len(self.individuals))] @TODO
+        out += [("Data Sources", len(self.sources))]
         return out
 
     def triplesCount(self):
@@ -249,7 +250,7 @@ class Ontospy(object):
         qres = self.queryHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
         for class_tuple in qres:
-            
+
             _uri = class_tuple[0]
             try:
                 _type = class_tuple[1]
@@ -839,8 +840,3 @@ class SparqlEndpoint(Ontospy):
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
         """
         super(SparqlEndpoint, self).__init__(source, text=False, endpoint=True, rdf_format=None)
-
-
-
-
-
