@@ -12,7 +12,7 @@
 
 {% block sidebar %}
 
-    {% with thispage="entities-tree" %}
+    {% with thispage=treetype %}
         {% include "sidebar.html" %}
     {% endwith %}
 
@@ -22,116 +22,42 @@
 
 {% block bodycontent %}
 
-        <div class="page-header">
-
-            <h3>Entities Tree
-{#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
-            </h3>
-
-        </div>
-
-
-      <div class="row">
-
-        {# first column #}
-        <div class="col-md-6">
-
-        {% if ontospy_graph.classes %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Classes ({{ ontospy_graph.classes|length }})</h3>
-            </div>
-            <div class="panel-body" style="overflow: auto;">
-               <dl>
-
-               {% for each in ontospy_graph.classes  %}
-                   <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
-                   <dd>
-{#                       {{ each.bestDescription|default:"[no definition]" }}#}
-                   </dd>
-
-               {% endfor %}
-
-              </dl>
-            </div>
-          </div>
-            </div>
-          </div>
-          {% endif %}
+  <ol class="breadcrumb">
+    <li>
+      <a href="entities-az.html">Entities</a>
+    </li>
+    <li class="active">
+          {{treetype|capfirst}}
+      </li>
+  </ol>
 
 
 
-           {% if ontospy_graph.skosConcepts %}
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="panel panel-default">
-                <div class="panel-heading">
-                  <h3 class="panel-title">Concepts ({{ ontospy_graph.skosConcepts|length }})</h3>
-                </div>
-                <div class="panel-body" style="overflow: auto;">
-                   <dl>
+  <div class="page-header">
 
-                   {% for each in ontospy_graph.skosConcepts  %}
-                       <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
-                       <dd>
-{#                           {{ each.bestDescription|default:"[no definition]" }}#}
-                       </dd>
+      <h3>Entities Tree: {{treetype|capfirst}}
 
-                   {% endfor %}
+      </h3>
 
-                  </dl>
-                </div>
-              </div>
-                </div>
-              </div>
-        {% endif %}
+  </div>
 
 
 
+     <div class="row"><div class="col-md-12">
+        <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Tree</h3>
+      </div>
+      <div class="panel-body">
 
-        </div>
-         {# END first column #}
+          {{treeTable|safe}}
 
-
-        {# second column #}
-        <div class="col-md-6">
-
-
-           {% if ontospy_graph.properties %}
-              <div class="row">
-                <div class="col-md-12">
-                  <div class="panel panel-default">
-                <div class="panel-heading">
-                  <h3 class="panel-title">Properties ({{ ontospy_graph.properties|length }})</h3>
-                </div>
-                <div class="panel-body" style="overflow: auto;">
-                   <dl>
-
-                   {% for each in ontospy_graph.properties  %}
-                       <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
-                       <dd>
-{#                           {{ each.bestDescription|default:"[no definition]" }}#}
-                       </dd>
-
-                   {% endfor %}
-
-                  </dl>
-                </div>
-              </div>
-                </div>
-              </div>
-        {% endif %}
-
-
-
-
-
-        </div>
-         {# END second column #}
 
       </div>
+    </div>
+     </div></div>
+
+
 
 
 

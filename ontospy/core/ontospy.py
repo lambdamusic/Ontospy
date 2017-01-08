@@ -522,9 +522,9 @@ class Ontospy(object):
 
 
 
-
+    # ===============
     # METHODS TO RETRIEVE OBJECTS
-
+    # ================
 
 
     def getClass(self, id=None, uri=None, match=None):
@@ -826,6 +826,55 @@ class Ontospy(object):
 
         else:
             printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
+
+
+    def ontologyClassTree(self):
+        """
+        Returns a dict representing the ontology tree
+        Top level = {0:[top classes]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.classes:
+            treedict[0] = self.toplayer
+            for element in self.classes:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+    def ontologyPropTree(self):
+        """
+        Returns a dict representing the ontology tree
+        Top level = {0:[top properties]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.properties:
+            treedict[0] = self.toplayerProperties
+            for element in self.properties:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+    def ontologyConceptTree(self):
+        """
+        Returns a dict representing the skos tree
+        Top level = {0:[top concepts]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.skosConcepts:
+            treedict[0] = self.toplayerSkosConcepts
+            for element in self.skosConcepts:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
 
 
 

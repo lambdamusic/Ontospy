@@ -57,6 +57,18 @@ def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
 	return out
 
 
+
+
+# note: duplicate of templatetagg so to avoid circular imports
+def truncchar_inverse(value, arg):
+	if len(value) < arg:
+		return value
+	else:
+		x = len(value) - arg
+		return '...' + value[x:]
+
+
+
 ##################
 #
 #  TREE DISPLAY FUNCTIONS [from ontospy web]
@@ -64,10 +76,150 @@ def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
 ##################
 
 
-# @todo update and make it work with latest ontospy
+def formatHTML_EntityTreeTable(treedict, element=0):
+	""" outputs an html tree representation based on the dictionary we get from the Inspector
+	object....
+
+	EG:
+	<table class=h>
+
+		<tr>
+		  <td class="tc" colspan=4><a href="../DataType">DataType</a>
+		  </td>
+		</tr>
+		<tr>
+		  <td class="tc" colspan=4><a href="../DataType">DataType</a>
+		  </td>
+		</tr>
+
+		<tr>
+		  <td class="space"></td>
+		  <td class="bar"></td>
+		  <td class="space"></td>
+
+		  <td>
+			<table class=h>
+			   <tr><td class="tc" colspan=4><a href="../Boolean">Boolean</a>
+					</td>
+			   </tr>
+			   <tr><td class="tc" colspan=4><a href="../Boolean">Boolean</a>
+					</td>
+			   </tr>
+		   </table>
+		  </td>
 
 
-def formatHTML_ClassTreeTable(onto, treedict=None, element=0):
+		 </tr>
+	 </table>
+
+
+	Note: The top level owl:Thing never appears as a link.
+
+	"""
+	# ontoFile = onto.ontologyMaskedLocation or onto.ontologyPhysicalLocation
+	# if not treedict:
+	# 	treedict = onto.ontologyClassTree()
+	stringa = """<table class="h">"""
+	for x in treedict[element]:
+		if x.qname == "owl:Thing":
+			stringa += """<tr>
+							<td class="tc" colspan=4><a>%s</a></td>
+						  </tr>""" % (truncchar_inverse(x.qname, 50))
+		else:
+			stringa += """<tr>
+							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
+						  </tr>""" % (x.uri, x.slug,
+									  truncchar_inverse(x.qname, 50))
+
+		if treedict.get(x, None):
+			stringa += """ <tr>
+							<td class="space"></td>
+							<td class="bar"></td>
+							<td class="space"></td>
+							<td>%s</td>
+							</tr>""" % formatHTML_EntityTreeTable(treedict, x)
+
+		# stringa += formatHTML_ClassTree(onto, treedict, x)
+		# stringa += "</li>"
+	stringa += "</table>"
+	return stringa
+
+
+
+
+def _formatHTML_ClassTreeTable(onto, treedict=None, element=0):
+	""" outputs an html tree representation based on the dictionary we get from the Inspector
+	object....
+
+	EG:
+	<table class=h>
+
+		<tr>
+		  <td class="tc" colspan=4><a href="../DataType">DataType</a>
+		  </td>
+		</tr>
+		<tr>
+		  <td class="tc" colspan=4><a href="../DataType">DataType</a>
+		  </td>
+		</tr>
+
+		<tr>
+		  <td class="space"></td>
+		  <td class="bar"></td>
+		  <td class="space"></td>
+
+		  <td>
+			<table class=h>
+			   <tr><td class="tc" colspan=4><a href="../Boolean">Boolean</a>
+					</td>
+			   </tr>
+			   <tr><td class="tc" colspan=4><a href="../Boolean">Boolean</a>
+					</td>
+			   </tr>
+		   </table>
+		  </td>
+
+
+		 </tr>
+	 </table>
+
+
+	Note: The top level owl:Thing never appears as a link.
+
+	"""
+	# ontoFile = onto.ontologyMaskedLocation or onto.ontologyPhysicalLocation
+	if not treedict:
+		treedict = onto.ontologyClassTree()
+	stringa = """<table class="h">"""
+	for x in treedict[element]:
+		if x.qname == "owl:Thing":
+			stringa += """<tr>
+							<td class="tc" colspan=4><a>%s</a></td>
+						  </tr>""" % (truncchar_inverse(x.qname, 50))
+		else:
+			stringa += """<tr>
+							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
+						  </tr>""" % (x.uri, x.slug,
+									  truncchar_inverse(x.qname, 50))
+
+		if treedict.get(x, None):
+			stringa += """ <tr>
+							<td class="space"></td>
+							<td class="bar"></td>
+							<td class="space"></td>
+							<td>%s</td>
+							</tr>""" % formatHTML_ClassTreeTable(onto, treedict, x)
+
+		# stringa += formatHTML_ClassTree(onto, treedict, x)
+		# stringa += "</li>"
+	stringa += "</table>"
+	return stringa
+
+
+
+
+
+def ORIGINAL_formatHTML_ClassTreeTable(onto, treedict=None, element=0):
 	""" outputs an html tree representation based on the dictionary we get from the Inspector
 	object....
 
@@ -136,7 +288,7 @@ def formatHTML_ClassTreeTable(onto, treedict=None, element=0):
 	return stringa
 
 
-def formatHTML_PropTreeTable(onto, classPredicate, treedict=None, element=0):
+def ORIGINAL_formatHTML_PropTreeTable(onto, classPredicate, treedict=None, element=0):
 	""" outputs an html tree representation based on the dictionary we get from the Inspector
 	object....
 	-see above for an example-
@@ -186,6 +338,3 @@ def formatHTML_PropTreeTable(onto, classPredicate, treedict=None, element=0):
 		# stringa += "</li>"
 	stringa += "</table>"
 	return stringa
-
-
-

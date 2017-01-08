@@ -12,6 +12,8 @@ from .. import *
 from ..core.utils import *
 from ..core.manager import *
 
+from .utils import *
+
 # Fix Python 2.x.
 try:
     input = raw_input
@@ -287,48 +289,69 @@ class KompleteViz(VizFactory):
         FILE_NAME = "entities-az.html"
         self._save2File(contents, FILE_NAME, browser_output_path)
 
-        # ENTITIES TREE
-        extra_context = {"ontograph": self.ontospy_graph}
-        contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
-        FILE_NAME = "entities-tree.html"
-        self._save2File(contents, FILE_NAME, browser_output_path)
 
-        # BROWSER PAGES - CLASSES ======
 
-        for entity in self.ontospy_graph.classes:
-            extra_context = {"main_entity": entity,
-                            "main_entity_type": "class",
-                            "ontograph": self.ontospy_graph
-                            }
-            extra_context.update(self.highlight_code(entity))
-            contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
-            FILE_NAME = entity.slug + ".html"
+        if self.ontospy_graph.classes:
+            # CLASSES = ENTITIES TREE
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "classes",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyClassTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-classes.html"
+            self._save2File(contents, FILE_NAME, browser_output_path)
+            # BROWSER PAGES - CLASSES ======
+            for entity in self.ontospy_graph.classes:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "class",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        if self.ontospy_graph.properties:
+
+            # PROPERTIES = ENTITIES TREE
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "properties",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyPropTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-properties.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
-        # BROWSER PAGES - PROPERTIES ======
+            # BROWSER PAGES - PROPERTIES ======
 
-        for entity in self.ontospy_graph.properties:
-            extra_context = {"main_entity": entity,
-                            "main_entity_type": "property",
-                            "ontograph": self.ontospy_graph
-                            }
-            extra_context.update(self.highlight_code(entity))
-            contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
-            FILE_NAME = entity.slug + ".html"
+            for entity in self.ontospy_graph.properties:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "property",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        if self.ontospy_graph.skosConcepts:
+
+            # CONCEPTS = ENTITIES TREE
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "concepts",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-concepts.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
-        # BROWSER PAGES - CONCEPTS ======
+            # BROWSER PAGES - CONCEPTS ======
 
-        for entity in self.ontospy_graph.skosConcepts:
-            extra_context = {"main_entity": entity,
-                            "main_entity_type": "concept",
-                            "ontograph": self.ontospy_graph
-                            }
-            extra_context.update(self.highlight_code(entity))
-            contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
-            FILE_NAME = entity.slug + ".html"
-            self._save2File(contents, FILE_NAME, browser_output_path)
-
+            for entity in self.ontospy_graph.skosConcepts:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "concept",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
 
 
         return main_url
@@ -341,7 +364,7 @@ if __name__ == '__main__':
     try:
 
         if True:
-            uri, g = get_random_ontology(100, pattern="article")
+            uri, g = get_random_ontology(50, pattern="subjects")
 
         if False:
             from ..core.ontospy import Ontospy

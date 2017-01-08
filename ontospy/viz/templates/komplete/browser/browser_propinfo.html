@@ -30,7 +30,7 @@
             		<a href="entities-az.html">Entities</a>
             	</li>
             	<li>
-                    <a href="entities-az.html">Properties</a>
+                    <a href="entities-tree-properties.html">Properties</a>
                 </li>
             	<li class="active">{{each.qname}}</li>
             </ol>
@@ -130,7 +130,7 @@
                       <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
                     {% endfor %}
                 {% else %}
-                    <a>owl:Thing</a> (inferred)
+                    <li><a>owl:Thing</a> (inferred)</li>
                 {% endif %}
 
             </div>
@@ -151,7 +151,7 @@
                      <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
                    {% endfor %}
                {% else %}
-                   <a>owl:Thing</a> (inferred)
+                   <li><a>owl:Thing</a> (inferred)</li>
                {% endif %}
 
            </div>
