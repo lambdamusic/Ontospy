@@ -364,7 +364,7 @@ if __name__ == '__main__':
     try:
 
         if True:
-            uri, g = get_random_ontology(50, pattern="subjects")
+            uri, g = get_random_ontology(50, pattern="core")
 
         if False:
             from ..core.ontospy import Ontospy

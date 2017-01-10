@@ -39,6 +39,7 @@
             <h3>Entities A-Z
 {#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
             </h3>
+            <input id="search-input" type="text" class="form-control" placeholder="Filter...">
 
         </div>
 
@@ -55,7 +56,7 @@
             <div class="panel-heading">
               <h3 class="panel-title">Classes ({{ ontospy_graph.classes|length }})</h3>
             </div>
-            <div class="panel-body" style="overflow: auto;">
+            <div class="panel-body entities-list" style="overflow: auto;">
                <dl>
 
                {% for each in ontospy_graph.classes  %}
@@ -82,7 +83,7 @@
                 <div class="panel-heading">
                   <h3 class="panel-title">Concepts ({{ ontospy_graph.skosConcepts|length }})</h3>
                 </div>
-                <div class="panel-body" style="overflow: auto;">
+                <div class="panel-body entities-list" style="overflow: auto;">
                    <dl>
 
                    {% for each in ontospy_graph.skosConcepts  %}
@@ -118,7 +119,7 @@
                 <div class="panel-heading">
                   <h3 class="panel-title">Properties ({{ ontospy_graph.properties|length }})</h3>
                 </div>
-                <div class="panel-body" style="overflow: auto;">
+                <div class="panel-body entities-list" style="overflow: auto;">
                    <dl>
 
                    {% for each in ontospy_graph.properties  %}
@@ -162,6 +163,24 @@
 
 {% block extrajs %}
 
+<script type="text/javascript">
 
+// http://stackoverflow.com/questions/9127498/how-to-perform-a-real-time-search-and-filter-on-a-html-table
+
+  $('#search-input').keyup(function() {
+
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    // var $rows = $(this).next(".entities-list").find("div");
+    var $rows = $(this).parent().next().find(".entities-list dt");
+
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+</script>
 
 {% endblock extrajs %}
