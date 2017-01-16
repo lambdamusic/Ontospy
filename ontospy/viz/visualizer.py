@@ -335,6 +335,7 @@ class KompleteViz(VizFactory):
         if self.ontospy_graph.skosConcepts:
 
             # CONCEPTS = ENTITIES TREE
+
             extra_context = {"ontograph": self.ontospy_graph, "treetype" : "concepts",
                 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree())}
             contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
@@ -363,10 +364,10 @@ if __name__ == '__main__':
 
     try:
 
-        if True:
+        if False:
             uri, g = get_random_ontology(50, pattern="core")
 
-        if False:
+        if True:
             from ..core.ontospy import Ontospy
             # g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
             g = Ontospy("/Users/michele.pasin/Dropbox/code/scigraph/knowledge-graph/models/ontologies/core")

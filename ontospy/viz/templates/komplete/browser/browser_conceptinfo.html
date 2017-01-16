@@ -12,7 +12,7 @@
 
 {% block sidebar %}
 
-    {% with thispage="" %}
+    {% with thispage=main_entity.qname %}
         {% include "sidebar.html" %}
     {% endwith %}
 

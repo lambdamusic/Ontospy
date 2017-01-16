@@ -11,21 +11,40 @@
         <li style="margin-top: 20px;"><a {% ifequal thispage "dashboard" %}class="active"{% endifequal %} href="dashboard.html">Dashboard</a>
         </li>
 
-        <li ><a {% ifequal thispage "entities-az" %}class="active"{% endifequal %}href="entities-az.html">Entities</a>
+        <li ><a {% ifequal thispage "entities-az" %}class="active"{% endifequal %}href="entities-az.html">Entities A-Z</a>
         </li>
 
+
+        {% if ontospy_graph.classes %}
+          <li class="-second-level" ><a {% ifequal thispage "classes" %}class="active"{% endifequal %}href="entities-tree-classes.html">Classes ({{ontospy_graph.classes|length}})</a>
+          </li>
+
             {# simulated second level #}
-            {% if ontospy_graph.classes %}
-              <li class="second-level" ><a {% ifequal thispage "classes" %}class="active"{% endifequal %}href="entities-tree-classes.html">Classes ({{ontospy_graph.classes|length}})</a>
-              </li>
-            {% endif %}
+          {% for each in  ontospy_graph.classes %}
+              <li class="second-level" style="line-height: 20px;"><a {% ifequal thispage each.qname %}class="active"{% endifequal %} href="{{each.slug}}.html">{{each.qname}}</a></li>
+          {% endfor %}
+        {% endif %}
+
             {% if ontospy_graph.properties %}
-              <li class="second-level" ><a {% ifequal thispage "properties" %}class="active"{% endifequal %} href="entities-tree-properties.html">Properties ({{ontospy_graph.properties|length}})</a>
+              <li class="-second-level" ><a {% ifequal thispage "properties" %}class="active"{% endifequal %} href="entities-tree-properties.html">Properties ({{ontospy_graph.properties|length}})</a>
               </li>
+
+              {# simulated second level #}
+            {% for each in  ontospy_graph.properties %}
+                <li class="second-level" style="line-height: 20px;"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+            {% endfor %}
+
             {% endif %}
+
             {% if ontospy_graph.skosConcepts  %}
               <li class="second-level" ><a {% ifequal thispage "concepts" %}class="active"{% endifequal %}href="entities-tree-concepts.html">Concepts ({{ontospy_graph.skosConcepts|length}})</a>
               </li>
+
+                {# simulated second level #}
+              {% for each in  ontospy_graph.skosConcepts %}
+                  <li class="second-level" style="line-height: 20px;"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+              {% endfor %}
+
             {% endif %}
 
         <li ><a {% ifequal thispage "visualizations" %}class="active"{% endifequal %} href="visualizations.html">Visualizations</a>
