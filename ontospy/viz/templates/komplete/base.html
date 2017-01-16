@@ -217,11 +217,29 @@ $("#menu-toggle").click(function(e) {
 });
 </script>
 
-    {% block extrajs %}
+
+{% if main_entity %}
+<!-- Scroll Sidebar Script -->
+{# Convention is to have sidebar menu li items with id "sd_XXXX"#}
+{# Entity pages get the script below - other pages need duplication unfortunately #}
+<script type="text/javascript">
+
+  $(document).ready(function (){
+    $('#sidebar-wrapper').animate({
+        scrollTop: $("#sd_{{main_entity.id}}").offset().top - 100
+    }, 100);
+  });
+
+</script>
+{% endif %}
 
 
 
-    {% endblock extrajs %}
+{% block extrajs %}
+
+
+
+{% endblock extrajs %}
 
 
 

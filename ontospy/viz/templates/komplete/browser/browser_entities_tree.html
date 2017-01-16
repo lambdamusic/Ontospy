@@ -97,4 +97,19 @@
 
 </script>
 
+
+
+<!-- Scroll Sidebar Script -->
+{# Convention is to have sidebar menu li items with id "sd_XXXX"#}
+<script type="text/javascript">
+
+  $(document).ready(function (){
+    $('#sidebar-wrapper').animate({
+        scrollTop: $("#sd_{{treetype}}").offset().top - 100
+    }, 100);
+  });
+
+</script>
+
+
 {% endblock extrajs %}
