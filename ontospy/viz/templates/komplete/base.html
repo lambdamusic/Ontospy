@@ -40,6 +40,7 @@
 <style type="text/css">
 
   .lead-plus {font-size: 26.5px;}
+  .label-xs {font-size: 10px;}
   .label-dark {background: #2c3e50; color: white; padding: 1px;}
   .margin50 {margin-top: 50px; margin-bottom: 50px;}
 
@@ -54,6 +55,10 @@
   .page-header  {margin-top: 30px;}
   #wrapper {margin-top: 50px;}
 
+  .implementation-panel {
+    overflow: auto;
+    max-height: 500px;
+  }
 
   tr.table-classproperties {
       background: #f5f5f5;
@@ -78,6 +83,10 @@
       margin-top: 30px;
   }
 
+  .fromclass_link {
+    color: white;
+    text-decoration: underline;
+  }
 
 		.mythumbnail {
 			display: block;
@@ -163,7 +172,7 @@
     <!-- Begin page content -->
     <div class="container" id="page-content-wrapper">
 
-      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-info margin-bottom-50" style="margin-top: 20px;">Toggle menu</button>
+      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-info margin-bottom-50" style="margin-top: 20px;">Toggle sidebar</button>
 
 	{% block bodycontent %}
 
@@ -218,19 +227,40 @@ $("#menu-toggle").click(function(e) {
 </script>
 
 
-{% if main_entity %}
-<!-- Scroll Sidebar Script -->
-{# Convention is to have sidebar menu li items with id "sd_XXXX"#}
-{# Entity pages get the script below - other pages need duplication unfortunately #}
+
+
 <script type="text/javascript">
 
-  $(document).ready(function (){
-    $('#sidebar-wrapper').animate({
-        scrollTop: $("#sd_{{main_entity.id}}").offset().top - 100
-    }, 100);
-  });
+$('#search-input-sidebar').keyup(function() {
+
+  var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+  // var $rows = $(this).next(".entities-list").find("div");
+  var $rows = $(this).parent().parent().find("li.second-level");
+
+  $rows.show().filter(function() {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return !~text.indexOf(val);
+  }).hide();
+});
 
 </script>
+
+
+
+{% if main_entity %}
+  <!-- Scroll Sidebar Script -->
+  {# Convention is to have sidebar menu li items with id "sd_XXXX"#}
+  {# Entity pages get the script below - other pages need duplication unfortunately #}
+  <script type="text/javascript">
+
+    $(document).ready(function (){
+      $('#sidebar-wrapper').animate({
+          scrollTop: $("#sd_{{main_entity.id}}").offset().top - 100
+      }, 100);
+    });
+
+  </script>
+
 {% endif %}
 
 

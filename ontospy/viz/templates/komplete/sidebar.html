@@ -3,12 +3,10 @@
 <div id="sidebar-wrapper">
     <ul class="sidebar-nav">
 
-        <li style="margin-top: 20px;" id="sd_dashboard"><a {% ifequal thispage "dashboard" %}class="active"{% endifequal %} href="dashboard.html">Dashboard</a>
-        </li>
 
-        <li id="sd_entities-az"><a {% ifequal thispage "entities-az" %}class="active"{% endifequal %}href="entities-az.html">Entities A-Z</a>
+        <li>
+          <input style="margin-top: 30px;  margin-bottom: 20px;" type="text" id="search-input-sidebar" name="" value="" placeholder="Type to search">
         </li>
-
 
         {% if ontospy_graph.classes %}
           <li class="-second-level" id="sd_classes"><a {% ifequal thispage "classes" %}class="active"{% endifequal %}href="entities-tree-classes.html">Classes ({{ontospy_graph.classes|length}})</a>
@@ -41,9 +39,6 @@
               {% endfor %}
 
             {% endif %}
-
-        <li id="sd_visualizations"><a {% ifequal thispage "visualizations" %}class="active"{% endifequal %} href="visualizations.html">Visualizations</a>
-        </li>
 
         <br />
         <br />

@@ -40,7 +40,7 @@
 {#                Property: #}
                 {{each.qname}}
                 {% if not each.children  %}
-                    <small class="badge">leaf node</small>
+                    <small class="label label-success label-xs ">leaf node</small>
                   {% endif %}
 
             </h1>
@@ -164,7 +164,7 @@
             <div class="panel-heading">
               <h3 class="panel-title">Implementation</h3>
             </div>
-            <div class="panel-body">
+            <div class="panel-body implementation-panel">
 
                 {% if pygments_code %}
 

@@ -3,7 +3,9 @@
 
 {% block navbar %}
 
-    {% include "navbar.html" %}
+  {% with thispage="visualizations" %}
+      {% include "navbar.html" %}
+  {% endwith %}
 
 {% endblock navbar %}
 
@@ -20,15 +22,6 @@
 
 
   {% block bodycontent %}
-
-        <div class="page-header">
-
-            {% include "onto_header.html" %}
-
-        </div>
-
-
-
 
 
 
@@ -291,7 +284,3 @@
 
 
   {% endblock bodycontent %}
-
-
-
-
