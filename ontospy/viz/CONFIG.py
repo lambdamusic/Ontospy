@@ -73,14 +73,6 @@ VISUALIZATIONS_LIST = {
         "Type": "single-file",
         "File-extension": "html",
         "Static-files": ["d3.v3.min.js" ]
-      }, {
-        "ID": "komplete",
-        "Title": "Complete [test]",
-        "Description": "buggy!",
-        "Type": "single-file",
-        "File-extension": "html",
-        "Static-files": ["d3.v3.min.js" ]
       }
   ]
 }
-

@@ -1,93 +1,186 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
+#
+#
+# TEST TEST TEST TEST TES
+#
+#
 
-from . import *  # imports __init__
+
+
 from .. import *
-import json
+from ..core.utils import *
+from ..core.manager import *
+
+from .utils import *
+from .vizFactory import VizFactory
+
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
+
+# django loading requires different steps based on version
+# https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
+import django
+
+# http://stackoverflow.com/questions/1714027/version-number-comparison
+from distutils.version import StrictVersion
+
+if StrictVersion(django.get_version()) > StrictVersion('1.7'):
+    from django.conf import settings
+    from django.template import Context, Template
+
+else:
+    from django.conf import settings
+    from django.template import Context, Template
 
 
-# ===========
-# 2016-11-27 : notes
-# ===========
-# ....
+import zipfile
+import os, sys
+import shutil
+import click
+
+# from pygments import highlight
+# from pygments.lexers.rdf import TurtleLexer
+# from pygments.formatters import HtmlFormatter
+#
+#
+# try:
+#     from .CONFIG import VISUALIZATIONS_LIST
+#     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
+# except:  # Mother of all exceptions
+#     click.secho("Visualizations configuration file not found.", fg="red")
+#     raise
+#
 
 
 
-
-def run(graph, save_on_github=False, main_entity=None):
+class KompleteViz(VizFactory):
     """
-    From a graph instance outputs a nicely formatted html documentation file.
-    2015-10-21: mainly used with w3c template
 
-    Django templates API: https://docs.djangoproject.com/en/dev/ref/templates/api/
-
-    output = string
-
-    2016-02-24: added <save_on_github>
     """
 
-    try:
-        ontology = graph.ontologies[0]
-        uri = ontology.uri
-    except:
-        ontology = None
-        uri = ";".join([s for s in graph.sources])
-
-    # ontotemplate = open("template.html", "r")
-    ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "komplete/index.html", "r")
-
-    t = Template(ontotemplate.read())
+    def __init__(self, ontospy_graph, title=""):
+        """
+        Init
+        """
+        super(KompleteViz, self).__init__(ontospy_graph, title)
+        self.static_files = ["static"]
 
 
-    c = Context({
-                    "STATIC_URL" : "static/",
-                    "ontology": ontology,
-                    "main_uri" : uri,
-                    "classes": graph.classes,
-                    "objproperties": graph.objectProperties,
-                    "dataproperties": graph.datatypeProperties,
-                    "annotationproperties": graph.annotationProperties,
-                    "skosConcepts": graph.skosConcepts,
-                    "instances": []
-                })
+    def _buildTemplates(self):
+        """
+        OVERRIDING THIS METHOD from Factory
+        """
 
-    rnd = t.render(c)
+        # DASHBOARD - MAIN PAGE
+        contents = self._renderTemplate("komplete/dashboard.html", extraContext=None)
+        FILE_NAME = "dashboard.html"
+        main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-    return safe_str(rnd)
+        # VIZ LIST
+        if False:
+            contents = self._renderTemplate("komplete/viz_list.html", extraContext=None)
+            FILE_NAME = "visualizations.html"
+            self._save2File(contents, FILE_NAME, self.output_path)
 
 
+        browser_output_path = self.output_path
+
+        # ENTITIES A-Z
+        extra_context = {"ontograph": self.ontospy_graph}
+        contents = self._renderTemplate("komplete/browser/browser_entities_az.html", extraContext=extra_context)
+        FILE_NAME = "entities-az.html"
+        self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+
+        if self.ontospy_graph.classes:
+            # CLASSES = ENTITIES TREE
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "classes",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyClassTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-classes.html"
+            self._save2File(contents, FILE_NAME, browser_output_path)
+            # BROWSER PAGES - CLASSES ======
+            for entity in self.ontospy_graph.classes:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "class",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        if self.ontospy_graph.properties:
+
+            # PROPERTIES = ENTITIES TREE
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "properties",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyPropTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-properties.html"
+            self._save2File(contents, FILE_NAME, browser_output_path)
+
+            # BROWSER PAGES - PROPERTIES ======
+
+            for entity in self.ontospy_graph.properties:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "property",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        if self.ontospy_graph.skosConcepts:
+
+            # CONCEPTS = ENTITIES TREE
+
+            extra_context = {"ontograph": self.ontospy_graph, "treetype" : "concepts",
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree())}
+            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            FILE_NAME = "entities-tree-concepts.html"
+            self._save2File(contents, FILE_NAME, browser_output_path)
+
+            # BROWSER PAGES - CONCEPTS ======
+
+            for entity in self.ontospy_graph.skosConcepts:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "concept",
+                                "ontograph": self.ontospy_graph
+                                }
+                extra_context.update(self.highlight_code(entity))
+                contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".html"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        return main_url
 
 
 
 if __name__ == '__main__':
-    import sys
-    try:
-        # TESTING THIS MODULE WITH A FEW HARDWIRED PATHS
 
-        TEST_PATH = "/Users/michele.pasin/Desktop/temp/"
-        # if False:
-        from .builder import _copyStaticFiles
-        print("..copying")
-        _copyStaticFiles(["static_komplete.zip" ], TEST_PATH, folder="")
-    
-        import zipfile
-        print("..unzipping")
-        zip_ref = zipfile.ZipFile(TEST_PATH+"static_komplete.zip", 'r')
-        zip_ref.extractall(TEST_PATH)
-        zip_ref.close()
-        
-        import os
-        import shutil
-        print("..cleaning up")
-        os.remove(TEST_PATH+"static_komplete.zip")
-        # http://superuser.com/questions/104500/what-is-macosx-folder
-        shutil.rmtree(TEST_PATH+"__MACOSX")
-        
-        func = locals()["run"] # main func dynamically
-        run_test_viz(func, filename="index.html", path=TEST_PATH)
-   
+    TEST_ONLINE = False
+    try:
+
+        if TEST_ONLINE:
+            from ..core.ontospy import Ontospy
+            g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
+        else:
+            uri, g = get_random_ontology(50) # pattern="core"
+
+        v = KompleteViz(g)
+        v.build()
+        v.preview()
+
         sys.exit(0)
 
-    except KeyboardInterrupt as e: # Ctrl-C
+    except KeyboardInterrupt as e:  # Ctrl-C
         raise e
-
