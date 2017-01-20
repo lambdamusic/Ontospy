@@ -33,7 +33,8 @@
     margin-left: -250px;
     margin-bottom: 100px;
     overflow-y: auto;
-    background: #000;
+    background: #666666;
+    /*background: #000;*/  /* ORIGINAL */
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
