@@ -397,61 +397,6 @@ def action_bootstrap():
 
 
 
-def action_visualize(args, fromshell=False, path=None):
-    """
-    export model into another format eg html, d3 etc...
-    <fromshell> : the local name is being passed from ontospy shell
-    """
-
-    from ..viz import ask_visualization, build_viz, VISUALIZATIONS_LIST
-
-    # get argument
-    if not(args):
-        ontouri = action_listlocal(all_details=False)
-        if ontouri:
-            islocal = True
-        else:
-            raise SystemExit(1)
-    elif fromshell:
-        ontouri = args
-        islocal = True
-    else:
-        ontouri = args[0]
-        islocal = False
-
-    # select a visualization
-    viztype = ask_visualization()
-    if viztype == "":
-        return None
-        # raise SystemExit, 1
-
-    # get ontospy graph
-    if islocal:
-        g = get_pickled_ontology(ontouri)
-        if not g:
-            g = do_pickle_ontology(ontouri)
-    else:
-        g = Ontospy(ontouri)
-
-    # put in home folder by default: <ontouri>/<viztype>/files..
-    if not path:
-        from os.path import expanduser
-        home = expanduser("~")
-        onto_path = slugify(unicode(ontouri))
-        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype]['Title']))
-        path = os.path.join(home, "ontospy-viz/" + onto_path + "/" + viz_path )
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-    url  = build_viz(ontouri, g, viztype, path)
-
-    return url
-
-
-
-
-
-
 
 
 

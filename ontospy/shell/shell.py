@@ -43,8 +43,10 @@ from ..VERSION import VERSION
 
 from ..core.ontospy import Ontospy
 from ..core import manager
-from ..core import actions 
+from ..core import actions
 from ..core.utils import *
+
+from ..viz.builder import action_visualize
 
 from .quotes import *  # quotes
 
@@ -106,7 +108,7 @@ class Shell(cmd.Cmd):
     GET_OPTS = ['ontology', 'class', 'property', 'concept']
     FILE_OPTS = ['rename', 'delete']
     IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack',]
-    VISUALIZE_OPTS = ['gist']
+    VISUALIZE_OPTS = []
 
 
     def __init__(self, uri=None):
@@ -823,7 +825,7 @@ class Shell(cmd.Cmd):
         if not self.current:
             self._help_noontology()
             return
-            
+
         if len(line) == 0:
             # default contextual behaviour [2016-03-01]
             line = ["classes"]
@@ -957,7 +959,7 @@ class Shell(cmd.Cmd):
         elif line[0] == "namespaces":
             for x in self.current['graph'].namespaces:
                 self._print("@prefix %s: <%s> ." % (x[0], x[1]))
-                
+
         elif line[0] == "parents":
             if self.currentEntity and self.currentEntity['object'].parents():
                 for x in self.currentEntity['object'].parents():
@@ -999,12 +1001,12 @@ class Shell(cmd.Cmd):
             return
 
         line = line.split()
-        _gist = False
-        if line and line[0] == "gist":
-            _gist = True
+        # _gist = False
+        # if line and line[0] == "gist":
+        #     _gist = True
 
         import webbrowser
-        url = actions.action_visualize(args=self.current['file'], save_gist=_gist, fromshell=True)
+        url = action_visualize(args=self.current['file'], fromshell=True)
         if url:
             webbrowser.open(url)
         return
@@ -1193,15 +1195,15 @@ class Shell(cmd.Cmd):
         txt += "==> Usage: tree [%s]" % "|".join([x for x in self.TREE_OPTS])
         # txt += "\n\nNote: tree is contextual. If you do not pass it any argument, it returns info based on the currently active object.\n"
         self._print(txt)
-        
+
     def help_import(self):
         txt = "Import an ontology from a remote repository or directory.\n"
         txt += "==> Usage: import [%s]" % "|".join([x for x in self.IMPORT_OPTS])
         self._print(txt)
 
     def help_visualize(self):
-        txt = "Visualize the currenlty selected ontology using an HTML template. Optionally this can be saved as an anonymous GitHub Gist.\n"
-        txt += "==> Usage: visualize [gist]"
+        txt = "Visualize the currenlty selected ontology using an HTML template.\n"
+        txt += "==> Usage: visualize "
         self._print(txt)
 
     def help_file(self):
@@ -1268,7 +1270,7 @@ class Shell(cmd.Cmd):
                             if f.startswith(text)
                             ]
         return completions
-    
+
     def complete_get(self, text, line, begidx, endidx):
         """completion for find command"""
 
