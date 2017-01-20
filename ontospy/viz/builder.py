@@ -71,7 +71,7 @@ import os
 from shutil import copyfile
 
 try:
-    from .CONFIG import VISUALIZATIONS_LIST
+    from .CHOICES import VISUALIZATIONS_LIST
 
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
@@ -131,7 +131,8 @@ def action_visualize(args, fromshell=False, path=None):
         if not os.path.exists(path):
             os.makedirs(path)
 
-    url  = build_viz(ontouri, g, viztype, path)
+    # url  = build_viz(ontouri, g, viztype, path)
+    url  = build_vizualization(ontouri, g, viztype, path)
 
     return url
 
@@ -165,6 +166,41 @@ def ask_visualization():
 # DYNAMIC RUNNER FUNCTION
 # ===========
 
+
+def build_vizualization(ontouri, g, viz_index, path=None):
+    """
+    2017-01-20: new verion, less clever but also simpler
+    :param g:
+    :param viz_index:
+    :param main_entity:
+    :return:
+    """
+
+    this_viz = VISUALIZATIONS_LIST[viz_index]
+
+    if this_viz['ID'] == "html-simple":
+        from .viz_html_simple import HTMLVisualizer
+        v = HTMLVisualizer(g)
+
+    elif this_viz['ID'] == "html-complex":
+        from .viz_komplete import KompleteViz
+        v = KompleteViz(g)
+
+    elif this_viz['ID'] == "markdown":
+        pass
+
+    else:
+        return False
+
+    url = v.build(path)
+
+    return url
+
+
+
+
+
+# LEGACY LEGACY LEGACY
 
 def build_viz(ontouri, g, viz_index, path=None):
     """
