@@ -170,6 +170,7 @@ def ask_visualization():
 def build_vizualization(ontouri, g, viz_index, path=None):
     """
     2017-01-20: new verion, less clever but also simpler
+
     :param g:
     :param viz_index:
     :param main_entity:
@@ -187,7 +188,8 @@ def build_vizualization(ontouri, g, viz_index, path=None):
         v = KompleteViz(g)
 
     elif this_viz['ID'] == "markdown":
-        pass
+        from .viz_markdown import MarkdownViz
+        v = MarkdownViz(g)
 
     else:
         return False
