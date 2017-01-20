@@ -29,7 +29,7 @@ from distutils.version import StrictVersion
 if StrictVersion(django.get_version()) > StrictVersion('1.7'):
     from django.conf import settings
     from django.template import Context, Template
-    
+
     settings.configure()
     django.setup()
     settings.TEMPLATES = [
@@ -63,7 +63,7 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
 else:
     from django.conf import settings
     from django.template import Context, Template
-    
+
     settings.configure()
 
 import os
@@ -71,7 +71,7 @@ from shutil import copyfile
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST
-    
+
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
     click.secho("Visualizations configuration file not found.", fg="red")
@@ -112,26 +112,26 @@ def build_viz(ontouri, g, viz_index, path=None):
     :param main_entity:
     :return:
     """
-    
+
     this_viz = VISUALIZATIONS_LIST[viz_index]
-    
+
     extension = "." + this_viz["File-extension"]
-    
+
     import importlib
     module_name = this_viz['ID']
     viz_module = importlib.import_module(".viz_" + module_name, "ontospy.viz")
     VIZ_WORKER = viz_module.run  # dynamically referenced
-    
+
     if this_viz['Type'] == "single-file":
         url = _buildSingleFile(ontouri, g, VIZ_WORKER, extension, path)
-    
+
     elif this_viz['Type'] == "multi-file":
         url = _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path)
-    
+
     # save static files too
     if this_viz['Static-files']:
         _copyStaticFiles(this_viz['Static-files'], path)
-    
+
     return url
 
 
@@ -150,7 +150,7 @@ def _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path):
     """
     contents = VIZ_WORKER(g, False, None)
     index_url = saveVizLocally(contents, "index" + extension, path)
-    
+
     entities = [g.classes, g.properties, g.skosConcepts]
     for group in entities:
         for c in group:
@@ -158,7 +158,7 @@ def _buildMultiFile(ontouri, g, VIZ_WORKER, extension, path):
             contents = VIZ_WORKER(g, False, c)
             _filename = c.slug + extension
             url = saveVizLocally(contents, _filename, path)
-    
+
     url = index_url
     printDebug("Documentation generated: <%s>" % url, "green")
     return url
@@ -181,11 +181,11 @@ def saveVizLocally(contents, filename="index.html", path=None):
         filename = ONTOSPY_LOCAL_VIZ + "/" + filename
     else:
         filename = os.path.join(path, filename)
-    
+
     f = open(filename, 'wb')
     f.write(contents)  # python will convert \n to os.linesep
     f.close()  # you can omit in most cases as the destructor will call it
-    
+
     url = "file://" + filename
     return url
 
@@ -239,21 +239,21 @@ def run_test_viz(func, filename="index.html", path=None):
     # script for testing - must launch as module for each viz eg
     # >python -m ontospy.viz.viz_packh
     """
-    
+
     import webbrowser, random
     ontouri = get_localontologies()[random.randint(0, 10)]  # [0]
     print("Testing with URI: %s" % ontouri)
-    
+
     g = get_pickled_ontology(ontouri)
     if not g:
         g = do_pickle_ontology(ontouri)
-    
+
     # getting main func dynamically
     contents = func(g, False)
-    
+
     url = saveVizLocally(contents, filename, path)
     if url:  # open browser
         import webbrowser
         webbrowser.open(url)
-    
+
     return True

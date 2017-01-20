@@ -13,7 +13,7 @@ from ..core.utils import *
 from ..core.manager import *
 
 from .utils import *
-from .vizFactory import VizFactory
+from .viz_factory import VizFactory
 
 # Fix Python 2.x.
 try:
@@ -37,23 +37,7 @@ else:
     from django.template import Context, Template
 
 
-import zipfile
 import os, sys
-import shutil
-import click
-
-# from pygments import highlight
-# from pygments.lexers.rdf import TurtleLexer
-# from pygments.formatters import HtmlFormatter
-#
-#
-# try:
-#     from .CONFIG import VISUALIZATIONS_LIST
-#     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
-# except:  # Mother of all exceptions
-#     click.secho("Visualizations configuration file not found.", fg="red")
-#     raise
-#
 
 
 

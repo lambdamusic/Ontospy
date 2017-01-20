@@ -71,7 +71,7 @@ def action_listlocal(all_details=True):
             _print_table_ontologies()
         else:
             _print2cols_ontologies()
-       
+
         while True:
             printDebug("------------------\nSelect a model by typing its number: (enter=quit)", "important")
             var = input()
@@ -444,7 +444,7 @@ def action_visualize(args, fromshell=False, path=None):
             os.makedirs(path)
 
     url  = build_viz(ontouri, g, viztype, path)
-    
+
     return url
 
 
@@ -575,9 +575,3 @@ def action_cache():
 
     else:
         print("Goodbye")
-
-
-
-
-
-
