@@ -89,6 +89,7 @@ def random_theme():
     return random.choice(BOOTSWATCH_THEMES)
 
 def validate_theme(theme_try, default="paper"):
+    print theme_try
     if theme_try in BOOTSWATCH_THEMES:
         return theme_try
     else:
@@ -144,7 +145,7 @@ def action_visualize(args, fromshell=False, path=None, title="", theme=""):
             os.makedirs(path)
 
     # url  = build_viz(ontouri, g, viztype, path)
-    url  = build_visualization(ontouri, g, viztype, path, title)
+    url  = build_visualization(ontouri, g, viztype, path, title, theme)
 
     return url
 

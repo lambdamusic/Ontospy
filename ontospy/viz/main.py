@@ -28,9 +28,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.argument('source', nargs=-1)
 @click.option('--library', '-l', is_flag=True, help='List ontologies saved in the local library.')
 @click.option('--outputpath', '-o',  help='Output path (default: home folder)')
-@click.option('--title', '-t',  help='Title for the visualization (default=graph uri)')
-@click.option('--theme', '-m',  help='CSS Theme for the visualization (note: only for the html-complex template)')
-@click.option('--showthemes', is_flag=True, help='Show the valid CSS theme choices')
+@click.option('--title',  help='Title for the visualization (default=graph uri)')
+@click.option('--theme',  help='CSS Theme for the html-complex visualization (random=use a random theme)')
+@click.option('--showthemes', is_flag=True, help='Show the available CSS theme choices')
 def cli_run_viz(source=None, library=False, outputpath="", title="", theme="", showthemes=False):
     """
 This application launches the OntoSpy visualization tool.
@@ -48,6 +48,10 @@ Examples:
         from .builder import show_themes
         show_themes()
         sys.exit(0)
+
+    if theme and theme=="random":
+        from .builder import random_theme
+        theme = random_theme()
 
     if outputpath:
         if not(os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
