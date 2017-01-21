@@ -33,7 +33,7 @@
             <li>
                 <a href="entities-tree-concepts.html">Concepts</a>
             </li>
-            <li class="active">{{each.qname}}</li>
+            <li class="active">{{each.uri}}</li>
         </ol>
 
 
@@ -112,6 +112,7 @@
            </div>
             </div></div>
 
+            {% if each.bestDescription %}
              <div class="row"><div class="col-md-12">
                <div class="panel panel-default">
              <div class="panel-heading">
@@ -123,6 +124,7 @@
              </div>
            </div>
             </div></div>
+            {% endif %}
 
 
 

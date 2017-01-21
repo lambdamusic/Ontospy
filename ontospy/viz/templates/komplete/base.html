@@ -13,14 +13,14 @@
     <link rel="icon" href="{{STATIC_URL}}libs/img/favicon.ico">
 
 	{% block pagetitle %}
-		<title>{{docs_title}} - Ontospy Docs</title>
+		<title>OntoSpy > {{docs_title}}</title>
 	{% endblock pagetitle %}
 
     <!-- Bootstrap core CSS -->
     <!-- <link href="{{STATIC_URL}}libs/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">  -->
     <!-- Bootswatch:  -->
     <!-- cerulean  | cyborg |  flatly |  lumen |  sandstone |   spacelab  |  yeti | cosmo |  darkly |  paper | simplex | superhero |  journal | readable  |   slate |  united -->
-    <link href="{{STATIC_URL}}libs/bootswatch3.2/paper/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}libs/bootswatch3.2/{{theme}}/bootstrap.min.css" rel="stylesheet">
     <link href="{{STATIC_URL}}custom/css/simple-sidebar.css" rel="stylesheet">
     <link href="{{STATIC_URL}}custom/css/familytree.css" rel="stylesheet">
     <link href="{{STATIC_URL}}custom/css/tabletree.css" rel="stylesheet">
@@ -82,6 +82,11 @@
   .breadcrumb {
       margin-top: 30px;
   }
+
+  .breadcrumb a {
+      text-transform: capitalize;
+  }
+
 
   .fromclass_link {
     color: white;
@@ -172,7 +177,7 @@
     <!-- Begin page content -->
     <div class="container" id="page-content-wrapper">
 
-      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-success margin-bottom-50" style="margin-top: 20px;">Toggle sidebar</button>
+      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-default margin-bottom-50" style="margin-top: 20px;">Toggle sidebar</button>
 
 	{% block bodycontent %}
 

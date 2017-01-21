@@ -33,7 +33,8 @@
     margin-left: -250px;
     margin-bottom: 100px;
     overflow-y: auto;
-    background: #666666;
+    background: #3e3f3a;
+    /*background: #666666;  */
     /*background: #000;*/  /* ORIGINAL */
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
@@ -82,7 +83,7 @@
   padding-left: 10%;
   font-size: 75%;
   color: lightgray;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
 }
 
 
@@ -96,7 +97,8 @@
 .sidebar-nav li a:focus {
     text-decoration: none;
     background: #5d5d5d;
-    color: white;
+    color: yellow;
+    /*color: white;*/
 }
 
 

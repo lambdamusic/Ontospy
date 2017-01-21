@@ -63,7 +63,7 @@ class VizFactory(object):
     """
 
     def __init__(self, ontospy_graph, title=""):
-        self.title = 'Base Visualizer'
+        self.title = ''
         self.ontospy_graph = ontospy_graph
         self.static_files = []
         self.final_url = None

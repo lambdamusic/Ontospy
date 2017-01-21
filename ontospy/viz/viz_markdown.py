@@ -123,7 +123,7 @@ if __name__ == '__main__':
         else:
             uri, g = get_random_ontology(50)
 
-        v = MarkdownViz(g)
+        v = MarkdownViz(g, title="")
         v.build()
         v.preview()
 

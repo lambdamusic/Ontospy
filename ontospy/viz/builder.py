@@ -71,7 +71,7 @@ import os
 from shutil import copyfile
 
 try:
-    from .CHOICES import VISUALIZATIONS_LIST
+    from .CHOICES import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES
 
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
@@ -81,11 +81,23 @@ except:  # Mother of all exceptions
 
 
 
+def show_themes():
+    for t in BOOTSWATCH_THEMES:
+        printDebug(t, "green")
+
+def random_theme():
+    return random.choice(BOOTSWATCH_THEMES)
+
+def validate_theme(theme_try, default="paper"):
+    if theme_try in BOOTSWATCH_THEMES:
+        return theme_try
+    else:
+        printDebug("Warning: theme not found", "red")
+        return default
 
 
 
-
-def action_visualize(args, fromshell=False, path=None):
+def action_visualize(args, fromshell=False, path=None, title="", theme=""):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
@@ -132,7 +144,7 @@ def action_visualize(args, fromshell=False, path=None):
             os.makedirs(path)
 
     # url  = build_viz(ontouri, g, viztype, path)
-    url  = build_vizualization(ontouri, g, viztype, path)
+    url  = build_visualization(ontouri, g, viztype, path, title)
 
     return url
 
@@ -167,7 +179,7 @@ def ask_visualization():
 # ===========
 
 
-def build_vizualization(ontouri, g, viz_index, path=None):
+def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
     """
     2017-01-20: new verion, less clever but also simpler
 
@@ -181,15 +193,15 @@ def build_vizualization(ontouri, g, viz_index, path=None):
 
     if this_viz['ID'] == "html-simple":
         from .viz_html_simple import HTMLVisualizer
-        v = HTMLVisualizer(g)
+        v = HTMLVisualizer(g, title)
 
     elif this_viz['ID'] == "html-complex":
         from .viz_komplete import KompleteViz
-        v = KompleteViz(g)
+        v = KompleteViz(g, title, theme)
 
     elif this_viz['ID'] == "markdown":
         from .viz_markdown import MarkdownViz
-        v = MarkdownViz(g)
+        v = MarkdownViz(g, title)
 
     else:
         return False
