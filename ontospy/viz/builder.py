@@ -89,12 +89,39 @@ def random_theme():
     return random.choice(BOOTSWATCH_THEMES)
 
 def validate_theme(theme_try, default="paper"):
-    print theme_try
+    # print theme_try
     if theme_try in BOOTSWATCH_THEMES:
         return theme_try
     else:
         printDebug("Warning: theme not found", "red")
         return default
+
+
+
+
+
+
+
+def ask_visualization():
+    """
+    ask user which viz output to use
+    """
+    while True:
+        text = "Please select an output format for the ontology visualization: (q=quit)\n"
+        for viz in VISUALIZATIONS_LIST:
+            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz['Title'])
+        var = input(text + ">")
+        if var == "q":
+            return ""
+        else:
+            try:
+                n = int(var) - 1
+                test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
+                return n
+            except:
+                printDebug("Invalid selection. Please try again.", "important")
+                continue
+
 
 
 
@@ -149,30 +176,6 @@ def action_visualize(args, fromshell=False, path=None, title="", theme=""):
 
     return url
 
-
-
-
-
-
-def ask_visualization():
-    """
-    ask user which viz output to use
-    """
-    while True:
-        text = "Please select an output format for the ontology visualization: (q=quit)\n"
-        for viz in VISUALIZATIONS_LIST:
-            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz['Title'])
-        var = input(text + ">")
-        if var == "q":
-            return ""
-        else:
-            try:
-                n = int(var) - 1
-                test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
-                return n
-            except:
-                printDebug("Invalid selection. Please try again.", "important")
-                continue
 
 
 # ===========

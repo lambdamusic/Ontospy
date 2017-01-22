@@ -207,7 +207,8 @@ class VizFactory(object):
         Create or clean up output path
         """
         if not output_path:
-            output_path = self.output_path_DEFAULT
+            # output_path = self.output_path_DEFAULT
+            output_path = os.path.join(self.output_path_DEFAULT, slugify(unicode(self.title)))
         if os.path.exists(output_path):
             shutil.rmtree(output_path)
         os.makedirs(output_path)
