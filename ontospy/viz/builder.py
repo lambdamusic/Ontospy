@@ -106,8 +106,9 @@ def ask_visualization():
     """
     ask user which viz output to use
     """
+    printDebug("Please choose an output format for the ontology visualization: (q=quit)\n", "important")
     while True:
-        text = "Please select an output format for the ontology visualization: (q=quit)\n"
+        text = ""
         for viz in VISUALIZATIONS_LIST:
             text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1, viz['Title'])
         var = input(text + ">")
@@ -119,13 +120,13 @@ def ask_visualization():
                 test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
                 return n
             except:
-                printDebug("Invalid selection. Please try again.", "important")
+                printDebug("Invalid selection. Please try again.", "red")
                 continue
 
 
 
 
-def action_visualize(args, fromshell=False, path=None, title="", theme=""):
+def action_visualize(args, fromshell=False, path=None, title="", theme="", verbose=False):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
@@ -153,13 +154,19 @@ def action_visualize(args, fromshell=False, path=None, title="", theme=""):
         return None
         # raise SystemExit, 1
 
+    # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
+    USE_CACHE = False
     # get ontospy graph
-    if islocal:
+    if islocal and USE_CACHE:
         g = get_pickled_ontology(ontouri)
         if not g:
             g = do_pickle_ontology(ontouri)
     else:
-        g = Ontospy(ontouri)
+        printDebug("Loading graph...", dim=True)
+        if islocal:
+            g = Ontospy(os.path.join(get_home_location(), ontouri), verbose=verbose)
+        else:
+            g = Ontospy(ontouri, verbose=verbose)
 
     # put in home folder by default: <ontouri>/<viztype>/files..
     if not path:
@@ -172,6 +179,7 @@ def action_visualize(args, fromshell=False, path=None, title="", theme=""):
             os.makedirs(path)
 
     # url  = build_viz(ontouri, g, viztype, path)
+    printDebug("Building visualization...", dim=True)
     url  = build_visualization(ontouri, g, viztype, path, title, theme)
 
     return url

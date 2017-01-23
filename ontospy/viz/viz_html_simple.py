@@ -48,11 +48,11 @@ class HTMLVisualizer(VizFactory):
     """
 
 
-    def __init__(self, ontospy_graph):
+    def __init__(self, ontospy_graph, title=""):
         """
         Init
         """
-        super(HTMLVisualizer, self).__init__(ontospy_graph)
+        super(HTMLVisualizer, self).__init__(ontospy_graph, title)
         self.template_name = "javadoc.html"
         self.main_file_name = "index.html"
 

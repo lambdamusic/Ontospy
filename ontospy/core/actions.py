@@ -81,8 +81,8 @@ def action_listlocal(all_details=True):
                 try:
                     _id = int(var)
                     ontouri = options[_id - 1]
-                    printDebug("\nYou selected:", "comment")
-                    printDebug("---------\n" + ontouri + "\n---------", "green")
+                    # printDebug("\nYou selected:", "comment")
+                    printDebug("---------\nYou selected: " + ontouri + "\n---------", "green")
                     return ontouri
                 except:
                     printDebug("Please enter a valid option.", "comment")
