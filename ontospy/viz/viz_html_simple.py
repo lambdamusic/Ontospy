@@ -53,7 +53,7 @@ class HTMLVisualizer(VizFactory):
         Init
         """
         super(HTMLVisualizer, self).__init__(ontospy_graph, title)
-        self.template_name = "html-simple.html"
+        self.template_name = "html-simple/html-simple.html"
         self.main_file_name = "index.html"
 
 
