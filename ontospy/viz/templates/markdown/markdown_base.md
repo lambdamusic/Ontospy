@@ -1,7 +1,7 @@
-_Vocabulary: [{{main_uri}}](index.md)_ 
+_Vocabulary: [{{docs_title}}](index.md)_ 
 
----	
-	
+---
+
 {% block main_column %}
 
 
