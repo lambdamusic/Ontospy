@@ -99,9 +99,6 @@ def validate_theme(theme_try, default="paper"):
 
 
 
-
-
-
 def ask_visualization():
     """
     ask user which viz output to use

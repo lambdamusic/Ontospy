@@ -31,7 +31,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--title',  help='Title for the visualization (default=graph uri)')
 @click.option('--theme',  help='CSS Theme for the html-complex visualization (random=use a random theme)')
 @click.option('--showthemes', is_flag=True, help='Show the available CSS theme choices')
-def cli_run_viz(source=None, library=False, outputpath="", title="", theme="", showthemes=False):
+@click.option('--verbose', is_flag=True, help='Verbose mode')
+def cli_run_viz(source=None, library=False, outputpath="", title="", theme="", showthemes=False, verbose=False):
     """
 This application launches the OntoSpy visualization tool.
 
@@ -71,7 +72,7 @@ Examples:
         click.secho('Note: currently only one argument can be passed', fg='red')
 
 
-    url = action_visualize(source, fromshell=False, path=outputpath, title=title, theme=theme)
+    url = action_visualize(source, fromshell=False, path=outputpath, title=title, theme=theme, verbose=verbose)
 
 
     if url:# open browser

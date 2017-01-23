@@ -173,7 +173,7 @@ class RDF_Entity(object):
         else:
             return out
 
-    def bestDescription(self, prefLanguage="en"):
+    def bestDescription(self, prefLanguage="en",quotes=False):
         """
         facility for extrating the best available description for an entity
 
@@ -185,7 +185,10 @@ class RDF_Entity(object):
         for pred in test_preds:
             test = self.getValuesForProperty(pred)
             if test:
-                return addQuotes(firstEnglishStringInList(test))
+                if quotes:
+                    return addQuotes(firstEnglishStringInList(test))
+                else:
+                    return firstEnglishStringInList(test)
         return ""
 
 
@@ -257,7 +260,7 @@ class OntoClass(RDF_Entity):
         """
         super(OntoClass, self).__init__(uri, rdftype, namespaces)
         self.slug = "class-" + slugify(self.qname)
-        
+
         self.domain_of = []
         self.range_of = []
         self.domain_of_inferred = []
@@ -405,20 +408,3 @@ class OntoSKOSConcept(RDF_Entity):
         self.printTriples()
         self.printStats()
         self.printGenericTree()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
