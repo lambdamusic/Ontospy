@@ -86,10 +86,10 @@ class VizFactory(object):
         else:
             return "Untitled"
 
-    def build(self, output_path=None):
+    def build(self, output_path=""):
         """method that should be inherited by all vis classes"""
         self.output_path = self.checkOutputPath(output_path)
-        self._buildStaticFiles(self.output_path)
+        self._buildStaticFiles()
         self.final_url = self._buildTemplates()
         return self.final_url
 
@@ -126,17 +126,19 @@ class VizFactory(object):
         return contents
 
 
-    def _buildStaticFiles(self, static_folder="static"):
+    def _buildStaticFiles(self):
         """ move over static files so that relative imports work
         Note: if a dir is passed, it is copied with all of its contents
         If the file is a zip, it is copied and extracted too
+        # By default folder name is 'static'
         """
-        static_path = os.path.join(self.output_path, static_folder)
-        if not os.path.exists(static_path):
-            os.makedirs(static_path)
+        static_output_path = os.path.join(self.output_path, "static")
+        # printDebug(static_output_path, "red")
+        if not os.path.exists(static_output_path):
+            os.makedirs(static_output_path)
         for x in self.static_files:
             source_f = os.path.join(self.static_root, x)
-            dest_f = os.path.join(static_path, x)
+            dest_f = os.path.join(static_output_path, x)
             if os.path.isdir(source_f):
                 if os.path.exists(dest_f):
                     # delete first if exists, as copytree will throw an error otherwise
@@ -147,12 +149,12 @@ class VizFactory(object):
                 if x.endswith('.zip'):
                     printDebug("..unzipping")
                     zip_ref = zipfile.ZipFile(os.path.join(dest_f), 'r')
-                    zip_ref.extractall(static_path)
+                    zip_ref.extractall(static_output_path)
                     zip_ref.close()
                     printDebug("..cleaning up")
                     os.remove(dest_f)
                     # http://superuser.com/questions/104500/what-is-macosx-folder
-                    shutil.rmtree(os.path.join(static_path, "__MACOSX"))
+                    shutil.rmtree(os.path.join(static_output_path, "__MACOSX"))
 
 
 

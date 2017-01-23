@@ -53,7 +53,7 @@ class KompleteViz(VizFactory):
         Init
         """
         super(KompleteViz, self).__init__(ontospy_graph, title)
-        self.static_files = ["static"]
+        self.static_files = ["custom", "libs"]
         self.theme = validate_theme(theme)
 
     def _buildTemplates(self):
