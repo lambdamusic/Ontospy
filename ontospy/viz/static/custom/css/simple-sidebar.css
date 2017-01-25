@@ -61,8 +61,9 @@
 
 .sidebar-nav {
     position: absolute;
+    overflow: auto;
     top: 0;
-    width: 250px;
+    width: 400px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -80,7 +81,8 @@
 }
 
 .sidebar-nav li.second-level a {
-  padding-left: 10%;
+  /*padding-left: 10%;*/
+  padding-left: 5%;
   font-size: 75%;
   color: lightgray;
   /*text-transform: uppercase;*/

@@ -66,8 +66,10 @@ class VizFactory(object):
         self.title = ''
         self.ontospy_graph = ontospy_graph
         self.static_files = []
+        self.static_url = "" # one used in templates
         self.final_url = None
         self.output_path = None
+        self.output_path_static = None
         home = os.path.expanduser("~")
         self.output_path_DEFAULT = os.path.join(home, "ontospy-viz-test")
         self.template_name = ""
@@ -88,6 +90,7 @@ class VizFactory(object):
 
     def build(self, output_path=""):
         """method that should be inherited by all vis classes"""
+
         self.output_path = self.checkOutputPath(output_path)
         self._buildStaticFiles()
         self.final_url = self._buildTemplates()
@@ -116,7 +119,6 @@ class VizFactory(object):
         :param extraContext: a dict that can be loaded on demand
         :return: the rendered template as a string
         """
-
         atemplate = open(self.templates_root + template_name, "r")
         t = Template(atemplate.read())
         context = Context(self.basic_context_data)
@@ -130,15 +132,16 @@ class VizFactory(object):
         """ move over static files so that relative imports work
         Note: if a dir is passed, it is copied with all of its contents
         If the file is a zip, it is copied and extracted too
-        # By default folder name is 'static'
+        # By default folder name is 'static', unless *output_path_static* is passed (now allowed only in special applications like KompleteVizMultiModel)
         """
-        static_output_path = os.path.join(self.output_path, "static")
-        # printDebug(static_output_path, "red")
-        if not os.path.exists(static_output_path):
-            os.makedirs(static_output_path)
+        if not self.output_path_static:
+            self.output_path_static = os.path.join(self.output_path, "static")
+        # printDebug(self.output_path_static, "red")
+        if not os.path.exists(self.output_path_static):
+            os.makedirs(self.output_path_static)
         for x in self.static_files:
             source_f = os.path.join(self.static_root, x)
-            dest_f = os.path.join(static_output_path, x)
+            dest_f = os.path.join(self.output_path_static, x)
             if os.path.isdir(source_f):
                 if os.path.exists(dest_f):
                     # delete first if exists, as copytree will throw an error otherwise
@@ -149,12 +152,12 @@ class VizFactory(object):
                 if x.endswith('.zip'):
                     printDebug("..unzipping")
                     zip_ref = zipfile.ZipFile(os.path.join(dest_f), 'r')
-                    zip_ref.extractall(static_output_path)
+                    zip_ref.extractall(self.output_path_static)
                     zip_ref.close()
                     printDebug("..cleaning up")
                     os.remove(dest_f)
                     # http://superuser.com/questions/104500/what-is-macosx-folder
-                    shutil.rmtree(os.path.join(static_output_path, "__MACOSX"))
+                    shutil.rmtree(os.path.join(self.output_path_static, "__MACOSX"))
 
 
 
@@ -175,8 +178,11 @@ class VizFactory(object):
                 for child in topclass.children():
                     if child not in topclasses: topclasses.append(child)
 
+        if not self.static_url:
+            self.static_url = "static/"  # default
+
         context_data = {
-            "STATIC_URL": "static/",
+            "STATIC_URL": self.static_url,
             "ontospy_version": VERSION,
             "ontospy_graph": self.ontospy_graph,
             "docs_title": self.title,

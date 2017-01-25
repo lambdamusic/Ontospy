@@ -157,6 +157,31 @@ class KompleteViz(VizFactory):
 
 
 
+
+class KompleteVizMultiModel(KompleteViz):
+    """
+    Specialized version that supports customizing where the static url / folder are.
+
+    The idea is to pass a location which can be shared by multiple html outputs. (eg multiple html-complex ontology folders)
+    """
+
+
+    def __init__(self, ontospy_graph, title="", theme="", static_url="", output_path_static=""):
+        """
+        Init
+        """
+        super(KompleteVizMultiModel, self).__init__(ontospy_graph, title, theme)
+        self.static_files = ["custom", "libs"]
+        self.theme = validate_theme(theme)
+        self.static_url = static_url  # eg "../static"
+        self.output_path_static = output_path_static  # eg full path to a top level
+        # note: the following serves to make sure self.static_url is passed correctly
+        self.basic_context_data = self._build_basic_context()
+
+
+
+
+
 if __name__ == '__main__':
 
     TEST_ONLINE = False

@@ -20,4 +20,6 @@ VISUALIZATIONS_LIST = {
 }
 
 
-BOOTSWATCH_THEMES = ['cerulean'  , 'cyborg' ,  'flatly' ,  'lumen' ,  'sandstone' ,   'spacelab'  ,  'yeti' , 'cosmo' ,  'darkly' ,  'paper' , 'simplex' , 'superhero' ,  'journal' , 'readable'  ,   'slate' ,  'united']
+BOOTSWATCH_THEMES = ['cerulean'  ,  'flatly' ,  'lumen' ,  'sandstone' ,   'spacelab'  ,  'yeti' , 'cosmo' ,  'darkly' ,  'paper' , 'simplex' , 'superhero' ,   'readable'  ,   'slate' ,  'united']
+
+# 'cyborg' , 'journal'

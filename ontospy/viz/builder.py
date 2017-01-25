@@ -71,7 +71,7 @@ import os
 from shutil import copyfile
 
 try:
-    from .CHOICES import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES
+    from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES
 
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
