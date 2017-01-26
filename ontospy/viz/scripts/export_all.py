@@ -14,13 +14,13 @@ More info in the README file.
 import click, sys
 # http://click.pocoo.org/5/arguments/
 # http://click.pocoo.org/5/options/
-from . import *
-from .. import *  # imports __init__
-from ..core import actions
-from ..core.manager import get_home_location
+from .. import *
+from ... import *  # imports __init__
+from ...core import actions
+from ...core.manager import get_home_location
 
-from .viz_komplete import KompleteViz, KompleteVizMultiModel
-from .builder import random_theme
+from ..viz_komplete import KompleteViz, KompleteVizMultiModel
+from ..builder import random_theme
 import webbrowser
 
 
@@ -36,7 +36,7 @@ def cli_run_viz(source=None, outputpath="", theme="", verbose=False):
 This application is a wrapper on the main ontospy-viz script. It generates docs for all models in the local library. Using the Complex-html template..
 @todo allow to pass a custom folder ..
 
-> >python -m ontospy.viz.export_all -o ~/Desktop/test/ --theme random
+> python -m ontospy.viz.scripts.export_all -o ~/Desktop/test/ --theme random
 
 """
 
@@ -58,7 +58,7 @@ This application is a wrapper on the main ontospy-viz script. It generates docs 
 
     report_pages = []
 
-    for onto_name in get_localontologies()[:1]:
+    for onto_name in get_localontologies():
 
         full_uri = os.path.join(get_home_location(), onto_name)
         if theme=="random":

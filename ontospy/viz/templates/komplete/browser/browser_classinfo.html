@@ -56,40 +56,42 @@
                 <ul>
                     {% if each.parents %}
 
+                        {% for s in each.parents %}
+
                         <li>
-                        {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
 
-                        <ul>
+                          <a href="{{s.slug}}.html">{{s.qname}}</a>
 
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+                          <ul>
 
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
+                            <li><a style="font-weight: bold;">{{each.qname}}</a>
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
 
-                        </ul>
+                          </ul>
 
-                        </li>
+                          </li>
                         {% endfor %}
 
                     {% else %}
 
                         <li href="#"><a>owl:Thing</a>
 
-                        <ul>
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+                          <ul>
+                            <li><a style="font-weight: bold;">{{each.qname}}</a>
 
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
 
-                        </ul>
+                          </ul>
 
                         </li>
                     {% endif %}

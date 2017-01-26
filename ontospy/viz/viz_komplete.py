@@ -163,6 +163,10 @@ class KompleteVizMultiModel(KompleteViz):
     Specialized version that supports customizing where the static url / folder are.
 
     The idea is to pass a location which can be shared by multiple html outputs. (eg multiple html-complex ontology folders)
+
+    eg
+
+    python -m ontospy.viz.scripts.export_all -o ~/Desktop/test2/ --theme random
     """
 
 

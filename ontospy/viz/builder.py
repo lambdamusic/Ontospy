@@ -71,7 +71,7 @@ import os
 from shutil import copyfile
 
 try:
-    from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES
+    from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES, BOOTSWATCH_THEME_DEFAULT
 
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
@@ -88,8 +88,10 @@ def show_themes():
 def random_theme():
     return random.choice(BOOTSWATCH_THEMES)
 
-def validate_theme(theme_try, default="paper"):
+def validate_theme(theme_try, default=BOOTSWATCH_THEME_DEFAULT):
     # print theme_try
+    if not theme_try:
+        return default
     if theme_try in BOOTSWATCH_THEMES:
         return theme_try
     else:
