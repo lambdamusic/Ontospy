@@ -62,6 +62,21 @@
 
 
 
+            {% if  each.bestLabel %}
+             <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">Label</h3>
+             </div>
+             <div class="panel-body">
+
+                 {{each.bestLabel}}
+             </div>
+           </div>
+            </div></div>
+            {% endif %}
+
+
             {% if each.bestDescription %}
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
@@ -125,42 +140,40 @@
             <div class="panel-heading">
               <h3 class="panel-title">Usage</h3>
             </div>
-            <div class="panel-body">
 
-              <table class="table table-bordered" style="overflow: auto;">
+            <table class="table table-bordered" style="overflow: auto;">
 
-                 <tr class="table-classproperties">
-                     <th>Domain</th><th>Property</th><th>Range</th>
-                 </tr>
-                 <tr>
-                     <td>
-                       {% if each.domains %}
-                           {% for s in each.domains %}
-                             <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
-                             {% if not forloop.last %}, {% endif %}
-                           {% endfor %}
-                       {% else %}
-                           <a>owl:Thing</a> (inferred)
-                       {% endif %}
-                     </td>
+               <tr class="table-classproperties">
+                   <th>Domain</th><th>Property</th><th>Range</th>
+               </tr>
+               <tr>
+                   <td>
+                     {% if each.domains %}
+                         {% for s in each.domains %}
+                           <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
+                           {% if not forloop.last %}, {% endif %}
+                         {% endfor %}
+                     {% else %}
+                         <a>owl:Thing</a> (inferred)
+                     {% endif %}
+                   </td>
 
-                      <td>
-                        {{each.qname}}
-                      </td>
+                    <td>
+                      {{each.qname}}
+                    </td>
 
-                      <td>
-                        {% if each.ranges %}
-                            {% for s in each.ranges %}
-                              <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
-                              {% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <a>owl:Thing</a> (inferred)
-                        {% endif %}
-                      </td>
-              </table>
+                    <td>
+                      {% if each.ranges %}
+                          {% for s in each.ranges %}
+                            <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
+                            {% if not forloop.last %}, {% endif %}
+                          {% endfor %}
+                      {% else %}
+                          <a>owl:Thing</a> (inferred)
+                      {% endif %}
+                    </td>
+            </table>
 
-            </div>
           </div>
            </div></div>
 

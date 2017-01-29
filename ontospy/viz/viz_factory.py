@@ -2,9 +2,6 @@
 #  -*- coding: UTF-8 -*-
 #
 #
-# TEST TEST TEST TEST TES
-#
-#
 
 
 

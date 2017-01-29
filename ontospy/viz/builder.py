@@ -38,11 +38,9 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [
                 # insert your TEMPLATE_DIRS here
-                ONTOSPY_VIZ_TEMPLATES + "shared",
-                ONTOSPY_VIZ_TEMPLATES + "splitter",
+                ONTOSPY_VIZ_TEMPLATES + "html-simple",
                 ONTOSPY_VIZ_TEMPLATES + "markdown",
                 ONTOSPY_VIZ_TEMPLATES + "komplete",
-                ONTOSPY_VIZ_TEMPLATES + "dashboard",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -77,7 +75,6 @@ try:
 except:  # Mother of all exceptions
     click.secho("Visualizations configuration file not found.", fg="red")
     raise
-
 
 
 
