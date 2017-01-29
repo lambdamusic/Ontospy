@@ -151,6 +151,23 @@
 
 
 
+{% ifequal theme "slate"  %}
+/* override default footer background for dark themes only */
+.footer {
+  background-color: inherit;
+}
+{% endifequal %}
+{% ifequal theme "darkly"  %}
+/* override default footer background for dark themes only */
+.footer {
+  background-color: inherit;
+}
+{% endifequal %}
+
+
+
+
+
 </style>
 
 
@@ -160,7 +177,6 @@
   </head>
 
   <body>
-
 
 {% block navbar %}
 

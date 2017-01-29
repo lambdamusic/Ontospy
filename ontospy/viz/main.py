@@ -31,7 +31,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--title',  help='Title for the visualization (default=graph uri).')
 @click.option('--theme',  help='CSS Theme for the html-complex visualization (random=use a random theme).')
 @click.option('--showthemes', is_flag=True, help='Show the available CSS theme choices.')
-@click.option('--verbose', is_flag=True, help='Verbose mode.')
+@click.option('--verbose', '-v', is_flag=True, help='Verbose mode.')
 def cli_run_viz(source=None, library=False, outputpath="", title="", theme="", showthemes=False, verbose=False):
     """
 This application launches the OntoSpy visualization tool.

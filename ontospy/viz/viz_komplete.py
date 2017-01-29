@@ -60,11 +60,15 @@ class KompleteViz(VizFactory):
         """
         OVERRIDING THIS METHOD from Factory
         """
+        # INDEX - MAIN PAGE
+        contents = self._renderTemplate("komplete/index.html", extraContext={"theme": self.theme})
+        FILE_NAME = "index.html"
+        main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-        # DASHBOARD - MAIN PAGE
+        # DASHBOARD
         contents = self._renderTemplate("komplete/dashboard.html", extraContext={"theme": self.theme})
         FILE_NAME = "dashboard.html"
-        main_url = self._save2File(contents, FILE_NAME, self.output_path)
+        self._save2File(contents, FILE_NAME, self.output_path)
 
         # VIZ LIST
         if False:

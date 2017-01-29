@@ -49,83 +49,55 @@
         {# first column #}
         <div class="col-md-6">
 
-        {% if namespaces %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Namespaces</h3>
+
+            <div class="row"><div class="col-md-12">
+                <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Entity Types</h3>
+              </div>
+              <div class="panel-body">
+
+
+                  <div class="row">
+
+
+                      <div class="col-md-12 ">
+                          <br />
+                          <canvas id="entitiesBarChart" ></canvas>
+                      </div>
+
+
+
+                  </div>
+
+
+              </div>
             </div>
-            <div class="panel-body" style="overflow: auto;">
-               <dl class="-dl-horizontal" style="--margin-left: -100px;">
-
-               {% for x, y in namespaces  %}
-                   <dt><span class="label label-info">{{x|default:":"}}</span></dt>
-                   <dd><a href="{{y}}" target="_blank">{{y}}</a></dd>
-
-               {% endfor %}
-
-              </dl>
-            </div>
-          </div>
-            </div>
-          </div>
-          {% endif %}
-
-           {% if ontologies%}
-
-           {% for ontology in ontologies %}
-
-           <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Ontology Metadata</h3>
-            </div>
-            <div class="panel-body">
-              {# <h5 class="well"><code>{{ ontology.uri }}</code></h5>#}
-              <dl>
-                <dt>URI</dt>
-                <dd><code>{{ ontology.uri }}</code></dd>
-              </dl>
-                {% if ontology.annotations %}
-                    <dl>
-                        {% for each in ontology.annotations %}
-                            {% ifchanged each.1 %}<dt>{{each.1}}</dt>{% endifchanged %}
-                            <dd>{{each.2}}</dd>
-                        {% endfor %}
-                    </dl>
-                {% else %}
-                    <i>No metadata available</i>
-                {% endif %}
-            </div>
-          </div>
-           </div></div>
-           {% endfor %}
-        {% endif %}
+             </div></div>
 
 
-           <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Metrics</h3>
-            </div>
-            <div class="panel-body">
-                <dl>
-
-                 {% for each in stats %}
 
 
-                      <dt>{{each.0}}</dt>
-                      <dd>{{each.1}}</dd>
 
+              <div class="row"><div class="col-md-12">
+                 <div class="panel panel-default">
+               <div class="panel-heading">
+                 <h3 class="panel-title">Triples</h3>
+               </div>
+               <div class="panel-body">
 
-                    {% endfor %}
+                   <div class="col-sm-3 col-md-3 ">
+                       <p id="chartsLegend">
+                           <span class="text-muted" style="text-transform: uppercase;">Triples</span>
+                           <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount}}</span>
+                       </p>
+                   </div>
 
-                    {% for foo in sources %}<li><small>{{ foo }}</small></li>{% endfor %}
-                </dl>
-            </div>
-          </div>
-           </div></div>
+   	        	<canvas id="triplesStats" ></canvas>
+
+               </div>
+             </div>
+              </div></div>
 
 
 
@@ -136,32 +108,6 @@
 
         {# second column #}
         <div class="col-md-6">
-
-
-          <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Entity Types</h3>
-            </div>
-            <div class="panel-body">
-
-
-                <div class="row">
-
-
-                    <div class="col-md-12 ">
-                        <br />
-                        <canvas id="entitiesBarChart" ></canvas>
-                    </div>
-
-
-
-                </div>
-
-
-            </div>
-          </div>
-           </div></div>
 
 
 
@@ -225,30 +171,6 @@
           </div></div>
         {% endif %}
 
-
-
-
-
-
-           <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Triples</h3>
-            </div>
-            <div class="panel-body">
-
-                <div class="col-sm-3 col-md-3 ">
-                    <p id="chartsLegend">
-                        <span class="text-muted" style="text-transform: uppercase;">Triples</span>
-                        <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount}}</span>
-                    </p>
-                </div>
-
-	        	<canvas id="triplesStats" ></canvas>
-
-            </div>
-          </div>
-           </div></div>
 
 
 

@@ -61,6 +61,7 @@
             </div></div>
 
 
+
             {% if each.bestDescription %}
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
@@ -119,46 +120,50 @@
             {% endif %}
 
 
-
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Domain</h3>
+              <h3 class="panel-title">Usage</h3>
             </div>
             <div class="panel-body">
 
-                {% if each.domains %}
-                    {% for s in each.domains %}
-                      <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
-                    {% endfor %}
-                {% else %}
-                    <li><a>owl:Thing</a> (inferred)</li>
-                {% endif %}
+              <table class="table table-bordered" style="overflow: auto;">
+
+                 <tr class="table-classproperties">
+                     <th>Domain</th><th>Property</th><th>Range</th>
+                 </tr>
+                 <tr>
+                     <td>
+                       {% if each.domains %}
+                           {% for s in each.domains %}
+                             <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
+                             {% if not forloop.last %}, {% endif %}
+                           {% endfor %}
+                       {% else %}
+                           <a>owl:Thing</a> (inferred)
+                       {% endif %}
+                     </td>
+
+                      <td>
+                        {{each.qname}}
+                      </td>
+
+                      <td>
+                        {% if each.ranges %}
+                            {% for s in each.ranges %}
+                              <a href="{{s.slug}}.html">{{s.qname|default:s}}</a>
+                              {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a>owl:Thing</a> (inferred)
+                        {% endif %}
+                      </td>
+              </table>
 
             </div>
           </div>
            </div></div>
 
-
-
-           <div class="row"><div class="col-md-12">
-             <div class="panel panel-default">
-           <div class="panel-heading">
-             <h3 class="panel-title">Range</h3>
-           </div>
-           <div class="panel-body">
-
-               {% if each.ranges %}
-                   {% for s in each.ranges %}
-                     <li><a href="{{s.slug}}.html">{{s.qname|default:s}}</a></li>
-                   {% endfor %}
-               {% else %}
-                   <li><a>owl:Thing</a> (inferred)</li>
-               {% endif %}
-
-           </div>
-         </div>
-          </div></div>
 
 
            <div class="row"><div class="col-md-12">
