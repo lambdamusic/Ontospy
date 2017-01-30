@@ -50,47 +50,50 @@
 
             <hr>
 
+
+
+
             <div class="tree-container">
             <div class="tree">
                 <ul>
                     {% if each.parents %}
-                        <li> {% for s in each.parents %}<a href="{{s.slug}}.html">{{s.qname}}</a>
 
-                        <ul>
+                        {% for s in each.parents %}
 
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+                        <li>
 
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}
-                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
-                                {% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a>
 
-                        </ul>
+                          <ul>
 
-                        </li>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
+
+                          </ul>
+
+                          </li>
                         {% endfor %}
 
                     {% else %}
 
-                        <li href="#"><a>skos:Concept</a>
+                        <li><a href="entities-tree-properties.html">owl:Thing</a>
 
-                        <ul>
-                          <li><a style="font-weight: bold;">{{each.qname}}</a>
+                          <ul>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
 
-                          {% if each.children  %}
-                              <ul>
-                                {% for s in each.children %}
-                                <li><a href="{{s.slug}}.html">{{s.qname}}</a></li>
-                                {% endfor %}
-                              </ul>
-                          {% endif %}
-                            </li>
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
 
-                        </ul>
+                          </ul>
 
                         </li>
                     {% endif %}
@@ -98,6 +101,8 @@
                 </ul>
             </div>
             </div>
+
+
 
 
             <div class="row"><div class="col-md-12">
@@ -130,7 +135,7 @@
 
 
 
-            
+
             {% if each.bestDescription %}
              <div class="row"><div class="col-md-12">
                <div class="panel panel-default">

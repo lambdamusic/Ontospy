@@ -5,12 +5,16 @@
 
 
 .tree-container {
-    width: 3000em;
+    width: 3000px;
     overflow-x: auto;
     white-space: nowrap;
 }
 
-.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
+.tree {
+  width: 3000em;
+  margin: 10px 0px 30px -20px;
+  padding: 0;
+  display: inline-block;}
 
 .tree ul {
 	padding-top: 20px; position: relative;

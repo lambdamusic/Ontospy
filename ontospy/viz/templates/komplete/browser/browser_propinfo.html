@@ -48,6 +48,59 @@
             <hr>
 
 
+
+            <div class="tree-container">
+            <div class="tree">
+                <ul>
+                    {% if each.parents %}
+
+                        {% for s in each.parents %}
+
+                        <li>
+
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a>
+
+                          <ul>
+
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
+
+                          </ul>
+
+                          </li>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <li><a href="entities-tree-properties.html">owl:Thing</a>
+
+                          <ul>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+
+                            {% if each.children  %}
+                                <ul>
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                </ul>
+                            {% endif %}
+                              </li>
+
+                          </ul>
+
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            </div>
+
+
+
+
             <div class="row"><div class="col-md-12">
                <div class="panel panel-default">
              <div class="panel-heading">
@@ -144,7 +197,7 @@
             <table class="table table-bordered" style="overflow: auto;">
 
                <tr class="table-classproperties">
-                   <th>Domain</th><th>Property</th><th>Range</th>
+                   <th>DOMAIN</th><th>PROPERTY</th><th>RANGE</th>
                </tr>
                <tr>
                    <td>
