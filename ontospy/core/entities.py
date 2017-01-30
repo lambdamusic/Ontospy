@@ -175,20 +175,21 @@ class RDF_Entity(object):
 
     def bestDescription(self, prefLanguage="en",quotes=False):
         """
-        facility for extrating the best available description for an entity
-
-        ..This checks RFDS.label, SKOS.prefLabel and finally the qname local component
+        facility for extracting a human readable description for an entity
         """
 
         test_preds = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description, rdflib.namespace.DC.description, rdflib.namespace.SKOS.definition ]
 
         for pred in test_preds:
             test = self.getValuesForProperty(pred)
+            # printDebug(str(test), "red")
             if test:
                 if quotes:
-                    return addQuotes(firstEnglishStringInList(test))
+                    # return addQuotes(firstEnglishStringInList(test))
+                    return addQuotes(joinStringsInList(test, prefLanguage="en"))
                 else:
-                    return firstEnglishStringInList(test)
+                    # return firstEnglishStringInList(test)
+                    return joinStringsInList(test, prefLanguage="en")
         return ""
 
 

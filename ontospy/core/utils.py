@@ -109,9 +109,9 @@ def printDebug(text, mystyle="", **kwargs):
     http://click.pocoo.org/5/api/#click.style
 
     :kwargs = you can do printDebug("s", bold=True)
-    
+
     """
-    
+
     if mystyle == "comment":
         click.secho(text, fg='green')
     elif mystyle == "important":
@@ -132,7 +132,7 @@ def printComment(text, mystyle="comment", **kwargs):
     .. same as printDebug, but just one option
     [for backward compatibility]
     """
-    
+
     click.secho(text, fg='green', **kwargs)
 
 
@@ -518,6 +518,27 @@ def firstStringInList(literalEntities, prefLanguage="en"):
 
 
 
+def joinStringsInList(literalEntities, prefLanguage="en"):
+    """
+    from a list of literals, returns the ones in prefLanguage joined up.
+    if the desired language specification is not available, join all up
+    """
+    match = []
+
+    if len(literalEntities) == 1:
+        return literalEntities[0]
+    elif len(literalEntities) > 1:
+        for x in literalEntities:
+            if getattr(x, 'language') and  getattr(x, 'language') == prefLanguage:
+                match.append(x)
+        if not match: # don't bother about language
+            for x in literalEntities:
+                match.append(x)
+
+    return " - ".join([x for x in match])
+
+
+
 
 def firstEnglishStringInList(literalEntities,):
     return firstStringInList(literalEntities, "en")
@@ -842,12 +863,12 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 def shellPrintOverview(g, opts={'labels' : False}):
     """
     overview of graph invoked from command line
-    
+
     @todo
     add pagination via something like this
     # import pydoc
     # pydoc.pager("SOME_VERY_LONG_TEXT")
-    
+
     """
     ontologies = g.ontologies
 
@@ -895,5 +916,3 @@ def get_files_with_extensions(folder, extensions):
                 # break
 
     return out
-
-
