@@ -5,15 +5,15 @@ VISUALIZATIONS_LIST = {
   "Visualizations":
   [{
         "ID": "html-simple",
-        "Title": "Basic Html",
+        "Title": "Html: single-page",
         "Description": "@todo",
       } , {
         "ID": "html-complex",
-        "Title": "Complex Html",
+        "Title": "Html: multi-page",
         "Description": "@todo",
       } , {
         "ID": "markdown",
-        "Title": "Markdown",
+        "Title": "Markdown: multi-page",
         "Description": "@todo",
       }
   ]
@@ -22,5 +22,5 @@ VISUALIZATIONS_LIST = {
 
 BOOTSWATCH_THEMES = ['cerulean'  ,  'flatly' ,  'lumen' ,  'sandstone' ,   'spacelab'  ,  'yeti' , 'cosmo' ,  'darkly' ,  'paper' , 'simplex' , 'superhero' ,   'readable'  ,   'slate' ,  'united']
 
-BOOTSWATCH_THEME_DEFAULT = "cosmo"
+BOOTSWATCH_THEME_DEFAULT = "simplex"
 # 'cyborg' , 'journal'

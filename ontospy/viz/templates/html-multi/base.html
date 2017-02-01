@@ -139,6 +139,14 @@
 		}
 
 
+    /* dropdown open on hover */
+
+    @media (min-width: 979px) {
+      ul.nav li.dropdown:hover > ul.dropdown-menu {
+        display: block;
+      }
+    }
+
 
 
 /*pygments css*/
@@ -151,19 +159,12 @@
 
 
 
-{% ifequal theme "slate"  %}
+{% if theme == "slate" or  theme == "darkly"  or  theme == "superhero"  %}
 /* override default footer background for dark themes only */
 .footer {
   background-color: inherit;
 }
-{% endifequal %}
-{% ifequal theme "darkly"  %}
-/* override default footer background for dark themes only */
-.footer {
-  background-color: inherit;
-}
-{% endifequal %}
-
+{% endif %}
 
 
 
@@ -187,7 +188,7 @@
 
 
 
-<div id="wrapper">
+<div id="wrapper" {% if thispage != "home" %}class="toggled"{% endif %}>
 
 
     {% block sidebar %}

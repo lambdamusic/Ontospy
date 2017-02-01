@@ -4,7 +4,7 @@
 
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Run it from the command line:
 
@@ -46,7 +46,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=True, hide_base_schemas=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """

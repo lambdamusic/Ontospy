@@ -40,7 +40,8 @@ if StrictVersion(django.get_version()) > StrictVersion('1.7'):
                 # insert your TEMPLATE_DIRS here
                 ONTOSPY_VIZ_TEMPLATES + "html-simple",
                 ONTOSPY_VIZ_TEMPLATES + "markdown",
-                ONTOSPY_VIZ_TEMPLATES + "komplete",
+                ONTOSPY_VIZ_TEMPLATES + "html-multi",
+                ONTOSPY_VIZ_TEMPLATES + "misc",
             ],
             'APP_DIRS': True,
             'OPTIONS': {
@@ -200,11 +201,11 @@ def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
     this_viz = VISUALIZATIONS_LIST[viz_index]
 
     if this_viz['ID'] == "html-simple":
-        from .viz_html_simple import HTMLVisualizer
+        from .viz_html_single import HTMLVisualizer
         v = HTMLVisualizer(g, title)
 
     elif this_viz['ID'] == "html-complex":
-        from .viz_komplete import KompleteViz
+        from .viz_html_multi import KompleteViz
         v = KompleteViz(g, title, theme)
 
     elif this_viz['ID'] == "markdown":

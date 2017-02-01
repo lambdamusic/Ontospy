@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
 """

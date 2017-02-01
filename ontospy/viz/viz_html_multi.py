@@ -56,7 +56,13 @@ class KompleteViz(VizFactory):
         Init
         """
         super(KompleteViz, self).__init__(ontospy_graph, title)
-        self.static_files = ["custom", "libs"]
+        self.static_files = [
+                "custom",
+                "libs/bootswatch3.2",
+                "libs/bootstrap-3.3.7-dist",
+                "libs/jquery/1.12.4/",
+                "libs/Chart.js-2.4.0/"
+                ]
         self.theme = validate_theme(theme)
 
     def _buildTemplates(self):
@@ -64,18 +70,18 @@ class KompleteViz(VizFactory):
         OVERRIDING THIS METHOD from Factory
         """
         # INDEX - MAIN PAGE
-        contents = self._renderTemplate("komplete/index.html", extraContext={"theme": self.theme})
+        contents = self._renderTemplate("html-multi/index.html", extraContext={"theme": self.theme})
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
         # DASHBOARD
-        contents = self._renderTemplate("komplete/dashboard.html", extraContext={"theme": self.theme})
+        contents = self._renderTemplate("html-multi/dashboard.html", extraContext={"theme": self.theme})
         FILE_NAME = "dashboard.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 
         # VIZ LIST
         if False:
-            contents = self._renderTemplate("komplete/viz_list.html", extraContext={"theme": self.theme})
+            contents = self._renderTemplate("html-multi/viz_list.html", extraContext={"theme": self.theme})
             FILE_NAME = "visualizations.html"
             self._save2File(contents, FILE_NAME, self.output_path)
 
@@ -84,7 +90,7 @@ class KompleteViz(VizFactory):
 
         # ENTITIES A-Z
         extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme}
-        contents = self._renderTemplate("komplete/browser/browser_entities_az.html", extraContext=extra_context)
+        contents = self._renderTemplate("html-multi/browser/browser_entities_az.html", extraContext=extra_context)
         FILE_NAME = "entities-az.html"
         self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -95,7 +101,7 @@ class KompleteViz(VizFactory):
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "classes",
                 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyClassTree())}
-            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-classes.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
             # BROWSER PAGES - CLASSES ======
@@ -106,7 +112,7 @@ class KompleteViz(VizFactory):
                                 "ontograph": self.ontospy_graph
                                 }
                 extra_context.update(self.highlight_code(entity))
-                contents = self._renderTemplate("komplete/browser/browser_classinfo.html", extraContext=extra_context)
+                contents = self._renderTemplate("html-multi/browser/browser_classinfo.html", extraContext=extra_context)
                 FILE_NAME = entity.slug + ".html"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -117,7 +123,7 @@ class KompleteViz(VizFactory):
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "properties",
                 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyPropTree())}
-            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-properties.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -130,7 +136,7 @@ class KompleteViz(VizFactory):
                                 "ontograph": self.ontospy_graph
                                 }
                 extra_context.update(self.highlight_code(entity))
-                contents = self._renderTemplate("komplete/browser/browser_propinfo.html", extraContext=extra_context)
+                contents = self._renderTemplate("html-multi/browser/browser_propinfo.html", extraContext=extra_context)
                 FILE_NAME = entity.slug + ".html"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -142,7 +148,7 @@ class KompleteViz(VizFactory):
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "concepts",
                 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree())}
-            contents = self._renderTemplate("komplete/browser/browser_entities_tree.html", extraContext=extra_context)
+            contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-concepts.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
 
@@ -155,7 +161,7 @@ class KompleteViz(VizFactory):
                                 "ontograph": self.ontospy_graph
                                 }
                 extra_context.update(self.highlight_code(entity))
-                contents = self._renderTemplate("komplete/browser/browser_conceptinfo.html", extraContext=extra_context)
+                contents = self._renderTemplate("html-multi/browser/browser_conceptinfo.html", extraContext=extra_context)
                 FILE_NAME = entity.slug + ".html"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 

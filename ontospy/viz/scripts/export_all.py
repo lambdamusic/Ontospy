@@ -4,7 +4,7 @@
 
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
 More info in the README file.
@@ -19,7 +19,7 @@ from ... import *  # imports __init__
 from ...core import actions
 from ...core.manager import get_home_location
 
-from ..viz_komplete import KompleteViz, KompleteVizMultiModel
+from ..viz_html_multi import KompleteViz, KompleteVizMultiModel
 from ..builder import random_theme
 import webbrowser
 

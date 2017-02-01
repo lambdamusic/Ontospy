@@ -3,7 +3,9 @@
 
 {% block navbar %}
 
-    {% include "navbar.html" %}
+  {% with thispage=treetype %}
+      {% include "navbar.html" %}
+  {% endwith %}
 
 {% endblock navbar %}
 
