@@ -15,16 +15,48 @@ else:
 
 
 # setup.py proper begins here
-
 from setuptools import setup, find_packages  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
+import os
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+
+
+
+def get_package_folders(top_folder, root_path):
+    """
+    Utility to generate dynamically the list of folders needed by the package_data setting
+    ..
+        package_data={
+             'ontospy': ['viz/static/*.*', 'viz/templates/*.*', 'viz/templates/shared/*.*', 'viz/templates/splitter/*.*', 'viz/templates/markdown/*.*'],
+        },
+    ...
+    """
+    _dirs = []
+    out = []
+    for root, dirs, files in os.walk(top_folder):
+        for dir in dirs:
+            _dirs.append(os.path.join(root, dir))
+    for d in _dirs:
+        _d = os.path.join(d, "*.*")
+        out.append(_d.replace(root_path+"/", ""))
+    return out
+
+
+project_root = os.path.join(here, "ontospy")
+static_root = os.path.join(project_root, "viz", "static")
+templates_root = os.path.join(project_root, "viz", "templates")
+# dynamically generate list of data folders
+package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
+
+# def
+
+
 
 setup(
     name='ontospy',
@@ -109,8 +141,12 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
+    # package_data={
+    #      'ontospy': ['viz/static/*.*', 'viz/templates/*.*', 'viz/templates/shared/*.*', 'viz/templates/splitter/*.*', 'viz/templates/markdown/*.*'],
+    # },
+
     package_data={
-         'ontospy': ['viz/static/*.*', 'viz/templates/*.*', 'viz/templates/shared/*.*', 'viz/templates/splitter/*.*', 'viz/templates/markdown/*.*'],
+        'ontospy': package_data_folders
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

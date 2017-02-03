@@ -2,9 +2,10 @@
 #  -*- coding: UTF-8 -*-
 # https://groups.google.com/forum/#!msg/rdflib-dev/1owj7Ghp1X8/pwClNSz_LI4J
 
-
+from __future__ import print_function
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 import rdflib
+
 
 store = SPARQLStore("http://dbpedia.org/sparql")
 g = rdflib.ConjunctiveGraph(store=store)
@@ -15,7 +16,7 @@ list(r)
 # In order to serialize the result as JSON, you can do
 #
 serialized=r.serialize(format='json')
-print serialized
+print(serialized)
 # '{"head": {"vars"...
 
 
@@ -23,4 +24,3 @@ print serialized
 # https://github.com/RDFLib/rdflib-sparqlstore
 # https://lawlesst.github.io/notebook/rdflib-stardog.html
 # https://github.com/RDFLib/rdflib
-

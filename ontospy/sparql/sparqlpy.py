@@ -28,16 +28,18 @@
 #
 # """
 
+from __future__ import print_function
 import sys
 import time
 import math
 import optparse
 import xml.dom.minidom
 
+
 try:
 	from SPARQLWrapper import SPARQLWrapper, JSON, XML, RDF
 except:
-	print "Error: can't find SPARQLWrapper (==> easy_install SPARQLWrapper)"
+	print("Error: can't find SPARQLWrapper (==> easy_install SPARQLWrapper)")
 	sys.exit()
 
 
@@ -114,7 +116,7 @@ class SparqlEndpoint(object):
 		query = "\n".join(lines)
 
 		if self.verbose:
-			print query, "\n\n"
+			print(query, "\n\n")
 
 		return self.__doQuery(query, format, convert)
 
@@ -137,7 +139,7 @@ class SparqlEndpoint(object):
 
 
 		if self.verbose:
-			print query, "\n\n"
+			print(query, "\n\n")
 
 		return self.__doQuery(query, format, convert)
 
@@ -164,7 +166,7 @@ class SparqlEndpoint(object):
 
 
 		if self.verbose:
-			print query, "\n\n"
+			print(query, "\n\n")
 
 
 		return self.__doQuery(query, format, convert)
@@ -186,7 +188,7 @@ class SparqlEndpoint(object):
 
 
 		if self.verbose:
-			print query, "\n\n"
+			print(query, "\n\n")
 
 
 		return self.__doQuery(query, format, convert)
@@ -285,16 +287,16 @@ def main():
 	s = SparqlEndpoint(url)
 
 	if query:
-		print "Contacting %s ... \nQuery: \"%s\"; Format: %s\n" % (url, query, format)
+		print("Contacting %s ... \nQuery: \"%s\"; Format: %s\n" % (url, query, format))
 		results = s.query(query, format)
 	elif describe:
-		print "Contacting %s ... \nQuery: DESCRIBE %s; Format: %s\n" % (url, describe, format)
+		print("Contacting %s ... \nQuery: DESCRIBE %s; Format: %s\n" % (url, describe, format))
 		results = s.describe(describe, format)
 	elif alltriples:
-		print "Contacting %s ... \nQuery: ALL TRIPLES FOR %s; Format: %s\n" % (url, alltriples, format)
+		print("Contacting %s ... \nQuery: ALL TRIPLES FOR %s; Format: %s\n" % (url, alltriples, format))
 		results = s.allTriplesForURI(alltriples, format)
 	elif ontology:
-		print "Contacting %s ... \nQuery: ONTOLOGY; Format: %s\n" % (url, format)
+		print("Contacting %s ... \nQuery: ONTOLOGY; Format: %s\n" % (url, format))
 		results = s.ontology(format)
 
 
@@ -302,12 +304,12 @@ def main():
 		results = results["results"]["bindings"]
 		for d in results:
 			for k, v in d.iteritems():
-				print "[%s] %s=> %s" % (k, v['type'],v['value'])
-			print "----"
+				print("[%s] %s=> %s" % (k, v['type'],v['value']))
+			print("----")
 	elif format == "XML":
-		print results.toxml()
+		print(results.toxml())
 	else:
-		print results
+		print(results)
 
 
 
@@ -315,14 +317,14 @@ def main():
 	# print some stats....
 	eTime = time.time()
 	tTime = eTime - sTime
-	print "-" * 10
-	print "Time:	   %0.2fs" %  tTime
+	print("-" * 10)
+	print("Time:	   %0.2fs" %  tTime)
 
 	try:
 		# most prob this works only with JSON results, but you get the idea!
-		print "Found:	   %d" % len(results)
-		print "Stats:	   (%d/s after %0.2fs)" % (
-				  int(math.ceil(float(len(results)) / tTime)), tTime)
+		print("Found:	   %d" % len(results))
+		print("Stats:	   (%d/s after %0.2fs)" % (
+				  int(math.ceil(float(len(results)) / tTime)), tTime))
 	except:
 		pass
 

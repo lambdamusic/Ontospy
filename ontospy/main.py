@@ -165,13 +165,18 @@ More info: <ontospy.readthedocs.org>
 
     else:
         if not sources:
-            click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
-            filename = action_listlocal(all_details=False)
-            if filename:
-                g = get_pickled_ontology(filename)
-                if not g:
-                    g = do_pickle_ontology(filename)
-                shellPrintOverview(g, print_opts)
+            # click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
+            click.secho("You haven't specified any argument.", fg='red')
+            if click.confirm('Show the local library?'):
+                filename = action_listlocal(all_details=False)
+                if filename:
+                    g = get_pickled_ontology(filename)
+                    if not g:
+                        g = do_pickle_ontology(filename)
+                    shellPrintOverview(g, print_opts)
+            else:
+                printDebug("Goodbye.", "comment")
+                raise SystemExit(1)
         else:
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')

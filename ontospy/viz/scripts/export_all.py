@@ -80,7 +80,7 @@ This application is a wrapper on the main ontospy-viz script. It generates docs 
         try:
             # note: onto_outputpath is wiped out each time as part of the build
             url = v.build(onto_outputpath)
-            report_pages.append("<a href='%s/dashboard.html' target='_blank'>%s</a> ('%s' theme)<br />" % (onto_name_safe, onto_name, _theme))
+            report_pages.append("<a href='%s/index.html' target='_blank'>%s</a> ('%s' theme)<br />" % (onto_name_safe, onto_name, _theme))
         except:
             e = sys.exc_info()[0]
             printDebug("Error: " + str(e), "red")
