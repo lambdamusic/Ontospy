@@ -3,12 +3,12 @@
 
 
 #
-# BEGINNING TO USE CLICK TO DO A LAUNCHER FOR ONTOSPY-VIZ 
+# BEGINNING TO USE CLICK TO DO A LAUNCHER FOR ONTOSPY-VIZ
 #
 
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
 Run it from the command line by passing it an ontology URI,
@@ -24,7 +24,8 @@ import sys, os, time, os.path, webbrowser
 
 from . import *  # imports __init__
 from ._version import *
-from .actions import *
+# from .actions import *
+from .viz.builder import action_visualize
 from .core.ontospy import Ontospy
 
 from .core.utils import *
@@ -52,7 +53,7 @@ def hello():
     else:
         click.echo('Invalid input :(')
     click.echo_via_pager('\n'.join('Line %d' % idx
-                               for idx in range(200)))    
+                               for idx in range(200)))
 
 
 @click.command()
@@ -71,7 +72,7 @@ def main(uri, outputpath, gist):
         if not(os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
             click.secho("WARNING: not a valid directory path.", bg='blue', fg='white')
             sys.exit(0)
-    
+
     url = action_visualize([uri], gist, False, outputpath)
     if url:# open browser
         webbrowser.open(url)

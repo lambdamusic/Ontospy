@@ -5,7 +5,7 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.load_local_test
+:path/to/ontospyProject>python -m ontospy.tests.load_test
 
 """
 
@@ -28,7 +28,7 @@ class TestLoadOntologies(unittest.TestCase):
 
 	def test1_load_locally(self):
 		"""
-		Check if the ontologies load ok (from RDF folder coming with ontospy)
+		Check if the ontologies in /RDF folder load ok
 		"""
 		print("\nTEST 1: Loading ontologies from <%s> folder.\n=================" % DATA_FOLDER)
 
@@ -46,7 +46,7 @@ class TestLoadOntologies(unittest.TestCase):
 					p.describe()
 
 				for s in o.skosConcepts:
-					s.describe()	
+					s.describe()
 
 				# self.assertEqual(type(o), ontospy.Ontology)
 

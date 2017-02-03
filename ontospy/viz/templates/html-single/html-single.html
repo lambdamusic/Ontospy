@@ -1,0 +1,792 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>OntoSpy > {{docs_title}}</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+
+  <style type="text/css" media="screen">
+
+
+  body {
+	  margin-left: 6em;
+	  margin-right: 12em;
+	  text-align: justify;
+    padding: 2em 1em 2em 70px;
+    margin: 0;
+    font-family: sans-serif;
+    color: black;
+    background: white;
+    background-position: top left;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  :link { color: #00C; background: transparent }
+  :visited { color: #00C; background: transparent }
+  a:active { color: #C00; background: transparent }
+
+  a:link img, a:visited img { border-style: none } /* no border on img links */
+
+  a:hover {color: white; background: #00C; }
+  a.backlink:hover {color: white; background: grey; }
+  a.greylink:hover {color: white; background: grey; }
+
+  .margintop {
+  	 margin-top: 40px;
+  }
+
+
+  dt, dd { margin-top: 10px; margin-bottom: 0 } /* opera 3.50 */
+  dt { font-weight: bold }
+
+
+  h1, h2, h3, h4, h5, h6 { text-align: left }
+  /* background should be transparent, but WebTV has a bug */
+  h1, h2, h3, h4, h5 { color: #005A9C; background: white }
+  h1.title { font: 200% sans-serif }
+  h1 { font: 170% sans-serif }
+  h2 { font: 140% sans-serif }
+  h3 { font: 120% sans-serif }
+  h4 { font: bold 100% sans-serif }
+  h5 { font: italic 100% sans-serif }
+  h6 { font: small-caps 100% sans-serif }
+
+  .hide { display: none }
+
+
+  pre { margin-left: 2em }
+
+  pre, code { font-family: monospace } /* navigator 4 requires this */
+
+
+  .implementation {
+  	background: aliceblue;
+	padding: 10px;
+	margin-top: 5px;
+  }
+
+  fieldset {
+	  margin-top: 20px;
+	  padding: 13px;
+      text-align: left;
+  }
+
+  legend {
+	  text-transform: uppercase;
+  }
+
+  .entity-div {
+	  margin: 55px 10px 30px 10px;
+  }
+
+  .entity-section {
+	  margin-bottom: 0px;
+  }
+
+
+  a.backlink {
+	  font-size: 80%;
+	  color: grey;
+  }
+
+  a.greylink {
+	  color: grey;
+  }
+
+
+   .implementation_title {
+{#       text-transform: uppercase;#}
+       font-weight: bold;
+       font-size: 100%;
+   }
+
+.section-desc {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+
+{#      CSS FOR TREE   2016-07-26   #}
+
+        .tree-container {
+            width: 3000em;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+		.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
+
+		.tree ul {
+			padding-top: 20px; position: relative;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		.tree li {
+			float: left; text-align: center;
+			list-style-type: none;
+			position: relative;
+			padding: 20px 5px 0 5px;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		/*We will use ::before and ::after to draw the connectors*/
+
+		.tree li::before, .tree li::after{
+			content: '';
+			position: absolute; top: 0; right: 50%;
+			border-top: 1px solid #ccc;
+			width: 50%; height: 20px;
+		}
+		.tree li::after{
+			right: auto; left: 50%;
+			border-left: 1px solid #ccc;
+		}
+
+		/*We need to remove left-right connectors from elements without
+		any siblings*/
+		.tree li:only-child::after, .tree li:only-child::before {
+			display: none;
+		}
+
+		/*Remove space from the top of single children*/
+		.tree li:only-child{ padding-top: 0;}
+
+		/*Remove left connector from first child and
+		right connector from last child*/
+		.tree li:first-child::before, .tree li:last-child::after{
+			border: 0 none;
+		}
+		/*Adding back the vertical connector to the last nodes*/
+		.tree li:last-child::before{
+			border-right: 1px solid #ccc;
+			border-radius: 0 5px 0 0;
+			-webkit-border-radius: 0 5px 0 0;
+			-moz-border-radius: 0 5px 0 0;
+		}
+		.tree li:first-child::after{
+			border-radius: 5px 0 0 0;
+			-webkit-border-radius: 5px 0 0 0;
+			-moz-border-radius: 5px 0 0 0;
+		}
+
+		/*Time to add downward connectors from parents*/
+		.tree ul ul::before{
+			content: '';
+			position: absolute; top: 0; left: 50%;
+			border-left: 1px solid #ccc;
+			width: 0; height: 20px;
+		}
+
+		.tree li a{
+			border: 1px solid #ccc;
+			padding: 5px 10px;
+			text-decoration: none;
+			color: #666;
+			font-family: arial, verdana, tahoma;
+			font-size: 11px;
+			display: inline-block;
+
+			border-radius: 5px;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		/*Time for some hover effects*/
+		/*We will apply the hover effect the the lineage of the element also*/
+		.tree li a:hover, .tree li a:hover+ul li a {
+			background: #c8e4f8; color: #000; border: 1px solid #94a0b4;
+		}
+		/*Connector styles on hover*/
+		.tree li a:hover+ul li::after,
+		.tree li a:hover+ul li::before,
+		.tree li a:hover+ul::before,
+		.tree li a:hover+ul ul::before{
+			border-color:  #94a0b4;
+		}
+
+		/*Thats all. I hope you enjoyed it.
+		Thanks :)*/
+
+
+  </style>
+
+
+</head>
+
+
+<body>
+
+
+    {# <h1>{{ontology.bestLabel}}</h1> #}
+	<h1 class="title">Graph:&nbsp;<a href="{{main_uri}}" target="_blank">{{docs_title}}</a></h1>
+	<h3>{{ontologies.0.bestDescription}}</h3>
+
+	<p><small>Ontology documentation automatically generated by <a class="greylink" href="http://ontospy.readthedocs.org/">OntoSpy</a> on {% now "jS F Y H:i" %}</small></p>
+
+
+
+	{# TOC SECTION #}
+
+
+	<hr class="margintop">
+
+	<h1><a name="toc">&nbsp;</a>Table of Content</h1>
+
+	<ul>
+		{% if ontology.annotations %}<li><a href="#annotations">Ontology Annotations</a></li>{% endif %}
+		<li><a href="#a-z">A-Z of Terms</a></li>
+		{% if classes %}<li><a href="#classes">Classes</a></li>{% endif %}
+		{% if objproperties %}<li><a href="#objproperties">Object Properties</a></li>{% endif %}
+		{% if dataproperties %}<li><a href="#dataproperties">Datatype properties</a></li>{% endif %}
+		{% if annotationproperties %}<li><a href="#annotationproperties">Annotation properties</a></li>{% endif %}
+		{% if skosConcepts %}<li><a href="#skosconcepts">SKOS Concepts</a></li>{% endif %}
+
+		{# {% if instances %}<li><a href="#instances">Instances</a></li>{% endif %} #}
+
+	</ul>
+
+
+
+
+	{# ANNOTATIONS SECTION #}
+
+	{% if ontology.annotations %}
+
+	<hr class="margintop">
+
+	<h1><a name="annotations">&nbsp;</a>Ontology annotations</h1>
+
+	{% for each in ontology.annotations %}
+
+		{% ifchanged each.1 %}
+
+			{% if not forloop.first %}</dl>{% endif %}
+		    <dl>
+		      <dt>{{each.1}}</dt>
+
+		{% endifchanged %}
+				<dd>{{each.2}}</dd>
+
+	{% endfor %}
+	{% endif %}
+
+
+
+
+	{# A-Z SECTION #}
+
+	<hr class="margintop">
+	<h1><a  name="a-z">&nbsp;</a>A-Z of terms</h1>
+
+	<div id="azterms">
+
+	This is a complete alphabetical A-Z index of all terms, by main logical type.
+
+	{% if classes %}
+		<fieldset> <legend>Classes ({{classes|length}})</legend>
+			{% for each in classes  %}<span><a href="#{{each.qname}}">{{each.qname}}</a></span>
+			{% if not forloop.last %}|{% endif %}
+			{% endfor %}
+		</fieldset>
+	{% endif %}
+
+	{% if objproperties %}
+
+	<fieldset> <legend>Object Properties ({{objproperties|length}})</legend>
+		&nbsp;{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+		{% if not forloop.last %}|{% endif %}  {% endfor %}
+	</fieldset>
+
+	{% endif %}
+
+	{% if dataproperties %}
+	<fieldset> <legend>Datatype Properties ({{dataproperties|length}})</legend>
+		&nbsp;{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+		{% if not forloop.last %}|{% endif %}  {% endfor %}
+	</fieldset>
+	{% endif %}
+
+	{% if annotationproperties %}
+
+		<fieldset> <legend>Annotation Properties ({{annotationproperties|length}})</legend>
+			&nbsp;{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+			{% if not forloop.last %}|{% endif %}  {% endfor %}
+		</fieldset>
+
+	{% endif %}
+
+	{% if skosConcepts %}
+
+		<fieldset> <legend>SKOS Concepts ({{skosConcepts|length}})</legend>
+			&nbsp;{% for each in skosConcepts  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+			{% if not forloop.last %}|{% endif %}  {% endfor %}
+		</fieldset>
+
+	{% endif %}
+
+
+	</div>
+
+
+
+	{# CLASSES SECTION #}
+
+
+	{% if classes %}
+
+		<hr class="margintop">
+		<h1 class="margintop" ><a name="classes">&nbsp;</a>Classes</h1>
+
+			{% for each in classes  %}
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        {% if each.parents %}
+                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                              {% if each.children  %}
+                                  <ul>
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                  </ul>
+                              {% endif %}
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            {% endfor %}
+
+                        {% else %}
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                              {% if each.children  %}
+                                  <ul>
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                  </ul>
+                              {% endif %}
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </div>
+                </div>
+
+
+                {% if not each.children  %}
+                <p class="section-desc">
+                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                {% endif %}
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    {{each.bestDescription}}
+                </p>
+
+                {% if each.ancestors %}
+					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                        <br />
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% else %}
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				{% endif %}
+
+
+
+				{% if each.domain_of %}
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        {% for s in each.domain_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+				{% if each.range_of %}
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        {% for s in each.range_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+
+			</div>
+
+
+			{% endfor %}
+
+	{% endif %}
+
+
+
+	{# OBJECT PROPERTIES SECTION #}
+
+	{% if objproperties %}
+
+		<hr class="margintop">
+		<h1 class="margintop"><a name="objproperties">&nbsp;</a>Object Properties</h1>
+
+			{% for each in objproperties  %}
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                {% if not each.children  %}
+                <p class="section-desc">
+                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                {% endif %}
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    {{each.bestDescription}}
+                </p>
+
+                {% if each.ancestors %}
+					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                        <br />
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% else %}
+
+				{% endif %}
+
+
+
+				{% if each.children %}
+					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
+                        <br />
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.domains %}
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.ranges %}
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+
+			</div>
+
+			{% endfor %}
+
+	{% endif %}
+
+
+
+
+
+
+
+	{# DATATYPE PROPERTIES SECTION #}
+
+	{% if dataproperties %}
+
+		<hr class="margintop">
+		<h1 class="margintop"><a name="dataproperties">&nbsp;</a>Datatype Properties</h1>
+
+			{% for each in dataproperties  %}
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Datatype Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                {% if not each.children  %}
+                <p class="section-desc">
+                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                {% endif %}
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    {{each.bestDescription}}
+                </p>
+
+                {% if each.ancestors %}
+					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                        <br />
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% else %}
+
+				{% endif %}
+
+
+
+				{% if each.children %}
+					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
+                        <br />
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.domains %}
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.ranges %}
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+
+
+			</div>
+			{% endfor %}
+
+	{% endif %}
+
+
+
+
+
+
+
+	{# ANNOTATION PROPERTIES SECTION #}
+
+	{% if annotationproperties %}
+
+		<hr class="margintop">
+		<h1 class="margintop"><a name="annotationproperties">&nbsp;</a>Annotation Properties</h1>
+
+			{% for each in annotationproperties  %}
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Annotation Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                {% if not each.children  %}
+                <p class="section-desc">
+                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                {% endif %}
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    {{each.bestDescription}}
+                </p>
+
+                {% if each.ancestors %}
+					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
+                        <br />
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% else %}
+
+				{% endif %}
+
+
+
+				{% if each.children %}
+					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
+                        <br />
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.domains %}
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+				{% if each.ranges %}
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+				{% endif %}
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+
+
+			</div>
+			{% endfor %}
+
+	{% endif %}
+
+
+
+
+	{# SKOS CONCEPTS SECTION #}
+
+
+	{% if skosConcepts %}
+
+
+		<hr class="margintop">
+		<h1 class="margintop"><a  name="skosconcepts">&nbsp;</a>SKOS Concepts</h1>
+
+			{% for each in skosConcepts  %}
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        {% if each.parents %}
+                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                              {% if each.children  %}
+                                  <ul>
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                  </ul>
+                              {% endif %}
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            {% endfor %}
+
+                        {% else %}
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+
+                              {% if each.children  %}
+                                  <ul>
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                  </ul>
+                              {% endif %}
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </div>
+
+
+                {% if not each.children  %}
+                <p class="section-desc">
+                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                {% endif %}
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    {{each.bestDescription}}
+                </p>
+
+                {% if each.ancestors %}
+					<p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
+                        <br />
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                    </p>
+				{% endif %}
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.serialize|linebreaks}}</code>
+				</div>
+
+			</div>
+
+			{% endfor %}
+
+	{% endif %}
+
+
+
+
+
+
+	<hr>
+	<small>Ontology documentation automatically generated by <a class="greylink"  href="http://ontospy.readthedocs.org/">OntoSpy</a> on {% now "jS F Y H:i" %}</small>
+
+
+</body>
+</html>

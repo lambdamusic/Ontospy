@@ -1,0 +1,658 @@
+
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<title>{{ontology.uri}}</title>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+
+
+
+<style type="text/css" media="screen">
+
+
+
+	body {
+	    margin-left: 6em;
+	    margin-right: 12em;
+	    font-size: 14px;
+	    font-family: "Helvetica Neue", Helvetica;
+	}
+
+	h1, h2, h3, h4, h5, h6 { text-align: left }
+
+	h1, h2, h3, h4, h5 { color: #000000;}
+	h2 { font: 140% sans-serif }
+	h3 { font: 120% sans-serif }
+	h4 { font: bold 100% sans-serif }
+	h5 { font: italic 100% sans-serif }
+	h6 { font: small-caps 100% sans-serif }
+
+	.margintop {
+		 margin-top: 40px;
+	}
+
+
+
+	/* rect {
+	   fill: none;
+	   pointer-events: all;
+	 }*/
+
+	 rect {
+	   fill:black;
+	   stroke:none;
+	 }
+
+	 line {
+	   stroke: #000;
+	   stroke-width: 1.5px;
+	 }
+
+	 .string, .regexp {
+	   color: #f39;
+	 }
+
+
+	 a:link, a:visited {
+	   color: #666;
+	   text-decoration: none;
+	 }
+
+	 a:hover {
+	   color: #000
+	 }
+
+
+	/*extra css*/
+
+	.node circle {
+	  cursor: pointer;
+	  fill: #fff;
+	  stroke: steelblue;
+	  stroke-width: 1.5px;
+	}
+
+	.node text {
+	  font-size: 11px;
+	}
+
+	path.link {
+	  fill: none;
+	  stroke: #ccc;
+	  stroke-width: 1.5px;
+	}
+
+
+	.infoentity {
+	    stroke: white;
+	    stroke-width: 2.5px;
+	    opacity: 0.7;
+		background: linen;
+		line-height: 0.7em;
+	}
+
+
+	.smalldesc {
+		font-size: 20px;
+		margin-top: 0px;
+		color: black;
+	}
+
+
+	.hidden {
+		display: none;
+	}
+
+	kbd {
+		padding: 2px 4px;
+	    font-size: 90%;
+	    color: #fff;
+	    background-color: #333;
+	    border-radius: 3px;
+	    box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);border-image-outset:
+	}
+
+	/*slider*/
+
+	.side-panel{
+		background-color: #E6E6E6;
+		padding: 10px;
+		/*word-wrap: break-word;*/
+	    overflow: auto;
+	}
+
+	.side-panel-left{
+		box-shadow: -5px 0 15px -6px #585858 inset;
+	}
+
+	.side-panel-right{
+		box-shadow: 5px 0 15px -6px #585858 inset;
+	}
+
+	a.class {
+		color: darkred;
+	}
+	a.prop {
+		color: darkblue;
+	}
+
+	.turtlesource {
+		font-size: 12px;
+	}
+
+	dt {
+		color: darkslategrey;
+	}
+
+	.text-muted {
+		color: grey;
+	}
+
+	hr {
+		margin-top: 20px;
+	    margin-bottom: 20px;
+	}
+
+    .credits {
+        color: gray;
+    }
+
+    a.greylink {
+        color: #666;
+        text-decoration: underline;
+    }
+
+    .section-title {
+{#        text-transform: uppercase;#}
+        font-size: smaller;
+    }
+
+</style>
+
+
+</head>
+
+
+<body>
+
+	{# VISIBLE PAGE HTML #}
+
+	{# note: showpanel arg is the ID of the div that is showing.. #}
+
+	<h1 class="title">Ontology:&nbsp;<a href="javascript:showpanel('ontoinfo');">{{docs_title}}</a></h1>
+
+	<p>
+    <small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://ontospy.readthedocs.org/" target="_blank">OntoSpy</a> on {% now "jS F Y H:i" %} </small>
+  </p>
+
+	<hr>
+
+
+	{% if TOTAL_CLASSES %}
+		<div class="row">
+			<h3>Classes ({{TOTAL_CLASSES}})</h3>
+			<div class="col-md-12" id="graph_classes">
+
+
+			</div>
+
+
+		</div>
+	{% endif %}
+
+	{% if TOTAL_PROPERTIES %}
+		<div class="row">
+			<h3>Properties ({{TOTAL_PROPERTIES}})</h3>
+			<div class="col-md-12" id="graph_properties">
+
+
+			</div>
+
+
+		</div>
+	{% endif %}
+
+
+	{% if TOTAL_CONCEPTS %}
+
+		<div class="row">
+			<h3>Concepts ({{TOTAL_CONCEPTS}})</h3>
+			<div class="col-md-12" id="graph_concepts">
+
+
+			</div>
+
+
+		</div>
+
+	{% endif %}
+
+
+
+
+	<hr>
+	<small class="credits">Documentation automatically generated with <a href="https://github.com/lambdamusic/OntoSpy" target="_blank" class="greylink">OntoSpy</a> on {% now "jS F Y H:i" %}</small>
+
+
+
+
+	{# SLIDER AND HIDDEN TABS #}
+
+	{% include "d3tree_hiddendivs.html" %}
+
+
+	<div id='slider' class="side-panel side-panel-left">
+		<span class="text-muted">Press <kbd>ESC</kbd> to close</span>
+		<div id="slide_contents"></div>
+	</div>
+
+	{# <button id='trigger'>Trigger</button> #}
+
+
+
+
+
+{# <script type="text/javascript" src="static/d3.layout.tree.js"></script> #}
+
+
+
+	{# JAVASCRIPT #}
+
+	{% if save_on_github %}
+
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+
+
+	    <script type="text/javascript" src="
+https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	    <script type="text/javascript" src="http://nnattawat.github.io/slideReveal/asset/js/jquery.slidereveal.js"></script>
+
+	{% else %}
+
+		<script type="text/javascript" src="{{STATIC_URL}}libs/d3-v2/d3.v2.min.js"></script>
+	    <script type="text/javascript" src="{{STATIC_URL}}libs/d3-v2/d3.layout.tree.js"></script>
+
+	    <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery-1.7.1.min.js"></script>
+	    <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery.slidereveal.min.js"></script>
+
+
+	{% endif %}
+
+
+
+
+    <script type="text/javascript">
+
+		var slider = $("#slider").slideReveal({
+			  trigger: $("#trigger"),
+			  push: false,
+			  overlay: true,
+			  width: '50%',
+			  speed: 700 ,
+			});
+
+		function showpanel(argument) {
+			console.log("#"+argument);
+			if (argument != "None") {
+				$("#slide_contents").empty();
+				$("#slide_contents").html($("#"+argument).html());
+				slider.slideReveal("show");
+			}
+		}
+
+
+
+
+
+    </script>
+
+
+
+
+
+
+{# JAVASCRIPT FOR D3 TREE #}
+
+
+<script type="text/javascript">
+
+//
+// CLASSES
+//
+
+{% if TOTAL_CLASSES %}
+
+	var json1 = {{JSON_DATA_CLASSES|safe}};
+
+	{% if classes_TOPLAYER > 40 %}
+	var variable_height1 = 1200;
+	{% else %}
+	var variable_height1 = 800;
+	{% endif %}
+
+	var m = [20, 120, 100, 120],
+	    w = 2600 - m[1] - m[3],
+	    h = variable_height1 - m[0] - m[2],
+	    i = 0,
+	    root_classes;
+
+	var tree1 = d3.layout.tree()
+	    .size([h, w]);
+
+	var diagonal1 = d3.svg.diagonal()
+	    .projection(function(d) { return [d.y, d.x]; });
+
+	var vis1 = d3.select("#graph_classes").append("svg:svg")
+	    .attr("width", w + m[1] + m[3])
+	    .attr("height", h + m[0] + m[2])
+	  	.append("svg:g")
+	    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+	// d3.json(JSON_FILE, function(json) {
+	root_classes = json1;
+	root_classes.x0 = h / 2;
+	root_classes.y0 = 0;
+
+
+	{% if TOTAL_CLASSES > 200 %}
+
+		// Initialize the display to show no nodes:
+		root_classes.children.forEach(toggleAll);
+	{% endif %}
+
+
+	update(vis1, tree1, diagonal1, root_classes, json1);
+
+{% endif %}
+
+
+
+
+//
+// PROPERTIES
+//
+
+
+{% if TOTAL_PROPERTIES %}
+
+
+	var json2 = {{JSON_DATA_PROPERTIES|safe}};
+
+
+	{% if properties_TOPLAYER > 40 %}
+	var variable_height2 = 1200;
+	{% else %}
+	var variable_height2 = 800;
+	{% endif %}
+
+	var m = [20, 120, 100, 120],
+	    w = 2600 - m[1] - m[3],
+	    h = variable_height2 - m[0] - m[2],
+	    i = 0,
+	    root_properties;
+
+	var tree2 = d3.layout.tree()
+	    .size([h, w]);
+
+	var diagonal2 = d3.svg.diagonal()
+	    .projection(function(d) { return [d.y, d.x]; });
+
+	var vis2 = d3.select("#graph_properties").append("svg:svg")
+	    .attr("width", w + m[1] + m[3])
+	    .attr("height", h + m[0] + m[2])
+	  	.append("svg:g")
+	    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+	// d3.json(JSON_FILE, function(json) {
+	root_properties = json2;
+	root_properties.x0 = h / 2;
+	root_properties.y0 = 0;
+
+	{% if TOTAL_PROPERTIES > 200 %}
+
+		// Initialize the display to show no nodes:
+		root_properties.children.forEach(toggleAll);
+	{% endif %}
+
+
+	update(vis2, tree2, diagonal2, root_properties, json2);
+
+{% endif %}
+
+
+
+
+
+{% if TOTAL_CONCEPTS %}
+
+	var json3 = {{JSON_DATA_CONCEPTS|safe}};
+
+
+	{% if skosConcepts_TOPLAYER > 40 %}
+	var variable_height3 = 1200;
+	{% else %}
+	var variable_height3 = 800;
+	{% endif %}
+
+	var m = [20, 120, 100, 120],
+	    w = 2600 - m[1] - m[3],
+	    h = variable_height3 - m[0] - m[2],
+	    i = 0,
+	    root_concepts;
+
+	var tree3 = d3.layout.tree()
+	    .size([h, w]);
+
+	var diagonal3 = d3.svg.diagonal()
+	    .projection(function(d) { return [d.y, d.x]; });
+
+	var vis3 = d3.select("#graph_concepts").append("svg:svg")
+	    .attr("width", w + m[1] + m[3])
+	    .attr("height", h + m[0] + m[2])
+	    .append("svg:g")
+	    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+	root_concepts = json3;
+	root_concepts.x0 = h / 2;
+	root_concepts.y0 = 0;
+
+
+
+	{% if TOTAL_CONCEPTS > 200 %}
+		// Initialize the display to show no nodes:
+		root_concepts.children.forEach(toggleAll);
+	{% endif %}
+
+
+
+	update(vis3, tree3, diagonal3, root_concepts, json3);
+
+
+{% endif %}
+
+
+
+//
+//  SHARED FUNCTIONS
+//
+
+
+// mikele: added more args [vis, tree, diagonal, root] which originally were referenced as a Global var
+function update(vis, tree, diagonal, source, root) {
+
+  var duration = d3.event && d3.event.altKey ? 5000 : 500;
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse();
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Update the nodes…
+  var node = vis.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("svg:g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; });
+
+
+  nodeEnter.append("svg:circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      .on("click", function(d) { toggle(d); update(vis, tree, diagonal, d, root); }); // note ref to <root>
+
+  nodeEnter.append("svg:text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6)
+      .on("click", function(d) { showpanel(d.objid); })
+	  .on("mouseover", function(d){
+			d3.select(this).attr("fill", "darkorange");
+			tooltip.text(d.qname);
+			tooltip.style("visibility", "visible"); }
+		)
+      .on("mousemove", function(d){return tooltip.style("top",
+		    (d3.event.pageY-100)+"px").style("left",(d3.event.pageX+50)+"px");})
+	  .on("mouseout", function(d){
+			d3.select(this).attr("fill", ""); // default = no stroke
+			return tooltip.style("visibility", "hidden");}
+			);
+	  // .on("mouseover", function(d, i) {
+	  // 		  label_name.text(d.name);
+	  // })
+	  // .on("mouseout", function(d, i) {
+	  // 		  label_name.text("");
+	  // });
+
+
+
+   // approach 1
+  var label_name = vis.append("text")
+      .attr("x", 20)
+      .attr("y", 200)
+	  // .attr("text-anchor", "middle")
+      .attr("opacity", "1")
+	  .style("font-size", "90px")
+	  .style("fill", "lightsteelblue")
+	  .text("");
+
+   // approach 2
+  var tooltip = d3.select("body")
+	    .append("div")
+	    .style("position", "absolute")
+	    .style("border-radius", "25px")
+	    .style("z-index", "100")
+	    .style("visibility", "hidden")
+	    .style("opacity", ".85")
+	    .style("color", "lightsteelblue")
+	    .style("background", "white")
+	    .style("font-size", "90px")
+	    .text("a simple tooltip");
+
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeUpdate.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .remove();
+
+  nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+  nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = vis.selectAll("path.link")
+      .data(tree.links(nodes), function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("svg:path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = {x: source.x0, y: source.y0};
+        return diagonal({source: o, target: o});
+      })
+    .transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition links to their new position.
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = {x: source.x, y: source.y};
+        return diagonal({source: o, target: o});
+      })
+      .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+
+
+}  // end of Update
+
+
+
+
+function toggleAll(d) {
+	if (d.children) {
+	  d.children.forEach(toggleAll);
+	  toggle(d);
+	}
+}
+
+
+
+// Toggle children.
+function toggle(d) {
+  if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -106,14 +106,45 @@ def remove_duplicates(seq, idfun=None):
 def printDebug(text, mystyle="", **kwargs):
     """
     util for printing in colors using click.secho()
-    http://click.pocoo.org/5/api/#click.style
 
     :kwargs = you can do printDebug("s", bold=True)
-    
+
+    <http://click.pocoo.org/5/api/#click.style>
+    Styles a text with ANSI styles and returns the new string. By default the styling is self contained which means that at the end of the string a reset code is issued. This can be prevented by passing reset=False.
+
+    Examples:
+
+    click.echo(click.style('Hello World!', fg='green'))
+    click.echo(click.style('ATTENTION!', blink=True))
+    click.echo(click.style('Some things', reverse=True, fg='cyan'))
+    Supported color names:
+
+    black (might be a gray)
+    red
+    green
+    yellow (might be an orange)
+    blue
+    magenta
+    cyan
+    white (might be light gray)
+    reset (reset the color code only)
+    New in version 2.0.
+
+    Parameters:
+    text – the string to style with ansi codes.
+    fg – if provided this will become the foreground color.
+    bg – if provided this will become the background color.
+    bold – if provided this will enable or disable bold mode.
+    dim – if provided this will enable or disable dim mode. This is badly supported.
+    underline – if provided this will enable or disable underline.
+    blink – if provided this will enable or disable blinking.
+    reverse – if provided this will enable or disable inverse rendering (foreground becomes background and the other way round).
+    reset – by default a reset-all code is added at the end of the string which means that styles do not carry over. This can be disabled to compose styles.
+
     """
-    
+
     if mystyle == "comment":
-        click.secho(text, fg='green')
+        click.secho(text, dim=True)
     elif mystyle == "important":
         click.secho(text, bold=True)
     elif mystyle == "normal":
@@ -132,7 +163,7 @@ def printComment(text, mystyle="comment", **kwargs):
     .. same as printDebug, but just one option
     [for backward compatibility]
     """
-    
+
     click.secho(text, fg='green', **kwargs)
 
 
@@ -518,6 +549,27 @@ def firstStringInList(literalEntities, prefLanguage="en"):
 
 
 
+def joinStringsInList(literalEntities, prefLanguage="en"):
+    """
+    from a list of literals, returns the ones in prefLanguage joined up.
+    if the desired language specification is not available, join all up
+    """
+    match = []
+
+    if len(literalEntities) == 1:
+        return literalEntities[0]
+    elif len(literalEntities) > 1:
+        for x in literalEntities:
+            if getattr(x, 'language') and  getattr(x, 'language') == prefLanguage:
+                match.append(x)
+        if not match: # don't bother about language
+            for x in literalEntities:
+                match.append(x)
+
+    return " - ".join([x for x in match])
+
+
+
 
 def firstEnglishStringInList(literalEntities,):
     return firstStringInList(literalEntities, "en")
@@ -842,12 +894,12 @@ def entityComment(rdfGraph, anEntity, language = DEFAULT_LANGUAGE, getall = True
 def shellPrintOverview(g, opts={'labels' : False}):
     """
     overview of graph invoked from command line
-    
+
     @todo
     add pagination via something like this
     # import pydoc
     # pydoc.pager("SOME_VERY_LONG_TEXT")
-    
+
     """
     ontologies = g.ontologies
 
@@ -895,5 +947,3 @@ def get_files_with_extensions(folder, extensions):
                 # break
 
     return out
-
-

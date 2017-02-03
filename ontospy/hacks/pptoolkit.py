@@ -14,6 +14,7 @@ HowTo
 """
 
 from __future__ import unicode_literals
+from __future__ import print_function
 from prompt_toolkit import prompt
 from prompt_toolkit.styles import style_from_dict
 from prompt_toolkit.token import Token
@@ -31,8 +32,8 @@ test_style = style_from_dict({
 
 def main():
     def get_bottom_toolbar_tokens(cli):
-        print cli.__class__
-        print cli.current_buffer_name
+        print(cli.__class__)
+        print(cli.current_buffer_name)
         return [(Token.Toolbar, ' OntoSpy ' + VERSION.VERSION)]
 
     text = prompt('Say something: ',

@@ -1,163 +1,133 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
+#
+#
+# VIZ MARKDOWN
+#
+#
 
 
-from . import *  # imports __init__
+
 from .. import *
-from ..core.entities import OntoClass, OntoProperty, OntoSKOSConcept, Ontology
+from ..core.utils import *
+from ..core.manager import *
+
+from .utils import *
+from .viz_factory import VizFactory
+
+# Fix Python 2.x.
+try:
+    input = raw_input
+except NameError:
+    pass
+
+# django loading requires different steps based on version
+# https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
+import django
+
+# http://stackoverflow.com/questions/1714027/version-number-comparison
+from distutils.version import StrictVersion
+
+if StrictVersion(django.get_version()) > StrictVersion('1.7'):
+    from django.conf import settings
+    from django.template import Context, Template
+
+else:
+    from django.conf import settings
+    from django.template import Context, Template
 
 
-# TEMPLATE: MARKDOWN EXPORT - MULTI FILE
-
-
-#
-# ===========
-# Comments:
-# ===========
-#
+import os, sys
 
 
 
-
-
-def run(graph, save_on_github=False, main_entity=None):
+class MarkdownViz(VizFactory):
     """
-    From a graph instance outputs a nicely formatted html documentation file.
-    
-    2016-08-07: hacked for multi file save
+    A simple markdown rendering in multi pages
+
     """
 
-    try:
-        ontology = graph.ontologies[0]
-        uri = ontology.uri
-    except:
-        ontology = None
-        uri = ";".join([s for s in graph.sources])
-        
-    context = {
-                    "ontology": ontology,
-                    "main_uri" : uri,
-                    "ontospy_version" : VERSION,
-                    "ontograph": graph,
-                    "STATIC_PATH": ONTOSPY_VIZ_STATIC,
-                }
-    
 
-    # Pygments CSS
-    # try:
-    #     from pygments import highlight
-    #     from pygments.lexers.rdf import TurtleLexer
-    #     from pygments.formatters import HtmlFormatter
-    # 
-    #     pygments_code = highlight(main_entity.serialize(), TurtleLexer(), HtmlFormatter())
-    #     pygments_code_css = HtmlFormatter().get_style_defs('.highlight')
-    #     context.update({ "pygments_code" : pygments_code,
-    #                      "pygments_code_css": pygments_code_css
-    #                      })
-    # except Exception, e:
-    #     pass
-    # 
-
-        
-    if type(main_entity) == OntoClass:
-        ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "markdown/markdown_classinfo.md", "r")
-        context.update({ "main_entity" : main_entity,
-                         "main_entity_type": "class"
-                         })
-    elif type(main_entity) == OntoProperty:
-        ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "markdown/markdown_propinfo.md", "r")
-        context.update({ "main_entity" : main_entity,
-                         "main_entity_type": "property"
-                         })
-    elif type(main_entity) == OntoSKOSConcept:
-        ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "markdown/markdown_conceptinfo.md", "r")
-        context.update({ "main_entity" : main_entity,
-                         "main_entity_type": "concept"
-                         })
-    else:
-            # if type(main_entity) == Ontology:
-        ontotemplate = open(ONTOSPY_VIZ_TEMPLATES + "markdown/markdown_ontoinfo.md", "r")
+    def __init__(self, ontospy_graph, title=""):
+        """
+        Init
+        """
+        super(MarkdownViz, self).__init__(ontospy_graph, title)
 
 
-    t = Template(ontotemplate.read())
-    c = Context(context)
+    def _buildTemplates(self):
+        """
+        OVERRIDING THIS METHOD from Factory
+        """
 
-    rnd = t.render(c)
+        # Ontology - MAIN PAGE
+        contents = self._renderTemplate("markdown/markdown_ontoinfo.md", extraContext=None)
+        FILE_NAME = "index.md"
+        main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-    return safe_str(rnd)
+        browser_output_path = self.output_path
+
+        if self.ontospy_graph.classes:
+
+            # BROWSER PAGES - CLASSES ======
+            for entity in self.ontospy_graph.classes:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "class",
+                                "ontograph": self.ontospy_graph
+                                }
+                contents = self._renderTemplate("markdown/markdown_classinfo.md", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".md"
+                self._save2File(contents, FILE_NAME, browser_output_path)
 
 
+        if self.ontospy_graph.properties:
 
+            # BROWSER PAGES - PROPERTIES ======
+            for entity in self.ontospy_graph.properties:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "property",
+                                "ontograph": self.ontospy_graph
+                                }
+                contents = self._renderTemplate("markdown/markdown_propinfo.md", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".md"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+
+        if self.ontospy_graph.skosConcepts:
+
+            # BROWSER PAGES - CONCEPTS ======
+            for entity in self.ontospy_graph.skosConcepts:
+                extra_context = {"main_entity": entity,
+                                "main_entity_type": "concept",
+                                "ontograph": self.ontospy_graph
+                                }
+                contents = self._renderTemplate("markdown/markdown_conceptinfo.md", extraContext=extra_context)
+                FILE_NAME = entity.slug + ".ms"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+        return main_url
 
 
 
+
+# if called directly, for testing purposes run the basic HTML rendering
 
 if __name__ == '__main__':
-    """
-    > python -m viz.viz_markdown
 
-    2016-08-04: # testing bypassing the usual abstract routine so to generate multiple files
-
-    """
-    import os, sys
+    TEST_ONLINE = False
     try:
 
-        # script for testing - must launch this module direclty eg
+        if TEST_ONLINE:
+            from ..core.ontospy import Ontospy
+            g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
+        else:
+            uri, g = get_random_ontology(50)
 
-        func = locals()["run"] # main func dynamically
-        # run_test_viz(func)
-
-        import webbrowser, random
-
-        ontouri = get_localontologies()[random.randint(0, 10)] # [13]=foaf #
-        print("Testing with URI: %s" % ontouri)
-
-        g = get_pickled_ontology(ontouri)
-        if not g:
-            g = do_pickle_ontology(ontouri)
-
-
-        def _saveVizLocally(contents, filename="index.md", path=None):
-            if not path:
-                filename = ONTOSPY_LOCAL_VIZ + "/" + filename
-            else:
-                filename = os.path.join(path, filename)
-
-            f = open(filename, 'wb')
-            f.write(contents)  # python will convert \n to os.linesep
-            f.close()  # you can omit in most cases as the destructor will call it
-
-            url = "file://" + filename
-            return url
-
-        from os.path import expanduser
-        home = expanduser("~")
-        DEST_FOLDER = os.path.join(home, "ontospy-viz/markdown")
-        if not os.path.exists(DEST_FOLDER):
-            os.makedirs(DEST_FOLDER)
-
-        # main index page for graph
-        contents = func(g, False, None)
-        index_url = _saveVizLocally(contents, "index.md", DEST_FOLDER)
-        
-        entities = [g.classes, g.properties, g.skosConcepts]
-        for group in entities:
-            for c in group:
-                # getting main func dynamically
-                contents = func(g, False, c)
-                _filename = c.slug + ".md"
-                url = _saveVizLocally(contents, _filename, DEST_FOLDER)
-
-        if index_url:  # open browser
-            import webbrowser
-            webbrowser.open(index_url)
-
-
+        v = MarkdownViz(g, title="")
+        v.build()
+        v.preview()
 
         sys.exit(0)
 
-    except KeyboardInterrupt as e: # Ctrl-C
+    except KeyboardInterrupt as e:  # Ctrl-C
         raise e
-
-
-

@@ -2,4 +2,4 @@
 
 - add .py file named as 'viz_%s'
 - add .html templates
-- update catalogue in `config.json`
+- update catalogue in `CONFIG.py`

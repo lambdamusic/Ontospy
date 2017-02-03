@@ -1,0 +1,126 @@
+
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<title>{{ontology.uri}}</title>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+
+
+
+<style type="text/css" media="screen">
+  	
+		
+
+	body {
+	    margin-left: 6em;
+	    margin-right: 12em;
+	    font-size: 14px;
+	    font-family: "Helvetica Neue", Helvetica;
+	}
+
+	h1, h2, h3, h4, h5, h6 { text-align: left }
+
+	h1, h2, h3, h4, h5 { color: #000000;}
+	h2 { font: 140% sans-serif }
+	h3 { font: 120% sans-serif }
+	h4 { font: bold 100% sans-serif }
+	h5 { font: italic 100% sans-serif }
+	h6 { font: small-caps 100% sans-serif }
+
+	.margintop {
+		 margin-top: 40px;
+	}	
+
+
+    #container {
+        /*max-width: 400px;*/
+        height: 600px;
+        margin: auto;
+    }
+
+</style>
+  
+
+</head>
+
+
+<body>
+	
+	{# VISIBLE PAGE HTML #}
+
+	{# note: showpanel arg is the ID of the div that is showing.. #}
+	
+	<h1 class="title">Ontology:&nbsp;<a href="javascript:showpanel('ontoinfo');">{{main_uri}}</a></h1>
+	<h3>{{ontology.bestDescription}}</h3>
+    
+	<p><small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://ontospy.readthedocs.org/" target="_blank">OntoSpy</a> on {% now "jS F Y H:i" %}</small></p>
+
+
+
+	<hr>
+
+
+
+    <div id="container"></div>
+    <script src="static/sigma.min.js"></script>
+    <script src="static/sigma.parsers.json.min.js"></script>
+    <script src="static/sigma.layout.forceAtlas2.min.js"></script>
+
+
+	
+	<hr>
+	<small class="credits">Documentation automatically generated with <a href="https://github.com/lambdamusic/OntoSpy" target="_blank" class="greylink">OntoSpy</a> on {% now "jS F Y H:i" %}</small>
+	
+
+
+
+
+   <script>
+    // these are just some preliminary settings
+    var g = {
+        nodes: [],
+        edges: []
+    };
+
+    var DATA_LOCAL = {{JSON_DATA_CLASSES|safe}};
+
+
+    // Create new Sigma instance in graph-container div (use your div name here)
+    s = new sigma({
+        graph: DATA_LOCAL,
+        container: 'container',
+        renderer: {
+            container: document.getElementById('container'),
+            type: 'canvas'
+        },
+        settings: {
+            doubleClickEnabled: false,
+            minNodeSize: 1,
+            maxNodeSize: 30,
+            enableEdgeHovering: true,
+            edgeHoverColor: 'edge',
+            defaultEdgeHoverColor: '#000',
+            edgeHoverSizeRatio: 1,
+            edgeHoverExtremities: true
+          }
+    });
+
+    // ? this runs the force atlas, but the rendering is not smooth!
+
+    s.refresh();
+    s.startForceAtlas2();
+
+
+    </script>
+
+
+
+</body>
+</html>
+
+

@@ -3,11 +3,14 @@
 
 {% block main_column %}
 
-# {{main_uri}}
+# _Vocabulary: [{{docs_title}}](index.md)_
 
 ---
 
+{% if ontologies %}
 #### Metadata
+{% for ontology in ontologies %}
+**{{ontology.uri}}**
 {% if ontology.annotations %}
 {% for each in ontology.annotations %}
 {% ifchanged each.1 %}
@@ -18,21 +21,23 @@
 {% else %}
 _No ontology metadata available_
 {% endif %}
+{% endfor %}
+{% endif %}
 
 
 #### Metrics
-{% for each in ontograph.stats %}
+{% for each in stats %}
 * {{each.0}}: **{{each.1}}**
 {% endfor %}
 
 
 
-{% if ontology.namespaces %}
+{% if namespaces %}
 #### Namespaces
 
 Prefix   | URI      |
 ---------|----------|
-{% for x,y in ontograph.namespaces %}**{{x}}**| [{{y}}]({{y}} "Open Url")|
+{% for x,y in namespaces %}**{{x}}**| [{{y}}]({{y}} "Open Url")|
  {% endfor %}
 {% endif %}
 
@@ -42,68 +47,67 @@ Prefix   | URI      |
 
 ## Entities  
 
-{% if ontograph.classes %}
-#### Classes ({{ontograph.classes|length}}) 
+{% if ontospy_graph.classes %}
+#### Classes ({{ontospy_graph.classes|length}})
 
-{% for each in ontograph.classes  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+{% for each in ontospy_graph.classes  %}
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
+{% endif %}
 
 
-{% if ontograph.skosConcepts %}
-#### SKOS Concepts ({{ontograph.skosConcepts|length}}) 
+{% if ontospy_graph.skosConcepts %}
+#### SKOS Concepts ({{ontospy_graph.skosConcepts|length}})
 
 {% for each in ontograph.skosConcepts  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
+{% endif %}
 
 
-{% if ontograph.objectProperties %}
-#### Object Properties ({{ontograph.objectProperties|length}}) 
+{% if ontospy_graph.objectProperties %}
+#### Object Properties ({{ontospy_graph.objectProperties|length}})
 
-{% for each in ontograph.objectProperties  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+{% for each in ontospy_graph.objectProperties  %}
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
+{% endif %}
 
 
-{% if ontograph.datatypeProperties %}
-#### Datatype Properties ({{ontograph.datatypeProperties|length}}) 
+{% if ontospy_graph.datatypeProperties %}
+#### Datatype Properties ({{ontospy_graph.datatypeProperties|length}})
 
-{% for each in ontograph.datatypeProperties  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+{% for each in ontospy_graph.datatypeProperties  %}
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
+{% endif %}
 
 
-{% if ontograph.annotationProperties %}
-#### Annotation Properties ({{ontograph.annotationProperties|length}}) 
+{% if ontospy_graph.annotationProperties %}
+#### Annotation Properties ({{ontograph.annotationProperties|length}})
 
-{% for each in ontograph.annotationProperties  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+{% for each in ontospy_graph.annotationProperties  %}
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
+{% endif %}
 
 
-{% if not ontograph.objectProperties and not ontograph.dataProperties and not ontograph.annotationProperties %}
-{% if ontograph.properties %}
-#### Properties ({{ontograph.properties|length}}) 
+{% if not ontospy_graph.objectProperties and not ontospy_graph.dataProperties and not ontospy_graph.annotationProperties %}
+{% if ontospy_graph.properties %}
+#### Properties ({{ontospy_graph.properties|length}})
 
-{% for each in ontograph.properties  %}
-- [{{each.qname}}]({{each.slug}}.md "Open") 
+{% for each in ontospy_graph.properties  %}
+- [{{each.qname}}]({{each.slug}}.md "Open")
 {% endfor %}
 
-{% endif %}	
-{% endif %}	
+{% endif %}
+{% endif %}
 
 
 
 {% endblock main_column %}
-

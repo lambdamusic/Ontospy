@@ -4,7 +4,7 @@
 
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 Run it from the command line:
 
@@ -33,7 +33,7 @@ from .entities import *
 from .queryHelper import QueryHelper
 
 
-class Ontospy(object):  # Graph
+class Ontospy(object):
     """
     Object that scan an rdf graph for schema definitions (aka 'ontologies')
 
@@ -46,7 +46,7 @@ class Ontospy(object):  # Graph
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=True, hide_base_schemas=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -63,6 +63,7 @@ class Ontospy(object):  # Graph
         self.objectProperties = []
         self.datatypeProperties = []
         self.skosConcepts = []
+        self.individuals = []
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
@@ -141,27 +142,34 @@ class Ontospy(object):  # Graph
 
 
     def stats(self):
-        """ shotcut to pull out useful info for a graph 
-
-        2016-08-18 the try/except is a dirty solution to a problem
-        emerging with counting graph lenght on cached Graph objects..
-        TODO: investigate what's going on..
-        """
+        """ shotcut to pull out useful info for a graph"""
         out = []
-        try:
-            out += [("Triples", len(self.rdfgraph))]
-        except:
-            pass
+        out += [("Ontologies", len(self.ontologies))]
+        out += [("Triples", self.triplesCount())]
         out += [("Classes", len(self.classes))]
         out += [("Properties", len(self.properties))]
         out += [("Annotation Properties", len(self.annotationProperties))]
         out += [("Object Properties", len(self.objectProperties))]
         out += [("Datatype Properties", len(self.datatypeProperties))]
         out += [("Skos Concepts", len(self.skosConcepts))]
-        # out += [("Individuals", len(self.instances))]
+        # out += [("Individuals", len(self.individuals))] @TODO
+        out += [("Data Sources", len(self.sources))]
         return out
 
-        
+    def triplesCount(self):
+        """
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph length on cached Graph objects..
+        """
+        # @todo  investigate what's going on..
+        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        try:
+            return len(self.rdfgraph)
+        except:
+            click.secho("Ontospy: error counting graph length..", fg="red")
+            return 0
+
 
     def __extractOntologies(self, exclude_BNodes = False, return_string=False):
         """
@@ -242,7 +250,7 @@ class Ontospy(object):  # Graph
         qres = self.queryHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
         for class_tuple in qres:
-            
+
             _uri = class_tuple[0]
             try:
                 _type = class_tuple[1]
@@ -514,9 +522,9 @@ class Ontospy(object):  # Graph
 
 
 
-
+    # ===============
     # METHODS TO RETRIEVE OBJECTS
-
+    # ================
 
 
     def getClass(self, id=None, uri=None, match=None):
@@ -820,6 +828,55 @@ class Ontospy(object):  # Graph
             printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
 
 
+    def ontologyClassTree(self):
+        """
+        Returns a dict representing the ontology tree
+        Top level = {0:[top classes]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.classes:
+            treedict[0] = self.toplayer
+            for element in self.classes:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+    def ontologyPropTree(self):
+        """
+        Returns a dict representing the ontology tree
+        Top level = {0:[top properties]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.properties:
+            treedict[0] = self.toplayerProperties
+            for element in self.properties:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+    def ontologyConceptTree(self):
+        """
+        Returns a dict representing the skos tree
+        Top level = {0:[top concepts]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.skosConcepts:
+            treedict[0] = self.toplayerSkosConcepts
+            for element in self.skosConcepts:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+
 
 
 class SparqlEndpoint(Ontospy):
@@ -832,8 +889,3 @@ class SparqlEndpoint(Ontospy):
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
         """
         super(SparqlEndpoint, self).__init__(source, text=False, endpoint=True, rdf_format=None)
-
-
-
-
-

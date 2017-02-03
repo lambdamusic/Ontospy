@@ -148,7 +148,7 @@ class RDF_Entity(object):
         return list(self.rdfgraph.objects(None, aPropURIRef))
 
 
-    def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=True):
+    def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=False):
         """
         facility for extrating the best available label for an entity
 
@@ -173,19 +173,23 @@ class RDF_Entity(object):
         else:
             return out
 
-    def bestDescription(self, prefLanguage="en"):
+    def bestDescription(self, prefLanguage="en",quotes=False):
         """
-        facility for extrating the best available description for an entity
-
-        ..This checks RFDS.label, SKOS.prefLabel and finally the qname local component
+        facility for extracting a human readable description for an entity
         """
 
         test_preds = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description, rdflib.namespace.DC.description, rdflib.namespace.SKOS.definition ]
 
         for pred in test_preds:
             test = self.getValuesForProperty(pred)
+            # printDebug(str(test), "red")
             if test:
-                return addQuotes(firstEnglishStringInList(test))
+                if quotes:
+                    # return addQuotes(firstEnglishStringInList(test))
+                    return addQuotes(joinStringsInList(test, prefLanguage="en"))
+                else:
+                    # return firstEnglishStringInList(test)
+                    return joinStringsInList(test, prefLanguage="en")
         return ""
 
 
@@ -257,7 +261,7 @@ class OntoClass(RDF_Entity):
         """
         super(OntoClass, self).__init__(uri, rdftype, namespaces)
         self.slug = "class-" + slugify(self.qname)
-        
+
         self.domain_of = []
         self.range_of = []
         self.domain_of_inferred = []
@@ -405,20 +409,3 @@ class OntoSKOSConcept(RDF_Entity):
         self.printTriples()
         self.printStats()
         self.printGenericTree()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,0 +1,56 @@
+
+<!-- Sidebar -->
+<div id="sidebar-wrapper">
+    <ul class="sidebar-nav">
+
+
+        <li>
+          <input style="margin-top: 30px;  margin-bottom: 20px;" type="text" id="search-input-sidebar" name="" value="" placeholder="Type to search">
+        </li>
+
+        {% if ontospy_graph.classes %}
+          <li class="-second-level" id="sd_classes"><a {% ifequal thispage "classes" %}class="active"{% endifequal %}href="entities-tree-classes.html">Classes ({{ontospy_graph.classes|length}})</a>
+          </li>
+
+            {# simulated second level #}
+          {% for each in  ontospy_graph.classes %}
+              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %} href="{{each.slug}}.html">{{each.qname}}</a></li>
+          {% endfor %}
+        {% endif %}
+
+        {% if ontospy_graph.properties %}
+            <li class="-second-level" id="sd_properties"><a {% ifequal thispage "properties" %}class="active"{% endifequal %} href="entities-tree-properties.html">Properties ({{ontospy_graph.properties|length}})</a>
+            </li>
+
+            {# simulated second level #}
+          {% for each in  ontospy_graph.properties %}
+              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+          {% endfor %}
+
+        {% endif %}
+
+        {% if ontospy_graph.skosConcepts  %}
+            <li class="-second-level" id="sd_concepts"><a {% ifequal thispage "concepts" %}class="active"{% endifequal %}href="entities-tree-concepts.html">Concepts ({{ontospy_graph.skosConcepts|length}})</a>
+            </li>
+
+              {# simulated second level #}
+            {% for each in  ontospy_graph.skosConcepts %}
+                <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+            {% endfor %}
+
+        {% endif %}
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
+    </ul>
+
+</div>
+
+
+<!-- /#sidebar-wrapper -->

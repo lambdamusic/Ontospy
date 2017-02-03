@@ -1,0 +1,33 @@
+{% load i18n %}
+
+{# 2017-01-06 unused #}
+
+    <div class="row">
+
+        <div class="col-md-10 well">
+            {% if ontologies %}
+            <h3>
+            <small><b>Ontolog{{ ontologies|pluralize:"y,ies" }}:</b></small>
+                {% for foo in ontologies %}
+                    <br />
+                    <code>{{ foo.uri }}</code>
+                {% endfor %}
+            </h3>
+            {% endif %}
+
+            {% if sources %}
+            <h3>
+            <small><b>Data Source{{ sources|pluralize }}:</b></small>
+                {% for foo in sources %}
+                    <br />
+                    <code>{{ foo }}</code>
+                {% endfor %}
+            </h3>
+            {% endif %}
+        </div>
+
+        <div class="col-md-2">
+
+        </div>
+
+    </div>

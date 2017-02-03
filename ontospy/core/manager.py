@@ -3,6 +3,7 @@
 
 from .. import *
 from colorama import Fore, Style
+import random
 
 
 # ===========
@@ -88,7 +89,7 @@ def get_home_location():
 
 
 
-def get_localontologies():
+def get_localontologies(pattern=""):
 	"returns a list of file names in the ontologies folder (not the full path)"
 	res = []
 	ONTOSPY_LOCAL_MODELS = get_home_location()
@@ -96,13 +97,32 @@ def get_localontologies():
 		for f in os.listdir(ONTOSPY_LOCAL_MODELS):
 			if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
 				if not f.startswith(".") and not f.endswith(".pickle"):
-					res += [f]
+					if not pattern:
+						res += [f]
+					else:
+						if pattern in f:
+							res += [f]
 	return res
+
+
+def get_random_ontology(TOP_RANGE=10, pattern=""):
+	"""for testing purposes. Returns a random ontology/graph"""
+	choices = get_localontologies(pattern=pattern)
+	try:
+		ontouri = choices[random.randint(0, TOP_RANGE)]  # [0]
+	except:
+		ontouri = choices[0]
+	print("Testing with URI: %s" % ontouri)
+	g = get_pickled_ontology(ontouri)
+	if not g:
+		g = do_pickle_ontology(ontouri)
+	return ontouri, g
 
 
 def get_pickled_ontology(filename):
 	""" try to retrieve a cached ontology """
-	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	pickledfile = os.path.join(ONTOSPY_LOCAL_CACHE, filename + ".pickle")
+	# pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if GLOBAL_DISABLE_CACHE:
 		printDebug("WARNING: DEMO MODE cache has been disabled in __init__.py ==============", "red")
 	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
@@ -117,7 +137,8 @@ def get_pickled_ontology(filename):
 
 def del_pickled_ontology(filename):
 	""" try to remove a cached ontology """
-	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	pickledfile = os.path.join(ONTOSPY_LOCAL_CACHE, filename + ".pickle")
+	# pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
 		os.remove(pickledfile)
 		return True
@@ -127,8 +148,10 @@ def del_pickled_ontology(filename):
 
 def rename_pickled_ontology(filename, newname):
 	""" try to rename a cached ontology """
-	pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
-	newpickledfile = ONTOSPY_LOCAL_CACHE + "/" + newname + ".pickle"
+	pickledfile = os.path.join(ONTOSPY_LOCAL_CACHE, filename + ".pickle")
+	# pickledfile = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	newpickledfile = os.path.join(ONTOSPY_LOCAL_CACHE, newname + ".pickle")
+	# newpickledfile = ONTOSPY_LOCAL_CACHE + "/" + newname + ".pickle"
 	if os.path.isfile(pickledfile) and not GLOBAL_DISABLE_CACHE:
 		os.rename(pickledfile, newpickledfile)
 		return True
@@ -144,25 +167,28 @@ def do_pickle_ontology(filename, g=None):
 		see http://stackoverflow.com/questions/2134706/hitting-maximum-recursion-depth-using-pythons-pickle-cpickle
 	"""
 	ONTOSPY_LOCAL_MODELS = get_home_location()
-	pickledpath = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
+	get_or_create_home_repo() # ensure all the right folders are there
+	pickledpath = os.path.join(ONTOSPY_LOCAL_CACHE, filename + ".pickle")
+	# pickledpath = ONTOSPY_LOCAL_CACHE + "/" + filename + ".pickle"
 	if not g:
-		g = Ontospy(ONTOSPY_LOCAL_MODELS + "/" + filename)
+		g = Ontospy(os.path.join(ONTOSPY_LOCAL_MODELS, filename))
+		# g = Ontospy(ONTOSPY_LOCAL_MODELS + "/" + filename)
 
 	if not GLOBAL_DISABLE_CACHE:
 		try:
 			cPickle.dump(g, open(pickledpath, "wb"))
-			# print Style.DIM + ".. cached <%s>" % pickledpath + Style.RESET_ALL
+			printDebug(".. cached <%s>" % filename, "green")
 		except Exception as e:
 			print(Style.DIM + "\n.. Failed caching <%s>" % filename + Style.RESET_ALL)
-			print(str(e))
-			print(Style.DIM + "\n... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL)
+			print(str(e) + "\n")
+			print(Style.DIM + "... attempting to increase the recursion limit from %d to %d" % (sys.getrecursionlimit(), sys.getrecursionlimit()*10) + Style.RESET_ALL)
 
-		try:
-			sys.setrecursionlimit(sys.getrecursionlimit()*10)
-			cPickle.dump(g, open(pickledpath, "wb"))
-			# print(Fore.GREEN + "Cached <%s>" % pickledpath + "..." + Style.RESET_ALL)
-		except Exception as e:
-			print(Style.BRIGHT + "\n... Failed caching <%s>... aborting..." % filename + Style.RESET_ALL)
-			print(str(e))
-		sys.setrecursionlimit(int(sys.getrecursionlimit()/10))
+			try:
+				sys.setrecursionlimit(sys.getrecursionlimit()*10)
+				cPickle.dump(g, open(pickledpath, "wb"))
+				printDebug(".. cached <%s>" % filename, "green")
+			except Exception as e:
+				printDebug("\n... Failed caching <%s>... Aborting caching operation..." % filename, "error")
+				print(str(e) + "\n")
+			sys.setrecursionlimit(int(sys.getrecursionlimit()/10))
 	return g

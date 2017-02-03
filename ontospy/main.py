@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 """
 ONTOSPY
-Copyright (c) 2013-2016 __Michele Pasin__ <http://www.michelepasin.org>.
+Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
 """
@@ -96,8 +96,8 @@ Open FOAF vocabulary and save it to the local library:
 > ontospy http://xmlns.com/foaf/spec/ -s
 
 More info: <ontospy.readthedocs.org>
-    
-    
+
+
     """
 
     sTime = time.time()
@@ -110,7 +110,7 @@ More info: <ontospy.readthedocs.org>
     click.secho("OntoSpy " + VERSION,  bold=True)
     # click.secho("Local library: '%s'" % get_home_location(), fg='white')
     click.secho("------------", fg='white')
-    
+
     if bootstrap:
         action_bootstrap()
         printDebug("Tip: you can now load an ontology by typing `ontospy -l`", "important")
@@ -118,11 +118,11 @@ More info: <ontospy.readthedocs.org>
 
     elif cache:
         action_cache()
-    
+
     elif delete:
         res = actions_delete()
         # raise SystemExit(1)
-       
+
     elif library:
         click.secho("Local library: '%s'" % get_home_location(), fg='white')
         filename = action_listlocal(all_details=True)
@@ -133,11 +133,11 @@ More info: <ontospy.readthedocs.org>
             shellPrintOverview(g, print_opts)
 
     # save?? missing
-    
+
     elif reset:
         action_erase()
         # raise SystemExit(1)
-    
+
     elif update:
         if not sources:
             printDebug("Please specify a new location for the local library.", 'important')
@@ -152,7 +152,7 @@ More info: <ontospy.readthedocs.org>
             if output:
                 printDebug("Note: no files have been moved or deleted (this has to be done manually)", "comment")
                 printDebug("----------\n" + "New location: '%s'" % _location, "important")
-    
+
             else:
                 printDebug("----------\n" + "Please specify an existing folder path.", "important")
             raise SystemExit(1)
@@ -162,20 +162,25 @@ More info: <ontospy.readthedocs.org>
     elif web:
         action_webimport()
         # raise SystemExit(1)
-        
+
     else:
         if not sources:
-            click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
-            filename = action_listlocal(all_details=False)
-            if filename:
-                g = get_pickled_ontology(filename)
-                if not g:
-                    g = do_pickle_ontology(filename)
-                shellPrintOverview(g, print_opts)
+            # click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
+            click.secho("You haven't specified any argument.", fg='red')
+            if click.confirm('Show the local library?'):
+                filename = action_listlocal(all_details=False)
+                if filename:
+                    g = get_pickled_ontology(filename)
+                    if not g:
+                        g = do_pickle_ontology(filename)
+                    shellPrintOverview(g, print_opts)
+            else:
+                printDebug("Goodbye.", "comment")
+                raise SystemExit(1)
         else:
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')
-            g = Ontospy(uri_or_path=sources)
+            g = Ontospy(uri_or_path=sources, verbose=verbose)
             shellPrintOverview(g, print_opts)
 
 
