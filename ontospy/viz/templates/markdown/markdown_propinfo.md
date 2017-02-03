@@ -3,7 +3,7 @@
 
 
 {% ifequal main_entity_type "property"  %}
-    
+
 {% with main_entity as each  %}
 
 ## Property {{each.qname}}
@@ -17,16 +17,16 @@
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.qname}}]({{s.slug}}.md)
 {% endfor %}        
 {% endif %}
 
 {% else %}
-* rdfs:Property
+* rdf:Property
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.qname}}]({{s.slug}}.md)
 {% endfor %}        
 {% endif %}
 
@@ -56,7 +56,7 @@ owl:Thing
 #### Usage
 {% if each.domains %}
 {% for s in each.domains %}
-[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %} 
+[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}
 {% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.qname}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
 
 #### Implementation
