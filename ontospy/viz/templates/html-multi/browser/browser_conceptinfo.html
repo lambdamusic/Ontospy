@@ -21,20 +21,19 @@
 
 
 {% block bodycontent %}
+
+
+
 {% ifequal main_entity_type "concept"  %}
 
         {% with main_entity as each  %}
 
 
-        <ol class="breadcrumb">
-            <li>
-                <a href="entities-az.html">Entities</a>
-            </li>
-            <li>
-                <a href="entities-tree-concepts.html">Concepts</a>
-            </li>
-            <li class="active">{{each.uri}}</li>
-        </ol>
+
+        {% with thispage="conceptinfo" %}
+            {% include "breadcrumbs.html" %}
+        {% endwith %}
+
 
 
 
@@ -81,7 +80,7 @@
 
                     {% else %}
 
-                        <li><a href="entities-tree-properties.html">owl:Thing</a>
+                        <li><a href="entities-tree-properties.html">skos:Concept</a>
 
                           <ul>
                             <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>

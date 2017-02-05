@@ -1,0 +1,162 @@
+
+
+{% if thispage == "home" %}
+<ol class="breadcrumb">
+  <li class="active">
+    Home
+  </li>
+</ol>
+{% endif %}
+
+
+
+{% if thispage == "dashboard" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li class="active">
+        Dashboard
+    </li>
+</ol>
+{% endif %}
+
+
+
+{% if thispage == "entities-az" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li class="active">
+        Entities A-Z
+    </li>
+</ol>
+{% endif %}
+
+
+
+
+{# TREE PAGES #}
+
+
+{% if thispage == "classes" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li>
+        <a href="entities-az.html">Entities</a>
+    </li>
+    <li class="active">
+          Classes
+      </li>
+</ol>
+{% endif %}
+
+
+
+{% if thispage == "properties" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li>
+        <a href="entities-az.html">Entities</a>
+    </li>
+    <li class="active">
+          Properties
+      </li>
+</ol>
+{% endif %}
+
+
+
+
+{% if thispage == "concepts" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li>
+        <a href="entities-az.html">Entities</a>
+    </li>
+    <li class="active">
+          Concepts
+      </li>
+</ol>
+{% endif %}
+
+
+
+{# SPECIFIC ENTITY INFO #}
+
+
+
+
+
+{% if thispage == "classinfo" %}
+
+
+  <ol class="breadcrumb">
+    <li>
+      <a href="index.html">Home</a>
+    </li>
+    <li>
+          <a href="entities-az.html">Entities</a>
+    </li>
+    <li>
+          <a href="entities-tree-classes.html">Classes</a>
+    </li>
+      <li class="active">
+            {{each.uri}}
+        </li>
+  </ol>
+
+{% endif %}
+
+
+
+
+{% if thispage == "propinfo" %}
+
+
+  <ol class="breadcrumb">
+    <li>
+      <a href="index.html">Home</a>
+    </li>
+    <li>
+          <a href="entities-az.html">Entities</a>
+    </li>
+    <li>
+          <a href="entities-tree-properties.html">Properties</a>
+    </li>
+      <li class="active">
+            {{each.uri}}
+        </li>
+  </ol>
+
+{% endif %}
+
+
+
+
+{% if thispage == "conceptinfo" %}
+
+
+  <ol class="breadcrumb">
+    <li>
+      <a href="index.html">Home</a>
+    </li>
+    <li>
+          <a href="entities-az.html">Entities</a>
+    </li>
+    <li>
+          <a href="entities-tree-concepts.html">Concepts</a>
+    </li>
+      <li class="active">
+            {{each.uri}}
+        </li>
+  </ol>
+
+{% endif %}

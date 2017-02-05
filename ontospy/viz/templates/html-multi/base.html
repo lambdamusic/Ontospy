@@ -79,8 +79,10 @@
       font-weight: normal;
   }
 
+
   .breadcrumb {
-      margin-top: 30px;
+    margin-top: 20px;
+    margin-bottom: 40px;
   }
 
   .breadcrumb a {
@@ -201,7 +203,9 @@
     <!-- Begin page content -->
     <div class="container" id="page-content-wrapper">
 
+      {% if 0 %}
       <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-default margin-bottom-50" style="margin-top: 20px;">Toggle sidebar</button>
+      {% endif %}
 
 	{% block bodycontent %}
 
@@ -225,7 +229,7 @@
   <footer class="footer">
     <div class="container">
     {% block footer %}
-      <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="http://ontospy.readthedocs.org/">OntoSpy</a> ({{ontospy_version}})</p>
+      <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="https://github.com/lambdamusic/OntoSpy">OntoSpy</a> ({{ontospy_version}})</p>
 
     {% endblock footer %}
     </div>

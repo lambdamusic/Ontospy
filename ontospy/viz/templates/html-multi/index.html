@@ -23,6 +23,13 @@
 
 {% block bodycontent %}
 
+
+    {% with thispage="home" %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
+
+
+
         <div class="page-header">
 
             <h3>Home
@@ -91,14 +98,15 @@
 
                  {% for each in stats %}
 
+                  {% if each.0 != "Data Sources" %}
 
                       <dt>{{each.0}}</dt>
                       <dd>{{each.1}}</dd>
 
+                  {% endif %}
 
                     {% endfor %}
 
-                    {% for foo in sources %}<li><small>{{ foo }}</small></li>{% endfor %}
                 </dl>
             </div>
           </div>
