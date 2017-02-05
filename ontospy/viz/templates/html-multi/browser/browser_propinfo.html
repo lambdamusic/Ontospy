@@ -21,19 +21,17 @@
 
 
 {% block bodycontent %}
+
+
 {% ifequal main_entity_type "property"  %}
 
         {% with main_entity as each  %}
 
-           <ol class="breadcrumb">
-            	<li>
-            		<a href="entities-az.html">Entities</a>
-            	</li>
-            	<li>
-                    <a href="entities-tree-properties.html">Properties</a>
-                </li>
-            	<li class="active">{{each.uri}}</li>
-            </ol>
+
+        {% with thispage="propinfo" %}
+            {% include "breadcrumbs.html" %}
+        {% endwith %}
+
 
 
             <h1>

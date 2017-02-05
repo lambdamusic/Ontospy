@@ -22,20 +22,21 @@
 
 {% block bodycontent %}
 
+
+
+
 {% ifequal main_entity_type "class"  %}
 
         {% with main_entity as each  %}
 
 
-            <ol class="breadcrumb">
-            	<li>
-            		<a href="entities-az.html">Entities</a>
-            	</li>
-            	<li>
-                    <a href="entities-tree-classes.html">Classes</a>
-                </li>
-            	<li class="active">{{each.uri}}</li>
-            </ol>
+
+
+        {% with thispage="classinfo" %}
+            {% include "breadcrumbs.html" %}
+        {% endwith %}
+
+
 
 
 

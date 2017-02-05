@@ -24,14 +24,12 @@
 
 {% block bodycontent %}
 
-  <ol class="breadcrumb">
-    <li>
-      <a href="entities-az.html">Entities</a>
-    </li>
-    <li class="active">
-          {{treetype|capfirst}}
-      </li>
-  </ol>
+
+
+    {% with thispage=treetype %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
+
 
 
 

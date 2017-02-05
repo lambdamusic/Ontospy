@@ -25,14 +25,9 @@
 {% block bodycontent %}
 
 
-    <ol class="breadcrumb">
-      <li>
-        <a href="entities-az.html">Entities</a>
-      </li>
-      <li class="active">
-            A-Z
-        </li>
-    </ol>
+    {% with thispage="entities-az" %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
 
 
 
