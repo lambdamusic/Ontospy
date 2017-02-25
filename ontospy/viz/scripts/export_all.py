@@ -89,8 +89,9 @@ This application is a wrapper on the main ontospy-viz script. It generates docs 
 
     # generate a report page
     report_path = os.path.join(outputpath, "index.html")
+    header = """<h1>Examples of documentation generated with OntoSpy:</h1>"""
     with open(report_path, "w") as text_file:
-        text_file.write("<html><body><h1>Ontologies</h1>%s</body></html>" % "".join([x for x in report_pages]))
+        text_file.write("<html><body>%s%s</body></html>" % (header, "".join([x for x in report_pages])))
     # open report
     webbrowser.open("file:///" + report_path)
 

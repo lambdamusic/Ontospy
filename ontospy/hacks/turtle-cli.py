@@ -96,9 +96,10 @@ def main(database):
             # print highlight(code, PythonLexer())
             print("You said \n---\n" + highlight(buffer, TurtleLexer(), Terminal256Formatter()) + "---")
         else:
-            buffer += text + "\n"
+            if text:
+                buffer += text + "\n"
 
-        
+
     print('GoodBye!')
 
 if __name__ == '__main__':
