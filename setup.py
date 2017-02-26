@@ -54,7 +54,12 @@ templates_root = os.path.join(project_root, "viz", "templates")
 # dynamically generate list of data folders
 package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
 
-# def
+
+# //// for testinging to fix errors
+if False:
+    for el in package_data_folders:
+        print el, os.path.isdir(el)
+# /////
 
 
 

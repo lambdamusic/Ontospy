@@ -57,7 +57,7 @@
                <dl>
 
                {% for each in ontospy_graph.classes  %}
-                   <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
+                   <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
                    <dd>
 {#                       {{ each.bestDescription|default:"[no definition]" }}#}
                    </dd>
@@ -84,7 +84,7 @@
                    <dl>
 
                    {% for each in ontospy_graph.skosConcepts  %}
-                       <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
+                       <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
                        <dd>
 {#                           {{ each.bestDescription|default:"[no definition]" }}#}
                        </dd>
@@ -120,7 +120,7 @@
                    <dl>
 
                    {% for each in ontospy_graph.properties  %}
-                       <dt><a href="{{each.slug}}.html">{{each.qname|upper}}</a></dt>
+                       <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
                        <dd>
 {#                           {{ each.bestDescription|default:"[no definition]" }}#}
                        </dd>

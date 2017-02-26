@@ -34,15 +34,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--verbose', '-v', is_flag=True, help='Verbose mode.')
 def cli_run_viz(source=None, library=False, outputpath="", title="", theme="", showthemes=False, verbose=False):
     """
-This application launches the OntoSpy visualization tool.
+This application allows to create html or markdown documentation for an RDF model.
+Example:
 
-Examples:
-
-> ontospy-viz ~/mymodel.rdf
-
-> ontospy-viz ~/mymodel.rdf -t "My new model" =>custom title
-
-> ontospy-viz -l -m "sandstone" =>local library + custom theme
+> ontospy-viz http://www.w3.org/2008/05/skos# --theme random -o ~/Desktop/skos
 
 """
     if showthemes:
