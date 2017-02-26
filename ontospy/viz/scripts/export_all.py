@@ -52,46 +52,74 @@ This application is a wrapper on the main ontospy-viz script. It generates docs 
         outputpath = os.path.join(home, "ontospy-viz-multi")
 
     if source:
-        click.secho("WARNING: not implemented yet. Only local repo can be exported.", fg="red")
-        sys.exit(0)
+        source_folder = source[0]
+        if not os.path.isdir(source_folder):
+            click.secho("WARNING: '%s' is not a valid directory path." % source_folder, fg="red")
+            sys.exit(0)
+
+
+        files_list = [f for f in os.listdir(source_folder) if os.path.isfile(os.path.join(source_folder, f))]
+        click.secho("Exporting the directory: '%s'" % source_folder, fg="green")
+        click.secho("----------", fg="green")
+
     else:
         click.secho("Exporting the local library: '%s'" % get_home_location(), fg="green")
+        click.secho("----------", fg="green")
+        files_list = get_localontologies()
+        source_folder = get_home_location()
 
     report_pages = []
 
-    for onto_name in get_localontologies():
+    for onto_name in files_list:
 
-        full_uri = os.path.join(get_home_location(), onto_name)
-        if theme=="random":
-            _theme = random_theme()
+        full_uri = os.path.join(source_folder, onto_name)
+        if theme:
+            if theme=="random":
+                _theme = random_theme()
+            else:
+                _theme = theme
         else:
-            _theme = theme
+            _theme = BOOTSWATCH_THEME_DEFAULT
         click.secho("Onto: <%s> Theme: '%s'" % (onto_name, _theme), fg="green")
 
         printDebug("Loading graph...", dim=True)
-        g = Ontospy(os.path.join(get_home_location(), onto_name), verbose=verbose)
-
-        printDebug("Building visualization...", dim=True)
-        onto_name_safe = slugify(unicode(onto_name))
-        onto_outputpath = os.path.join(outputpath, onto_name_safe )
-        # note: single static files output path
-        static_outputpath = os.path.join(outputpath, "static" )
-        # v = KompleteViz(g, theme=_theme)
-        v = KompleteVizMultiModel(g, theme=_theme, static_url="../static/", output_path_static=static_outputpath)
-        try:
-            # note: onto_outputpath is wiped out each time as part of the build
-            url = v.build(onto_outputpath)
-            report_pages.append("<a href='%s/index.html' target='_blank'>%s</a> ('%s' theme)<br />" % (onto_name_safe, onto_name, _theme))
-        except:
-            e = sys.exc_info()[0]
-            printDebug("Error: " + str(e), "red")
-            continue
+        g = Ontospy(os.path.join(source_folder, onto_name), verbose=verbose)
+        if g.sources:
+            # if Ontospy graph has no valid 'sources' = file passed was not valid RDF
+            printDebug("Building visualization...", dim=True)
+            onto_name_safe = slugify(unicode(onto_name))
+            onto_outputpath = os.path.join(outputpath, onto_name_safe )
+            # note: single static files output path
+            static_outputpath = os.path.join(outputpath, "static" )
+            # v = KompleteViz(g, theme=_theme)
+            v = KompleteVizMultiModel(g, theme=_theme, static_url="../static/", output_path_static=static_outputpath)
+            try:
+                # note: onto_outputpath is wiped out each time as part of the build
+                url = v.build(onto_outputpath)
+                report_pages.append("<a href='%s/index.html' target='_blank'>%s</a> ('%s' theme)<br />" % (onto_name_safe, onto_name, _theme))
+            except:
+                e = sys.exc_info()[0]
+                printDebug("Error: " + str(e), "red")
+                continue
 
     # generate a report page
     report_path = os.path.join(outputpath, "index.html")
-    header = """<h1>Examples of documentation generated with OntoSpy:</h1>"""
+    html = """
+<html>
+<head>
+  <style media="screen">
+    a {font-size: 20px; padding: 15px; text-transform: capitalize; text-decoration: none;}
+    a:hover {text-decoration: underline;}
+  </style>
+</head>
+<body>
+<h1>OntoSpy-generated documentation:</h1>
+%s
+</body>
+</html>
+    """
     with open(report_path, "w") as text_file:
-        text_file.write("<html><body>%s%s</body></html>" % (header, "".join([x for x in report_pages])))
+        text_file.write(html % ("".join([x for x in report_pages])))
     # open report
     webbrowser.open("file:///" + report_path)
 

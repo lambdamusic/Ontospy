@@ -58,10 +58,10 @@ class KompleteViz(VizFactory):
         super(KompleteViz, self).__init__(ontospy_graph, title)
         self.static_files = [
                 "custom",
-                "libs/bootswatch3.2",
-                "libs/bootstrap-3.3.7-dist",
-                "libs/jquery/1.12.4/",
-                "libs/Chart.js-2.4.0/"
+                "libs/bootswatch3_2",
+                "libs/bootstrap-3_3_7-dist",
+                "libs/jquery/1_12_4/",
+                "libs/chartjs-2_4_0"
                 ]
         self.theme = validate_theme(theme)
 
