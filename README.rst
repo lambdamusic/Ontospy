@@ -15,9 +15,6 @@ The basic workflow is simple: load a graph by instantiating the ``Ontospy`` clas
 The same functionalities are accessible also via a command line application (`ontospy-shell`). This is an interactive environment (like a repl) that allows to load ontologies from a local repository, interrogate them and cache them so that they can be quickly reloaded for inspection later on.
 
 
-Documentation
+More info
 ---------------
-http://ontospy.readthedocs.org/en/latest/
-
-See also: https://github.com/lambdamusic/OntoSPy
-
+https://github.com/lambdamusic/OntoSpy/wiki
