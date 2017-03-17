@@ -133,6 +133,7 @@ setup(
         'pyfiglet',
         'click',
         'pygments',
+		'pyparsing',
 	],
 
     # List additional groups of dependencies here (e.g. development dependencies).
