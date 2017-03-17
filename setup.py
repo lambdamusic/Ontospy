@@ -123,8 +123,8 @@ setup(
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
     # NOTE: packages are installed in reverse order
     install_requires=[
-        'rdflib-jsonld',
         'rdflib',
+        'rdflib-jsonld',
         'SPARQLWrapper',
 		'colorama',
 		'django',
