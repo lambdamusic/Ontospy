@@ -123,7 +123,6 @@ setup(
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
     # NOTE: packages are installed in reverse order
     install_requires=[
-		'readline',  # for shell autocomplete
         'rdflib-jsonld',
         'rdflib',
         'SPARQLWrapper',
@@ -140,6 +139,7 @@ setup(
     # You can install these using the following syntax, for example:
     # $ pip install -e .[dev,test]
     extras_require = {
+	'shell-autocomplete': ['readline']
         # 'dev': ['check-manifest'],
         # 'test': ['coverage'],
     },
