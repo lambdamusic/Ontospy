@@ -131,6 +131,8 @@ setup(
         'pyfiglet',
         'click',
         'colorama',
+        # note: on windows click requires colorama too
+        # http://click.pocoo.org/5/utils/#ansi-colors
 		'pyparsing',
 	],
 
@@ -167,7 +169,6 @@ setup(
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
             'ontospy-shell=ontospy.shell.main:cli_run_shell',
-            'ontospy-viz=ontospy.viz.main:cli_run_viz',
             'ontospy=ontospy.main:main_cli'
         ],
     },

@@ -122,9 +122,9 @@ def _print_table_ontologies():
         counter = 0
         for file in ontologies:
             counter += 1
-            # _counter = Fore.BLUE + Style.BRIGHT + str(counter) + Style.RESET_ALL
             _counter = str(counter)
-            name = Style.BRIGHT + file + Style.RESET_ALL
+            # name = Style.BRIGHT + file + Style.RESET_ALL
+            name = click.style(file, fg='green')
             try:
                 mtime = os.path.getmtime(ONTOSPY_LOCAL_MODELS + "/" + file)
             except OSError:
@@ -217,7 +217,8 @@ def action_import_folder(location):
         for file in onlyfiles:
             if not file.startswith("."):
                 filepath = os.path.join(location,file)
-                print(Fore.RED + "\n---------\n" + filepath + "\n---------" + Style.RESET_ALL)
+                # print(Fore.RED + "\n---------\n" + filepath + "\n---------" + Style.RESET_ALL)
+                click.secho("\n---------\n" + filepath + "\n---------", fg='red')
                 return action_import(filepath)
     else:
         printDebug("Not a valid directory", "important")
@@ -293,8 +294,7 @@ def _import_LOV(baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list"
         for x in options:
             uri, title, ns = x['uri'], x['titles'][0]['value'], x['nsp']
             # print("%s ==> %s" % (d['titles'][0]['value'], d['uri']))
-
-            print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + uri + " ==> ", Fore.RED + title, Style.RESET_ALL)
+            click.echo(click.style("[%d]" % counter, fg='blue') + click.style(uri + " ==> ", fg='black') + click.style(title, fg='red'))
 
             counter += 1
 
