@@ -9,10 +9,6 @@ michele.pasin@gmail.com
 # https://hg.python.org/cpython/file/2.7/Lib/cmd.py
 # http://pymotw.com/2/cmd/
 
-# Colorama cheatsheet: https://pypi.python.org/pypi/colorama
-# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
-# Style: DIM, NORMAL, BRIGHT, RESET_ALL
 
 """
 
@@ -29,8 +25,8 @@ try:
 except NameError:
     pass
 
-from colorama import Fore, Back, Style
 from pyfiglet import Figlet
+from colorama import Fore, Style
 
 from subprocess import PIPE, Popen
 PY2 = sys.version < '3'
@@ -46,7 +42,6 @@ from ..core import manager
 from ..core import actions
 from ..core.utils import *
 
-from ..viz.builder import action_visualize
 
 from .quotes import *  # quotes
 
@@ -1001,9 +996,13 @@ class Shell(cmd.Cmd):
             return
 
         line = line.split()
-        # _gist = False
-        # if line and line[0] == "gist":
-        #     _gist = True
+
+        try:
+            # from ..viz.builder import action_visualize
+            from ontospydocs import action_visualize
+        except:
+            self._print("You need the ontospy-docs library for this: `pip install ontospy-docs`")
+            return
 
         import webbrowser
         url = action_visualize(args=self.current['file'], fromshell=True)

@@ -9,6 +9,8 @@ All rights reserved.
 
 from __future__ import print_function
 
+from colorama import Fore, Style
+
 import sys, os, time, optparse, os.path, shutil, requests
 
 try:
@@ -34,8 +36,6 @@ except NameError:
 
 import time, optparse, os, rdflib, sys, datetime
 
-
-from colorama import Fore, Style
 
 from .. import *  # imports __init__
 from ..VERSION import *

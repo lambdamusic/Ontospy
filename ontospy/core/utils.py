@@ -10,13 +10,14 @@ Copyright (c) 2010-2015 __Michele Pasin__ <http://www.michelepasin.org>. All rig
 
 from __future__ import print_function
 
+from colorama import Fore, Style
+
 import rdflib
 from rdflib import RDFS, RDF, BNode
 from rdflib.namespace import OWL, DC
 DEFAULT_LANGUAGE = "en"
 
 import sys, os, subprocess, random, platform
-from colorama import Fore, Back, Style
 
 import click
 

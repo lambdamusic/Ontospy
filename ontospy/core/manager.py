@@ -2,9 +2,9 @@
 #  -*- coding: UTF-8 -*-
 
 from .. import *
-from colorama import Fore, Style
 import random
 
+from colorama import Fore, Style
 
 # ===========
 #
@@ -35,8 +35,6 @@ def get_or_create_home_repo(reset=False):
 	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_CACHE)):
 		# print "HERE"
 		os.makedirs(ONTOSPY_LOCAL_CACHE)
-	if dosetup or not(os.path.exists(ONTOSPY_LOCAL_VIZ)):
-		os.mkdir(ONTOSPY_LOCAL_VIZ)
 	if dosetup or not(os.path.exists(ONTOSPY_LIBRARY_DEFAULT)):
 		os.mkdir(ONTOSPY_LIBRARY_DEFAULT)
 

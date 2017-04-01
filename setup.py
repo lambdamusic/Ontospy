@@ -48,12 +48,13 @@ def get_package_folders(top_folder, root_path):
     return out
 
 
-project_root = os.path.join(here, "ontospy")
-static_root = os.path.join(project_root, "viz", "static")
-templates_root = os.path.join(project_root, "viz", "templates")
-# dynamically generate list of data folders
-package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
-
+# if False:
+#     project_root = os.path.join(here, "ontospy")
+#     static_root = os.path.join(project_root, "viz", "static")
+#     templates_root = os.path.join(project_root, "viz", "templates")
+#     # dynamically generate list of data folders
+#     package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
+package_data_folders = []
 
 # //// for testinging to fix errors
 if False:
@@ -71,7 +72,7 @@ setup(
     # https://packaging.python.org/en/latest/distributing.html#version
     version=VERSIONSTRING,
 
-    description='A Python package for working with RDF/OWL ontologies',
+    description='Query, inspect and visualize knowledge models encoded as RDF/OWL ontologies.',
     long_description=long_description,
 
     # The project's main homepage.
@@ -126,12 +127,10 @@ setup(
         'rdflib',
         'rdflib-jsonld',
         'SPARQLWrapper',
-		'colorama',
-		'django',
         'requests',
         'pyfiglet',
         'click',
-        'pygments',
+        'colorama',
 		'pyparsing',
 	],
 

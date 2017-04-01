@@ -25,9 +25,6 @@ try:
 except NameError:
     pass
 
-from colorama import Fore, Style
-
-
 from .core.ontospy import Ontospy
 # this allows to load with 'import ontospy', and using 'ontospy.Ontospy'
 
@@ -67,14 +64,8 @@ else:
 # python package installation
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
 
-ONTOSPY_VIZ_TEMPLATES = _dirname + "/viz/templates/"
-ONTOSPY_VIZ_STATIC = _dirname + "/viz/static/"
-ONTOSPY_SOUNDS = _dirname + "/data/sounds/"
-
-
 # local repository constants
 ONTOSPY_LOCAL = os.path.join(os.path.expanduser('~'), '.ontospy')
-ONTOSPY_LOCAL_VIZ = ONTOSPY_LOCAL + "/viz"
 ONTOSPY_LOCAL_CACHE = ONTOSPY_LOCAL + "/.cache/" + VERSION
 
 ONTOSPY_LIBRARY_DEFAULT = ONTOSPY_LOCAL + "/models/"
