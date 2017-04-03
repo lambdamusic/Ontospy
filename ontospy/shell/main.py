@@ -11,12 +11,20 @@ More info in the README file.
 
 """
 
+import sys
 import click
 # http://click.pocoo.org/5/arguments/
 # http://click.pocoo.org/5/options/
 
+try:
+    import readline
+except:
+    click.secho("WARNING: ontospy shell can't without the readline library.", fg='red')
+    click.secho("Tip: install it with `pip install readline` (you can try pyreadline on Windows)", fg='green')
+    sys.exit(0)
+
 from .. import *  # imports __init__
-from .shell import Shell, STARTUP_MESSAGE       
+from .shell import Shell, STARTUP_MESSAGE
 
 
 

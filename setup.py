@@ -56,7 +56,7 @@ def get_package_folders(top_folder, root_path):
 #     package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
 package_data_folders = []
 
-# //// for testinging to fix errors
+# //// for testing
 if False:
     for el in package_data_folders:
         print el, os.path.isdir(el)
@@ -91,7 +91,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
@@ -129,10 +129,10 @@ setup(
         'SPARQLWrapper',
         'requests',
         'pyfiglet',
-        'click',
-        'colorama',
         # note: on windows click requires colorama too
         # http://click.pocoo.org/5/utils/#ansi-colors
+        'click',
+        'colorama',
 		'pyparsing',
 	],
 

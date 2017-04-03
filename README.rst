@@ -1,7 +1,7 @@
 OntoSpy
 =======================
 
-RDFLIb-based Python toolkit for inspecting ontologies on the Semantic Web.
+Python toolkit for inspecting linked data knowledge models AKA ontologies or vocabularies.
 
 
 Description
