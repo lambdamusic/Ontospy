@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 
-from .. import *
+from . import *
 import random
 
 from colorama import Fore, Style

@@ -37,8 +37,7 @@ except NameError:
 import time, optparse, os, rdflib, sys, datetime
 
 
-from .. import *  # imports __init__
-from ..VERSION import *
+from . import *
 from .ontospy import Ontospy
 from .utils import *
 from .manager import *
