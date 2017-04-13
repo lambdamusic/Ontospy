@@ -43,7 +43,7 @@ from ..core import actions
 from ..core.utils import *
 
 
-from .quotes import *  # quotes
+from .shell_quotes import *  # quotes
 
 
 

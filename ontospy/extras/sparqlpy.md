@@ -14,7 +14,7 @@ Furthemore, there are two specializations of the main sparql wrapper: nature.py 
 These are like 'plugins' that embed special behaviour for specific endpoints.
 
 ####Dependencies:
-Sparqly relies on sparql-wrapper, which itseld depends on rdflib. Install both of them using `easy_install`.
+Sparqly relies on sparql-wrapper, which itself depends on rdflib. Install both of them using `easy_install`.
 
 - http://sparql-wrapper.sourceforge.net/
 - https://github.com/RDFLib
