@@ -3,14 +3,14 @@
 
 from __future__ import print_function
 
+from colorama import Fore, Style
+
 import rdflib
 from itertools import count
 # http://stackoverflow.com/questions/8628123/counting-instances-of-a-class
-from colorama import Fore, Back, Style
 
 
-
-
+from . import *
 from .utils import *
 
 

@@ -48,14 +48,15 @@ def get_package_folders(top_folder, root_path):
     return out
 
 
-project_root = os.path.join(here, "ontospy")
-static_root = os.path.join(project_root, "viz", "static")
-templates_root = os.path.join(project_root, "viz", "templates")
-# dynamically generate list of data folders
-package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
+# if False:
+#     project_root = os.path.join(here, "ontospy")
+#     static_root = os.path.join(project_root, "viz", "static")
+#     templates_root = os.path.join(project_root, "viz", "templates")
+#     # dynamically generate list of data folders
+#     package_data_folders = get_package_folders(static_root, project_root) + get_package_folders(templates_root, project_root)
+package_data_folders = []
 
-
-# //// for testinging to fix errors
+# //// for testing
 if False:
     for el in package_data_folders:
         print el, os.path.isdir(el)
@@ -71,7 +72,7 @@ setup(
     # https://packaging.python.org/en/latest/distributing.html#version
     version=VERSIONSTRING,
 
-    description='A Python package for working with RDF/OWL ontologies',
+    description='Query, inspect and visualize knowledge models encoded as RDF/OWL ontologies.',
     long_description=long_description,
 
     # The project's main homepage.
@@ -90,7 +91,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
@@ -126,12 +127,12 @@ setup(
         'rdflib',
         'rdflib-jsonld',
         'SPARQLWrapper',
-		'colorama',
-		'django',
         'requests',
         'pyfiglet',
+        # note: on windows click requires colorama too
+        # http://click.pocoo.org/5/utils/#ansi-colors
         'click',
-        'pygments',
+        'colorama',
 		'pyparsing',
 	],
 
@@ -167,8 +168,7 @@ setup(
     entry_points={
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
-            'ontospy-shell=ontospy.shell.main:cli_run_shell',
-            'ontospy-viz=ontospy.viz.main:cli_run_viz',
+            'ontospy-shell=ontospy.extras.shell:cli_run_shell',
             'ontospy=ontospy.main:main_cli'
         ],
     },
