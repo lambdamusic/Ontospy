@@ -39,13 +39,14 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql=None):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
         super(Ontospy, self).__init__()
 
         self.rdfgraph = None
+        self.sparql_endpoint = None
         self.sources = None
         self.queryHelper = None
         self.ontologies = []
@@ -65,9 +66,12 @@ class Ontospy(object):
         # finally:
         if uri_or_path or text or file_obj:
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
+        elif sparql:
+            self.load_sparql(sparql, verbose, hide_base_schemas)
 
 
     def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+        """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
         self.rdfgraph = loader.rdfgraph
@@ -76,6 +80,21 @@ class Ontospy(object):
         self.namespaces = sorted(self.rdfgraph.namespaces())
         # extract entities
         self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
+
+
+    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True):
+        """Set up a SPARQLStore backend as a virtual ontospy graph"""
+        try:
+            graph = rdflib.Graph('SPARQLStore', identifier=sparql_endpoint)
+            graph.open(sparql_endpoint)
+            self.rdfgraph = graph
+            self.sources = [sparql_endpoint]
+            self.sparql_endpoint = sparql_endpoint
+            self.queryHelper = QueryHelper(self.rdfgraph)
+            self.namespaces = sorted(self.rdfgraph.namespaces())
+        except:
+            raise
+        # don't extract entities by default..
 
     def serialize(self, format="turtle"):
         """ Shortcut that outputs the graph
