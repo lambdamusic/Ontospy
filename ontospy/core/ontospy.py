@@ -104,7 +104,10 @@ class Ontospy(object):
 
     def __repr__(self):
         if self.rdfgraph:
-            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+            if not self.sparql_endpoint:
+                return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+            else:
+                return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
         else:
             return "<Ontospy object created but not initialized (use the `load` method to load an rdf schema)>"
 

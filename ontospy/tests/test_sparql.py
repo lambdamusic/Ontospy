@@ -45,7 +45,6 @@ class TestSparqlStore(unittest.TestCase):
         else:
             print("No results")
 
-        # print("Success.\n")
 
 
 
