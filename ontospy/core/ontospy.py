@@ -17,8 +17,6 @@ except ImportError:
     import urllib.request as urllib2
 
 import rdflib
-from rdflib.plugins.stores.sparqlstore import SPARQLStore
-
 
 from .utils import *
 from .rdf_loader import RDFLoader
@@ -28,14 +26,7 @@ from .queryHelper import QueryHelper
 
 class Ontospy(object):
     """
-    Object that scan an rdf graph for schema definitions (aka 'ontologies')
-
-    In [1]: import ontospy
-
-    In [2]: g = ontospy.Ontospy("foaf.ttl")
-    Loaded 3478 triples
-    Ontologies found: 1
-    [etc...]
+    Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
 
     """
 
@@ -68,7 +59,8 @@ class Ontospy(object):
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
         elif sparql:
             self.load_sparql(sparql, verbose, hide_base_schemas)
-
+        else:
+            pass
 
     def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """Load an RDF source into an ontospy/rdflib graph"""
@@ -85,11 +77,12 @@ class Ontospy(object):
     def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True):
         """Set up a SPARQLStore backend as a virtual ontospy graph"""
         try:
-            graph = rdflib.Graph('SPARQLStore', identifier=sparql_endpoint)
+            # graph = rdflib.ConjunctiveGraph('SPARQLStore', identifier='sparql_endpoint')
+            graph = rdflib.ConjunctiveGraph('SPARQLStore')
             graph.open(sparql_endpoint)
             self.rdfgraph = graph
-            self.sources = [sparql_endpoint]
             self.sparql_endpoint = sparql_endpoint
+            self.sources = [sparql_endpoint]
             self.queryHelper = QueryHelper(self.rdfgraph)
             self.namespaces = sorted(self.rdfgraph.namespaces())
         except:
