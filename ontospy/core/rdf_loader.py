@@ -27,37 +27,37 @@ from .utils import *
 class RDFLoader(object):
     """
     Utility to Load any RDF source into an RDFLIB graph instance.
-    
-    Accepts: [single item or list]
-    :: uri_or_path = a uri or local path 
-    :: text = a string containing rdf 
-    :: file_obj = a python file objecy 
 
-    Returns: rdflib graph instance. 
+    Accepts: [single item or list]
+    :: uri_or_path = a uri or local path
+    :: text = a string containing rdf
+    :: file_obj = a python file objecy
+
+    Returns: rdflib graph instance.
 
     Other options:
     :: rdf_format = one of ['xml', 'turtle', 'n3', 'nt', 'trix', 'rdfa']
     :: verbose = if True, prints out a summary of loading operations
 
     Note : you can pass lists, with the effect that the resulting graph
-    will be a union of the rdf data contained in each of the arguments 
+    will be a union of the rdf data contained in each of the arguments
 
     """
 
     def __init__(self, rdfgraph=None):
         super(RDFLoader, self).__init__()
-        
+
         self.rdfgraph = rdfgraph or rdflib.Graph()
         self.sources_valid = []
         self.sources_invalid = []
 
     def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False):
-        
+
         if not rdf_format:
             self.rdf_format_opts = ['xml', 'turtle', 'n3', 'nt', 'trix', 'rdfa']
         else:
             self.rdf_format_opts = [rdf_format]
-       
+
         # URI OR PATH
         if uri_or_path:
             if not type(uri_or_path) in [list,tuple]:
@@ -65,7 +65,7 @@ class RDFLoader(object):
             for candidate in uri_or_path:
                 if os.path.isdir(candidate):
                     # inner loop in case it's a folder
-                    temp = get_files_with_extensions(candidate, ["ttl", "rdf", "owl", 
+                    temp = get_files_with_extensions(candidate, ["ttl", "rdf", "owl",
                         "trix", "rdfa", "n3", "nq", "jsonld"])
                 else:
                     # fake a one-element list
@@ -95,12 +95,12 @@ class RDFLoader(object):
         else:
             raise Exception("You must specify where to load RDF from.")
 
-    
+
 
         if verbose: self.print_summary()
 
         return self.rdfgraph
-        
+
 
 
 
@@ -109,7 +109,7 @@ class RDFLoader(object):
         print out stats about loading operation
         """
         if self.sources_valid:
-            printDebug("----------\nLoaded %d triples.\n----------" % 
+            printDebug("----------\nLoaded %d triples.\n----------" %
                 len(self.rdfgraph), fg='green')
             printDebug("RDF sources loaded successfully: %d of %d.\n----------" %
                 (len(self.sources_valid), len(self.sources_valid) + len(self.sources_invalid)), fg='green')
@@ -122,13 +122,13 @@ class RDFLoader(object):
             printDebug("----------\nRDF sources failed to load: %d.\n----------" %
                 (len(self.sources_invalid)), fg='red')
             for s in self.sources_invalid:
-                printDebug("-> " + s, fg="red")        
+                printDebug("-> " + s, fg="red")
 
 
 
     def load_uri(self, uri, verbose):
         """
-        
+
         :param uri:
         :param rdf_format_opts:
         :param verbose:
@@ -152,12 +152,12 @@ class RDFLoader(object):
         if not success == True:
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += [uri]
-      
-                
+
+
 
     def load_text(self, text, verbose):
         """
-        
+
         :param text:
         :param rdf_format_opts:
         :param verbose:
@@ -187,7 +187,7 @@ class RDFLoader(object):
     def load_file(file_obj, verbose):
         """
         The type of open file objects such as sys.stdout; alias of the built-in file.
-        @TODO: when is this used? 
+        @TODO: when is this used?
         """
         if verbose: printDebug("----------")
         if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
@@ -210,7 +210,7 @@ class RDFLoader(object):
         :return:
         """
         if type(uri) == type("string") or type(uri) == type(u"unicode"):
-            
+
             if uri.startswith("www."):  # support for lazy people
                 uri = "http://%s" % str(uri)
             if uri.startswith("http://"):
@@ -219,10 +219,10 @@ class RDFLoader(object):
                 req = urllib2.Request(uri, headers=headers)
                 res = urllib2.urlopen(req)
                 uri = res.geturl()
-        
+
         else:
             raise Exception("A URI must be in string format.")
-        
+
         return uri
 
 
@@ -262,9 +262,7 @@ def test(uri_or_path, noverbose, trylist):
 
 if __name__ == '__main__':
     """
-    simple test: python -m ontospy.core.loader [PATH] [OPTIONS]
+    simple test: python -m ontospy.core.rdf_loader [PATH] [OPTIONS]
     """
     test()
     printDebug("Finished")
-
-

@@ -5,13 +5,6 @@
 """
 ONTOSPY
 Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
-
-Run it from the command line:
-
->>> python ontospy.py -h
-
-More info in the README file.
-
 """
 
 from __future__ import print_function
@@ -28,7 +21,7 @@ from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 
 from .utils import *
-from .loader import RDFLoader
+from .rdf_loader import RDFLoader
 from .entities import *
 from .queryHelper import QueryHelper
 
@@ -71,10 +64,10 @@ class Ontospy(object):
 
         # finally:
         if uri_or_path or text or file_obj:
-            self.load(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
+            self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
 
 
-    def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         loader = RDFLoader()
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
         self.rdfgraph = loader.rdfgraph
