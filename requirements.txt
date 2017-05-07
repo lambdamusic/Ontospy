@@ -6,5 +6,6 @@ pyfiglet==0.7.5
 click==6.6
 colorama==0.3.7
 pyparsing==2.1.10
+keepalive==0.5
 # unidecode==0.4.19
 # readline==6.2.4.1  # optional, for shell autocomplete

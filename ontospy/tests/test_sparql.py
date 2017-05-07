@@ -22,6 +22,9 @@ from ..core.utils import *
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
 
+# ENDPOINT = "http://dbpedia.org/sparql"
+ENDPOINT = "http://192.168.1.64:7200/repositories/scigraph-test"
+
 class TestSparqlStore(unittest.TestCase):
 
 
@@ -30,12 +33,18 @@ class TestSparqlStore(unittest.TestCase):
 		Check if the dbpedia endpoint loads ok
 		"http://dbpedia.org/sparql"
 		"""
-		print("=================\nTEST 1: Loading DBPEDIA <%s> endpoint.\n=================" % "http://dbpedia.org/sparql")
+		print("=================\nTEST 1: Loading DBPEDIA <%s> endpoint.\n=================" % ENDPOINT)
 
-		o = Ontospy(sparql="http://dbpedia.org/sparql", verbose=True)
+		o = Ontospy(sparql=ENDPOINT, verbose=True)
 
+		q = o.sparql("select ?x where {?x a ?b} limit 100")
+		if q:
+			for el in q:
+				print(el)
+		else:
+			print("No results")
 
-		print("Success.\n")
+		# print("Success.\n")
 
 
 
