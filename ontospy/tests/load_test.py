@@ -13,6 +13,7 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
+from ..core import *
 from ..core.utils import *
 
 
@@ -30,7 +31,7 @@ class TestLoadOntologies(unittest.TestCase):
 		"""
 		Check if the ontologies in /RDF folder load ok
 		"""
-		print("\nTEST 1: Loading ontologies from <%s> folder.\n=================" % DATA_FOLDER)
+		print("=================\nTEST 1: Loading ontologies from <%s> folder.\n=================" % DATA_FOLDER)
 
 		for f in os.listdir(DATA_FOLDER):
 			if not f.startswith('.'):
@@ -59,9 +60,9 @@ class TestLoadOntologies(unittest.TestCase):
 		Check if the ontologies in BOOTSTRAP list load ok
 		"""
 		MAX = 2
-		print("\nTEST 2: Loading some sample online ontologies.\n=================")
+		print("=================\nTEST 2: Loading some sample online ontologies.\n=================")
 
-		printDebug("--------------")
+		# printDebug("--------------")
 		printDebug("The following ontologies will be loaded from the web:")
 		printDebug("--------------")
 		count = 0
