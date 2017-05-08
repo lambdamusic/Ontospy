@@ -24,6 +24,7 @@ from .entities import *
 from .queryHelper import QueryHelper
 
 
+
 class Ontospy(object):
     """
     Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
@@ -86,6 +87,7 @@ class Ontospy(object):
             self.queryHelper = QueryHelper(self.rdfgraph)
             self.namespaces = sorted(self.rdfgraph.namespaces())
         except:
+            printDebug("Error trying to connect to Endpoint.")
             raise
         # don't extract entities by default..
 
@@ -96,18 +98,23 @@ class Ontospy(object):
         return self.rdfgraph.serialize(format=format)
 
 
-    def sparql(self, stringa):
+    def query(self, stringa):
         """ wrapper around a sparql query """
         qres = self.rdfgraph.query(stringa)
         return list(qres)
 
 
     def __repr__(self):
-        if self.rdfgraph:
-            if not self.sparql_endpoint:
-                return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
-            else:
-                return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
+        """
+        Return some info for the ontospy instance.
+
+        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
+        
+        """
+        if self.sparql_endpoint and self.rdfgraph != None:
+            return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
+        elif self.rdfgraph != None:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
         else:
             return "<Ontospy object created but not initialized (use the `load` method to load an rdf schema)>"
 

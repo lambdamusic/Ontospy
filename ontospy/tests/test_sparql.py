@@ -38,13 +38,14 @@ class TestSparqlStore(unittest.TestCase):
 
         o = Ontospy(sparql=ENDPOINT, verbose=True)
 
-        q = o.sparql("select distinct ?b where {?x a ?b} limit 10")
+        print(o), print("---------")
+
+        q = o.query("select distinct ?b where {?x a ?b} limit 10")
         if q:
             for el in q:
                 print(el)
         else:
             print("No results")
-
 
 
 
