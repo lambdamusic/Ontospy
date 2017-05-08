@@ -31,7 +31,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql=None):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql=None, extract_entities=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -58,7 +58,9 @@ class Ontospy(object):
         # finally:
         if uri_or_path or text or file_obj:
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
-        elif sparql:
+            if extract_entities:
+                self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
+        elif sparql: # by default entities are not extracted
             self.load_sparql(sparql, verbose, hide_base_schemas)
         else:
             pass
@@ -71,8 +73,6 @@ class Ontospy(object):
         self.sources = loader.sources_valid
         self.queryHelper = QueryHelper(self.rdfgraph)
         self.namespaces = sorted(self.rdfgraph.namespaces())
-        # extract entities
-        self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
 
 
     def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True):
@@ -109,7 +109,7 @@ class Ontospy(object):
         Return some info for the ontospy instance.
 
         note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
-        
+
         """
         if self.sparql_endpoint and self.rdfgraph != None:
             return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
@@ -124,11 +124,9 @@ class Ontospy(object):
     # === main method === #
     # ------------
 
-    def _scan(self, verbose=False, hide_base_schemas=True):
+    def extract_entities(self, verbose=False, hide_base_schemas=True):
         """
-        scan a source of RDF triples
-        build all the objects to deal with the ontology/ies pythonically
-
+        Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
         if verbose:
             printDebug("Scanning entities...", "green")
@@ -170,6 +168,7 @@ class Ontospy(object):
         # out += [("Individuals", len(self.individuals))] @TODO
         out += [("Data Sources", len(self.sources))]
         return out
+
 
     def triplesCount(self):
         """
