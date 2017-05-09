@@ -34,7 +34,7 @@ class TestSparqlStore(unittest.TestCase):
         Check if the dbpedia endpoint loads ok
         "http://dbpedia.org/sparql"
         """
-        print("=================\nTEST 1: Loading <%s> endpoint.\n=================" % ENDPOINT)
+        printDebug("=================\nTEST: Loading <%s> endpoint.\n=================" % ENDPOINT, "important")
 
         o = Ontospy(sparql=ENDPOINT, verbose=True)
 

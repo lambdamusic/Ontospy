@@ -1,0 +1,89 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sg: <http://www.springernature.com/scigraph/ontologies/core/> .
+@prefix sgg: <http://www.springernature.com/scigraph/graphs/> .
+@prefix sgo: <http://www.springernature.com/scigraph/ontologies/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix shapes: <http://www.springernature.com/scigraph/shapes/> .
+
+# shape - Article
+
+shapes:Article
+    a sh:Shape ;
+    sh:targetClass sg:Article ;
+    rdfs:label "RDF shape for the sg:Article model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    # Identity
+    sh:property [
+        sh:predicate sg:scigraphId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:dimensionsId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:doi ;
+        sh:datatype xsd:string ; sh:pattern "^10\\.\\d{4,5}\\/\\S+$" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:doiLink ;
+        sh:stem "http://dx.doi.org/" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:dimensionsId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+
+    # Label
+    sh:property [
+        sh:predicate sg:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:predicate sg:title ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:predicate sg:abstract ;
+        sh:datatype xsd:string ;
+    ] ;
+
+    # Publisher
+    sh:property [
+        sh:predicate sg:publicationYear ;
+        sh:datatype xsd:gYear ; sh:pattern "^\\d{4}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:publicationYearMonth ;
+        sh:datatype xsd:gYearMonth ; sh:pattern "^\\d{4}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:publicationDate ;
+        sh:datatype xsd:date ; sh:pattern "^\\d{4}-\\d{2}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+
+    # Source
+    sh:property [
+        sh:predicate sg:volume ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:issue ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    .

@@ -25,5 +25,11 @@ echo "=================="
 python -m ontospy.tests.test_sparql
 
 echo "=================="
+echo "test_shapes..."
+echo "=================="
+
+python -m ontospy.tests.test_shapes
+
+echo "=================="
 echo "Completed."
 echo "=================="

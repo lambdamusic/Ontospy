@@ -31,15 +31,18 @@ class TestLoadOntologies(unittest.TestCase):
 		"""
 		Check if the ontologies in /RDF folder load ok
 		"""
-		print("=================\nTEST 1: Loading ontologies from <%s> folder.\n=================" % DATA_FOLDER)
+		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % DATA_FOLDER)
 
 		for f in os.listdir(DATA_FOLDER):
 			if not f.startswith('.'):
-				print("\nLoading... >", f)
+				printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
 
-				o = Ontospy(DATA_FOLDER + f)
+				o = Ontospy(DATA_FOLDER + f, verbose=True)
 
+				print("CLASS TREE")
 				o.printClassTree()
+				print("----------")
+
 				for c in o.classes:
 					c.describe()
 

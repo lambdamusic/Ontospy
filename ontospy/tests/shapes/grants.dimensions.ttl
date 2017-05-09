@@ -1,0 +1,192 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sg: <http://www.springernature.com/scigraph/ontologies/core/> .
+@prefix sgg: <http://www.springernature.com/scigraph/graphs/> .
+@prefix sgo: <http://www.springernature.com/scigraph/ontologies/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix shapes: <http://www.springernature.com/scigraph/shapes/> .
+
+# shape - Grant
+
+shapes:Grant
+    a sh:Shape ;
+    sh:targetClass sg:Grant ;
+    rdfs:label "RDF shape for the sg:Grant model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    # Identity
+    sh:property [
+        sh:predicate sg:scigraphId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:dimensionsId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:dimensionsId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+
+
+    # Funding
+    sh:property [
+        sh:predicate sg:fundingAmount ;
+        sh:datatype xsd:decimal ; sh:maxCount 1 ;
+        sh:pattern "[0-9]*[.][0-9]" ;
+    ] ;
+    sh:property [
+        sh:predicate sg:fundingCurrency ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+        sh:in ( "GBP" "USD" ) ;
+    ] ;
+
+    # Label
+    sh:property [
+        sh:predicate sg:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:predicate sg:title ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:predicate sg:abstract ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:predicate sg:titleTranslated ;
+        sh:datatype rdf:langString ;
+    ] ;
+    sh:property [
+        sh:predicate sg:abstractTranslated ;
+        sh:datatype rdf:langString ;
+    ] ;
+
+    # Date
+    sh:property [
+        sh:predicate sg:endYear ;
+        sh:datatype xsd:gYear ; sh:pattern "^\\d{4}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:startYear ;
+        sh:datatype xsd:gYear ; sh:pattern "^\\d{4}$" ; sh:maxCount 1 ;
+    ] ;
+
+    # Organization
+    sh:property [
+        sh:predicate sg:hasFundingOrganization ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://www.grid.ac/" ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasRecipientOrganization ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://www.grid.ac/" ;
+    ] ;
+
+    # Other
+    sh:property [
+        sh:predicate sg:hasContribution ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://www.springernature.com/scigraph/things/contributions/" ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasFieldOfResearchCode ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://purl.org/au-research/vocabulary/anzsrc-for/" ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasFundedPublication ;
+        sh:nodeKind sh:IRI ;
+        # sh:stem "http://www.springernature.com/scigraph/things/articles/" ;
+    ] ;
+    sh:property [
+        sh:predicate sg:webpage ;
+        sh:nodeKind sh:IRI ;
+    ] ;
+    sh:property [
+        sh:predicate sg:license ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    .
+
+# shape - Contribution
+
+shapes:Contribution
+    a sh:Shape ;
+    sh:targetClass sg:Contribution ;
+    rdfs:label "RDF shape for the sg:Contribution model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    sh:property [
+        sh:predicate sg:publishedFamilyName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:publishedGivenName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:publishedName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:order ;
+        sh:datatype xsd:integer ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:isCorresponding ;
+        sh:datatype xsd:boolean ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:role ;
+        # sh:datatype xsd:string ;
+        sh:in ( "author" "editor" "principal investigator" ) ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasPerson ;
+        sh:stem "http://www.springernature.com/scigraph/things/persons/" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasAffiliation ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://www.springernature.com/scigraph/things/affiliations/" ;
+    ] ;
+    .
+
+# shape - Affiliation
+
+shapes:Affiliation
+    a sh:Shape ;
+    sh:targetClass sg:Affiliation ;
+    rdfs:label "RDF shape for the sg:Affiliation model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    sh:property [
+        sh:predicate sg:publishedName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:order ;
+        sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:predicate sg:hasOrganization ;
+        sh:nodeKind sh:IRI ; sh:maxCount 1 ;
+    ] ;
+    .

@@ -66,7 +66,7 @@ class RDFLoader(object):
                 if os.path.isdir(candidate):
                     # inner loop in case it's a folder
                     temp = get_files_with_extensions(candidate, ["ttl", "rdf", "owl",
-                        "trix", "rdfa", "n3", "nq", "jsonld"])
+                        "trix", "rdfa", "n3", "nq", "jsonld", "nt"])
                 else:
                     # fake a one-element list
                     temp = [candidate]

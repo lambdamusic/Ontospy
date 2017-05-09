@@ -41,17 +41,16 @@ class TestLoadOntologies(unittest.TestCase):
 
 
 		for f in BOOTSTRAP_ONTOLOGIES[:MAX]:
-			print("\nLoading... >", f)
+
+			printDebug("\n*****\nTest: loading remote uri... > %s\n*****" % str(f), "important")
 
 			try:
-				o = Ontospy(f)
+				o = Ontospy(f, verbose=True)
 
+				print("CLASS TREE")
 				o.printClassTree()
-				for c in o.classes:
-					c.describe()
+				print("----------")
 
-				for p in o.properties:
-					p.describe()
 			except:
 				printDebug("An error occured - are you sure this resource is online?")
 				pass

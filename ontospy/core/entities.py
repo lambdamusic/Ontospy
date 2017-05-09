@@ -47,6 +47,7 @@ class RDF_Entity(object):
         self.triples = None
         self.rdfgraph = rdflib.Graph()
         self.namespaces = namespaces
+        self.shapes = []
 
         self._children = []
         self._parents = []
@@ -409,3 +410,44 @@ class OntoSKOSConcept(RDF_Entity):
         self.printTriples()
         self.printStats()
         self.printGenericTree()
+
+
+
+
+
+
+
+
+class OntoShape(RDF_Entity):
+    """
+    Python representation of a SHACL shape.
+
+    """
+
+    def __init__(self, uri, rdftype=None, namespaces=None):
+        """
+        ...
+        """
+        super(OntoShape, self).__init__(uri, rdftype, namespaces)
+        self.slug = "shape-" + slugify(self.qname)
+        self.ontology = None
+        self.targetClasses = []
+        self.sparqlHelper = None	 # the original graph the class derives from
+
+    def __repr__(self):
+        return "<SHACL shape *%s*>" % ( self.uri)
+
+
+    def printStats(self):
+        """ shotcut to pull out useful info for interactive use """
+        printDebug("----------------")
+        printDebug("Parents......: %d" % len(self.parents()))
+        printDebug("Children.....: %d" % len(self.children()))
+        printDebug("Ancestors....: %d" % len(self.ancestors()))
+        printDebug("Descendants..: %d" % len(self.descendants()))
+        printDebug("----------------")
+
+    def describe(self):
+        """ shotcut to pull out useful info for interactive use """
+        self.printTriples()
+        self.printStats()

@@ -70,6 +70,7 @@ class Ontospy(object):
         self.datatypeProperties = []
         self.skosConcepts = []
         self.individuals = []
+        self.shapes = []
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
@@ -169,6 +170,9 @@ class Ontospy(object):
 
         self.extract_skos_concepts()
         if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
+
+        self.extract_shapes()
+        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.shapes), "comment")
 
         self.__computeTopLayer()
 
@@ -429,7 +433,37 @@ class Ontospy(object):
         Instatiate the Shape Python objects and relate it to existing classes,
         if available.
         """
-        pass
+        self.shapes = [] # @todo: keep adding?
+
+        qres = self.sparqlHelper.getShapes()
+
+        for candidate in qres:
+
+            test_existing_cl = self.getEntity(uri=candidate[0])
+            if not test_existing_cl:
+                # create it
+                self.shapes += [OntoShape(candidate[0], None, self.namespaces)]
+            else:
+                pass
+
+        #add more data
+        shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
+
+        for aShape in self.shapes:
+
+            aShape.rdftype = shacl['Shape']
+            aShape.triples = self.sparqlHelper.entityTriples(aShape.uri)
+            aShape._buildGraph() # force construction of mini graph
+
+            aShape.sparqlHelper = self.sparqlHelper
+
+            # attach to a class
+            for uri in aShape.getValuesForProperty(shacl['targetClass']):
+                aclass = self.getClass(str(uri))
+                if aclass:
+                    aShape.targetClasses += [aclass]
+                    aclass.shapes += [aShape]
+
 
 
 
@@ -565,6 +599,7 @@ class Ontospy(object):
         out += [("Object Properties", len(self.objectProperties))]
         out += [("Datatype Properties", len(self.datatypeProperties))]
         out += [("Skos Concepts", len(self.skosConcepts))]
+        out += [("Data Shapes", len(self.shapes))]
         # out += [("Individuals", len(self.individuals))] @TODO
         out += [("Data Sources", len(self.sources))]
         return out
