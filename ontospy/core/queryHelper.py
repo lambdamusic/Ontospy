@@ -20,14 +20,15 @@ DEFAULT_LANGUAGE = "en"
 
 class QueryHelper(object):
     """
-    A bunch of RDF queries
+    Class containing a bunch of useful RDF queries.
 
-    2015-10-1: note - the sparql query returns always a
-    rdflib.plugins.sparql.processor.SPARQLResult instance; the list method
-    transforms it into a list of tuples/triples results
-    eg:
+    Tip:the sparql query returns always a `rdflib.plugins.sparql.processor.SPARQLResult` instance;
+    calling the list method on it transforms it into a list of tuples/triples
+
+    Eg
     [(rdflib.term.URIRef(u'http://www.w3.org/2006/time'))]
-    2016-02-12: note - when a list is returned, the object is extracted with index [0]
+
+    Hence, when a list is returned, the URI/entity is extracted with index [0]
     """
 
 
@@ -44,12 +45,15 @@ class QueryHelper(object):
         self.rdfgraph.bind("rdfs", rdflib.namespace.RDFS)
         self.rdfgraph.bind("owl", rdflib.namespace.OWL)
         self.rdfgraph.bind("skos", rdflib.namespace.SKOS)
-
-
+        self.rdfgraph.bind("dc", "http://purl.org/dc/elements/1.1/")
+        self.rdfgraph.bind("vann", "http://purl.org/vocab/vann/")
+        self.rdfgraph.bind("void", "http://rdfs.org/ns/void#")
+        self.rdfgraph.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
+        self.rdfgraph.bind("sh", "http://www.w3.org/ns/shacl#")
 
 
     # ..................
-    # ONTOLOGY OBJECT
+    # ONTOLOGY
     # ..................
 
 
@@ -61,6 +65,22 @@ class QueryHelper(object):
                }""")
         return list(qres)
 
+
+
+
+    # ..................
+    # DATA SHAPES
+    # ..................
+
+
+    def getShapes(self):
+        qres = self.rdfgraph.query(
+            """SELECT DISTINCT ?x
+               WHERE {
+                  ?x a sh:Shape .
+                  # ?x sh:targetClass ?class
+               }""")
+        return list(qres)
 
 
 

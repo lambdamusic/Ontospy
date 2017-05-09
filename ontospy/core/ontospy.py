@@ -29,6 +29,26 @@ class Ontospy(object):
     """
     Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
 
+    In [3]: import ontospy
+
+    In [5]: o = ontospy.Ontospy()
+
+    In [7]: o.load_rdf("foaf.rdf")
+
+    In [11]: o.extract_entities()
+
+    In [13]: o.stats()
+    Out[13]:
+    [('Ontologies', 1),
+     ('Triples', 630),
+     ('Classes', 15),
+     ('Properties', 67),
+     ('Annotation Properties', 7),
+     ('Object Properties', 34),
+     ('Datatype Properties', 26),
+     ('Skos Concepts', 0),
+     ('Data Sources', 1)]
+
     """
 
     def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql=None, extract_entities=True):
@@ -65,6 +85,22 @@ class Ontospy(object):
         else:
             pass
 
+
+    def __repr__(self):
+        """
+        Return some info for the ontospy instance.
+
+        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
+
+        """
+        if self.sparql_endpoint and self.rdfgraph != None:
+            return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
+        elif self.rdfgraph != None:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        else:
+            return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
+
+
     def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
@@ -91,37 +127,24 @@ class Ontospy(object):
             raise
         # don't extract entities by default..
 
+
     def serialize(self, format="turtle"):
-        """ Shortcut that outputs the graph
+        """
+        Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
         """
         return self.rdfgraph.serialize(format=format)
 
 
     def query(self, stringa):
-        """ wrapper around a sparql query """
+        """ wrapper for rdflib sparql query method """
         qres = self.rdfgraph.query(stringa)
         return list(qres)
 
 
-    def __repr__(self):
-        """
-        Return some info for the ontospy instance.
-
-        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
-
-        """
-        if self.sparql_endpoint and self.rdfgraph != None:
-            return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
-        elif self.rdfgraph != None:
-            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
-        else:
-            return "<Ontospy object created but not initialized (use the `load` method to load an rdf schema)>"
-
-
 
     # ------------
-    # === main method === #
+    # === methods to build python objects === #
     # ------------
 
     def extract_entities(self, verbose=False, hide_base_schemas=True):
@@ -132,19 +155,19 @@ class Ontospy(object):
             printDebug("Scanning entities...", "green")
             printDebug("----------", "comment")
 
-        self.__extractOntologies()
+        self.extract_ontologies()
         if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
 
-        self.__extractClasses(hide_base_schemas)
+        self.extract_classes(hide_base_schemas)
         if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
 
-        self.__extractProperties()
+        self.extract_properties()
         if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
         if verbose: printDebug("..annotation.......: %d" % len(self.annotationProperties), "comment")
         if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
         if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
 
-        self.__extractSkosConcepts()
+        self.extract_skos_concepts()
         if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
 
         self.__computeTopLayer()
@@ -154,44 +177,17 @@ class Ontospy(object):
         if verbose: printDebug("----------", "comment")
 
 
-    def stats(self):
-        """ shotcut to pull out useful info for a graph"""
-        out = []
-        out += [("Ontologies", len(self.ontologies))]
-        out += [("Triples", self.triplesCount())]
-        out += [("Classes", len(self.classes))]
-        out += [("Properties", len(self.properties))]
-        out += [("Annotation Properties", len(self.annotationProperties))]
-        out += [("Object Properties", len(self.objectProperties))]
-        out += [("Datatype Properties", len(self.datatypeProperties))]
-        out += [("Skos Concepts", len(self.skosConcepts))]
-        # out += [("Individuals", len(self.individuals))] @TODO
-        out += [("Data Sources", len(self.sources))]
-        return out
-
-
-    def triplesCount(self):
+    def extract_ontologies(self, exclude_BNodes = False, return_string=False):
         """
+        Extract ontology instances info from the graph, then creates python objects for them.
 
-        2016-08-18 the try/except is a dirty solution to a problem
-        emerging with counting graph length on cached Graph objects..
-        """
-        # @todo  investigate what's going on..
-        # click.secho(unicode(type(self.rdfgraph)), fg="red")
-        try:
-            return len(self.rdfgraph)
-        except:
-            click.secho("Ontospy: error counting graph length..", fg="red")
-            return 0
-
-
-    def __extractOntologies(self, exclude_BNodes = False, return_string=False):
-        """
-        returns Ontology class instances
+        Note: often ontology info is nested in structures like this:
 
         [ a owl:Ontology ;
             vann:preferredNamespacePrefix "bsym" ;
-            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
+            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ]
+
+        Hence there is some logic to deal with these edge cases.
         """
         out = []
 
@@ -237,16 +233,11 @@ class Ontospy(object):
 
 
 
-    ##################
-    #
-    #  METHODS for MANIPULATING RDFS/OWL CLASSES
     #
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
-    ##################
 
-
-    def __extractClasses(self, hide_base_schemas=True):
+    def extract_classes(self, hide_base_schemas=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -274,7 +265,8 @@ class Ontospy(object):
             test_existing_cl = self.getClass(uri=_uri)
             if not test_existing_cl:
                 # create it
-                self.classes += [OntoClass(_uri, _type, self.namespaces)]
+                ontoclass = OntoClass(_uri, _type, self.namespaces)
+                self.classes += [ontoclass]
             else:
                 # if OWL.Class over RDFS.Class - update it
                 if _type == rdflib.OWL.Class:
@@ -311,7 +303,7 @@ class Ontospy(object):
 
 
 
-    def __extractProperties(self):
+    def extract_properties(self):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -380,36 +372,8 @@ class Ontospy(object):
 
 
 
-    def __buildDomainRanges(self, aProp):
-        """
-        extract domain/range details and add to Python objects
-        """
-        domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
-        ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
 
-        for x in domains:
-            if not isBlankNode(x):
-                aClass = self.getClass(uri=str(x))
-                if aClass:
-                    aProp.domains += [aClass]
-                    aClass.domain_of += [aProp]
-                else:
-                    aProp.domains += [x]  # edge case: it's not an OntoClass instance?
-
-        for x in ranges:
-            if not isBlankNode(x):
-                aClass = self.getClass(uri=str(x))
-                if aClass:
-                    aProp.ranges += [aClass]
-                    aClass.range_of += [aProp]
-                else:
-                    aProp.ranges += [x]
-
-
-
-
-
-    def __extractSkosConcepts(self):
+    def extract_skos_concepts(self):
         """
         2015-08-19: first draft
         """
@@ -455,6 +419,53 @@ class Ontospy(object):
                     # add inverse relationships (= direct subs for superclass)
                     if aConcept not in superclass.children():
                          superclass._children.append(aConcept)
+
+
+    def extract_shapes(self):
+        """
+        Extract SHACL data shapes from the rdf graph.
+        <http://www.w3.org/ns/shacl#>
+
+        Instatiate the Shape Python objects and relate it to existing classes,
+        if available.
+        """
+        pass
+
+
+
+
+    # ------------
+    # === methods to refine the ontology structure  === #
+    # ------------
+
+
+
+    def __buildDomainRanges(self, aProp):
+        """
+        extract domain/range details and add to Python objects
+        """
+        domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
+        ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
+
+        for x in domains:
+            if not isBlankNode(x):
+                aClass = self.getClass(uri=str(x))
+                if aClass:
+                    aProp.domains += [aClass]
+                    aClass.domain_of += [aProp]
+                else:
+                    aProp.domains += [x]  # edge case: it's not an OntoClass instance?
+
+        for x in ranges:
+            if not isBlankNode(x):
+                aClass = self.getClass(uri=str(x))
+                if aClass:
+                    aProp.ranges += [aClass]
+                    aClass.range_of += [aProp]
+                else:
+                    aProp.ranges += [x]
+
+
 
 
     def __computeTopLayer(self):
@@ -536,8 +547,47 @@ class Ontospy(object):
 
 
 
+
+
+    # ------------
+    # === utils === #
+    # ------------
+
+
+    def stats(self):
+        """ shotcut to pull out useful info for a graph"""
+        out = []
+        out += [("Ontologies", len(self.ontologies))]
+        out += [("Triples", self.triplesCount())]
+        out += [("Classes", len(self.classes))]
+        out += [("Properties", len(self.properties))]
+        out += [("Annotation Properties", len(self.annotationProperties))]
+        out += [("Object Properties", len(self.objectProperties))]
+        out += [("Datatype Properties", len(self.datatypeProperties))]
+        out += [("Skos Concepts", len(self.skosConcepts))]
+        # out += [("Individuals", len(self.individuals))] @TODO
+        out += [("Data Sources", len(self.sources))]
+        return out
+
+
+    def triplesCount(self):
+        """
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph length on cached Graph objects..
+        """
+        # @todo  investigate what's going on..
+        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        try:
+            return len(self.rdfgraph)
+        except:
+            click.secho("Ontospy: error counting graph length..", fg="red")
+            return 0
+
+
+
     # ===============
-    # METHODS TO RETRIEVE OBJECTS
+    # methods for retrieving objects
     # ================
 
 
@@ -888,18 +938,3 @@ class Ontospy(object):
                     treedict[element] = element.children()
             return treedict
         return treedict
-
-
-
-
-
-class SparqlEndpoint(Ontospy):
-    """
-    A remote graph accessible via a sparql endpoint
-    """
-
-    def __init__(self, source):
-        """
-        Init ontology object. Load the graph in memory, then setup all necessary attributes.
-        """
-        super(SparqlEndpoint, self).__init__(source, text=False, endpoint=True, rdf_format=None)

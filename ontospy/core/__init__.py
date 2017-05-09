@@ -86,3 +86,13 @@ BOOTSTRAP_ONTOLOGIES = [
 	# "http://purl.org/spar/cito/",
 	# "http://ns.nature.com/terms/",
 ]
+
+
+
+# sample endpoints
+BOOTSTRAP_ENDPOINTS = [
+	"http://dbpedia.org/sparql" ,
+	"http://data.semanticweb.org/sparql",
+	"http://linkedgeodata.org/sparql",
+	"http://sparql.data.southampton.ac.uk/"
+]
