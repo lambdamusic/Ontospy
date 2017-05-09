@@ -267,7 +267,7 @@ class OntoClass(RDF_Entity):
         self.domain_of_inferred = []
         self.range_of_inferred = []
         self.ontology = None
-        self.queryHelper = None	 # the original graph the class derives from
+        self.sparqlHelper = None	 # the original graph the class derives from
 
     def __repr__(self):
         return "<Class *%s*>" % ( self.uri)
@@ -277,14 +277,14 @@ class OntoClass(RDF_Entity):
 
     def all(self):
         out = []
-        if self.queryHelper:
-            qres = self.queryHelper.getClassInstances(self.uri)
+        if self.sparqlHelper:
+            qres = self.sparqlHelper.getClassInstances(self.uri)
             out = [x[0] for x in qres]
         return out
 
     def count(self):
-        if self.queryHelper:
-            return self.queryHelper.getClassInstancesCount(self.uri)
+        if self.sparqlHelper:
+            return self.sparqlHelper.getClassInstancesCount(self.uri)
         else:
             return 0
 
@@ -385,7 +385,7 @@ class OntoSKOSConcept(RDF_Entity):
         self.slug = "concept-" + slugify(self.qname)
         self.instance_of = []
         self.ontology = None
-        self.queryHelper = None	 # the original graph the class derives from
+        self.sparqlHelper = None	 # the original graph the class derives from
 
     def __repr__(self):
         return "<SKOS Concept *%s*>" % ( self.uri)

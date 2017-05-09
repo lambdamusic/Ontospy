@@ -18,7 +18,7 @@ DEFAULT_LANGUAGE = "en"
 
 
 
-class QueryHelper(object):
+class SparqlHelper(object):
     """
     Class containing a bunch of useful RDF queries.
 
@@ -33,7 +33,7 @@ class QueryHelper(object):
 
 
     def __init__(self, rdfgraph):
-        super(QueryHelper, self).__init__()
+        super(SparqlHelper, self).__init__()
         self.rdfgraph = rdfgraph
 
         # TODO add 2 versions of queries, one for declared classes only,

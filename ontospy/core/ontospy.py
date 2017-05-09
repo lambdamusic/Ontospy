@@ -21,7 +21,7 @@ import rdflib
 from .utils import *
 from .rdf_loader import RDFLoader
 from .entities import *
-from .queryHelper import QueryHelper
+from .sparqlHelper import SparqlHelper
 
 
 
@@ -60,7 +60,7 @@ class Ontospy(object):
         self.rdfgraph = None
         self.sparql_endpoint = None
         self.sources = None
-        self.queryHelper = None
+        self.sparqlHelper = None
         self.ontologies = []
         self.classes = []
         self.namespaces = []
@@ -107,7 +107,7 @@ class Ontospy(object):
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
         self.rdfgraph = loader.rdfgraph
         self.sources = loader.sources_valid
-        self.queryHelper = QueryHelper(self.rdfgraph)
+        self.sparqlHelper = SparqlHelper(self.rdfgraph)
         self.namespaces = sorted(self.rdfgraph.namespaces())
 
 
@@ -120,7 +120,7 @@ class Ontospy(object):
             self.rdfgraph = graph
             self.sparql_endpoint = sparql_endpoint
             self.sources = [sparql_endpoint]
-            self.queryHelper = QueryHelper(self.rdfgraph)
+            self.sparqlHelper = SparqlHelper(self.rdfgraph)
             self.namespaces = sorted(self.rdfgraph.namespaces())
         except:
             printDebug("Error trying to connect to Endpoint.")
@@ -191,7 +191,7 @@ class Ontospy(object):
         """
         out = []
 
-        qres = self.queryHelper.getOntology()
+        qres = self.sparqlHelper.getOntology()
 
         if qres:
             # NOTE: SPARQL returns a list of rdflib.query.ResultRow (~ tuples..)
@@ -228,7 +228,7 @@ class Ontospy(object):
         #finally... add all annotations/triples
         self.ontologies = out
         for onto in self.ontologies:
-            onto.triples = self.queryHelper.entityTriples(onto.uri)
+            onto.triples = self.sparqlHelper.entityTriples(onto.uri)
             onto._buildGraph() # force construction of mini graph
 
 
@@ -243,7 +243,7 @@ class Ontospy(object):
         2015-05-25: optimized via sparql queries in order to remove BNodes
         2015-05-09: new attempt
 
-        Note: queryHelper.getAllClasses() returns a list of tuples,
+        Note: sparqlHelper.getAllClasses() returns a list of tuples,
         (class, classRDFtype)
         so in some cases there are duplicates if a class is both RDFS.CLass and OWL.Class
         In this case we keep only OWL.Class as it is more informative.
@@ -252,7 +252,7 @@ class Ontospy(object):
 
         self.classes = [] # @todo: keep adding?
 
-        qres = self.queryHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
+        qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
         for class_tuple in qres:
 
@@ -277,10 +277,10 @@ class Ontospy(object):
         #add more data
         for aClass in self.classes:
 
-            aClass.triples = self.queryHelper.entityTriples(aClass.uri)
+            aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph() # force construction of mini graph
 
-            aClass.queryHelper = self.queryHelper
+            aClass.sparqlHelper = self.sparqlHelper
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
@@ -290,7 +290,7 @@ class Ontospy(object):
                     aClass.ontology = onto
 
             # add direct Supers
-            directSupers = self.queryHelper.getClassDirectSupers(aClass.uri)
+            directSupers = self.sparqlHelper.getClassDirectSupers(aClass.uri)
 
             for x in directSupers:
                 superclass = self.getClass(uri=x[0])
@@ -318,7 +318,7 @@ class Ontospy(object):
         self.objectProperties = []
         self.datatypeProperties = []
 
-        qres = self.queryHelper.getAllProperties()
+        qres = self.sparqlHelper.getAllProperties()
 
         for candidate in qres:
 
@@ -344,7 +344,7 @@ class Ontospy(object):
             else:
                 pass
 
-            aProp.triples = self.queryHelper.entityTriples(aProp.uri)
+            aProp.triples = self.sparqlHelper.entityTriples(aProp.uri)
             aProp._buildGraph() # force construction of mini graph
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
@@ -359,7 +359,7 @@ class Ontospy(object):
             self.__buildDomainRanges(aProp)
 
             # add direct Supers
-            directSupers = self.queryHelper.getPropDirectSupers(aProp.uri)
+            directSupers = self.sparqlHelper.getPropDirectSupers(aProp.uri)
 
             for x in directSupers:
                 superprop = self.getProperty(uri=x[0])
@@ -379,7 +379,7 @@ class Ontospy(object):
         """
         self.skosConcepts = [] # @todo: keep adding?
 
-        qres = self.queryHelper.getSKOSInstances()
+        qres = self.sparqlHelper.getSKOSInstances()
 
         for candidate in qres:
 
@@ -396,10 +396,10 @@ class Ontospy(object):
         for aConcept in self.skosConcepts:
 
             aConcept.rdftype = skos['Concept']
-            aConcept.triples = self.queryHelper.entityTriples(aConcept.uri)
+            aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
             aConcept._buildGraph() # force construction of mini graph
 
-            aConcept.queryHelper = self.queryHelper
+            aConcept.sparqlHelper = self.sparqlHelper
 
             # attach to an ontology
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
@@ -409,7 +409,7 @@ class Ontospy(object):
                     aConcept.ontology = onto
 
             # add direct Supers
-            directSupers = self.queryHelper.getSKOSDirectSupers(aConcept.uri)
+            directSupers = self.sparqlHelper.getSKOSDirectSupers(aConcept.uri)
 
             for x in directSupers:
                 superclass = self.getSkosConcept(uri=x[0])
