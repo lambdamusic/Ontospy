@@ -47,10 +47,6 @@ class TestSparqlStore(unittest.TestCase):
         else:
             print("No results")
 
-        o.extract_classes()
-        for c in o.classes:
-            print(c)
-
 
 
 if __name__ == "__main__":
