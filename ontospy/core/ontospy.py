@@ -5,13 +5,6 @@
 """
 ONTOSPY
 Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
-
-Run it from the command line:
-
->>> python ontospy.py -h
-
-More info in the README file.
-
 """
 
 from __future__ import print_function
@@ -24,37 +17,50 @@ except ImportError:
     import urllib.request as urllib2
 
 import rdflib
-from rdflib.plugins.stores.sparqlstore import SPARQLStore
-
 
 from .utils import *
-from .loader import RDFLoader
+from .rdf_loader import RDFLoader
 from .entities import *
-from .queryHelper import QueryHelper
+from .sparqlHelper import SparqlHelper
+
 
 
 class Ontospy(object):
     """
-    Object that scan an rdf graph for schema definitions (aka 'ontologies')
+    Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
 
-    In [1]: import ontospy
+    In [3]: import ontospy
 
-    In [2]: g = ontospy.Ontospy("foaf.ttl")
-    Loaded 3478 triples
-    Ontologies found: 1
-    [etc...]
+    In [5]: o = ontospy.Ontospy()
+
+    In [7]: o.load_rdf("foaf.rdf")
+
+    In [11]: o.extract_entities()
+
+    In [13]: o.stats()
+    Out[13]:
+    [('Ontologies', 1),
+     ('Triples', 630),
+     ('Classes', 15),
+     ('Properties', 67),
+     ('Annotation Properties', 7),
+     ('Object Properties', 34),
+     ('Datatype Properties', 26),
+     ('Skos Concepts', 0),
+     ('Data Sources', 1)]
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, extract_entities=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
         super(Ontospy, self).__init__()
 
         self.rdfgraph = None
+        self.sparql_endpoint = None
         self.sources = None
-        self.queryHelper = None
+        self.sparqlHelper = None
         self.ontologies = []
         self.classes = []
         self.namespaces = []
@@ -64,6 +70,7 @@ class Ontospy(object):
         self.datatypeProperties = []
         self.skosConcepts = []
         self.individuals = []
+        self.shapes = []
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
@@ -71,68 +78,101 @@ class Ontospy(object):
 
         # finally:
         if uri_or_path or text or file_obj:
-            self.load(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
+            self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
+            if extract_entities:
+                self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
+        elif sparql_endpoint: # by default entities are not extracted
+            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas)
+        else:
+            pass
 
 
-    def load(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def __repr__(self):
+        """
+        Return some info for the ontospy instance.
+
+        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
+
+        """
+        if self.sparql_endpoint and self.rdfgraph != None:
+            return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
+        elif self.rdfgraph != None:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        else:
+            return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
+
+
+    def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+        """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
         self.rdfgraph = loader.rdfgraph
         self.sources = loader.sources_valid
-        self.queryHelper = QueryHelper(self.rdfgraph)
+        self.sparqlHelper = SparqlHelper(self.rdfgraph)
         self.namespaces = sorted(self.rdfgraph.namespaces())
-        # extract entities
-        self._scan(verbose=verbose, hide_base_schemas=hide_base_schemas)
+
+
+    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True):
+        """Set up a SPARQLStore backend as a virtual ontospy graph"""
+        try:
+            # graph = rdflib.ConjunctiveGraph('SPARQLStore', identifier='sparql_endpoint')
+            graph = rdflib.ConjunctiveGraph('SPARQLStore')
+            graph.open(sparql_endpoint)
+            self.rdfgraph = graph
+            self.sparql_endpoint = sparql_endpoint
+            self.sources = [sparql_endpoint]
+            self.sparqlHelper = SparqlHelper(self.rdfgraph)
+            self.namespaces = sorted(self.rdfgraph.namespaces())
+        except:
+            printDebug("Error trying to connect to Endpoint.")
+            raise
+        # don't extract entities by default..
+
 
     def serialize(self, format="turtle"):
-        """ Shortcut that outputs the graph
+        """
+        Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
         """
         return self.rdfgraph.serialize(format=format)
 
 
-    def sparql(self, stringa):
-        """ wrapper around a sparql query """
+    def query(self, stringa):
+        """ wrapper for rdflib sparql query method """
         qres = self.rdfgraph.query(stringa)
         return list(qres)
 
 
-    def __repr__(self):
-        if self.rdfgraph:
-            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
-        else:
-            return "<Ontospy object created but not initialized (use the `load` method to load an rdf schema)>"
-
-
 
     # ------------
-    # === main method === #
+    # === methods to build python objects === #
     # ------------
 
-    def _scan(self, verbose=False, hide_base_schemas=True):
+    def extract_entities(self, verbose=False, hide_base_schemas=True):
         """
-        scan a source of RDF triples
-        build all the objects to deal with the ontology/ies pythonically
-
+        Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
         if verbose:
             printDebug("Scanning entities...", "green")
             printDebug("----------", "comment")
 
-        self.__extractOntologies()
+        self.extract_ontologies()
         if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
 
-        self.__extractClasses(hide_base_schemas)
+        self.extract_classes(hide_base_schemas)
         if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
 
-        self.__extractProperties()
+        self.extract_properties()
         if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
         if verbose: printDebug("..annotation.......: %d" % len(self.annotationProperties), "comment")
         if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
         if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
 
-        self.__extractSkosConcepts()
+        self.extract_skos_concepts()
         if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
+
+        self.extract_shapes()
+        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.shapes), "comment")
 
         self.__computeTopLayer()
 
@@ -141,47 +181,21 @@ class Ontospy(object):
         if verbose: printDebug("----------", "comment")
 
 
-    def stats(self):
-        """ shotcut to pull out useful info for a graph"""
-        out = []
-        out += [("Ontologies", len(self.ontologies))]
-        out += [("Triples", self.triplesCount())]
-        out += [("Classes", len(self.classes))]
-        out += [("Properties", len(self.properties))]
-        out += [("Annotation Properties", len(self.annotationProperties))]
-        out += [("Object Properties", len(self.objectProperties))]
-        out += [("Datatype Properties", len(self.datatypeProperties))]
-        out += [("Skos Concepts", len(self.skosConcepts))]
-        # out += [("Individuals", len(self.individuals))] @TODO
-        out += [("Data Sources", len(self.sources))]
-        return out
-
-    def triplesCount(self):
+    def extract_ontologies(self, exclude_BNodes = False, return_string=False):
         """
+        Extract ontology instances info from the graph, then creates python objects for them.
 
-        2016-08-18 the try/except is a dirty solution to a problem
-        emerging with counting graph length on cached Graph objects..
-        """
-        # @todo  investigate what's going on..
-        # click.secho(unicode(type(self.rdfgraph)), fg="red")
-        try:
-            return len(self.rdfgraph)
-        except:
-            click.secho("Ontospy: error counting graph length..", fg="red")
-            return 0
-
-
-    def __extractOntologies(self, exclude_BNodes = False, return_string=False):
-        """
-        returns Ontology class instances
+        Note: often ontology info is nested in structures like this:
 
         [ a owl:Ontology ;
             vann:preferredNamespacePrefix "bsym" ;
-            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ],
+            vann:preferredNamespaceUri "http://bsym.bloomberg.com/sym/" ]
+
+        Hence there is some logic to deal with these edge cases.
         """
         out = []
 
-        qres = self.queryHelper.getOntology()
+        qres = self.sparqlHelper.getOntology()
 
         if qres:
             # NOTE: SPARQL returns a list of rdflib.query.ResultRow (~ tuples..)
@@ -218,27 +232,22 @@ class Ontospy(object):
         #finally... add all annotations/triples
         self.ontologies = out
         for onto in self.ontologies:
-            onto.triples = self.queryHelper.entityTriples(onto.uri)
+            onto.triples = self.sparqlHelper.entityTriples(onto.uri)
             onto._buildGraph() # force construction of mini graph
 
 
 
-    ##################
-    #
-    #  METHODS for MANIPULATING RDFS/OWL CLASSES
     #
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
-    ##################
 
-
-    def __extractClasses(self, hide_base_schemas=True):
+    def extract_classes(self, hide_base_schemas=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
         2015-05-09: new attempt
 
-        Note: queryHelper.getAllClasses() returns a list of tuples,
+        Note: sparqlHelper.getAllClasses() returns a list of tuples,
         (class, classRDFtype)
         so in some cases there are duplicates if a class is both RDFS.CLass and OWL.Class
         In this case we keep only OWL.Class as it is more informative.
@@ -247,7 +256,7 @@ class Ontospy(object):
 
         self.classes = [] # @todo: keep adding?
 
-        qres = self.queryHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
+        qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
         for class_tuple in qres:
 
@@ -260,7 +269,8 @@ class Ontospy(object):
             test_existing_cl = self.getClass(uri=_uri)
             if not test_existing_cl:
                 # create it
-                self.classes += [OntoClass(_uri, _type, self.namespaces)]
+                ontoclass = OntoClass(_uri, _type, self.namespaces)
+                self.classes += [ontoclass]
             else:
                 # if OWL.Class over RDFS.Class - update it
                 if _type == rdflib.OWL.Class:
@@ -271,10 +281,10 @@ class Ontospy(object):
         #add more data
         for aClass in self.classes:
 
-            aClass.triples = self.queryHelper.entityTriples(aClass.uri)
+            aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph() # force construction of mini graph
 
-            aClass.queryHelper = self.queryHelper
+            aClass.sparqlHelper = self.sparqlHelper
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
@@ -284,7 +294,7 @@ class Ontospy(object):
                     aClass.ontology = onto
 
             # add direct Supers
-            directSupers = self.queryHelper.getClassDirectSupers(aClass.uri)
+            directSupers = self.sparqlHelper.getClassDirectSupers(aClass.uri)
 
             for x in directSupers:
                 superclass = self.getClass(uri=x[0])
@@ -297,7 +307,7 @@ class Ontospy(object):
 
 
 
-    def __extractProperties(self):
+    def extract_properties(self):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -312,7 +322,7 @@ class Ontospy(object):
         self.objectProperties = []
         self.datatypeProperties = []
 
-        qres = self.queryHelper.getAllProperties()
+        qres = self.sparqlHelper.getAllProperties()
 
         for candidate in qres:
 
@@ -338,7 +348,7 @@ class Ontospy(object):
             else:
                 pass
 
-            aProp.triples = self.queryHelper.entityTriples(aProp.uri)
+            aProp.triples = self.sparqlHelper.entityTriples(aProp.uri)
             aProp._buildGraph() # force construction of mini graph
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
@@ -353,7 +363,7 @@ class Ontospy(object):
             self.__buildDomainRanges(aProp)
 
             # add direct Supers
-            directSupers = self.queryHelper.getPropDirectSupers(aProp.uri)
+            directSupers = self.sparqlHelper.getPropDirectSupers(aProp.uri)
 
             for x in directSupers:
                 superprop = self.getProperty(uri=x[0])
@@ -363,6 +373,104 @@ class Ontospy(object):
                     # add inverse relationships (= direct subs for superprop)
                     if aProp not in superprop.children():
                          superprop._children.append(aProp)
+
+
+
+
+    def extract_skos_concepts(self):
+        """
+        2015-08-19: first draft
+        """
+        self.skosConcepts = [] # @todo: keep adding?
+
+        qres = self.sparqlHelper.getSKOSInstances()
+
+        for candidate in qres:
+
+            test_existing_cl = self.getSkosConcept(uri=candidate[0])
+            if not test_existing_cl:
+                # create it
+                self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
+            else:
+                pass
+
+        #add more data
+        skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
+
+        for aConcept in self.skosConcepts:
+
+            aConcept.rdftype = skos['Concept']
+            aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
+            aConcept._buildGraph() # force construction of mini graph
+
+            aConcept.sparqlHelper = self.sparqlHelper
+
+            # attach to an ontology
+            for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
+                onto = self.getOntology(str(uri))
+                if onto:
+                    onto.skosConcepts += [aConcept]
+                    aConcept.ontology = onto
+
+            # add direct Supers
+            directSupers = self.sparqlHelper.getSKOSDirectSupers(aConcept.uri)
+
+            for x in directSupers:
+                superclass = self.getSkosConcept(uri=x[0])
+                if superclass:
+                    aConcept._parents.append(superclass)
+
+                    # add inverse relationships (= direct subs for superclass)
+                    if aConcept not in superclass.children():
+                         superclass._children.append(aConcept)
+
+
+    def extract_shapes(self):
+        """
+        Extract SHACL data shapes from the rdf graph.
+        <http://www.w3.org/ns/shacl#>
+
+        Instatiate the Shape Python objects and relate it to existing classes,
+        if available.
+        """
+        self.shapes = [] # @todo: keep adding?
+
+        qres = self.sparqlHelper.getShapes()
+
+        for candidate in qres:
+
+            test_existing_cl = self.getEntity(uri=candidate[0])
+            if not test_existing_cl:
+                # create it
+                self.shapes += [OntoShape(candidate[0], None, self.namespaces)]
+            else:
+                pass
+
+        #add more data
+        shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
+
+        for aShape in self.shapes:
+
+            aShape.rdftype = shacl['Shape']
+            aShape.triples = self.sparqlHelper.entityTriples(aShape.uri)
+            aShape._buildGraph() # force construction of mini graph
+
+            aShape.sparqlHelper = self.sparqlHelper
+
+            # attach to a class
+            for uri in aShape.getValuesForProperty(shacl['targetClass']):
+                aclass = self.getClass(str(uri))
+                if aclass:
+                    aShape.targetClasses += [aclass]
+                    aclass.shapes += [aShape]
+
+
+
+
+
+    # ------------
+    # === methods to refine the ontology structure  === #
+    # ------------
 
 
 
@@ -392,55 +500,6 @@ class Ontospy(object):
                     aProp.ranges += [x]
 
 
-
-
-
-    def __extractSkosConcepts(self):
-        """
-        2015-08-19: first draft
-        """
-        self.skosConcepts = [] # @todo: keep adding?
-
-        qres = self.queryHelper.getSKOSInstances()
-
-        for candidate in qres:
-
-            test_existing_cl = self.getSkosConcept(uri=candidate[0])
-            if not test_existing_cl:
-                # create it
-                self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
-            else:
-                pass
-
-        #add more data
-        skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
-
-        for aConcept in self.skosConcepts:
-
-            aConcept.rdftype = skos['Concept']
-            aConcept.triples = self.queryHelper.entityTriples(aConcept.uri)
-            aConcept._buildGraph() # force construction of mini graph
-
-            aConcept.queryHelper = self.queryHelper
-
-            # attach to an ontology
-            for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
-                if onto:
-                    onto.skosConcepts += [aConcept]
-                    aConcept.ontology = onto
-
-            # add direct Supers
-            directSupers = self.queryHelper.getSKOSDirectSupers(aConcept.uri)
-
-            for x in directSupers:
-                superclass = self.getSkosConcept(uri=x[0])
-                if superclass:
-                    aConcept._parents.append(superclass)
-
-                    # add inverse relationships (= direct subs for superclass)
-                    if aConcept not in superclass.children():
-                         superclass._children.append(aConcept)
 
 
     def __computeTopLayer(self):
@@ -522,8 +581,48 @@ class Ontospy(object):
 
 
 
+
+
+    # ------------
+    # === utils === #
+    # ------------
+
+
+    def stats(self):
+        """ shotcut to pull out useful info for a graph"""
+        out = []
+        out += [("Ontologies", len(self.ontologies))]
+        out += [("Triples", self.triplesCount())]
+        out += [("Classes", len(self.classes))]
+        out += [("Properties", len(self.properties))]
+        out += [("Annotation Properties", len(self.annotationProperties))]
+        out += [("Object Properties", len(self.objectProperties))]
+        out += [("Datatype Properties", len(self.datatypeProperties))]
+        out += [("Skos Concepts", len(self.skosConcepts))]
+        out += [("Data Shapes", len(self.shapes))]
+        # out += [("Individuals", len(self.individuals))] @TODO
+        out += [("Data Sources", len(self.sources))]
+        return out
+
+
+    def triplesCount(self):
+        """
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph length on cached Graph objects..
+        """
+        # @todo  investigate what's going on..
+        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        try:
+            return len(self.rdfgraph)
+        except:
+            click.secho("Ontospy: error counting graph length..", fg="red")
+            return 0
+
+
+
     # ===============
-    # METHODS TO RETRIEVE OBJECTS
+    # methods for retrieving objects
     # ================
 
 
@@ -874,18 +973,3 @@ class Ontospy(object):
                     treedict[element] = element.children()
             return treedict
         return treedict
-
-
-
-
-
-class SparqlEndpoint(Ontospy):
-    """
-    A remote graph accessible via a sparql endpoint
-    """
-
-    def __init__(self, source):
-        """
-        Init ontology object. Load the graph in memory, then setup all necessary attributes.
-        """
-        super(SparqlEndpoint, self).__init__(source, text=False, endpoint=True, rdf_format=None)

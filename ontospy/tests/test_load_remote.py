@@ -5,7 +5,7 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.load_test
+:path/to/ontospyProject>python -m ontospy.tests.test_load_remote
 
 """
 
@@ -13,11 +13,9 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
+from ..core import *
 from ..core.utils import *
 
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_FOLDER = dir_path + "/rdf/"
 
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
@@ -26,42 +24,14 @@ print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 class TestLoadOntologies(unittest.TestCase):
 
 
-	def test1_load_locally(self):
-		"""
-		Check if the ontologies in /RDF folder load ok
-		"""
-		print("\nTEST 1: Loading ontologies from <%s> folder.\n=================" % DATA_FOLDER)
-
-		for f in os.listdir(DATA_FOLDER):
-			if not f.startswith('.'):
-				print("\nLoading... >", f)
-
-				o = Ontospy(DATA_FOLDER + f)
-
-				o.printClassTree()
-				for c in o.classes:
-					c.describe()
-
-				for p in o.properties:
-					p.describe()
-
-				for s in o.skosConcepts:
-					s.describe()
-
-				# self.assertEqual(type(o), ontospy.Ontology)
-
-				print("Success.\n")
-
-
-
 	def test2_load_url(self):
 		"""
 		Check if the ontologies in BOOTSTRAP list load ok
 		"""
 		MAX = 2
-		print("\nTEST 2: Loading some sample online ontologies.\n=================")
+		print("=================\nTEST 2: Loading some sample online ontologies.\n=================")
 
-		printDebug("--------------")
+		# printDebug("--------------")
 		printDebug("The following ontologies will be loaded from the web:")
 		printDebug("--------------")
 		count = 0
@@ -71,17 +41,16 @@ class TestLoadOntologies(unittest.TestCase):
 
 
 		for f in BOOTSTRAP_ONTOLOGIES[:MAX]:
-			print("\nLoading... >", f)
+
+			printDebug("\n*****\nTest: loading remote uri... > %s\n*****" % str(f), "important")
 
 			try:
-				o = Ontospy(f)
+				o = Ontospy(f, verbose=True)
 
+				print("CLASS TREE")
 				o.printClassTree()
-				for c in o.classes:
-					c.describe()
+				print("----------")
 
-				for p in o.properties:
-					p.describe()
 			except:
 				printDebug("An error occured - are you sure this resource is online?")
 				pass

@@ -47,6 +47,7 @@ class RDF_Entity(object):
         self.triples = None
         self.rdfgraph = rdflib.Graph()
         self.namespaces = namespaces
+        self.shapes = []
 
         self._children = []
         self._parents = []
@@ -267,7 +268,7 @@ class OntoClass(RDF_Entity):
         self.domain_of_inferred = []
         self.range_of_inferred = []
         self.ontology = None
-        self.queryHelper = None	 # the original graph the class derives from
+        self.sparqlHelper = None	 # the original graph the class derives from
 
     def __repr__(self):
         return "<Class *%s*>" % ( self.uri)
@@ -277,14 +278,14 @@ class OntoClass(RDF_Entity):
 
     def all(self):
         out = []
-        if self.queryHelper:
-            qres = self.queryHelper.getClassInstances(self.uri)
+        if self.sparqlHelper:
+            qres = self.sparqlHelper.getClassInstances(self.uri)
             out = [x[0] for x in qres]
         return out
 
     def count(self):
-        if self.queryHelper:
-            return self.queryHelper.getClassInstancesCount(self.uri)
+        if self.sparqlHelper:
+            return self.sparqlHelper.getClassInstancesCount(self.uri)
         else:
             return 0
 
@@ -385,7 +386,7 @@ class OntoSKOSConcept(RDF_Entity):
         self.slug = "concept-" + slugify(self.qname)
         self.instance_of = []
         self.ontology = None
-        self.queryHelper = None	 # the original graph the class derives from
+        self.sparqlHelper = None	 # the original graph the class derives from
 
     def __repr__(self):
         return "<SKOS Concept *%s*>" % ( self.uri)
@@ -409,3 +410,44 @@ class OntoSKOSConcept(RDF_Entity):
         self.printTriples()
         self.printStats()
         self.printGenericTree()
+
+
+
+
+
+
+
+
+class OntoShape(RDF_Entity):
+    """
+    Python representation of a SHACL shape.
+
+    """
+
+    def __init__(self, uri, rdftype=None, namespaces=None):
+        """
+        ...
+        """
+        super(OntoShape, self).__init__(uri, rdftype, namespaces)
+        self.slug = "shape-" + slugify(self.qname)
+        self.ontology = None
+        self.targetClasses = []
+        self.sparqlHelper = None	 # the original graph the class derives from
+
+    def __repr__(self):
+        return "<SHACL shape *%s*>" % ( self.uri)
+
+
+    def printStats(self):
+        """ shotcut to pull out useful info for interactive use """
+        printDebug("----------------")
+        printDebug("Parents......: %d" % len(self.parents()))
+        printDebug("Children.....: %d" % len(self.children()))
+        printDebug("Ancestors....: %d" % len(self.ancestors()))
+        printDebug("Descendants..: %d" % len(self.descendants()))
+        printDebug("----------------")
+
+    def describe(self):
+        """ shotcut to pull out useful info for interactive use """
+        self.printTriples()
+        self.printStats()
