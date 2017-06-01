@@ -36,7 +36,7 @@ class TestSparqlStore(unittest.TestCase):
         """
         printDebug("=================\nTEST: Loading <%s> endpoint.\n=================" % ENDPOINT, "important")
 
-        o = Ontospy(sparql=ENDPOINT, verbose=True)
+        o = Ontospy(sparql_endpoint=ENDPOINT, verbose=True)
 
         print(o), print("---------")
 
@@ -46,6 +46,10 @@ class TestSparqlStore(unittest.TestCase):
                 print(el)
         else:
             print("No results")
+
+        o.extract_classes()
+        for c in o.classes:
+            print(c)
 
 
 

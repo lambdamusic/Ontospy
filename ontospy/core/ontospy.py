@@ -51,7 +51,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql=None, extract_entities=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, extract_entities=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -81,8 +81,8 @@ class Ontospy(object):
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
             if extract_entities:
                 self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
-        elif sparql: # by default entities are not extracted
-            self.load_sparql(sparql, verbose, hide_base_schemas)
+        elif sparql_endpoint: # by default entities are not extracted
+            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas)
         else:
             pass
 

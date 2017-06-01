@@ -17,7 +17,6 @@ except ImportError:
 
 import click
 import rdflib
-from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 
 from .utils import *
