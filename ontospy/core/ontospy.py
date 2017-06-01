@@ -174,7 +174,7 @@ class Ontospy(object):
         self.extract_shapes()
         if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.shapes), "comment")
 
-        self.__computeTopLayer()
+        # self.__computeTopLayer()
 
         self.__computeInferredProperties()
 
@@ -305,6 +305,14 @@ class Ontospy(object):
                     if aClass not in superclass.children():
                          superclass._children.append(aClass)
 
+        # compute top layer
+        exit = []
+        for c in self.classes:
+            if not c.parents():
+                exit += [c]
+        self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+
 
 
     def extract_properties(self):
@@ -375,6 +383,14 @@ class Ontospy(object):
                          superprop._children.append(aProp)
 
 
+        # computer top layer for properties
+        exit = []
+        for c in self.properties:
+            if not c.parents():
+                exit += [c]
+        self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+
 
 
     def extract_skos_concepts(self):
@@ -423,6 +439,16 @@ class Ontospy(object):
                     # add inverse relationships (= direct subs for superclass)
                     if aConcept not in superclass.children():
                          superclass._children.append(aConcept)
+
+
+        # compute top layer for skos
+        exit = []
+        for c in self.skosConcepts:
+            if not c.parents():
+                exit += [c]
+        self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+
 
 
     def extract_shapes(self):
@@ -503,6 +529,10 @@ class Ontospy(object):
 
 
     def __computeTopLayer(self):
+
+        """
+        deprecated: now this is calculated when entities get extracted
+        """
 
         exit = []
         for c in self.classes:
@@ -870,7 +900,7 @@ class Ontospy(object):
         return None
 
 
-    def printClassTree(self, element = None, showids=False, labels=False, showtype=False):
+    def printClassTree(self, element=None, showids=False, labels=False, showtype=False):
         """
         Print nicely into stdout the class tree of an ontology
 
