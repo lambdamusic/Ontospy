@@ -10,7 +10,7 @@
 
 
 
-__version__ = "1.8.2" # 1.8 major update with ontodocs split
+__version__ = "1.8.3" # 1.8 major update with ontodocs split
 
 __copyright__ = "CopyRight (C) 2015-2017 by Michele Pasin"
 __license__ = "GNU"

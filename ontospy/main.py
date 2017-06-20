@@ -71,13 +71,14 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--bootstrap', '-b', is_flag=True, help='BOOTSTRAP: bootstrap the local library.')
 @click.option('--cache', '-c', is_flag=True, help='CACHE: force caching of the local library (for faster loading).')
 @click.option('--delete', '-d', is_flag=True, help='DELETE: remove an ontology from the local library.')
+@click.option('--endpoint', '-e', is_flag=True, help='ENDPOINT: query a sparql endpoint.')
 @click.option('--library', '-l', is_flag=True, help='LIBRARY: list ontologies saved in the local library.')
 @click.option('--save', '-s', is_flag=True, help='SAVE: save a file/folder/url into the local library.')
 @click.option('--reset', '-r', is_flag=True, help='RESET: delete all files in the local library.')
 @click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
 @click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
-def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False):
+def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
     """
 Ontospy is a command line inspector for RDF/OWL knowledge models.
 
@@ -164,7 +165,23 @@ More info: <ontospy.readthedocs.org>
         # raise SystemExit(1)
 
     else:
-        if not sources:
+        if sources or endpoint:
+            t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
+            click.secho(str(t), fg='green')
+            if endpoint:
+                g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
+                printDebug("Extracting classes info")
+                g.extract_classes()
+                printDebug("..done")
+                printDebug("Extracting properties info")
+                g.extract_properties()
+                printDebug("..done")
+            else:
+                g = Ontospy(uri_or_path=sources, verbose=verbose)
+
+            shellPrintOverview(g, print_opts)
+
+        else:
             # click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
             click.secho("You haven't specified any argument.", fg='red')
             if click.confirm('Show the local library?'):
@@ -177,11 +194,7 @@ More info: <ontospy.readthedocs.org>
             else:
                 printDebug("Goodbye.", "comment")
                 raise SystemExit(1)
-        else:
-            t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
-            click.secho(str(t), fg='green')
-            g = Ontospy(uri_or_path=sources, verbose=verbose)
-            shellPrintOverview(g, print_opts)
+
 
 
     # finally: print(some stats.... )
