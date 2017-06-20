@@ -121,7 +121,7 @@ class Ontospy(object):
             self.rdfgraph = graph
             self.sparql_endpoint = sparql_endpoint
             self.sources = [sparql_endpoint]
-            self.sparqlHelper = SparqlHelper(self.rdfgraph)
+            self.sparqlHelper = SparqlHelper(self.rdfgraph, self.sparql_endpoint)
             self.namespaces = sorted(self.rdfgraph.namespaces())
         except:
             printDebug("Error trying to connect to Endpoint.")
@@ -298,7 +298,8 @@ class Ontospy(object):
 
             for x in directSupers:
                 superclass = self.getClass(uri=x[0])
-                if superclass:
+                # note: extra condition to avoid recursive structures
+                if superclass and superclass.uri != aClass.uri:
                     aClass._parents.append(superclass)
 
                     # add inverse relationships (= direct subs for superclass)
@@ -375,7 +376,8 @@ class Ontospy(object):
 
             for x in directSupers:
                 superprop = self.getProperty(uri=x[0])
-                if superprop:
+                # note: extra condition to avoid recursive structures
+                if superprop and superprop.uri != aProp.uri:
                     aProp._parents.append(superprop)
 
                     # add inverse relationships (= direct subs for superprop)
@@ -433,7 +435,8 @@ class Ontospy(object):
 
             for x in directSupers:
                 superclass = self.getSkosConcept(uri=x[0])
-                if superclass:
+                # note: extra condition to avoid recursive structures
+                if superclass and superclass.uri != aConcept.uri:
                     aConcept._parents.append(superclass)
 
                     # add inverse relationships (= direct subs for superclass)

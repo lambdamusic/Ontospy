@@ -32,9 +32,10 @@ class SparqlHelper(object):
     """
 
 
-    def __init__(self, rdfgraph):
+    def __init__(self, rdfgraph, sparql_endpoint=False):
         super(SparqlHelper, self).__init__()
         self.rdfgraph = rdfgraph
+        self.sparql_endpoint = sparql_endpoint
 
         # TODO add 2 versions of queries, one for declared classes only,
         # one with basic (RDFS+?) inference too
@@ -420,7 +421,6 @@ class SparqlHelper(object):
         Note: if a triple object is a blank node (=a nested definition)
         we try to extract all relevant data recursively (does not work with
         sparql endpoins)
-        2015-10-18: updated
         """
 
         aURI = aURI
@@ -444,8 +444,11 @@ class SparqlHelper(object):
                     pass
             return out
 
-        try:
-            return lres + recurse(lres)
-        except:
-            printDebug("Error extracting blank nodes info", "important")
+        if self.sparql_endpoint:
             return lres
+        else:
+            try:
+                return lres + recurse(lres)
+            except:
+                printDebug("Error extracting blank nodes info", "important")
+                return lres
