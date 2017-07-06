@@ -51,7 +51,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, extract_entities=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, extract_entities=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -59,6 +59,7 @@ class Ontospy(object):
 
         self.rdfgraph = None
         self.sparql_endpoint = None
+        self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
         self.sparqlHelper = None
         self.ontologies = []
@@ -82,7 +83,7 @@ class Ontospy(object):
             if extract_entities:
                 self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
         elif sparql_endpoint: # by default entities are not extracted
-            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas)
+            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
         else:
             pass
 
@@ -112,11 +113,22 @@ class Ontospy(object):
         self.namespaces = sorted(self.rdfgraph.namespaces())
 
 
-    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True):
-        """Set up a SPARQLStore backend as a virtual ontospy graph"""
+    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True, credentials=None):
+        """
+        Set up a SPARQLStore backend as a virtual ontospy graph
+
+        Note: we're using a 'SPARQLUpdateStore' backend instead of 'SPARQLStore' cause otherwise authentication fails (https://github.com/RDFLib/rdflib/issues/755)
+
+        """
         try:
-            # graph = rdflib.ConjunctiveGraph('SPARQLStore', identifier='sparql_endpoint')
-            graph = rdflib.ConjunctiveGraph('SPARQLStore')
+            # graph = rdflib.ConjunctiveGraph('SPARQLStore')
+            graph = rdflib.ConjunctiveGraph('SPARQLUpdateStore')
+
+            if credentials and type(credentials) == tuple:
+                # https://github.com/RDFLib/rdflib/issues/343
+                graph.store.setCredentials(credentials[0], credentials[1])
+                # graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')            
+
             graph.open(sparql_endpoint)
             self.rdfgraph = graph
             self.sparql_endpoint = sparql_endpoint
