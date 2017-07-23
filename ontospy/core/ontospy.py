@@ -127,7 +127,7 @@ class Ontospy(object):
             if credentials and type(credentials) == tuple:
                 # https://github.com/RDFLib/rdflib/issues/343
                 graph.store.setCredentials(credentials[0], credentials[1])
-                # graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')            
+                # graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')
 
             graph.open(sparql_endpoint)
             self.rdfgraph = graph
@@ -529,7 +529,7 @@ class Ontospy(object):
                     aProp.domains += [aClass]
                     aClass.domain_of += [aProp]
                 else:
-                    aProp.domains += [x]  # edge case: it's not an OntoClass instance?
+                    aProp.domains += [OntoClass(x, None, self.namespaces, ext_model=True)] # edge case: it's not an OntoClass instance
 
         for x in ranges:
             if not isBlankNode(x):
@@ -538,7 +538,10 @@ class Ontospy(object):
                     aProp.ranges += [aClass]
                     aClass.range_of += [aProp]
                 else:
-                    aProp.ranges += [x]
+                    # eg a DataType property has xsd:STRING
+                    # here we're storing an ontospy entities but not adding it to
+                    # the main index
+                    aProp.ranges += [OntoClass(x, None, self.namespaces, ext_model=True)]
 
 
 
