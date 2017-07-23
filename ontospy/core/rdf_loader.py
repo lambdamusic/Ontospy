@@ -149,7 +149,7 @@ class RDFLoader(object):
                 if verbose: printDebug("..... failed")
 
         if not success == True:
-            self.loading_failed(self.rdf_format_opts)
+            self.loading_failed(self.rdf_format_opts, uri=uri)
             self.sources_invalid += [uri]
 
 
@@ -227,10 +227,12 @@ class RDFLoader(object):
 
 
 
-    def loading_failed(self, rdf_format_opts):
+    def loading_failed(self, rdf_format_opts, uri=""):
         """default message if we need to abort loading"""
+        if uri:
+            uri = " <%s>" % str(uri)
         printDebug(
-            "----------\nFatal error parsing graph (tried using RDF serialization: %s)\n" % (str(rdf_format_opts)), "red")
+            "----------\nFatal error parsing graph%s\n(using RDF serializations: %s)" % (uri, str(rdf_format_opts)), "red")
         printDebug(
             "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>")
 
