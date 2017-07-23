@@ -289,9 +289,6 @@ class Ontospy(object):
                 if _type == rdflib.OWL.Class:
                     test_existing_cl.rdftype = rdflib.OWL.Class
 
-        # sort alphabetically
-        self.classes.sort()
-
         #add more data
         for aClass in self.classes:
 
@@ -319,6 +316,9 @@ class Ontospy(object):
                     # add inverse relationships (= direct subs for superclass)
                     if aClass not in superclass.children():
                          superclass._children.append(aClass)
+
+        # sort alphabetically
+        self.classes = sorted(self.classes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
@@ -358,8 +358,6 @@ class Ontospy(object):
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
                     test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
 
-        # sort alphabetically
-        self.properties.sort()
 
         #add more data
         for aProp in self.properties:
@@ -401,6 +399,9 @@ class Ontospy(object):
                          superprop._children.append(aProp)
 
 
+        # sort alphabetically
+        self.properties = sorted(self.properties, key=lambda x: x.qname)
+
         # computer top layer for properties
         exit = []
         for c in self.properties:
@@ -427,9 +428,6 @@ class Ontospy(object):
                 self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
             else:
                 pass
-
-        # sort alphabetically
-        self.skosConcepts.sort()
 
         #add more data
         skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
@@ -463,6 +461,9 @@ class Ontospy(object):
                          superclass._children.append(aConcept)
 
 
+        # sort alphabetically
+        self.skosConcepts = sorted(self.skosConcepts, key=lambda x: x.qname)
+
         # compute top layer for skos
         exit = []
         for c in self.skosConcepts:
@@ -494,9 +495,6 @@ class Ontospy(object):
             else:
                 pass
 
-        # sort alphabetically
-        self.shapes.sort()
-
         #add more data
         shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
 
@@ -515,6 +513,9 @@ class Ontospy(object):
                     aShape.targetClasses += [aclass]
                     aclass.shapes += [aShape]
 
+
+        # sort alphabetically
+        self.shapes = sorted(self.shapes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
