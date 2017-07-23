@@ -75,6 +75,7 @@ class Ontospy(object):
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
+        self.toplayerShapes = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
         # finally:
@@ -504,6 +505,14 @@ class Ontospy(object):
                 if aclass:
                     aShape.targetClasses += [aclass]
                     aclass.shapes += [aShape]
+
+
+        # compute top layer
+        exit = []
+        for c in self.shapes:
+            if not c.parents():
+                exit += [c]
+        self.toplayerShapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
@@ -1017,6 +1026,23 @@ class Ontospy(object):
         if self.skosConcepts:
             treedict[0] = self.toplayerSkosConcepts
             for element in self.skosConcepts:
+                if element.children():
+                    treedict[element] = element.children()
+            return treedict
+        return treedict
+
+
+
+    def ontologyShapeTree(self):
+        """
+        Returns a dict representing the ontology tree
+        Top level = {0:[top properties]}
+        Multi inheritance is represented explicitly
+        """
+        treedict = {}
+        if self.shapes:
+            treedict[0] = self.toplayerShapes
+            for element in self.shapes:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
