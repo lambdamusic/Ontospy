@@ -761,7 +761,7 @@ def uri2niceString(aUri, namespaces = None):
     elif type(aUri) == rdflib.term.Literal:
         stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
     else:
-        print(type(aUri))
+        # print(type(aUri))
         if type(aUri) == type(u''):
             stringa = aUri
         else:
@@ -916,6 +916,11 @@ def shellPrintOverview(g, opts={'labels' : False}):
     if g.skosConcepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printSkosTree(showids=False, labels=opts['labels'])
+    if g.shapes:
+        print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10	 + Style.RESET_ALL)
+        for x in g.shapes:
+            printDebug("%s" % (x.qname))
+            # printDebug("%s" % (x.bestLabel()), "comment")
 
 
 
