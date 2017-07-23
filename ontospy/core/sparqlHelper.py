@@ -78,9 +78,12 @@ class SparqlHelper(object):
         qres = self.rdfgraph.query(
             """SELECT DISTINCT ?x
                WHERE {
-                  ?x a sh:Shape .
-                  # ?x sh:targetClass ?class
-               }""")
+                        { ?x a sh:Shape }
+                        union
+                        { ?x a sh:NodeShape }
+                        union
+                        { ?x a sh:PropertyShape }
+                    } """)
         return list(qres)
 
 
