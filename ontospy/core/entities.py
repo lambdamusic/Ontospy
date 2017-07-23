@@ -46,6 +46,7 @@ class RDF_Entity(object):
         self.uri = uri # rdflib.Uriref
         self.qname = self.__buildQname(self.uri, namespaces)
         self.locale	 = inferURILocalSymbol(self.uri)[0]
+        self.ext_model = ext_model
         self.slug	 = None
         self.rdftype = rdftype
         self.rdftype_qname = self.__buildQname(rdftype, namespaces)
@@ -212,11 +213,11 @@ class Ontology(RDF_Entity):
         return "<OntoSpy: Ontology object for uri *%s*>" % (self.uri)
 
 
-    def __init__(self, uri, rdftype=None, namespaces=None, prefPrefix=""):
+    def __init__(self, uri, rdftype=None, namespaces=None, prefPrefix="", ext_model=False):
         """
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
         """
-        super(Ontology, self).__init__(uri, rdftype, namespaces)
+        super(Ontology, self).__init__(uri, rdftype, namespaces, ext_model)
         # self.uri = uri # rdflib.Uriref
         self.prefix = prefPrefix
         self.slug = "ontology-" + slugify(self.qname)
@@ -264,11 +265,11 @@ class OntoClass(RDF_Entity):
             ]
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
         """
         ...
         """
-        super(OntoClass, self).__init__(uri, rdftype, namespaces)
+        super(OntoClass, self).__init__(uri, rdftype, namespaces, ext_model)
         self.slug = "class-" + slugify(self.qname)
 
         self.domain_of = []
@@ -335,11 +336,11 @@ class OntoProperty(RDF_Entity):
 
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
         """
         ...
         """
-        super(OntoProperty, self).__init__(uri, rdftype, namespaces)
+        super(OntoProperty, self).__init__(uri, rdftype, namespaces, ext_model)
 
         self.slug = "prop-" + slugify(self.qname)
         self.rdftype = inferMainPropertyType(rdftype)
@@ -386,11 +387,11 @@ class OntoSKOSConcept(RDF_Entity):
 
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
         """
         ...
         """
-        super(OntoSKOSConcept, self).__init__(uri, rdftype, namespaces)
+        super(OntoSKOSConcept, self).__init__(uri, rdftype, namespaces, ext_model)
         self.slug = "concept-" + slugify(self.qname)
         self.instance_of = []
         self.ontology = None
@@ -432,11 +433,11 @@ class OntoShape(RDF_Entity):
 
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
         """
         ...
         """
-        super(OntoShape, self).__init__(uri, rdftype, namespaces)
+        super(OntoShape, self).__init__(uri, rdftype, namespaces, ext_model)
         self.slug = "shape-" + slugify(self.qname)
         self.ontology = None
         self.targetClasses = []
