@@ -37,9 +37,10 @@ EOL = '\r\n' if WINDOWS and not PY2 else '\n'
 from .. import * # load top level __init__
 from ..VERSION import VERSION
 
-from ..core.ontospy import Ontospy
+from ..core import ONTOSPY_LOCAL
 from ..core import manager
 from ..core import actions
+from ..core.ontospy import Ontospy
 from ..core.utils import *
 
 
