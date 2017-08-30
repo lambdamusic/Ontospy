@@ -33,13 +33,14 @@ class RDF_Entity(object):
     def __repr__(self):
         return "<OntoSpy: RDF_Entity object for uri *%s*>" % (self.uri)
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, is_Bnode=False):
         """
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
 
         2017-07-23
         ext_model: flag to mark entities that are instantiated but are not part
         of the main model (eg xsd:String range values)
+        is_Bnode: flag to identify Bnodes
         """
         self.id = next(self._ids)
 
@@ -47,6 +48,7 @@ class RDF_Entity(object):
         self.qname = self.__buildQname(self.uri, namespaces)
         self.locale	 = inferURILocalSymbol(self.uri)[0]
         self.ext_model = ext_model
+        self.is_Bnode = is_Bnode
         self.slug	 = None
         self.rdftype = rdftype
         self.rdftype_qname = self.__buildQname(rdftype, namespaces)

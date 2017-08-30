@@ -542,16 +542,21 @@ class Ontospy(object):
         ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
 
         for x in domains:
-            if not isBlankNode(x):
+            if isBlankNode(x):
+                aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
+            else:
                 aClass = self.getClass(uri=str(x))
                 if aClass:
                     aProp.domains += [aClass]
                     aClass.domain_of += [aProp]
                 else:
-                    aProp.domains += [OntoClass(x, None, self.namespaces, ext_model=True)] # edge case: it's not an OntoClass instance
+                    # edge case: it's not an OntoClass instance
+                    aProp.domains += [OntoClass(x, None, self.namespaces, ext_model=True)]
 
         for x in ranges:
-            if not isBlankNode(x):
+            if isBlankNode(x):
+                aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
+            else:
                 aClass = self.getClass(uri=str(x))
                 if aClass:
                     aProp.ranges += [aClass]
