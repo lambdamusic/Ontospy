@@ -6,11 +6,12 @@
 #
 #  metadata
 #
+#  note: 1.8 major update with ontodocs split
 ##################
 
 
 
-__version__ = "1.8.6" # note: 1.8 major update with ontodocs split
+__version__ = "1.8.7"  # 2017-11-17
 
 __copyright__ = "CopyRight (C) 2015-2017 by Michele Pasin"
 __license__ = "GNU"
