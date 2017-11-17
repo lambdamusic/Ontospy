@@ -7,29 +7,34 @@
 clear
 
 echo "=================="
-echo "test_load_local..."
+echo "CALLING [test_load_local] in 5 seconds..."
 echo "=================="
-
+sleep 5
 python -m ontospy.tests.test_load_local
 
-echo "=================="
-echo "test_load_remote...."
-echo "=================="
 
+echo ""
+echo "=================="
+echo "CALLING [test_load_remote] in 5 seconds..."
+echo "=================="
+sleep 5
 python -m ontospy.tests.test_load_remote
 
+echo ""
 echo "=================="
-echo "test_sparql..."
+echo "CALLING [test_sparql] in 5 seconds..."
 echo "=================="
-
+sleep 5
 python -m ontospy.tests.test_sparql
 
+echo ""
 echo "=================="
-echo "test_shapes..."
+echo "CALLING [test_shapes] in 5 seconds..."
 echo "=================="
-
+sleep 5
 python -m ontospy.tests.test_shapes
 
+echo ""
 echo "=================="
 echo "Completed."
 echo "=================="
