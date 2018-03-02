@@ -59,7 +59,7 @@ package_data_folders = []
 # //// for testing
 if False:
     for el in package_data_folders:
-        print el, os.path.isdir(el)
+        print(el, os.path.isdir(el))
 # /////
 
 
