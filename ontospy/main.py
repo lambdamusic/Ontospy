@@ -112,6 +112,7 @@ More info: <ontospy.readthedocs.org>
     # click.secho("Local library: '%s'" % get_home_location(), fg='white')
     click.secho("------------", fg='white')
 
+    #import pudb; pudb.set_trace()
     if bootstrap:
         action_bootstrap()
         printDebug("Tip: you can now load an ontology by typing `ontospy -l`", "important")
@@ -133,7 +134,10 @@ More info: <ontospy.readthedocs.org>
                 g = do_pickle_ontology(filename)
             shellPrintOverview(g, print_opts)
 
-    # save?? missing
+    elif save:
+        import pudb; pudb.set_trace()
+        for source in sources:
+            action_import(source)
 
     elif reset:
         action_erase()
