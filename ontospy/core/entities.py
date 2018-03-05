@@ -71,7 +71,11 @@ class RDF_Entity(object):
             return None
 
     def printSerialize(self, format="turtle"):
-        printDebug("\n" + self.serialize(format))
+        #printDebug("\n" + self.serialize(format))
+        s = self.serialize(format)
+        if isinstance(s, bytes):
+            s = s.decode('utf-8')
+        printDebug("\n" + s)
 
     def printTriples(self):
         """ display triples """
