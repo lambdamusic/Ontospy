@@ -43,3 +43,6 @@ dev
 venv
 
 .idea
+
+# vim python
+.ropeproject
