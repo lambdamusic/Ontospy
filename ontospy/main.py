@@ -78,7 +78,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
 @click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
-def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
+@click.pass_context
+def main_cli(ctx, sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
     """
 Ontospy is a command line inspector for RDF/OWL knowledge models.
 
@@ -182,19 +183,8 @@ More info: <ontospy.readthedocs.org>
             shellPrintOverview(g, print_opts)
 
         else:
-            # click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
-            click.secho("You haven't specified any argument.", fg='red')
-            if click.confirm('Show the local library?'):
-                filename = action_listlocal(all_details=False)
-                if filename:
-                    g = get_pickled_ontology(filename)
-                    if not g:
-                        g = do_pickle_ontology(filename)
-                    shellPrintOverview(g, print_opts)
-            else:
-                printDebug("Goodbye.", "comment")
-                raise SystemExit(1)
-
+            click.echo(ctx.get_help())
+            return
 
 
     # finally: print(some stats.... )
