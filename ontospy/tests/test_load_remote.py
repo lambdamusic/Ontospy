@@ -28,7 +28,7 @@ class TestLoadOntologies(unittest.TestCase):
 		"""
 		Check if the ontologies in BOOTSTRAP list load ok
 		"""
-		MAX = 2
+		MAX = 1
 		print("=================\nTEST 2: Loading some sample online ontologies.\n=================")
 
 		# printDebug("--------------")

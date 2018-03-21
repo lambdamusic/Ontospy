@@ -240,7 +240,8 @@ class Ontology(RDF_Entity):
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
         # self.printGenericTree()
-        self.printTriples()
+        # self.printTriples()
+        printDebug(self.uri, "green")
         self.stats()
 
 
@@ -279,26 +280,37 @@ class OntoClass(RDF_Entity):
         self.domain_of_inferred = []
         self.range_of_inferred = []
         self.ontology = None
+        self._instances = False  # calc on demand at runtime 
         self.sparqlHelper = None	 # the original graph the class derives from
 
     def __repr__(self):
         return "<Class *%s*>" % ( self.uri)
 
+    @property
     def instances(self):  # = all instances
-        return self.all()
+        if self._instances == False:
+            # calculate and set
+            self._instances = []
+            if self.sparqlHelper:
+                qres = self.sparqlHelper.getClassInstances(self.uri)
+                for uri in [x[0] for x in qres]:
+                    instance = RDF_Entity(uri, self.uri, self.namespaces)
+                    instance.triples = self.sparqlHelper.entityTriples(instance.uri)
+                    instance._buildGraph() # force construction of mini graph
+                    self._instances += [instance]
 
-    def all(self):
-        out = []
-        if self.sparqlHelper:
-            qres = self.sparqlHelper.getClassInstances(self.uri)
-            out = [x[0] for x in qres]
-        return out
+            return self._instances
+        else:
+            # it's been calc already, hence return
+            return self._instances
+
 
     def count(self):
-        if self.sparqlHelper:
-            return self.sparqlHelper.getClassInstancesCount(self.uri)
-        else:
-            return 0
+        return len(self.instances)
+        # if self.sparqlHelper:
+        #     return self.sparqlHelper.getClassInstancesCount(self.uri)
+        # else:
+        #     return 0
 
 
     def printStats(self):
@@ -318,7 +330,8 @@ class OntoClass(RDF_Entity):
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
-        self.printTriples()
+        # self.printTriples()
+        printDebug(self.uri, "green")
         self.printStats()
         # self.printGenericTree()
 
@@ -373,7 +386,8 @@ class OntoProperty(RDF_Entity):
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
-        self.printTriples()
+        # self.printTriples()
+        printDebug(self.uri, "green")
         self.printStats()
         # self.printGenericTree()
 
@@ -418,7 +432,8 @@ class OntoSKOSConcept(RDF_Entity):
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
-        self.printTriples()
+        # self.printTriples()
+        printDebug(self.uri, "green")
         self.printStats()
         self.printGenericTree()
 
@@ -460,5 +475,5 @@ class OntoShape(RDF_Entity):
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
-        self.printTriples()
+        # self.printTriples()
         self.printStats()

@@ -446,8 +446,8 @@ class Shell(cmd.Cmd):
         if self.currentEntity['type'] == 'class':
             if hrlinetop:
                 self._print("----------------")
-            self._print("INSTANCES: [%d]" % len(x.all()), "IMPORTANT")
-            for i in x.all():
+            self._print("INSTANCES: [%d]" % len(x.instances, "IMPORTANT")
+            for i in x.instances:
                 self._print(i.qname)
             self._print("----------------")
         return
