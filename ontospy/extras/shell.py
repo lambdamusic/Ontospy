@@ -28,6 +28,17 @@ from .shell_lib import Shell, STARTUP_MESSAGE
 
 
 
+def launch_shell(source=None):
+    Shell()._clear_screen()
+    print(STARTUP_MESSAGE)
+    if source and len(source) > 1:
+        click.secho('Note: currently only one argument can be passed', fg='red')
+    uri = source[0] if source else None
+    Shell(uri).cmdloop()
+    raise SystemExit(1)
+
+
+
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 # @click.option('--source', '-s',  multiple=True, help='Load the shell with a specific graph (uri or file)')
@@ -43,13 +54,7 @@ Note: if a local path or URI of an RDF model is provided, that gets loaded into 
 > ontospy-shell path/to/mymodel.rdf
 
 """
-    Shell()._clear_screen()
-    print(STARTUP_MESSAGE)
-    if source and len(source) > 1:
-        click.secho('Note: currently only one argument can be passed', fg='red')
-    uri = source[0] if source else None
-    Shell(uri).cmdloop()
-    raise SystemExit(1)
+    launch_shell(source)
 
 
 

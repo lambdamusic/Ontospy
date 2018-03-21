@@ -78,8 +78,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
 @click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
+@click.option('--shell', '-z', is_flag=True, help='SHELL: launch the interactive shell.')
 @click.pass_context
-def main_cli(ctx, sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
+def main_cli(ctx, sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, shell=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
     """
 Ontospy is a command line inspector for RDF/OWL knowledge models.
 
@@ -164,6 +165,10 @@ More info: <ontospy.readthedocs.org>
     elif web:
         action_webimport()
         # raise SystemExit(1)
+
+    elif shell:
+        from extras.shell import launch_shell
+        launch_shell(sources)
 
     else:
         if sources or (sources and endpoint):
