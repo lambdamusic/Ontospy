@@ -165,7 +165,7 @@ More info: <ontospy.readthedocs.org>
         # raise SystemExit(1)
 
     else:
-        if sources or endpoint:
+        if sources or (sources and endpoint):
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')
             if endpoint:
