@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'OntoSpy'
-copyright = u'2015-2017, Michele Pasin'
+copyright = u'2015-2018, Michele Pasin'
 author = u'Michele Pasin'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -43,3 +43,4 @@ dev
 venv
 
 .idea
+.vsdocs

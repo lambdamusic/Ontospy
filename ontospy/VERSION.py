@@ -11,9 +11,9 @@
 
 
 
-__version__ = "1.8.7"  # 2017-11-17
+__version__ = "1.8.8"  # 2018-03-21
 
-__copyright__ = "CopyRight (C) 2015-2017 by Michele Pasin"
+__copyright__ = "CopyRight (C) 2015-2018 by Michele Pasin"
 __license__ = "GNU"
 __author__ = "Michele Pasin"
 __author_email__ = "michele dot pasin at gmail dot com"
