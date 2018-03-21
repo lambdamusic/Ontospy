@@ -3,6 +3,15 @@ Changelog
 
 Summary of changes. 
 
+March 21, 2018: v1.8.8
+---------------------------------
+* fix https://github.com/lambdamusic/Ontospy/issues/33
+* instances method for classes on-demand
+* simplified describe method
+* cli: no args shows help
+* fix reference to ontodocs
+* Merge pull request #37 from satra/patch-1
+
 
 June 1, 2017
 ---------------------------------
