@@ -1000,9 +1000,9 @@ class Shell(cmd.Cmd):
 
         try:
             # from ..viz.builder import action_visualize
-            from ontospydocs import action_visualize
+            from ontodocs.core.builder import action_visualize
         except:
-            self._print("You need the ontospy-docs library for this: `pip install ontospy-docs`")
+            self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return
 
         import webbrowser
