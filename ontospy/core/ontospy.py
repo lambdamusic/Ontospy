@@ -4,7 +4,7 @@
 
 """
 ONTOSPY
-Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
+Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 """
 
 from __future__ import print_function
