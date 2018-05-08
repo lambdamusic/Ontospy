@@ -412,7 +412,7 @@ def printBasicInfo(onto):
     """
     Terminal printing of basic ontology information
     """
-    rdfGraph = onto.rdfGraph
+    rdfGraph = onto.rdflib_graph
 
     print("_" * 50, "\n")
     print("TRIPLES = %s" % len(rdfGraph))

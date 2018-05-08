@@ -52,7 +52,7 @@ class RDF_Entity(object):
         self.slug	 = None
         self.rdftype = rdftype
         self.triples = None
-        self.rdfgraph = rdflib.Graph()
+        self.rdflib_graph = rdflib.Graph()
         self.namespaces = namespaces
         self.shapes = []
 
@@ -66,9 +66,9 @@ class RDF_Entity(object):
     def serialize(self, format="turtle"):
         """ xml, n3, turtle, nt, pretty-xml, trix are built in"""
         if self.triples:
-            if not self.rdfgraph:
+            if not self.rdflib_graph:
                 self._buildGraph()
-            return self.rdfgraph.serialize(format=format)
+            return self.rdflib_graph.serialize(format=format)
         else:
             return None
 
@@ -98,10 +98,10 @@ class RDF_Entity(object):
         (which can be used later for querying)
         """
         for n in self.namespaces:
-            self.rdfgraph.bind(n[0], rdflib.Namespace(n[1]))
+            self.rdflib_graph.bind(n[0], rdflib.Namespace(n[1]))
         if self.triples:
             for terzetto in self.triples:
-                self.rdfgraph.add(terzetto)
+                self.rdflib_graph.add(terzetto)
 
     # methods added to RDF_Entity even though they apply only to some subs
 
@@ -163,7 +163,7 @@ class RDF_Entity(object):
         """
         if not type(aPropURIRef) == rdflib.URIRef:
             aPropURIRef = rdflib.URIRef(aPropURIRef)
-        return list(self.rdfgraph.objects(None, aPropURIRef))
+        return list(self.rdflib_graph.objects(None, aPropURIRef))
 
 
     def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=False):

@@ -57,7 +57,7 @@ class Ontospy(object):
         """
         super(Ontospy, self).__init__()
 
-        self.rdfgraph = None
+        self.rdflib_graph = None
         self.sparql_endpoint = None
         self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
@@ -93,13 +93,13 @@ class Ontospy(object):
         """
         Return some info for the ontospy instance.
 
-        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
+        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdflib_graph` on a sparql endpoint is enough to cause a long query!)
 
         """
-        if self.sparql_endpoint and self.rdfgraph != None:
+        if self.sparql_endpoint and self.rdflib_graph != None:
             return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
-        elif self.rdfgraph != None:
-            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        elif self.rdflib_graph != None:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdflib_graph))
         else:
             return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
 
@@ -108,10 +108,10 @@ class Ontospy(object):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
-        self.rdfgraph = loader.rdfgraph
+        self.rdflib_graph = loader.rdflib_graph
         self.sources = loader.sources_valid
-        self.sparqlHelper = SparqlHelper(self.rdfgraph)
-        self.namespaces = sorted(self.rdfgraph.namespaces())
+        self.sparqlHelper = SparqlHelper(self.rdflib_graph)
+        self.namespaces = sorted(self.rdflib_graph.namespaces())
 
 
     def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True, credentials=None):
@@ -131,11 +131,11 @@ class Ontospy(object):
                 # graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')
 
             graph.open(sparql_endpoint)
-            self.rdfgraph = graph
+            self.rdflib_graph = graph
             self.sparql_endpoint = sparql_endpoint
             self.sources = [sparql_endpoint]
-            self.sparqlHelper = SparqlHelper(self.rdfgraph, self.sparql_endpoint)
-            self.namespaces = sorted(self.rdfgraph.namespaces())
+            self.sparqlHelper = SparqlHelper(self.rdflib_graph, self.sparql_endpoint)
+            self.namespaces = sorted(self.rdflib_graph.namespaces())
         except:
             printDebug("Error trying to connect to Endpoint.")
             raise
@@ -147,12 +147,12 @@ class Ontospy(object):
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
         """
-        return self.rdfgraph.serialize(format=format)
+        return self.rdflib_graph.serialize(format=format)
 
 
     def query(self, stringa):
         """ wrapper for rdflib sparql query method """
-        qres = self.rdfgraph.query(stringa)
+        qres = self.rdflib_graph.query(stringa)
         return list(qres)
 
 
@@ -218,15 +218,15 @@ class Ontospy(object):
                     if exclude_BNodes:
                         continue
                     else:
-                        checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], rdflib.namespace.DC.identifier)]
+                        checkDC_ID = [x for x in self.rdflib_graph.objects(candidate[0], rdflib.namespace.DC.identifier)]
                         if checkDC_ID:
                             out += [Ontology(checkDC_ID[0], namespaces=self.namespaces),]
                         else:
                             vannprop = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespaceUri")
                             vannpref = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespacePrefix")
-                            checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], vannprop)]
+                            checkDC_ID = [x for x in self.rdflib_graph.objects(candidate[0], vannprop)]
                             if checkDC_ID:
-                                checkDC_prefix = [x for x in self.rdfgraph.objects(candidate[0], vannpref)]
+                                checkDC_prefix = [x for x in self.rdflib_graph.objects(candidate[0], vannpref)]
                                 if checkDC_prefix:
                                     out += [Ontology(checkDC_ID[0],
                                                      namespaces=self.namespaces,
@@ -562,8 +562,8 @@ class Ontospy(object):
         """
         extract domain/range details and add to Python objects
         """
-        domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
-        ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
+        domains = aProp.rdflib_graph.objects(None, rdflib.RDFS.domain)
+        ranges =  aProp.rdflib_graph.objects(None, rdflib.RDFS.range)
 
         for x in domains:
             if isBlankNode(x):
@@ -708,9 +708,9 @@ class Ontospy(object):
         emerging with counting graph length on cached Graph objects..
         """
         # @todo  investigate what's going on..
-        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        # click.secho(unicode(type(self.rdflib_graph)), fg="red")
         try:
-            return len(self.rdfgraph)
+            return len(self.rdflib_graph)
         except:
             click.secho("Ontospy: error counting graph length..", fg="red")
             return 0
