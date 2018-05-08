@@ -76,7 +76,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--save', '-s', is_flag=True, help='SAVE: save a file/folder/url into the local library.')
 @click.option('--reset', '-r', is_flag=True, help='RESET: delete all files in the local library.')
 @click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
-@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
+@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: verbose logs and entities labels.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
 @click.option('--shell', '-z', is_flag=True, help='SHELL: launch the interactive shell.')
 @click.pass_context
