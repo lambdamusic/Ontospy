@@ -21,11 +21,11 @@ from ..core.utils import *
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_FOLDER = dir_path + "/shapes/"
-
-
 class TestShapes(unittest.TestCase):
+
+
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	DATA_FOLDER = dir_path + "/shapes/"
 
 
 	def test1_local_shapes(self):
@@ -33,9 +33,9 @@ class TestShapes(unittest.TestCase):
 		"""
 		Check if the shapes in the SciGraph onto are loaded properly
 		"""
-		printDebug("=================\nTEST: Loading ontology & shapes from <%s> folder and printing summary.\n=================" % DATA_FOLDER, "important")
+		printDebug("=================\nTEST: Loading ontology & shapes from <%s> folder and printing summary.\n=================" % self.DATA_FOLDER, "important")
 
-		o = Ontospy(DATA_FOLDER, verbose=False)
+		o = Ontospy(self.DATA_FOLDER, verbose=False)
 
 		for el in o.stats():
 			print("%s : %d" % (el[0], el[1]))

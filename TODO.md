@@ -7,11 +7,15 @@ TODOs
 
 * x.rdfgraph should be x.rdflib_graph   @DONE
 
-* x.serialize better named as x.rdf_source(...)
+* x.serialize better named as x.rdf_source(...) @DONE
+
+* tidy up all tests code and rationale @DONE
+
 
 * x.properties => x.properties_all
 * x.annotationProperties  => x.properties_annotation
 etc..etc... (ONTODOCS dependency here though)
 
 
-* tidy up all tests code and rationale
+
+* before making a release, check that ontodocs doesn't break

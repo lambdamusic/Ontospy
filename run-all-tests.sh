@@ -14,6 +14,13 @@ python -m ontospy.tests.test_load_local
 
 echo ""
 echo "=================="
+echo "CALLING [test_methods] in 5 seconds..."
+echo "=================="
+sleep 2
+python -m ontospy.tests.test_methods
+
+echo ""
+echo "=================="
 echo "CALLING [test_load_remote] in 5 seconds..."
 echo "=================="
 sleep 2
