@@ -74,7 +74,7 @@ class TestMethods(unittest.TestCase):
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
 		print("RDF SOURCE: ")
-		print(e.serialize())
+		print(e.rdf_source())
 
 
 	

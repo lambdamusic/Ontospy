@@ -63,7 +63,7 @@ class RDF_Entity(object):
         self._parents = []
         # self.siblings = []
 
-    def serialize(self, format="turtle"):
+    def rdf_source(self, format="turtle"):
         """ xml, n3, turtle, nt, pretty-xml, trix are built in"""
         if self.triples:
             if not self.rdflib_graph:
@@ -73,7 +73,7 @@ class RDF_Entity(object):
             return None
 
     def printSerialize(self, format="turtle"):
-        printDebug("\n" + self.serialize(format))
+        printDebug("\n" + self.rdf_source(format))
 
     def printTriples(self):
         """ display triples """

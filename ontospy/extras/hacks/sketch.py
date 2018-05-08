@@ -119,7 +119,7 @@ class Sketch(object):
 		self.rdflib_graph.remove((None, None, None))
 
 
-	def serialize(self, aformat="turtle"):
+	def rdf_source(self, aformat="turtle"):
 		"""
 		Serialize graph using the format required
 		"""
@@ -148,7 +148,7 @@ class Sketch(object):
 
 	def omnigraffle(self):
 		""" tries to open an export directly in omnigraffle """
-		temp = self.serialize("dot")
+		temp = self.rdf_source("dot")
 
 		try:  # try to put in the user/tmp folder
 			from os.path import expanduser
@@ -167,7 +167,7 @@ class Sketch(object):
 
 
 	def show(self, aformat="turtle"):
-		print(self.serialize(aformat))
+		print(self.rdf_source(aformat))
 
 	def docs(self):
 		print(self.__docs__)

@@ -1098,7 +1098,7 @@ class Shell(cmd.Cmd):
             self.currentEntity['object'].printSerialize(line[0])
 
         else:
-            self._print(g.serialize(format=line[0]))
+            self._print(g.rdf_source(format=line[0]))
             # 2016-05-27: was like this before
             # for o in g.ontologies:
             # 	o.printSerialize(line[0])

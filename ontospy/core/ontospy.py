@@ -142,7 +142,7 @@ class Ontospy(object):
         # don't extract entities by default..
 
 
-    def serialize(self, format="turtle"):
+    def rdf_source(self, format="turtle"):
         """
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]

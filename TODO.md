@@ -5,12 +5,13 @@ TODOs
 
 * extract_entity_from_uri: add a method to extract all triples for a specific URI (even if not in model) and instantiate RDF_Entity() so that it can be queried further  @DONE
 
-* x.rdfgraph should be x.rdflib_graph
+* x.rdfgraph should be x.rdflib_graph   @DONE
+
+* x.serialize better named as x.rdf_source(...)
 
 * x.properties => x.properties_all
 * x.annotationProperties  => x.properties_annotation
 etc..etc... (ONTODOCS dependency here though)
 
-* x.serialize better named as x.rdf_source(...)
 
 * tidy up all tests code and rationale
