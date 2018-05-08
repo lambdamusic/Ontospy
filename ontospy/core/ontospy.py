@@ -70,7 +70,7 @@ class Ontospy(object):
         self.objectProperties = []
         self.datatypeProperties = []
         self.skosConcepts = []
-        self.individuals = []
+        # self.individuals = []
         self.shapes = []
         self.toplayer = []
         self.toplayerProperties = []
