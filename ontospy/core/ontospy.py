@@ -35,7 +35,7 @@ class Ontospy(object):
 
     In [7]: o.load_rdf("foaf.rdf")
 
-    In [11]: o.extract_entities()
+    In [11]: o.extract_all()
 
     In [13]: o.stats()
     Out[13]:
@@ -51,7 +51,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, extract_entities=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, extract_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -81,8 +81,8 @@ class Ontospy(object):
         # finally:
         if uri_or_path or text or file_obj:
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
-            if extract_entities:
-                self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
+            if extract_all:
+                self.extract_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
         elif sparql_endpoint: # by default entities are not extracted
             self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
         else:
@@ -161,7 +161,7 @@ class Ontospy(object):
     # === methods to build python objects === #
     # ------------
 
-    def extract_entities(self, verbose=False, hide_base_schemas=True):
+    def extract_all(self, verbose=False, hide_base_schemas=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """

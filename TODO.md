@@ -10,3 +10,6 @@ TODOs
 * x.properties => x.properties_all
 * x.annotationProperties  => x.properties_annotation
 etc..etc... (ONTODOCS dependency here though)
+
+* x.serialize better named as x.rdf_source(...)
+
