@@ -157,6 +157,8 @@ class RDF_Entity(object):
             [rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class'),
              rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')]
         """
+        if not type(aPropURIRef) == rdflib.URIRef:
+            aPropURIRef = rdflib.URIRef(aPropURIRef)
         return list(self.rdfgraph.objects(None, aPropURIRef))
 
 

@@ -39,10 +39,11 @@ class TestQuick(unittest.TestCase):
 		o = Ontospy(f, verbose=True)
 
 		for c in o.classes:
-			c.describe()
+			# c.describe()
 			if c.instances:
 				for el in c.instances:
 					print(el.uri, el.qname)
+					print(el.getValuesForProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 
 if __name__ == "__main__":
 	unittest.main()

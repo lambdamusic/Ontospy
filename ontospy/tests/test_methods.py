@@ -52,7 +52,6 @@ class TestLoadOntologies(unittest.TestCase):
 				for s in o.skosConcepts:
 					s.describe()
 
-				# self.assertEqual(type(o), ontospy.Ontology)
 
 				print("Success.\n")
 
