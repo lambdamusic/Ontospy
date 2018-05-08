@@ -5,11 +5,12 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.test_load_local
+:path/to/ontospyProject>python -m ontospy.tests.test_methods
 
 """
 
 from __future__ import print_function
+import click 
 
 import unittest, os, sys
 from .. import *
@@ -17,43 +18,68 @@ from ..core import *
 from ..core.utils import *
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_FOLDER = dir_path + "/rdf/"
-
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
 
-class TestLoadOntologies(unittest.TestCase):
+class TestMethods(unittest.TestCase):
 
+	# updated 2018-05-08
 
-	def test1_load_locally(self):
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	DATA_FOLDER = dir_path + "/rdf/"
+	f = DATA_FOLDER + "pizza.ttl"
+	o = Ontospy(f, verbose=True)
+
+	printDebug("\n*****\nTest: loading with local file... > %s\n*****" % str(f), "important")
+
+	def test1(self):
 		"""
-		Check if the ontologies in /RDF folder load ok
+		Instances method
 		"""
-		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % DATA_FOLDER)
+		printDebug("\n=================\nTEST 1: Checking the <instances> method", "green")
 
-		for f in os.listdir(DATA_FOLDER):
-			if not f.startswith('.'):
-				printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
-
-				o = Ontospy(DATA_FOLDER + f, verbose=True)
-
-				print("CLASS TREE")
-				o.printClassTree()
-				print("----------")
-
-				for c in o.classes:
-					c.describe()
-
-				for p in o.properties:
-					p.describe()
-
-				for s in o.skosConcepts:
-					s.describe()
+		for c in self.o.classes:
+			# c.describe()
+			if c.instances:
+				print("CLASS: " + c.uri)
+				print("INSTANCES: ")
+				for el in c.instances:
+					print(el.uri, el.qname)
+					print(el.getValuesForProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 
 
-				print("Success.\n")
+	def test2(self):
+		"""
+		getValuesForProperty
+		"""
+		printDebug("\n=================\nTEST 2: Checking the <getValuesForProperty> method", "green")
+
+		for c in self.o.classes[:3]:
+			print("CLASS: ")
+			print(c.uri, c.qname)
+			print("RDF:TYPE VALUES: ")
+			print(c.getValuesForProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
+
+
+	
+	def test3(self):
+		"""
+		extract_entity_from_uri
+		"""
+		printDebug("\n=================\nTEST 2: Checking the <extract_entity_from_uri> method", "green")
+
+		e = self.o.extract_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
+		print("URI: ", e)
+		print("RDFTYPE: ", e.rdftype)
+		print("BEST LABEL: ", e.bestLabel())
+		print("RDF SOURCE: ")
+		print(e.serialize())
+
+
+	
+	
+	print("Success.\n")
 
 
 

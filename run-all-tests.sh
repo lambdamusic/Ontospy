@@ -12,7 +12,6 @@ echo "=================="
 sleep 2
 python -m ontospy.tests.test_load_local
 
-
 echo ""
 echo "=================="
 echo "CALLING [test_load_remote] in 5 seconds..."

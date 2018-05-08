@@ -527,6 +527,30 @@ class Ontospy(object):
 
 
 
+    def extract_entity_from_uri(self, uri):
+        """
+        Extract RDF statements having a URI as subject
+
+        Instatiate the RDF_Entity Python object so that it can be queried further.
+
+        NOTE: the entity is not attached to any index. In future version we may create an index for these (individuals?) keeping into account that any existing model entity could be (re)created this way.
+        """
+        qres = self.sparqlHelper.entityTriples(uri)
+        if qres:
+            entity = RDF_Entity(rdflib.URIRef(uri), None, self.namespaces)
+            entity.triples = qres
+            entity._buildGraph() # force construction of mini graph
+            # try to add class info
+            test = entity.getValuesForProperty(rdflib.RDF.type)
+            if test:
+                entity.rdftype = test
+                entity.rdftype_qname = [entity._build_qname(x) for x in test]
+            return entity
+        else:
+            return None
+
+
+
 
     # ------------
     # === methods to refine the ontology structure  === #

@@ -45,17 +45,19 @@ class RDF_Entity(object):
         self.id = next(self._ids)
 
         self.uri = uri # rdflib.Uriref
-        self.qname = self.__buildQname(self.uri, namespaces)
+
         self.locale	 = inferURILocalSymbol(self.uri)[0]
         self.ext_model = ext_model
         self.is_Bnode = is_Bnode
         self.slug	 = None
         self.rdftype = rdftype
-        self.rdftype_qname = self.__buildQname(rdftype, namespaces)
         self.triples = None
         self.rdfgraph = rdflib.Graph()
         self.namespaces = namespaces
         self.shapes = []
+
+        self.qname = self._build_qname()
+        self.rdftype_qname = self._build_qname(rdftype)
 
         self._children = []
         self._parents = []
@@ -81,12 +83,14 @@ class RDF_Entity(object):
             printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET)
         print("")
 
-    def __buildQname(self, uri, namespaces, ):
+    def _build_qname(self, uri=None, namespaces=None ):
         """ extracts a qualified name for a uri """
-        if uri:
-            return uri2niceString(uri, namespaces)
-        else:
-            return ""
+        if not uri:
+            uri = self.uri
+        if not namespaces:
+            namespaces = self.namespaces
+        return uri2niceString(uri, namespaces)
+
 
     def _buildGraph(self):
         """

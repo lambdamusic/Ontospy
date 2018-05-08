@@ -802,8 +802,10 @@ def niceString2uri(aUriString, namespaces = None):
 
 
 
-def entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
+def xxx_entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
     """
+    2018-05-08: can delete? same name as sparqlHelper.entityTriples..
+
     Returns the pred-obj for any given resource, excluding selected ones..
 
     Sorting: by default results are sorted alphabetically and according to namespaces: [RDF, RDFS, OWL.OWLNS, DC.DCNS]

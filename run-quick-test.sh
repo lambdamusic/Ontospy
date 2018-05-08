@@ -7,9 +7,9 @@
 clear
 
 echo "=================="
-echo "CALLING [test_quick] in 2 seconds..."
+echo "CALLING [test_quick] in 1 second..."
 echo "=================="
-sleep 2
+sleep 1
 python -m ontospy.tests.test_quick
 
 
