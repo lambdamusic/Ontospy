@@ -35,7 +35,7 @@ class Ontospy(object):
 
     In [7]: o.load_rdf("foaf.rdf")
 
-    In [11]: o.extract_all()
+    In [11]: o.build_all()
 
     In [13]: o.stats()
     Out[13]:
@@ -51,7 +51,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, extract_all=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -82,8 +82,8 @@ class Ontospy(object):
         # finally:
         if uri_or_path or text or file_obj:
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
-            if extract_all:
-                self.extract_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
+            if build_all:
+                self.build_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
         elif sparql_endpoint: # by default entities are not extracted
             self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
         else:
@@ -162,7 +162,7 @@ class Ontospy(object):
     # === methods to build python objects === #
     # ------------
 
-    def extract_all(self, verbose=False, hide_base_schemas=True):
+    def build_all(self, verbose=False, hide_base_schemas=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -170,22 +170,22 @@ class Ontospy(object):
             printDebug("Scanning entities...", "green")
             printDebug("----------", "comment")
 
-        self.extract_ontologies()
+        self.build_ontologies()
         if verbose: printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
-        self.extract_classes(hide_base_schemas)
+        self.build_classes(hide_base_schemas)
         if verbose: printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
-        self.extract_properties()
+        self.build_properties()
         if verbose: printDebug("Properties.........: %d" % len(self.all_properties), "comment")
         if verbose: printDebug("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
         if verbose: printDebug("..datatype.........: %d" % len(self.all_properties_datatype), "comment")
         if verbose: printDebug("..object...........: %d" % len(self.all_properties_object), "comment")
 
-        self.extract_skos_concepts()
+        self.build_skos_concepts()
         if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.all_skos_concepts), "comment")
 
-        self.extract_shapes()
+        self.build_shapes()
         if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
 
         # self.__computeTopLayer()
@@ -195,7 +195,7 @@ class Ontospy(object):
         if verbose: printDebug("----------", "comment")
 
 
-    def extract_ontologies(self, exclude_BNodes = False, return_string=False):
+    def build_ontologies(self, exclude_BNodes = False, return_string=False):
         """
         Extract ontology instances info from the graph, then creates python objects for them.
 
@@ -255,7 +255,7 @@ class Ontospy(object):
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
 
-    def extract_classes(self, hide_base_schemas=True):
+    def build_classes(self, hide_base_schemas=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -331,7 +331,7 @@ class Ontospy(object):
 
 
 
-    def extract_properties(self):
+    def build_properties(self):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -413,7 +413,7 @@ class Ontospy(object):
 
 
 
-    def extract_skos_concepts(self):
+    def build_skos_concepts(self):
         """
         2015-08-19: first draft
         """
@@ -475,7 +475,7 @@ class Ontospy(object):
 
 
 
-    def extract_shapes(self):
+    def build_shapes(self):
         """
         Extract SHACL data shapes from the rdf graph.
         <http://www.w3.org/ns/shacl#>
@@ -528,7 +528,7 @@ class Ontospy(object):
 
 
 
-    def extract_entity_from_uri(self, uri):
+    def build_entity_from_uri(self, uri):
         """
         Extract RDF statements having a URI as subject
 
@@ -979,7 +979,7 @@ class Ontospy(object):
         TYPE_MARGIN = 11 # length for owl:class etc..
 
         if not element:	 # first time
-            for x in self.toplayer:
+            for x in self.toplayer_classes:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -1032,7 +1032,7 @@ class Ontospy(object):
         """
         treedict = {}
         if self.all_classes:
-            treedict[0] = self.toplayer
+            treedict[0] = self.toplayer_classes
             for element in self.all_classes:
                 if element.children():
                     treedict[element] = element.children()

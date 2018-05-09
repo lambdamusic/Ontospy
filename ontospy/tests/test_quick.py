@@ -46,7 +46,7 @@ class TestQuick(unittest.TestCase):
 		"""
 		print("=================\nQUICK TEST 1 **************")
 
-		e = self.o.extract_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
+		e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
 
 		print(e)
 		print(e.bestLabel())

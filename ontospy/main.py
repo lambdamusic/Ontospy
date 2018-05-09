@@ -177,10 +177,10 @@ More info: <ontospy.readthedocs.org>
             if endpoint:
                 g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
                 printDebug("Extracting classes info")
-                g.extract_classes()
+                g.build_classes()
                 printDebug("..done")
                 printDebug("Extracting properties info")
-                g.extract_properties()
+                g.build_properties()
                 printDebug("..done")
             else:
                 g = Ontospy(uri_or_path=sources, verbose=verbose)

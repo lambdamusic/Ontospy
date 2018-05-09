@@ -65,11 +65,11 @@ class TestMethods(unittest.TestCase):
 	
 	def test3(self):
 		"""
-		extract_entity_from_uri
+		build_entity_from_uri
 		"""
-		printDebug("\n=================\nTEST 2: Checking the <extract_entity_from_uri> method", "green")
+		printDebug("\n=================\nTEST 2: Checking the <build_entity_from_uri> method", "green")
 
-		e = self.o.extract_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
+		e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
 		print("URI: ", e)
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
