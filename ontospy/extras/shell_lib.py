@@ -583,7 +583,7 @@ class Shell(cmd.Cmd):
     def _select_class(self, line):
         """
         try to match a class and load it from the graph
-        NOTE: the g.getClass(pattern) method does the heavy lifting
+        NOTE: the g.get_class(pattern) method does the heavy lifting
         """
         g = self.current['graph']
         if not line:
@@ -593,7 +593,7 @@ class Shell(cmd.Cmd):
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getClass(line)
+            out = g.get_class(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "class")
@@ -620,7 +620,7 @@ class Shell(cmd.Cmd):
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getProperty(line)
+            out = g.get_property(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "property")
@@ -647,7 +647,7 @@ class Shell(cmd.Cmd):
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getSkosConcept(line)
+            out = g.get_skos(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "concept")

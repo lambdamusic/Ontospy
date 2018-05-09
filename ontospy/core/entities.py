@@ -298,7 +298,7 @@ class OntoClass(RDF_Entity):
             # calculate and set
             self._instances = []
             if self.sparqlHelper:
-                qres = self.sparqlHelper.getClassInstances(self.uri)
+                qres = self.sparqlHelper.get_classInstances(self.uri)
                 for uri in [x[0] for x in qres]:
                     instance = RDF_Entity(uri, self.uri, self.namespaces)
                     instance.triples = self.sparqlHelper.entityTriples(instance.uri)
@@ -314,7 +314,7 @@ class OntoClass(RDF_Entity):
     def count(self):
         return len(self.instances)
         # if self.sparqlHelper:
-        #     return self.sparqlHelper.getClassInstancesCount(self.uri)
+        #     return self.sparqlHelper.get_classInstancesCount(self.uri)
         # else:
         #     return 0
 

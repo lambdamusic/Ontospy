@@ -280,7 +280,7 @@ class Ontospy(object):
             except:
                 _type= ""
 
-            test_existing_cl = self.getClass(uri=_uri)
+            test_existing_cl = self.get_class(uri=_uri)
             if not test_existing_cl:
                 # create it
                 ontoclass = OntoClass(_uri, _type, self.namespaces)
@@ -300,16 +300,16 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
                     onto.all_classes += [aClass]
                     aClass.ontology = onto
 
             # add direct Supers
-            directSupers = self.sparqlHelper.getClassDirectSupers(aClass.uri)
+            directSupers = self.sparqlHelper.get_classDirectSupers(aClass.uri)
 
             for x in directSupers:
-                superclass = self.getClass(uri=x[0])
+                superclass = self.get_class(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superclass and superclass.uri != aClass.uri:
                     aClass._parents.append(superclass)
@@ -350,7 +350,7 @@ class Ontospy(object):
 
         for candidate in qres:
 
-            test_existing_prop = self.getProperty(uri=candidate[0])
+            test_existing_prop = self.get_property(uri=candidate[0])
             if not test_existing_prop:
                 # create it
                 self.all_properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
@@ -377,7 +377,7 @@ class Ontospy(object):
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
             for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
                     onto.all_properties += [aProp]
                     aProp.ontology = onto
@@ -390,7 +390,7 @@ class Ontospy(object):
             directSupers = self.sparqlHelper.getPropDirectSupers(aProp.uri)
 
             for x in directSupers:
-                superprop = self.getProperty(uri=x[0])
+                superprop = self.get_property(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superprop and superprop.uri != aProp.uri:
                     aProp._parents.append(superprop)
@@ -423,7 +423,7 @@ class Ontospy(object):
 
         for candidate in qres:
 
-            test_existing_cl = self.getSkosConcept(uri=candidate[0])
+            test_existing_cl = self.get_skos(uri=candidate[0])
             if not test_existing_cl:
                 # create it
                 self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
@@ -443,7 +443,7 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
                     onto.all_skos_concepts += [aConcept]
                     aConcept.ontology = onto
@@ -452,7 +452,7 @@ class Ontospy(object):
             directSupers = self.sparqlHelper.getSKOSDirectSupers(aConcept.uri)
 
             for x in directSupers:
-                superclass = self.getSkosConcept(uri=x[0])
+                superclass = self.get_skos(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superclass and superclass.uri != aConcept.uri:
                     aConcept._parents.append(superclass)
@@ -489,7 +489,7 @@ class Ontospy(object):
 
         for candidate in qres:
 
-            test_existing_cl = self.getEntity(uri=candidate[0])
+            test_existing_cl = self.get_any_entity(uri=candidate[0])
             if not test_existing_cl:
                 # create it
                 self.all_shapes += [OntoShape(candidate[0], None, self.namespaces)]
@@ -509,7 +509,7 @@ class Ontospy(object):
 
             # attach to a class
             for uri in aShape.getValuesForProperty(shacl['targetClass']):
-                aclass = self.getClass(str(uri))
+                aclass = self.get_class(str(uri))
                 if aclass:
                     aShape.targetClasses += [aclass]
                     aclass.all_shapes += [aShape]
@@ -570,7 +570,7 @@ class Ontospy(object):
             if isBlankNode(x):
                 aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
             else:
-                aClass = self.getClass(uri=str(x))
+                aClass = self.get_class(uri=str(x))
                 if aClass:
                     aProp.domains += [aClass]
                     aClass.domain_of += [aProp]
@@ -582,7 +582,7 @@ class Ontospy(object):
             if isBlankNode(x):
                 aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
             else:
-                aClass = self.getClass(uri=str(x))
+                aClass = self.get_class(uri=str(x))
                 if aClass:
                     aProp.ranges += [aClass]
                     aClass.range_of += [aProp]
@@ -723,19 +723,19 @@ class Ontospy(object):
     # ================
 
 
-    def getClass(self, id=None, uri=None, match=None):
+    def get_class(self, id=None, uri=None, match=None):
         """
         get the saved-class with given ID or via other methods...
 
         Note: it tries to guess what is being passed..
 
-        In [1]: g.getClass(uri='http://www.w3.org/2000/01/rdf-schema#Resource')
+        In [1]: g.get_class(uri='http://www.w3.org/2000/01/rdf-schema#Resource')
         Out[1]: <Class *http://www.w3.org/2000/01/rdf-schema#Resource*>
 
-        In [2]: g.getClass(10)
+        In [2]: g.get_class(10)
         Out[2]: <Class *http://purl.org/ontology/bibo/AcademicArticle*>
 
-        In [3]: g.getClass(match="person")
+        In [3]: g.get_class(match="person")
         Out[3]:
         [<Class *http://purl.org/ontology/bibo/PersonalCommunicationDocument*>,
          <Class *http://purl.org/ontology/bibo/PersonalCommunication*>,
@@ -774,7 +774,7 @@ class Ontospy(object):
             return None
 
 
-    def getProperty(self, id=None, uri=None, match=None):
+    def get_property(self, id=None, uri=None, match=None):
         """
         get the saved-class with given ID or via other methods...
 
@@ -812,7 +812,7 @@ class Ontospy(object):
             return None
 
 
-    def getSkosConcept(self, id=None, uri=None, match=None):
+    def get_skos(self, id=None, uri=None, match=None):
         """
         get the saved skos concept with given ID or via other methods...
 
@@ -850,7 +850,7 @@ class Ontospy(object):
             return None
 
 
-    def getEntity(self, id=None, uri=None, match=None):
+    def get_any_entity(self, id=None, uri=None, match=None):
         """
         get a generic entity with given ID or via other methods...
         """
@@ -898,7 +898,7 @@ class Ontospy(object):
 
 
 
-    def getOntology(self, id=None, uri=None, match=None):
+    def get_ontology(self, id=None, uri=None, match=None):
         """
         get the saved-ontology with given ID or via other methods...
         """

@@ -203,7 +203,7 @@ def main(argv=None):
 		print("Argument passing not implemented yet")
 		if False:
 			onto = Model(argv[0])
-			for x in onto.getClasses():
+			for x in onto.get_classes():
 				print(x)
 			onto.buildPythonClasses()
 			s = Sketch()
