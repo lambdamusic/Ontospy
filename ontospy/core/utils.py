@@ -904,7 +904,7 @@ def shellPrintOverview(g, opts={'labels' : False}):
     # pydoc.pager("SOME_VERY_LONG_TEXT")
 
     """
-    ontologies = g.ontologies
+    ontologies = g.all_ontologies
 
     for o in ontologies:
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)

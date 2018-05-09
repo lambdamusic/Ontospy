@@ -326,7 +326,7 @@ def _import_PREFIXCC(keyword=""):
     printDebug("----------\nReading source...")
     g = Ontospy(SOURCE, verbose=False)
 
-    for x in g.ontologies:
+    for x in g.all_ontologies:
         if keyword:
             if keyword in unicode(x.prefix).lower() or keyword in unicode(x.uri).lower():
                 options += [(unicode(x.prefix), unicode(x.uri))]

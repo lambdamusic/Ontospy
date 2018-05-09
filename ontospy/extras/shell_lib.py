@@ -118,7 +118,7 @@ class Shell(cmd.Cmd):
         # useful vars
         self.LOCAL = ONTOSPY_LOCAL
         self.LOCAL_MODELS = manager.get_home_location()
-        self.ontologies = manager.get_localontologies()
+        self.all_ontologies = manager.get_localontologies()
         self.current = None
         self.currentEntity = None
         if uri:
@@ -238,7 +238,7 @@ class Shell(cmd.Cmd):
         """
         if hrlinetop:
             self._print("----------------", "TIP")
-        self._print("Ontologies......: %d" % len(graph.ontologies), "TIP")
+        self._print("Ontologies......: %d" % len(graph.all_ontologies), "TIP")
         self._print("Classes.........: %d" % len(graph.classes), "TIP")
         self._print("Properties......: %d" % len(graph.properties), "TIP")
         self._print("..annotation....: %d" % len(graph.annotationProperties), "TIP")
@@ -268,7 +268,7 @@ class Shell(cmd.Cmd):
             self._print("Graph: <" + self.current['fullpath'] + ">", 'TIP')
             self._print("----------------", "TIP")
             self._printStats(self.current['graph'])
-            for obj in self.current['graph'].ontologies:
+            for obj in self.current['graph'].all_ontologies:
                 print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
                 # self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
                 # self._print("----------------", "TIP")
@@ -530,10 +530,10 @@ class Shell(cmd.Cmd):
         """Dynamically retrieves the next ontology in the list"""
         currentfile = self.current['file']
         try:
-            idx = self.ontologies.index(currentfile)
-            return self.ontologies[idx+1]
+            idx = self.all_ontologies.index(currentfile)
+            return self.all_ontologies[idx+1]
         except:
-            return self.ontologies[0]
+            return self.all_ontologies[0]
 
 
 
@@ -568,11 +568,11 @@ class Shell(cmd.Cmd):
         """try to select an ontology NP: the actual load from FS is in <_load_ontology> """
         try:
             var = int(line)	 # it's a string
-            if var in range(1, len(self.ontologies)+1):
-                self._load_ontology(self.ontologies[var-1])
+            if var in range(1, len(self.all_ontologies)+1):
+                self._load_ontology(self.all_ontologies[var-1])
         except ValueError:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line, "ontology")
@@ -667,12 +667,12 @@ class Shell(cmd.Cmd):
         """	Delete an ontology
             2016-04-11: not a direct command anymore """
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
 
         else:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line)
@@ -687,7 +687,7 @@ class Shell(cmd.Cmd):
                         os.remove(fullpath)
                         manager.del_pickled_ontology(choice)
                         self._print("<%s> was deleted succesfully." % choice)
-                        self.ontologies = manager.get_localontologies()
+                        self.all_ontologies = manager.get_localontologies()
                     else:
                         return
 
@@ -706,11 +706,11 @@ class Shell(cmd.Cmd):
         """Rename an ontology
             2016-04-11: not a direct command anymore """
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
         else:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line)
@@ -728,7 +728,7 @@ class Shell(cmd.Cmd):
                             os.rename(fullpath, self.LOCAL_MODELS + "/" + var)
                             manager.rename_pickled_ontology(choice, var)
                             self._print("<%s> was renamed succesfully." % choice)
-                            self.ontologies = manager.get_localontologies()
+                            self.all_ontologies = manager.get_localontologies()
                         except:
                             self._print("Not a valid name. An error occurred.")
                             return
@@ -777,7 +777,7 @@ class Shell(cmd.Cmd):
             # self._print("Usage: ls [%s]" % "|".join([x for x in opts]))
 
         elif line[0] == "ontologies":
-            if not self.ontologies:
+            if not self.all_ontologies:
                 self._help_nofiles()
             else:
                 self._select_ontology(_pattern)
@@ -869,7 +869,7 @@ class Shell(cmd.Cmd):
             # self._print("Usage: get [%s] <name>" % "|".join([x for x in opts]))
 
         elif line[0] == "ontology":
-            if not self.ontologies:
+            if not self.all_ontologies:
                 self._help_nofiles()
             else:
                 self._select_ontology(_pattern)
@@ -1050,7 +1050,7 @@ class Shell(cmd.Cmd):
         else:
             self.help_import()
 
-        self.ontologies = manager.get_localontologies()
+        self.all_ontologies = manager.get_localontologies()
         return
 
 
@@ -1058,7 +1058,7 @@ class Shell(cmd.Cmd):
         """PErform some file operation"""
         opts = self.FILE_OPTS
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
             return
 
@@ -1100,7 +1100,7 @@ class Shell(cmd.Cmd):
         else:
             self._print(g.rdf_source(format=line[0]))
             # 2016-05-27: was like this before
-            # for o in g.ontologies:
+            # for o in g.all_ontologies:
             # 	o.printSerialize(line[0])
 
 
@@ -1123,7 +1123,7 @@ class Shell(cmd.Cmd):
             else:
                 print("Not implemented")
         else:
-            if len(self.ontologies) > 1:
+            if len(self.all_ontologies) > 1:
                 nextonto = self._next_ontology()
                 self._load_ontology(nextonto)
             else:

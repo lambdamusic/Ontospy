@@ -62,7 +62,7 @@ class Ontospy(object):
         self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
         self.sparqlHelper = None
-        self.ontologies = []
+        self.all_ontologies = []
         self.classes = []
         self.namespaces = []
         self.properties = []
@@ -170,7 +170,7 @@ class Ontospy(object):
             printDebug("----------", "comment")
 
         self.extract_ontologies()
-        if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
+        if verbose: printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
         self.extract_classes(hide_base_schemas)
         if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
@@ -243,8 +243,8 @@ class Ontospy(object):
             # printDebug("No owl:Ontologies found")
 
         #finally... add all annotations/triples
-        self.ontologies = out
-        for onto in self.ontologies:
+        self.all_ontologies = out
+        for onto in self.all_ontologies:
             onto.triples = self.sparqlHelper.entityTriples(onto.uri)
             onto._buildGraph() # force construction of mini graph
 
@@ -687,7 +687,7 @@ class Ontospy(object):
     def stats(self):
         """ shotcut to pull out useful info for a graph"""
         out = []
-        out += [("Ontologies", len(self.ontologies))]
+        out += [("Ontologies", len(self.all_ontologies))]
         out += [("Triples", self.triplesCount())]
         out += [("Classes", len(self.classes))]
         out += [("Properties", len(self.properties))]
@@ -915,12 +915,12 @@ class Ontospy(object):
             if type(match) != type("string"):
                 return []
             res = []
-            for x in self.ontologies:
+            for x in self.all_ontologies:
                 if match.lower() in x.uri.lower():
                     res += [x]
             return res
         else:
-            for x in self.ontologies:
+            for x in self.all_ontologies:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
