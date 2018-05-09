@@ -229,7 +229,7 @@ class Ontology(RDF_Entity):
         # self.uri = uri # rdflib.Uriref
         self.prefix = prefPrefix
         self.slug = "ontology-" + slugify(self.qname)
-        self.classes = []
+        self.all_classes = []
         self.properties = []
         self.skosConcepts = []
 
@@ -253,7 +253,7 @@ class Ontology(RDF_Entity):
 
     def stats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("Classes.....: %d" % len(self.classes))
+        printDebug("Classes.....: %d" % len(self.all_classes))
         printDebug("Properties..: %d" % len(self.properties))
 
 

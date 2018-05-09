@@ -63,7 +63,7 @@ class Ontospy(object):
         self.sources = None
         self.sparqlHelper = None
         self.all_ontologies = []
-        self.classes = []
+        self.all_classes = []
         self.namespaces = []
         self.properties = []
         self.annotationProperties = []
@@ -173,7 +173,7 @@ class Ontospy(object):
         if verbose: printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
         self.extract_classes(hide_base_schemas)
-        if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
+        if verbose: printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
         self.extract_properties()
         if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
@@ -267,7 +267,7 @@ class Ontospy(object):
         """
 
 
-        self.classes = [] # @todo: keep adding?
+        self.all_classes = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
@@ -283,14 +283,14 @@ class Ontospy(object):
             if not test_existing_cl:
                 # create it
                 ontoclass = OntoClass(_uri, _type, self.namespaces)
-                self.classes += [ontoclass]
+                self.all_classes += [ontoclass]
             else:
                 # if OWL.Class over RDFS.Class - update it
                 if _type == rdflib.OWL.Class:
                     test_existing_cl.rdftype = rdflib.OWL.Class
 
         #add more data
-        for aClass in self.classes:
+        for aClass in self.all_classes:
 
             aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph() # force construction of mini graph
@@ -301,7 +301,7 @@ class Ontospy(object):
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
                 onto = self.getOntology(str(uri))
                 if onto:
-                    onto.classes += [aClass]
+                    onto.all_classes += [aClass]
                     aClass.ontology = onto
 
             # add direct Supers
@@ -318,11 +318,11 @@ class Ontospy(object):
                          superclass._children.append(aClass)
 
         # sort alphabetically
-        self.classes = sorted(self.classes, key=lambda x: x.qname)
+        self.all_classes = sorted(self.all_classes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             if not c.parents():
                 exit += [c]
         self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -601,7 +601,7 @@ class Ontospy(object):
         """
 
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             if not c.parents():
                 exit += [c]
         self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -627,7 +627,7 @@ class Ontospy(object):
         :return: attach a list of dicts to each class, detailing valid props up the subsumption tree
         """
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of")
             c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of")
 
@@ -689,7 +689,7 @@ class Ontospy(object):
         out = []
         out += [("Ontologies", len(self.all_ontologies))]
         out += [("Triples", self.triplesCount())]
-        out += [("Classes", len(self.classes))]
+        out += [("Classes", len(self.all_classes))]
         out += [("Properties", len(self.properties))]
         out += [("Annotation Properties", len(self.annotationProperties))]
         out += [("Object Properties", len(self.objectProperties))]
@@ -756,16 +756,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.classes:
+            for x in self.all_classes:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -868,14 +868,14 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.qname.lower():
                         res += [x]
                 for x in self.properties:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.uri.lower():
                         res += [x]
                 for x in self.properties:
@@ -883,7 +883,7 @@ class Ontospy(object):
                         res += [x]
             return res
         else:
-            for x in self.classes:
+            for x in self.all_classes:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -930,10 +930,10 @@ class Ontospy(object):
 
     def nextClass(self, classuri):
         """Returns the next class in the list of classes. If it's the last one, returns the first one."""
-        if classuri == self.classes[-1].uri:
-            return self.classes[0]
+        if classuri == self.all_classes[-1].uri:
+            return self.all_classes[0]
         flag = False
-        for x in self.classes:
+        for x in self.all_classes:
             if flag == True:
                 return x
             if x.uri == classuri:
@@ -1030,9 +1030,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.classes:
+        if self.all_classes:
             treedict[0] = self.toplayer
-            for element in self.classes:
+            for element in self.all_classes:
                 if element.children():
                     treedict[element] = element.children()
             return treedict

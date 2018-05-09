@@ -43,7 +43,7 @@ class TestLoadOntologies(unittest.TestCase):
 				o.printClassTree()
 				print("----------")
 
-				for c in o.classes:
+				for c in o.all_classes:
 					c.describe()
 
 				for p in o.properties:

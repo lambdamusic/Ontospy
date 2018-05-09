@@ -909,7 +909,7 @@ def shellPrintOverview(g, opts={'labels' : False}):
     for o in ontologies:
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
         o.printTriples()
-    if g.classes:
+    if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printClassTree(showids=False, labels=opts['labels'])
     if g.properties:

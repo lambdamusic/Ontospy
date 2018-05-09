@@ -239,7 +239,7 @@ class Shell(cmd.Cmd):
         if hrlinetop:
             self._print("----------------", "TIP")
         self._print("Ontologies......: %d" % len(graph.all_ontologies), "TIP")
-        self._print("Classes.........: %d" % len(graph.classes), "TIP")
+        self._print("Classes.........: %d" % len(graph.all_classes), "TIP")
         self._print("Properties......: %d" % len(graph.properties), "TIP")
         self._print("..annotation....: %d" % len(graph.annotationProperties), "TIP")
         self._print("..datatype......: %d" % len(graph.datatypeProperties), "TIP")
@@ -587,7 +587,7 @@ class Shell(cmd.Cmd):
         """
         g = self.current['graph']
         if not line:
-            out = g.classes
+            out = g.all_classes
             using_pattern=False
         else:
             using_pattern=True
@@ -789,7 +789,7 @@ class Shell(cmd.Cmd):
         elif line[0] == "classes":
             g = self.current['graph']
 
-            if g.classes:
+            if g.all_classes:
                 self._select_class(_pattern)
             else:
                 self._print("No classes available.")
@@ -832,7 +832,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "classes":
             g = self.current['graph']
-            if g.classes:
+            if g.all_classes:
                 g.printClassTree(showids=False, labels=False, showtype=True)
                 self._print("----------------", "TIP")
             else:
@@ -880,7 +880,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "class":
             g = self.current['graph']
-            if g.classes:
+            if g.all_classes:
                 self._select_class(_pattern)
             else:
                 self._print("No classes available.")

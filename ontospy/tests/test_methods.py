@@ -39,7 +39,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		printDebug("\n=================\nTEST 1: Checking the <instances> method", "green")
 
-		for c in self.o.classes:
+		for c in self.o.all_classes:
 			# c.describe()
 			if c.instances:
 				print("CLASS: " + c.uri)
@@ -55,7 +55,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		printDebug("\n=================\nTEST 2: Checking the <getValuesForProperty> method", "green")
 
-		for c in self.o.classes[:3]:
+		for c in self.o.all_classes[:3]:
 			print("CLASS: ")
 			print(c.uri, c.qname)
 			print("RDF:TYPE VALUES: ")
