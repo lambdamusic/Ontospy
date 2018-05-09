@@ -46,7 +46,7 @@ class TestLoadOntologies(unittest.TestCase):
 				for c in o.all_classes:
 					c.describe()
 
-				for p in o.properties:
+				for p in o.all_properties:
 					p.describe()
 
 				for s in o.skosConcepts:

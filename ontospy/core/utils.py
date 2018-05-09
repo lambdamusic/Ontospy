@@ -447,7 +447,7 @@ def inferMainPropertyType(uriref):
     Attempt to reduce the property types to 4 main types
     (without the OWL ontology - which would be the propert way)
 
-    In [3]: for x in g.properties:
+    In [3]: for x in g.all_properties:
        ...:		print x.rdftype
        ...:
     http://www.w3.org/2002/07/owl#FunctionalProperty
@@ -912,7 +912,7 @@ def shellPrintOverview(g, opts={'labels' : False}):
     if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printClassTree(showids=False, labels=opts['labels'])
-    if g.properties:
+    if g.all_properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printPropertyTree(showids=False, labels=opts['labels'])
     if g.skosConcepts:

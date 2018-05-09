@@ -62,11 +62,11 @@ class Ontospy(object):
         self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
         self.sparqlHelper = None
+        self.namespaces = []
         self.all_ontologies = []
         self.all_classes = []
-        self.namespaces = []
-        self.properties = []
-        self.annotationProperties = []
+        self.all_properties = []
+        self.all_properties_annotation = []
         self.objectProperties = []
         self.datatypeProperties = []
         self.skosConcepts = []
@@ -176,8 +176,8 @@ class Ontospy(object):
         if verbose: printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
         self.extract_properties()
-        if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
-        if verbose: printDebug("..annotation.......: %d" % len(self.annotationProperties), "comment")
+        if verbose: printDebug("Properties.........: %d" % len(self.all_properties), "comment")
+        if verbose: printDebug("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
         if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
         if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
 
@@ -340,8 +340,8 @@ class Ontospy(object):
         # eg OWL:ObjectProperty over RDF:property
 
         """
-        self.properties = [] # @todo: keep adding?
-        self.annotationProperties = []
+        self.all_properties = [] # @todo: keep adding?
+        self.all_properties_annotation = []
         self.objectProperties = []
         self.datatypeProperties = []
 
@@ -352,7 +352,7 @@ class Ontospy(object):
             test_existing_prop = self.getProperty(uri=candidate[0])
             if not test_existing_prop:
                 # create it
-                self.properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
+                self.all_properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
             else:
                 # update it
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
@@ -360,12 +360,12 @@ class Ontospy(object):
 
 
         #add more data
-        for aProp in self.properties:
+        for aProp in self.all_properties:
 
             if aProp.rdftype == rdflib.OWL.DatatypeProperty:
                 self.datatypeProperties += [aProp]
             elif aProp.rdftype == rdflib.OWL.AnnotationProperty:
-                self.annotationProperties += [aProp]
+                self.all_properties_annotation += [aProp]
             elif aProp.rdftype == rdflib.OWL.ObjectProperty:
                 self.objectProperties += [aProp]
             else:
@@ -378,7 +378,7 @@ class Ontospy(object):
             for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
                 onto = self.getOntology(str(uri))
                 if onto:
-                    onto.properties += [aProp]
+                    onto.all_properties += [aProp]
                     aProp.ontology = onto
 
 
@@ -400,11 +400,11 @@ class Ontospy(object):
 
 
         # sort alphabetically
-        self.properties = sorted(self.properties, key=lambda x: x.qname)
+        self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
 
         # computer top layer for properties
         exit = []
-        for c in self.properties:
+        for c in self.all_properties:
             if not c.parents():
                 exit += [c]
         self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -608,7 +608,7 @@ class Ontospy(object):
 
         # properties
         exit = []
-        for c in self.properties:
+        for c in self.all_properties:
             if not c.parents():
                 exit += [c]
         self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -657,7 +657,7 @@ class Ontospy(object):
 
             # add properties from Owl:Thing ie the inference layer
 
-            topLevelProps = [p for p in self.properties if p.domains == []]
+            topLevelProps = [p for p in self.all_properties if p.domains == []]
             if topLevelProps:
                 _list.append({self.OWLTHING: topLevelProps})
 
@@ -669,7 +669,7 @@ class Ontospy(object):
 
             # add properties from Owl:Thing ie the inference layer
 
-            topLevelProps = [p for p in self.properties if p.ranges == []]
+            topLevelProps = [p for p in self.all_properties if p.ranges == []]
             if topLevelProps:
                 _list.append({self.OWLTHING: topLevelProps})
 
@@ -690,8 +690,8 @@ class Ontospy(object):
         out += [("Ontologies", len(self.all_ontologies))]
         out += [("Triples", self.triplesCount())]
         out += [("Classes", len(self.all_classes))]
-        out += [("Properties", len(self.properties))]
-        out += [("Annotation Properties", len(self.annotationProperties))]
+        out += [("Properties", len(self.all_properties))]
+        out += [("Annotation Properties", len(self.all_properties_annotation))]
         out += [("Object Properties", len(self.objectProperties))]
         out += [("Datatype Properties", len(self.datatypeProperties))]
         out += [("Skos Concepts", len(self.skosConcepts))]
@@ -794,16 +794,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.properties:
+            for x in self.all_properties:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -871,14 +871,14 @@ class Ontospy(object):
                 for x in self.all_classes:
                     if match.lower() in x.qname.lower():
                         res += [x]
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
                 for x in self.all_classes:
                     if match.lower() in x.uri.lower():
                         res += [x]
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
@@ -888,7 +888,7 @@ class Ontospy(object):
                     return x
                 if uri and x.uri.lower() == uri.lower():
                     return x
-            for x in self.properties:
+            for x in self.all_properties:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -943,10 +943,10 @@ class Ontospy(object):
 
     def nextProperty(self, propuri):
         """Returns the next property in the list of properties. If it's the last one, returns the first one."""
-        if propuri == self.properties[-1].uri:
-            return self.properties[0]
+        if propuri == self.all_properties[-1].uri:
+            return self.all_properties[0]
         flag = False
-        for x in self.properties:
+        for x in self.all_properties:
             if flag == True:
                 return x
             if x.uri == propuri:
@@ -1046,9 +1046,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.properties:
+        if self.all_properties:
             treedict[0] = self.toplayerProperties
-            for element in self.properties:
+            for element in self.all_properties:
                 if element.children():
                     treedict[element] = element.children()
             return treedict

@@ -103,10 +103,10 @@ def matcher(graph1, graph2, confidence=0.5, output_file="matching_results.csv", 
 
 		elif class_or_prop == "properties":
 
-			for x in graph1.properties:
+			for x in graph1.all_properties:
 				l1 = unicode(x.bestLabel(qname_allowed=True))
 
-				for y in graph2.properties:
+				for y in graph2.all_properties:
 					l2 = unicode(y.bestLabel(qname_allowed=True))
 
 					if similar(l1, l2) > confidence:

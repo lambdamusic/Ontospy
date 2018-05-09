@@ -240,8 +240,8 @@ class Shell(cmd.Cmd):
             self._print("----------------", "TIP")
         self._print("Ontologies......: %d" % len(graph.all_ontologies), "TIP")
         self._print("Classes.........: %d" % len(graph.all_classes), "TIP")
-        self._print("Properties......: %d" % len(graph.properties), "TIP")
-        self._print("..annotation....: %d" % len(graph.annotationProperties), "TIP")
+        self._print("Properties......: %d" % len(graph.all_properties), "TIP")
+        self._print("..annotation....: %d" % len(graph.all_properties_annotation), "TIP")
         self._print("..datatype......: %d" % len(graph.datatypeProperties), "TIP")
         self._print("..object........: %d" % len(graph.objectProperties), "TIP")
         self._print("Concepts(SKOS)..: %d" % len(graph.skosConcepts), "TIP")
@@ -614,7 +614,7 @@ class Shell(cmd.Cmd):
         """try to match a property and load it"""
         g = self.current['graph']
         if not line:
-            out = g.properties
+            out = g.all_properties
             using_pattern=False
         else:
             using_pattern=True
@@ -796,7 +796,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "properties":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 self._select_property(_pattern)
             else:
                 self._print("No properties available.")
@@ -840,7 +840,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "properties":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 g.printPropertyTree(showids=False, labels=False, showtype=True)
             else:
                 self._print("No properties available.")
@@ -887,7 +887,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "property":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 self._select_property(_pattern)
             else:
                 self._print("No properties available.")

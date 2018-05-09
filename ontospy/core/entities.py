@@ -230,7 +230,7 @@ class Ontology(RDF_Entity):
         self.prefix = prefPrefix
         self.slug = "ontology-" + slugify(self.qname)
         self.all_classes = []
-        self.properties = []
+        self.all_properties = []
         self.skosConcepts = []
 
     def annotations(self, qname=True):
@@ -254,7 +254,7 @@ class Ontology(RDF_Entity):
     def stats(self):
         """ shotcut to pull out useful info for interactive use """
         printDebug("Classes.....: %d" % len(self.all_classes))
-        printDebug("Properties..: %d" % len(self.properties))
+        printDebug("Properties..: %d" % len(self.all_properties))
 
 
 

@@ -43,7 +43,7 @@ def get_default_preds():
     """dynamically build autocomplete options based on an external file"""
     g = ontospy.Ontospy(rdfsschema, text=True, verbose=False, hide_base_schemas=False)
     classes = [(x.qname, x.bestDescription()) for x in g.all_classes]
-    properties = [(x.qname, x.bestDescription()) for x in g.properties]
+    properties = [(x.qname, x.bestDescription()) for x in g.all_properties]
     commands = [('exit', 'exits the terminal'), ('show', 'show current buffer')]
     return rdfschema + owlschema + classes + properties + commands
 

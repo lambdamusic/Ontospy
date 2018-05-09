@@ -12,7 +12,7 @@ TODOs
 * tidy up all tests code and rationale @DONE
 
 
-* x.properties => x.all_properties
+* x.all_properties => x.all_properties
 * x.annotationProperties  => x.all_properties_annotation
 etc..etc... (ONTODOCS dependency here though)
 
