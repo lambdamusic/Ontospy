@@ -306,7 +306,7 @@ class Ontospy(object):
                     aClass.ontology = onto
 
             # add direct Supers
-            directSupers = self.sparqlHelper.get_classDirectSupers(aClass.uri)
+            directSupers = self.sparqlHelper.getClassDirectSupers(aClass.uri)
 
             for x in directSupers:
                 superclass = self.get_class(uri=x[0])

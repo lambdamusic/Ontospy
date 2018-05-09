@@ -12,6 +12,7 @@ TODOs
 * tidy up all tests code and rationale @DONE
 
 
+* rename all entities methods @DONE
 * x.all_properties => x.all_properties
 * x.annotationProperties  => x.all_properties_annotation
 etc..etc... (ONTODOCS dependency here though)
