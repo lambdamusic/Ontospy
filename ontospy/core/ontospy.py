@@ -63,6 +63,7 @@ class Ontospy(object):
         self.sources = None
         self.sparqlHelper = None
         self.namespaces = []
+        # entities buckets start with 'all_'
         self.all_ontologies = []
         self.all_classes = []
         self.all_properties = []
@@ -72,10 +73,10 @@ class Ontospy(object):
         self.all_skos_concepts = []
         self.all_shapes = []
         # self.all_individuals = []
-        self.toplayer = []
-        self.toplayerProperties = []
-        self.toplayerSkosConcepts = []
-        self.toplayerShapes = []
+        self.toplayer_classes  = []
+        self.toplayer_properties = []
+        self.toplayer_skos = []
+        self.toplayer_shapes = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
         # finally:
@@ -325,7 +326,7 @@ class Ontospy(object):
         for c in self.all_classes:
             if not c.parents():
                 exit += [c]
-        self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_classes  = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
@@ -407,7 +408,7 @@ class Ontospy(object):
         for c in self.all_properties:
             if not c.parents():
                 exit += [c]
-        self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_properties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
@@ -469,7 +470,7 @@ class Ontospy(object):
         for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
-        self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_skos = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
@@ -522,7 +523,7 @@ class Ontospy(object):
         for c in self.all_shapes:
             if not c.parents():
                 exit += [c]
-        self.toplayerShapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_shapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
@@ -604,21 +605,21 @@ class Ontospy(object):
         for c in self.all_classes:
             if not c.parents():
                 exit += [c]
-        self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_classes  = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
         # properties
         exit = []
         for c in self.all_properties:
             if not c.parents():
                 exit += [c]
-        self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_properties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
         # skos
         exit = []
         for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
-        self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_skos = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
     def __computeInferredProperties(self):
@@ -997,7 +998,7 @@ class Ontospy(object):
         TYPE_MARGIN = 18 # length for owl:AnnotationProperty etc..
 
         if not element:	 # first time
-            for x in self.toplayerProperties:
+            for x in self.toplayer_properties:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -1016,7 +1017,7 @@ class Ontospy(object):
         TYPE_MARGIN = 13 # length for skos:concept
 
         if not element:	 # first time
-            for x in self.toplayerSkosConcepts:
+            for x in self.toplayer_skos:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -1047,7 +1048,7 @@ class Ontospy(object):
         """
         treedict = {}
         if self.all_properties:
-            treedict[0] = self.toplayerProperties
+            treedict[0] = self.toplayer_properties
             for element in self.all_properties:
                 if element.children():
                     treedict[element] = element.children()
@@ -1063,7 +1064,7 @@ class Ontospy(object):
         """
         treedict = {}
         if self.all_skos_concepts:
-            treedict[0] = self.toplayerSkosConcepts
+            treedict[0] = self.toplayer_skos
             for element in self.all_skos_concepts:
                 if element.children():
                     treedict[element] = element.children()
@@ -1080,7 +1081,7 @@ class Ontospy(object):
         """
         treedict = {}
         if self.all_shapes:
-            treedict[0] = self.toplayerShapes
+            treedict[0] = self.toplayer_shapes
             for element in self.all_shapes:
                 if element.children():
                     treedict[element] = element.children()

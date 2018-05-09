@@ -939,17 +939,17 @@ class Shell(cmd.Cmd):
 
 
         elif line[0] == "toplayer":
-            if g.toplayer:
+            if g.toplayer_classes:
                 self._print("Top Classes\n----------------", "IMPORTANT")
-            for x in g.toplayer:
+            for x in g.toplayer_classes:
                     self._print(x.qname)
-            if g.toplayerProperties:
+            if g.toplayer_properties:
                 self._print("\nTop Properties\n----------------", "IMPORTANT")
-                for x in g.toplayerProperties:
+                for x in g.toplayer_properties:
                     self._print(x.qname)
-            if g.toplayerSkosConcepts:
+            if g.toplayer_skos:
                 self._print("\nTop Concepts (SKOS)\n----------------", "IMPORTANT")
-                for x in g.toplayerSkosConcepts:
+                for x in g.toplayer_skos:
                     self._print(x.qname)
 
         elif line[0] == "namespaces":
