@@ -67,7 +67,7 @@ class Ontospy(object):
         self.all_classes = []
         self.all_properties = []
         self.all_properties_annotation = []
-        self.objectProperties = []
+        self.all_properties_object = []
         self.datatypeProperties = []
         self.skosConcepts = []
         # self.individuals = []
@@ -179,7 +179,7 @@ class Ontospy(object):
         if verbose: printDebug("Properties.........: %d" % len(self.all_properties), "comment")
         if verbose: printDebug("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
         if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
-        if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
+        if verbose: printDebug("..object...........: %d" % len(self.all_properties_object), "comment")
 
         self.extract_skos_concepts()
         if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
@@ -342,7 +342,7 @@ class Ontospy(object):
         """
         self.all_properties = [] # @todo: keep adding?
         self.all_properties_annotation = []
-        self.objectProperties = []
+        self.all_properties_object = []
         self.datatypeProperties = []
 
         qres = self.sparqlHelper.getAllProperties()
@@ -367,7 +367,7 @@ class Ontospy(object):
             elif aProp.rdftype == rdflib.OWL.AnnotationProperty:
                 self.all_properties_annotation += [aProp]
             elif aProp.rdftype == rdflib.OWL.ObjectProperty:
-                self.objectProperties += [aProp]
+                self.all_properties_object += [aProp]
             else:
                 pass
 
@@ -692,7 +692,7 @@ class Ontospy(object):
         out += [("Classes", len(self.all_classes))]
         out += [("Properties", len(self.all_properties))]
         out += [("Annotation Properties", len(self.all_properties_annotation))]
-        out += [("Object Properties", len(self.objectProperties))]
+        out += [("Object Properties", len(self.all_properties_object))]
         out += [("Datatype Properties", len(self.datatypeProperties))]
         out += [("Skos Concepts", len(self.skosConcepts))]
         out += [("Data Shapes", len(self.shapes))]

@@ -243,7 +243,7 @@ class Shell(cmd.Cmd):
         self._print("Properties......: %d" % len(graph.all_properties), "TIP")
         self._print("..annotation....: %d" % len(graph.all_properties_annotation), "TIP")
         self._print("..datatype......: %d" % len(graph.datatypeProperties), "TIP")
-        self._print("..object........: %d" % len(graph.objectProperties), "TIP")
+        self._print("..object........: %d" % len(graph.all_properties_object), "TIP")
         self._print("Concepts(SKOS)..: %d" % len(graph.skosConcepts), "TIP")
         self._print("----------------", "TIP")
 
