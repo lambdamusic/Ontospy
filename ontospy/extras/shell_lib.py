@@ -244,7 +244,7 @@ class Shell(cmd.Cmd):
         self._print("..annotation....: %d" % len(graph.all_properties_annotation), "TIP")
         self._print("..datatype......: %d" % len(graph.all_properties_datatype), "TIP")
         self._print("..object........: %d" % len(graph.all_properties_object), "TIP")
-        self._print("Concepts(SKOS)..: %d" % len(graph.skosConcepts), "TIP")
+        self._print("Concepts(SKOS)..: %d" % len(graph.all_skos_concepts), "TIP")
         self._print("----------------", "TIP")
 
 
@@ -641,7 +641,7 @@ class Shell(cmd.Cmd):
         """try to match a class and load it"""
         g = self.current['graph']
         if not line:
-            out = g.skosConcepts
+            out = g.all_skos_concepts
             using_pattern=False
         else:
             using_pattern=True
@@ -803,7 +803,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "concepts":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 self._select_concept(_pattern)
             else:
                 self._print("No concepts available.")
@@ -847,7 +847,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "concepts":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 g.printSkosTree(showids=False, labels=False, showtype=True)
             else:
                 self._print("No concepts available.")
@@ -894,7 +894,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "concept":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 self._select_concept(_pattern)
             else:
                 self._print("No concepts available.")

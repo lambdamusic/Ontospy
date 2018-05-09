@@ -54,7 +54,7 @@ class RDF_Entity(object):
         self.triples = None
         self.rdflib_graph = rdflib.Graph()
         self.namespaces = namespaces
-        self.shapes = []
+        self.all_shapes = []
 
         self.qname = self._build_qname()
         self.rdftype_qname = self._build_qname(rdftype)
@@ -231,7 +231,7 @@ class Ontology(RDF_Entity):
         self.slug = "ontology-" + slugify(self.qname)
         self.all_classes = []
         self.all_properties = []
-        self.skosConcepts = []
+        self.all_skos_concepts = []
 
     def annotations(self, qname=True):
         """

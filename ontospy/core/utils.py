@@ -915,12 +915,12 @@ def shellPrintOverview(g, opts={'labels' : False}):
     if g.all_properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printPropertyTree(showids=False, labels=opts['labels'])
-    if g.skosConcepts:
+    if g.all_skos_concepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printSkosTree(showids=False, labels=opts['labels'])
-    if g.shapes:
+    if g.all_shapes:
         print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10	 + Style.RESET_ALL)
-        for x in g.shapes:
+        for x in g.all_shapes:
             printDebug("%s" % (x.qname))
             # printDebug("%s" % (x.bestLabel()), "comment")
 

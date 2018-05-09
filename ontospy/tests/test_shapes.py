@@ -40,12 +40,12 @@ class TestShapes(unittest.TestCase):
 		for el in o.stats():
 			print("%s : %d" % (el[0], el[1]))
 
-		for s in o.shapes:
+		for s in o.all_shapes:
 			printDebug("\nSHAPE: %s" % str(s), "green")
 			if s.targetClasses:
 				for x in s.targetClasses:
 					print(".....hasTargetClass: " + str(x))
-					print("     Reverse link: the class has %d associated shape." % len(x.shapes))
+					print("     Reverse link: the class has %d associated shape." % len(x.all_shapes))
 			else:
 				print("..... has no target class!")
 

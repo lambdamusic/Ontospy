@@ -69,9 +69,9 @@ class Ontospy(object):
         self.all_properties_annotation = []
         self.all_properties_object = []
         self.all_properties_datatype = []
-        self.skosConcepts = []
-        # self.individuals = []
-        self.shapes = []
+        self.all_skos_concepts = []
+        self.all_shapes = []
+        # self.all_individuals = []
         self.toplayer = []
         self.toplayerProperties = []
         self.toplayerSkosConcepts = []
@@ -182,10 +182,10 @@ class Ontospy(object):
         if verbose: printDebug("..object...........: %d" % len(self.all_properties_object), "comment")
 
         self.extract_skos_concepts()
-        if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
+        if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.all_skos_concepts), "comment")
 
         self.extract_shapes()
-        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.shapes), "comment")
+        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
 
         # self.__computeTopLayer()
 
@@ -416,7 +416,7 @@ class Ontospy(object):
         """
         2015-08-19: first draft
         """
-        self.skosConcepts = [] # @todo: keep adding?
+        self.all_skos_concepts = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getSKOSInstances()
 
@@ -425,14 +425,14 @@ class Ontospy(object):
             test_existing_cl = self.getSkosConcept(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
+                self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
             else:
                 pass
 
         #add more data
         skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
 
-        for aConcept in self.skosConcepts:
+        for aConcept in self.all_skos_concepts:
 
             aConcept.rdftype = skos['Concept']
             aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
@@ -444,7 +444,7 @@ class Ontospy(object):
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
                 onto = self.getOntology(str(uri))
                 if onto:
-                    onto.skosConcepts += [aConcept]
+                    onto.all_skos_concepts += [aConcept]
                     aConcept.ontology = onto
 
             # add direct Supers
@@ -462,11 +462,11 @@ class Ontospy(object):
 
 
         # sort alphabetically
-        self.skosConcepts = sorted(self.skosConcepts, key=lambda x: x.qname)
+        self.all_skos_concepts = sorted(self.all_skos_concepts, key=lambda x: x.qname)
 
         # compute top layer for skos
         exit = []
-        for c in self.skosConcepts:
+        for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
         self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -482,7 +482,7 @@ class Ontospy(object):
         Instatiate the Shape Python objects and relate it to existing classes,
         if available.
         """
-        self.shapes = [] # @todo: keep adding?
+        self.all_shapes = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getShapes()
 
@@ -491,14 +491,14 @@ class Ontospy(object):
             test_existing_cl = self.getEntity(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.shapes += [OntoShape(candidate[0], None, self.namespaces)]
+                self.all_shapes += [OntoShape(candidate[0], None, self.namespaces)]
             else:
                 pass
 
         #add more data
         shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
 
-        for aShape in self.shapes:
+        for aShape in self.all_shapes:
 
             aShape.rdftype = shacl['Shape']
             aShape.triples = self.sparqlHelper.entityTriples(aShape.uri)
@@ -511,15 +511,15 @@ class Ontospy(object):
                 aclass = self.getClass(str(uri))
                 if aclass:
                     aShape.targetClasses += [aclass]
-                    aclass.shapes += [aShape]
+                    aclass.all_shapes += [aShape]
 
 
         # sort alphabetically
-        self.shapes = sorted(self.shapes, key=lambda x: x.qname)
+        self.all_shapes = sorted(self.all_shapes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
-        for c in self.shapes:
+        for c in self.all_shapes:
             if not c.parents():
                 exit += [c]
         self.toplayerShapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -615,7 +615,7 @@ class Ontospy(object):
 
         # skos
         exit = []
-        for c in self.skosConcepts:
+        for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
         self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
@@ -694,8 +694,8 @@ class Ontospy(object):
         out += [("Annotation Properties", len(self.all_properties_annotation))]
         out += [("Object Properties", len(self.all_properties_object))]
         out += [("Datatype Properties", len(self.all_properties_datatype))]
-        out += [("Skos Concepts", len(self.skosConcepts))]
-        out += [("Data Shapes", len(self.shapes))]
+        out += [("Skos Concepts", len(self.all_skos_concepts))]
+        out += [("Data Shapes", len(self.all_shapes))]
         # out += [("Individuals", len(self.individuals))] @TODO
         out += [("Data Sources", len(self.sources))]
         return out
@@ -832,16 +832,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.skosConcepts:
+                for x in self.all_skos_concepts:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.skosConcepts:
+                for x in self.all_skos_concepts:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.skosConcepts:
+            for x in self.all_skos_concepts:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -955,10 +955,10 @@ class Ontospy(object):
 
     def nextConcept(self, concepturi):
         """Returns the next skos concept in the list of concepts. If it's the last one, returns the first one."""
-        if concepturi == self.skosConcepts[-1].uri:
-            return self.skosConcepts[0]
+        if concepturi == self.all_skos_concepts[-1].uri:
+            return self.all_skos_concepts[0]
         flag = False
-        for x in self.skosConcepts:
+        for x in self.all_skos_concepts:
             if flag == True:
                 return x
             if x.uri == concepturi:
@@ -1062,9 +1062,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.skosConcepts:
+        if self.all_skos_concepts:
             treedict[0] = self.toplayerSkosConcepts
-            for element in self.skosConcepts:
+            for element in self.all_skos_concepts:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
@@ -1079,9 +1079,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.shapes:
+        if self.all_shapes:
             treedict[0] = self.toplayerShapes
-            for element in self.shapes:
+            for element in self.all_shapes:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
