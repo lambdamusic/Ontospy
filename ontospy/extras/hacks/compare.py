@@ -70,7 +70,7 @@ def compare(referenceOnto, somegraph):
 
 	return {'stats' : {	'classes': len(spy2.allclasses),
 						'properties' : len(spy2.allinferredproperties),
-						'triples' : len(spy2.rdfGraph)},
+						'triples' : len(spy2.rdflib_graph)},
 			'class_comparison' : class_comparison ,
 			'prop_comparison' : prop_comparison}
 

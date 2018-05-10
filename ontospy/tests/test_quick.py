@@ -3,9 +3,11 @@
 """
 Unit test stub for ontosPy
 
-Run like this:
+Test Quick: use this file to quickly run scripts/tests which will then be integrated into proper tests
 
-:path/to/ontospyProject>python -m ontospy.tests.test_load_local
+Running it:
+
+./run-quick-test.sh
 
 """
 
@@ -17,32 +19,39 @@ from ..core import *
 from ..core.utils import *
 
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-DATA_FOLDER = dir_path + "/rdf/"
-
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
 
 class TestQuick(unittest.TestCase):
 
+	dir_path = os.path.dirname(os.path.realpath(__file__))
+	DATA_FOLDER = dir_path + "/rdf/"
+	f = DATA_FOLDER + "pizza.ttl"
+	o = Ontospy(f, verbose=True)
 
-	def test_quick(self):
+	printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
+
+	def test_quick0(self):
 		"""
 
 		"""
-		print("=================\nQUICK TEST **************")
+		print("=================\nQUICK TEST 0 **************")
+		# just showing how to accumulate tests
 
-		f = DATA_FOLDER + "pizza.ttl"
-		printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
 
-		o = Ontospy(f, verbose=True)
+	def test_quick1(self):
+		"""
 
-		for c in o.classes:
-			c.describe()
-			if c.instances:
-				for el in c.instances:
-					print(el.uri, el.qname)
+		"""
+		print("=================\nQUICK TEST 1 **************")
+
+		e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
+
+		print(e)
+		print(e.bestLabel())
+		print(e.rdf_source())
+
 
 if __name__ == "__main__":
 	unittest.main()

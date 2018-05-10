@@ -4,6 +4,28 @@ Changelog
 Summary of changes. 
 
 
+May 9, 2018: v1.9
+---------------------------------
+Refactoring method names:
+* all 'extract_' methods renamed as 'build_' renamed as extract_all 
+* build_entity_from_uri: extract all triples for a specific URI (even if not in model) and instantiate RDF_Entity() so that it can be queried further  
+* x.rdfgraph renamed as x.rdflib_graph 
+* x.serialize renamed as x.rdf_source
+* tidy up all tests code
+* ontospy properties returning entities: all renamed using the all_* pattern eg all_classes etc..
+
+
+
+March 21, 2018: v1.8.8
+---------------------------------
+* fix https://github.com/lambdamusic/Ontospy/issues/33
+* instances method for classes on-demand
+* simplified describe method
+* cli: no args shows help
+* fix reference to ontodocs
+* Merge pull request #37 from satra/patch-1
+
+
 June 1, 2017
 ---------------------------------
 merged dev into master

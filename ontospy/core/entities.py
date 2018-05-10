@@ -45,33 +45,35 @@ class RDF_Entity(object):
         self.id = next(self._ids)
 
         self.uri = uri # rdflib.Uriref
-        self.qname = self.__buildQname(self.uri, namespaces)
+
         self.locale	 = inferURILocalSymbol(self.uri)[0]
         self.ext_model = ext_model
         self.is_Bnode = is_Bnode
         self.slug	 = None
         self.rdftype = rdftype
-        self.rdftype_qname = self.__buildQname(rdftype, namespaces)
         self.triples = None
-        self.rdfgraph = rdflib.Graph()
+        self.rdflib_graph = rdflib.Graph()
         self.namespaces = namespaces
-        self.shapes = []
+        self.all_shapes = []
+
+        self.qname = self._build_qname()
+        self.rdftype_qname = self._build_qname(rdftype)
 
         self._children = []
         self._parents = []
         # self.siblings = []
 
-    def serialize(self, format="turtle"):
+    def rdf_source(self, format="turtle"):
         """ xml, n3, turtle, nt, pretty-xml, trix are built in"""
         if self.triples:
-            if not self.rdfgraph:
+            if not self.rdflib_graph:
                 self._buildGraph()
-            return self.rdfgraph.serialize(format=format)
+            return self.rdflib_graph.serialize(format=format)
         else:
             return None
 
     def printSerialize(self, format="turtle"):
-        printDebug("\n" + self.serialize(format))
+        printDebug("\n" + self.rdf_source(format))
 
     def printTriples(self):
         """ display triples """
@@ -81,12 +83,14 @@ class RDF_Entity(object):
             printDebug(Fore.GREEN + ".... " + unicode(x[2]) + Fore.RESET)
         print("")
 
-    def __buildQname(self, uri, namespaces, ):
+    def _build_qname(self, uri=None, namespaces=None ):
         """ extracts a qualified name for a uri """
-        if uri:
-            return uri2niceString(uri, namespaces)
-        else:
-            return ""
+        if not uri:
+            uri = self.uri
+        if not namespaces:
+            namespaces = self.namespaces
+        return uri2niceString(uri, namespaces)
+
 
     def _buildGraph(self):
         """
@@ -94,10 +98,10 @@ class RDF_Entity(object):
         (which can be used later for querying)
         """
         for n in self.namespaces:
-            self.rdfgraph.bind(n[0], rdflib.Namespace(n[1]))
+            self.rdflib_graph.bind(n[0], rdflib.Namespace(n[1]))
         if self.triples:
             for terzetto in self.triples:
-                self.rdfgraph.add(terzetto)
+                self.rdflib_graph.add(terzetto)
 
     # methods added to RDF_Entity even though they apply only to some subs
 
@@ -157,7 +161,9 @@ class RDF_Entity(object):
             [rdflib.term.URIRef(u'http://www.w3.org/2002/07/owl#Class'),
              rdflib.term.URIRef(u'http://www.w3.org/2000/01/rdf-schema#Class')]
         """
-        return list(self.rdfgraph.objects(None, aPropURIRef))
+        if not type(aPropURIRef) == rdflib.URIRef:
+            aPropURIRef = rdflib.URIRef(aPropURIRef)
+        return list(self.rdflib_graph.objects(None, aPropURIRef))
 
 
     def bestLabel(self, prefLanguage="en", qname_allowed=True, quotes=False):
@@ -223,9 +229,9 @@ class Ontology(RDF_Entity):
         # self.uri = uri # rdflib.Uriref
         self.prefix = prefPrefix
         self.slug = "ontology-" + slugify(self.qname)
-        self.classes = []
-        self.properties = []
-        self.skosConcepts = []
+        self.all_classes = []
+        self.all_properties = []
+        self.all_skos_concepts = []
 
     def annotations(self, qname=True):
         """
@@ -247,8 +253,8 @@ class Ontology(RDF_Entity):
 
     def stats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("Classes.....: %d" % len(self.classes))
-        printDebug("Properties..: %d" % len(self.properties))
+        printDebug("Classes.....: %d" % len(self.all_classes))
+        printDebug("Properties..: %d" % len(self.all_properties))
 
 
 
@@ -307,10 +313,6 @@ class OntoClass(RDF_Entity):
 
     def count(self):
         return len(self.instances)
-        # if self.sparqlHelper:
-        #     return self.sparqlHelper.getClassInstancesCount(self.uri)
-        # else:
-        #     return 0
 
 
     def printStats(self):

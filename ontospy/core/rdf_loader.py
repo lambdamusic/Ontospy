@@ -46,7 +46,7 @@ class RDFLoader(object):
     def __init__(self, rdfgraph=None):
         super(RDFLoader, self).__init__()
 
-        self.rdfgraph = rdfgraph or rdflib.Graph()
+        self.rdflib_graph = rdfgraph or rdflib.Graph()
         self.sources_valid = []
         self.sources_invalid = []
 
@@ -98,7 +98,7 @@ class RDFLoader(object):
 
         if verbose: self.print_summary()
 
-        return self.rdfgraph
+        return self.rdflib_graph
 
 
 
@@ -109,7 +109,7 @@ class RDFLoader(object):
         """
         if self.sources_valid:
             printDebug("----------\nLoaded %d triples.\n----------" %
-                len(self.rdfgraph), fg='green')
+                len(self.rdflib_graph), fg='green')
             printDebug("RDF sources loaded successfully: %d of %d.\n----------" %
                 (len(self.sources_valid), len(self.sources_valid) + len(self.sources_invalid)), fg='green')
             for s in self.sources_valid:
@@ -140,7 +140,7 @@ class RDFLoader(object):
         for f in self.rdf_format_opts:
             if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
             try:
-                self.rdfgraph.parse(uri, format=f)
+                self.rdflib_graph.parse(uri, format=f)
                 if verbose: printDebug("..... success!", bold=True)
                 success = True
                 self.sources_valid += [uri]
@@ -168,7 +168,7 @@ class RDFLoader(object):
         for f in self.rdf_format_opts:
             if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
             try:
-                self.rdfgraph.parse(data=text, format=f)
+                self.rdflib_graph.parse(data=text, format=f)
                 if verbose: printDebug("..... success!")
                 success = True
                 self.sources_valid += ["Text: '%s ...'" % text[:10]]
@@ -192,7 +192,7 @@ class RDFLoader(object):
         if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
 
         if type(file_obj) == file:
-            self.rdfgraph = self.rdfgraph + file_obj
+            self.rdflib_graph = self.rdflib_graph + file_obj
             self.sources_valid += [file_obj.NAME]
         else:
             self.loading_failed(self.rdf_format_opts)

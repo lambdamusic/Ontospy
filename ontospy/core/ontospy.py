@@ -35,7 +35,7 @@ class Ontospy(object):
 
     In [7]: o.load_rdf("foaf.rdf")
 
-    In [11]: o.extract_entities()
+    In [11]: o.build_all()
 
     In [13]: o.stats()
     Out[13]:
@@ -51,38 +51,39 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, extract_entities=True):
+    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
         super(Ontospy, self).__init__()
 
-        self.rdfgraph = None
+        self.rdflib_graph = None
         self.sparql_endpoint = None
         self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
         self.sparqlHelper = None
-        self.ontologies = []
-        self.classes = []
         self.namespaces = []
-        self.properties = []
-        self.annotationProperties = []
-        self.objectProperties = []
-        self.datatypeProperties = []
-        self.skosConcepts = []
-        self.individuals = []
-        self.shapes = []
-        self.toplayer = []
-        self.toplayerProperties = []
-        self.toplayerSkosConcepts = []
-        self.toplayerShapes = []
+        # entities buckets start with 'all_'
+        self.all_ontologies = []
+        self.all_classes = []
+        self.all_properties = []
+        self.all_properties_annotation = []
+        self.all_properties_object = []
+        self.all_properties_datatype = []
+        self.all_skos_concepts = []
+        self.all_shapes = []
+        # self.all_individuals = []
+        self.toplayer_classes  = []
+        self.toplayer_properties = []
+        self.toplayer_skos = []
+        self.toplayer_shapes = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
         # finally:
         if uri_or_path or text or file_obj:
             self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
-            if extract_entities:
-                self.extract_entities(verbose=verbose, hide_base_schemas=hide_base_schemas)
+            if build_all:
+                self.build_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
         elif sparql_endpoint: # by default entities are not extracted
             self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
         else:
@@ -93,13 +94,13 @@ class Ontospy(object):
         """
         Return some info for the ontospy instance.
 
-        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdfgraph` on a sparql endpoint is enough to cause a long query!)
+        note: if it's a sparql backend, limit the info returned to avoid long queries (tip: a statement like `if self.rdflib_graph` on a sparql endpoint is enough to cause a long query!)
 
         """
-        if self.sparql_endpoint and self.rdfgraph != None:
+        if self.sparql_endpoint and self.rdflib_graph != None:
             return "<Ontospy Graph (sparql endpoint = <%s>)>" % self.sparql_endpoint
-        elif self.rdfgraph != None:
-            return "<Ontospy Graph (%d triples)>" % (len(self.rdfgraph))
+        elif self.rdflib_graph != None:
+            return "<Ontospy Graph (%d triples)>" % (len(self.rdflib_graph))
         else:
             return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
 
@@ -108,10 +109,10 @@ class Ontospy(object):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
         loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
-        self.rdfgraph = loader.rdfgraph
+        self.rdflib_graph = loader.rdflib_graph
         self.sources = loader.sources_valid
-        self.sparqlHelper = SparqlHelper(self.rdfgraph)
-        self.namespaces = sorted(self.rdfgraph.namespaces())
+        self.sparqlHelper = SparqlHelper(self.rdflib_graph)
+        self.namespaces = sorted(self.rdflib_graph.namespaces())
 
 
     def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True, credentials=None):
@@ -131,28 +132,28 @@ class Ontospy(object):
                 # graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')
 
             graph.open(sparql_endpoint)
-            self.rdfgraph = graph
+            self.rdflib_graph = graph
             self.sparql_endpoint = sparql_endpoint
             self.sources = [sparql_endpoint]
-            self.sparqlHelper = SparqlHelper(self.rdfgraph, self.sparql_endpoint)
-            self.namespaces = sorted(self.rdfgraph.namespaces())
+            self.sparqlHelper = SparqlHelper(self.rdflib_graph, self.sparql_endpoint)
+            self.namespaces = sorted(self.rdflib_graph.namespaces())
         except:
             printDebug("Error trying to connect to Endpoint.")
             raise
         # don't extract entities by default..
 
 
-    def serialize(self, format="turtle"):
+    def rdf_source(self, format="turtle"):
         """
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
         """
-        return self.rdfgraph.serialize(format=format)
+        return self.rdflib_graph.serialize(format=format)
 
 
     def query(self, stringa):
         """ wrapper for rdflib sparql query method """
-        qres = self.rdfgraph.query(stringa)
+        qres = self.rdflib_graph.query(stringa)
         return list(qres)
 
 
@@ -161,7 +162,7 @@ class Ontospy(object):
     # === methods to build python objects === #
     # ------------
 
-    def extract_entities(self, verbose=False, hide_base_schemas=True):
+    def build_all(self, verbose=False, hide_base_schemas=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -169,23 +170,23 @@ class Ontospy(object):
             printDebug("Scanning entities...", "green")
             printDebug("----------", "comment")
 
-        self.extract_ontologies()
-        if verbose: printDebug("Ontologies.........: %d" % len(self.ontologies), "comment")
+        self.build_ontologies()
+        if verbose: printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
-        self.extract_classes(hide_base_schemas)
-        if verbose: printDebug("Classes............: %d" % len(self.classes), "comment")
+        self.build_classes(hide_base_schemas)
+        if verbose: printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
-        self.extract_properties()
-        if verbose: printDebug("Properties.........: %d" % len(self.properties), "comment")
-        if verbose: printDebug("..annotation.......: %d" % len(self.annotationProperties), "comment")
-        if verbose: printDebug("..datatype.........: %d" % len(self.datatypeProperties), "comment")
-        if verbose: printDebug("..object...........: %d" % len(self.objectProperties), "comment")
+        self.build_properties()
+        if verbose: printDebug("Properties.........: %d" % len(self.all_properties), "comment")
+        if verbose: printDebug("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
+        if verbose: printDebug("..datatype.........: %d" % len(self.all_properties_datatype), "comment")
+        if verbose: printDebug("..object...........: %d" % len(self.all_properties_object), "comment")
 
-        self.extract_skos_concepts()
-        if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.skosConcepts), "comment")
+        self.build_skos_concepts()
+        if verbose: printDebug("Concepts (SKOS)....: %d" % len(self.all_skos_concepts), "comment")
 
-        self.extract_shapes()
-        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.shapes), "comment")
+        self.build_shapes()
+        if verbose: printDebug("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
 
         # self.__computeTopLayer()
 
@@ -194,7 +195,7 @@ class Ontospy(object):
         if verbose: printDebug("----------", "comment")
 
 
-    def extract_ontologies(self, exclude_BNodes = False, return_string=False):
+    def build_ontologies(self, exclude_BNodes = False, return_string=False):
         """
         Extract ontology instances info from the graph, then creates python objects for them.
 
@@ -218,15 +219,15 @@ class Ontospy(object):
                     if exclude_BNodes:
                         continue
                     else:
-                        checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], rdflib.namespace.DC.identifier)]
+                        checkDC_ID = [x for x in self.rdflib_graph.objects(candidate[0], rdflib.namespace.DC.identifier)]
                         if checkDC_ID:
                             out += [Ontology(checkDC_ID[0], namespaces=self.namespaces),]
                         else:
                             vannprop = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespaceUri")
                             vannpref = rdflib.URIRef("http://purl.org/vocab/vann/preferredNamespacePrefix")
-                            checkDC_ID = [x for x in self.rdfgraph.objects(candidate[0], vannprop)]
+                            checkDC_ID = [x for x in self.rdflib_graph.objects(candidate[0], vannprop)]
                             if checkDC_ID:
-                                checkDC_prefix = [x for x in self.rdfgraph.objects(candidate[0], vannpref)]
+                                checkDC_prefix = [x for x in self.rdflib_graph.objects(candidate[0], vannpref)]
                                 if checkDC_prefix:
                                     out += [Ontology(checkDC_ID[0],
                                                      namespaces=self.namespaces,
@@ -243,8 +244,8 @@ class Ontospy(object):
             # printDebug("No owl:Ontologies found")
 
         #finally... add all annotations/triples
-        self.ontologies = out
-        for onto in self.ontologies:
+        self.all_ontologies = out
+        for onto in self.all_ontologies:
             onto.triples = self.sparqlHelper.entityTriples(onto.uri)
             onto._buildGraph() # force construction of mini graph
 
@@ -254,7 +255,7 @@ class Ontospy(object):
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
 
-    def extract_classes(self, hide_base_schemas=True):
+    def build_classes(self, hide_base_schemas=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -267,7 +268,7 @@ class Ontospy(object):
         """
 
 
-        self.classes = [] # @todo: keep adding?
+        self.all_classes = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
 
@@ -279,18 +280,18 @@ class Ontospy(object):
             except:
                 _type= ""
 
-            test_existing_cl = self.getClass(uri=_uri)
+            test_existing_cl = self.get_class(uri=_uri)
             if not test_existing_cl:
                 # create it
                 ontoclass = OntoClass(_uri, _type, self.namespaces)
-                self.classes += [ontoclass]
+                self.all_classes += [ontoclass]
             else:
                 # if OWL.Class over RDFS.Class - update it
                 if _type == rdflib.OWL.Class:
                     test_existing_cl.rdftype = rdflib.OWL.Class
 
         #add more data
-        for aClass in self.classes:
+        for aClass in self.all_classes:
 
             aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph() # force construction of mini graph
@@ -299,16 +300,16 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
-                    onto.classes += [aClass]
+                    onto.all_classes += [aClass]
                     aClass.ontology = onto
 
             # add direct Supers
             directSupers = self.sparqlHelper.getClassDirectSupers(aClass.uri)
 
             for x in directSupers:
-                superclass = self.getClass(uri=x[0])
+                superclass = self.get_class(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superclass and superclass.uri != aClass.uri:
                     aClass._parents.append(superclass)
@@ -318,19 +319,19 @@ class Ontospy(object):
                          superclass._children.append(aClass)
 
         # sort alphabetically
-        self.classes = sorted(self.classes, key=lambda x: x.qname)
+        self.all_classes = sorted(self.all_classes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             if not c.parents():
                 exit += [c]
-        self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_classes  = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
 
-    def extract_properties(self):
+    def build_properties(self):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -340,19 +341,19 @@ class Ontospy(object):
         # eg OWL:ObjectProperty over RDF:property
 
         """
-        self.properties = [] # @todo: keep adding?
-        self.annotationProperties = []
-        self.objectProperties = []
-        self.datatypeProperties = []
+        self.all_properties = [] # @todo: keep adding?
+        self.all_properties_annotation = []
+        self.all_properties_object = []
+        self.all_properties_datatype = []
 
         qres = self.sparqlHelper.getAllProperties()
 
         for candidate in qres:
 
-            test_existing_prop = self.getProperty(uri=candidate[0])
+            test_existing_prop = self.get_property(uri=candidate[0])
             if not test_existing_prop:
                 # create it
-                self.properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
+                self.all_properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
             else:
                 # update it
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
@@ -360,14 +361,14 @@ class Ontospy(object):
 
 
         #add more data
-        for aProp in self.properties:
+        for aProp in self.all_properties:
 
             if aProp.rdftype == rdflib.OWL.DatatypeProperty:
-                self.datatypeProperties += [aProp]
+                self.all_properties_datatype += [aProp]
             elif aProp.rdftype == rdflib.OWL.AnnotationProperty:
-                self.annotationProperties += [aProp]
+                self.all_properties_annotation += [aProp]
             elif aProp.rdftype == rdflib.OWL.ObjectProperty:
-                self.objectProperties += [aProp]
+                self.all_properties_object += [aProp]
             else:
                 pass
 
@@ -376,9 +377,9 @@ class Ontospy(object):
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
             for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
-                    onto.properties += [aProp]
+                    onto.all_properties += [aProp]
                     aProp.ontology = onto
 
 
@@ -389,7 +390,7 @@ class Ontospy(object):
             directSupers = self.sparqlHelper.getPropDirectSupers(aProp.uri)
 
             for x in directSupers:
-                superprop = self.getProperty(uri=x[0])
+                superprop = self.get_property(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superprop and superprop.uri != aProp.uri:
                     aProp._parents.append(superprop)
@@ -400,39 +401,39 @@ class Ontospy(object):
 
 
         # sort alphabetically
-        self.properties = sorted(self.properties, key=lambda x: x.qname)
+        self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
 
         # computer top layer for properties
         exit = []
-        for c in self.properties:
+        for c in self.all_properties:
             if not c.parents():
                 exit += [c]
-        self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_properties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
 
-    def extract_skos_concepts(self):
+    def build_skos_concepts(self):
         """
         2015-08-19: first draft
         """
-        self.skosConcepts = [] # @todo: keep adding?
+        self.all_skos_concepts = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getSKOSInstances()
 
         for candidate in qres:
 
-            test_existing_cl = self.getSkosConcept(uri=candidate[0])
+            test_existing_cl = self.get_skos(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.skosConcepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
+                self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
             else:
                 pass
 
         #add more data
         skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
 
-        for aConcept in self.skosConcepts:
+        for aConcept in self.all_skos_concepts:
 
             aConcept.rdftype = skos['Concept']
             aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
@@ -442,16 +443,16 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.getOntology(str(uri))
+                onto = self.get_ontology(str(uri))
                 if onto:
-                    onto.skosConcepts += [aConcept]
+                    onto.all_skos_concepts += [aConcept]
                     aConcept.ontology = onto
 
             # add direct Supers
             directSupers = self.sparqlHelper.getSKOSDirectSupers(aConcept.uri)
 
             for x in directSupers:
-                superclass = self.getSkosConcept(uri=x[0])
+                superclass = self.get_skos(uri=x[0])
                 # note: extra condition to avoid recursive structures
                 if superclass and superclass.uri != aConcept.uri:
                     aConcept._parents.append(superclass)
@@ -462,19 +463,19 @@ class Ontospy(object):
 
 
         # sort alphabetically
-        self.skosConcepts = sorted(self.skosConcepts, key=lambda x: x.qname)
+        self.all_skos_concepts = sorted(self.all_skos_concepts, key=lambda x: x.qname)
 
         # compute top layer for skos
         exit = []
-        for c in self.skosConcepts:
+        for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
-        self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_skos = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
 
 
-    def extract_shapes(self):
+    def build_shapes(self):
         """
         Extract SHACL data shapes from the rdf graph.
         <http://www.w3.org/ns/shacl#>
@@ -482,23 +483,23 @@ class Ontospy(object):
         Instatiate the Shape Python objects and relate it to existing classes,
         if available.
         """
-        self.shapes = [] # @todo: keep adding?
+        self.all_shapes = [] # @todo: keep adding?
 
         qres = self.sparqlHelper.getShapes()
 
         for candidate in qres:
 
-            test_existing_cl = self.getEntity(uri=candidate[0])
+            test_existing_cl = self.get_any_entity(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.shapes += [OntoShape(candidate[0], None, self.namespaces)]
+                self.all_shapes += [OntoShape(candidate[0], None, self.namespaces)]
             else:
                 pass
 
         #add more data
         shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
 
-        for aShape in self.shapes:
+        for aShape in self.all_shapes:
 
             aShape.rdftype = shacl['Shape']
             aShape.triples = self.sparqlHelper.entityTriples(aShape.uri)
@@ -508,22 +509,46 @@ class Ontospy(object):
 
             # attach to a class
             for uri in aShape.getValuesForProperty(shacl['targetClass']):
-                aclass = self.getClass(str(uri))
+                aclass = self.get_class(str(uri))
                 if aclass:
                     aShape.targetClasses += [aclass]
-                    aclass.shapes += [aShape]
+                    aclass.all_shapes += [aShape]
 
 
         # sort alphabetically
-        self.shapes = sorted(self.shapes, key=lambda x: x.qname)
+        self.all_shapes = sorted(self.all_shapes, key=lambda x: x.qname)
 
         # compute top layer
         exit = []
-        for c in self.shapes:
+        for c in self.all_shapes:
             if not c.parents():
                 exit += [c]
-        self.toplayerShapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_shapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
+
+
+
+    def build_entity_from_uri(self, uri):
+        """
+        Extract RDF statements having a URI as subject
+
+        Instatiate the RDF_Entity Python object so that it can be queried further.
+
+        NOTE: the entity is not attached to any index. In future version we may create an index for these (individuals?) keeping into account that any existing model entity could be (re)created this way.
+        """
+        qres = self.sparqlHelper.entityTriples(uri)
+        if qres:
+            entity = RDF_Entity(rdflib.URIRef(uri), None, self.namespaces)
+            entity.triples = qres
+            entity._buildGraph() # force construction of mini graph
+            # try to add class info
+            test = entity.getValuesForProperty(rdflib.RDF.type)
+            if test:
+                entity.rdftype = test
+                entity.rdftype_qname = [entity._build_qname(x) for x in test]
+            return entity
+        else:
+            return None
 
 
 
@@ -538,14 +563,14 @@ class Ontospy(object):
         """
         extract domain/range details and add to Python objects
         """
-        domains = aProp.rdfgraph.objects(None, rdflib.RDFS.domain)
-        ranges =  aProp.rdfgraph.objects(None, rdflib.RDFS.range)
+        domains = aProp.rdflib_graph.objects(None, rdflib.RDFS.domain)
+        ranges =  aProp.rdflib_graph.objects(None, rdflib.RDFS.range)
 
         for x in domains:
             if isBlankNode(x):
                 aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
             else:
-                aClass = self.getClass(uri=str(x))
+                aClass = self.get_class(uri=str(x))
                 if aClass:
                     aProp.domains += [aClass]
                     aClass.domain_of += [aProp]
@@ -557,7 +582,7 @@ class Ontospy(object):
             if isBlankNode(x):
                 aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
             else:
-                aClass = self.getClass(uri=str(x))
+                aClass = self.get_class(uri=str(x))
                 if aClass:
                     aProp.ranges += [aClass]
                     aClass.range_of += [aProp]
@@ -577,24 +602,24 @@ class Ontospy(object):
         """
 
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             if not c.parents():
                 exit += [c]
-        self.toplayer = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_classes  = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
         # properties
         exit = []
-        for c in self.properties:
+        for c in self.all_properties:
             if not c.parents():
                 exit += [c]
-        self.toplayerProperties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_properties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
         # skos
         exit = []
-        for c in self.skosConcepts:
+        for c in self.all_skos_concepts:
             if not c.parents():
                 exit += [c]
-        self.toplayerSkosConcepts = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.toplayer_skos = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
     def __computeInferredProperties(self):
@@ -603,7 +628,7 @@ class Ontospy(object):
         :return: attach a list of dicts to each class, detailing valid props up the subsumption tree
         """
         exit = []
-        for c in self.classes:
+        for c in self.all_classes:
             c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of")
             c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of")
 
@@ -633,7 +658,7 @@ class Ontospy(object):
 
             # add properties from Owl:Thing ie the inference layer
 
-            topLevelProps = [p for p in self.properties if p.domains == []]
+            topLevelProps = [p for p in self.all_properties if p.domains == []]
             if topLevelProps:
                 _list.append({self.OWLTHING: topLevelProps})
 
@@ -645,7 +670,7 @@ class Ontospy(object):
 
             # add properties from Owl:Thing ie the inference layer
 
-            topLevelProps = [p for p in self.properties if p.ranges == []]
+            topLevelProps = [p for p in self.all_properties if p.ranges == []]
             if topLevelProps:
                 _list.append({self.OWLTHING: topLevelProps})
 
@@ -663,15 +688,15 @@ class Ontospy(object):
     def stats(self):
         """ shotcut to pull out useful info for a graph"""
         out = []
-        out += [("Ontologies", len(self.ontologies))]
+        out += [("Ontologies", len(self.all_ontologies))]
         out += [("Triples", self.triplesCount())]
-        out += [("Classes", len(self.classes))]
-        out += [("Properties", len(self.properties))]
-        out += [("Annotation Properties", len(self.annotationProperties))]
-        out += [("Object Properties", len(self.objectProperties))]
-        out += [("Datatype Properties", len(self.datatypeProperties))]
-        out += [("Skos Concepts", len(self.skosConcepts))]
-        out += [("Data Shapes", len(self.shapes))]
+        out += [("Classes", len(self.all_classes))]
+        out += [("Properties", len(self.all_properties))]
+        out += [("Annotation Properties", len(self.all_properties_annotation))]
+        out += [("Object Properties", len(self.all_properties_object))]
+        out += [("Datatype Properties", len(self.all_properties_datatype))]
+        out += [("Skos Concepts", len(self.all_skos_concepts))]
+        out += [("Data Shapes", len(self.all_shapes))]
         # out += [("Individuals", len(self.individuals))] @TODO
         out += [("Data Sources", len(self.sources))]
         return out
@@ -684,9 +709,9 @@ class Ontospy(object):
         emerging with counting graph length on cached Graph objects..
         """
         # @todo  investigate what's going on..
-        # click.secho(unicode(type(self.rdfgraph)), fg="red")
+        # click.secho(unicode(type(self.rdflib_graph)), fg="red")
         try:
-            return len(self.rdfgraph)
+            return len(self.rdflib_graph)
         except:
             click.secho("Ontospy: error counting graph length..", fg="red")
             return 0
@@ -698,19 +723,19 @@ class Ontospy(object):
     # ================
 
 
-    def getClass(self, id=None, uri=None, match=None):
+    def get_class(self, id=None, uri=None, match=None):
         """
         get the saved-class with given ID or via other methods...
 
         Note: it tries to guess what is being passed..
 
-        In [1]: g.getClass(uri='http://www.w3.org/2000/01/rdf-schema#Resource')
+        In [1]: g.get_class(uri='http://www.w3.org/2000/01/rdf-schema#Resource')
         Out[1]: <Class *http://www.w3.org/2000/01/rdf-schema#Resource*>
 
-        In [2]: g.getClass(10)
+        In [2]: g.get_class(10)
         Out[2]: <Class *http://purl.org/ontology/bibo/AcademicArticle*>
 
-        In [3]: g.getClass(match="person")
+        In [3]: g.get_class(match="person")
         Out[3]:
         [<Class *http://purl.org/ontology/bibo/PersonalCommunicationDocument*>,
          <Class *http://purl.org/ontology/bibo/PersonalCommunication*>,
@@ -732,16 +757,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.classes:
+            for x in self.all_classes:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -749,7 +774,7 @@ class Ontospy(object):
             return None
 
 
-    def getProperty(self, id=None, uri=None, match=None):
+    def get_property(self, id=None, uri=None, match=None):
         """
         get the saved-class with given ID or via other methods...
 
@@ -770,16 +795,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.properties:
+            for x in self.all_properties:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -787,7 +812,7 @@ class Ontospy(object):
             return None
 
 
-    def getSkosConcept(self, id=None, uri=None, match=None):
+    def get_skos(self, id=None, uri=None, match=None):
         """
         get the saved skos concept with given ID or via other methods...
 
@@ -808,16 +833,16 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.skosConcepts:
+                for x in self.all_skos_concepts:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.skosConcepts:
+                for x in self.all_skos_concepts:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.skosConcepts:
+            for x in self.all_skos_concepts:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -825,7 +850,7 @@ class Ontospy(object):
             return None
 
 
-    def getEntity(self, id=None, uri=None, match=None):
+    def get_any_entity(self, id=None, uri=None, match=None):
         """
         get a generic entity with given ID or via other methods...
         """
@@ -844,27 +869,27 @@ class Ontospy(object):
                 return []
             res = []
             if ":" in match: # qname
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.qname.lower():
                         res += [x]
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.qname.lower():
                         res += [x]
             else:
-                for x in self.classes:
+                for x in self.all_classes:
                     if match.lower() in x.uri.lower():
                         res += [x]
-                for x in self.properties:
+                for x in self.all_properties:
                     if match.lower() in x.uri.lower():
                         res += [x]
             return res
         else:
-            for x in self.classes:
+            for x in self.all_classes:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
                     return x
-            for x in self.properties:
+            for x in self.all_properties:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -873,7 +898,7 @@ class Ontospy(object):
 
 
 
-    def getOntology(self, id=None, uri=None, match=None):
+    def get_ontology(self, id=None, uri=None, match=None):
         """
         get the saved-ontology with given ID or via other methods...
         """
@@ -891,12 +916,12 @@ class Ontospy(object):
             if type(match) != type("string"):
                 return []
             res = []
-            for x in self.ontologies:
+            for x in self.all_ontologies:
                 if match.lower() in x.uri.lower():
                     res += [x]
             return res
         else:
-            for x in self.ontologies:
+            for x in self.all_ontologies:
                 if id and x.id == id:
                     return x
                 if uri and x.uri.lower() == uri.lower():
@@ -906,10 +931,10 @@ class Ontospy(object):
 
     def nextClass(self, classuri):
         """Returns the next class in the list of classes. If it's the last one, returns the first one."""
-        if classuri == self.classes[-1].uri:
-            return self.classes[0]
+        if classuri == self.all_classes[-1].uri:
+            return self.all_classes[0]
         flag = False
-        for x in self.classes:
+        for x in self.all_classes:
             if flag == True:
                 return x
             if x.uri == classuri:
@@ -919,10 +944,10 @@ class Ontospy(object):
 
     def nextProperty(self, propuri):
         """Returns the next property in the list of properties. If it's the last one, returns the first one."""
-        if propuri == self.properties[-1].uri:
-            return self.properties[0]
+        if propuri == self.all_properties[-1].uri:
+            return self.all_properties[0]
         flag = False
-        for x in self.properties:
+        for x in self.all_properties:
             if flag == True:
                 return x
             if x.uri == propuri:
@@ -931,10 +956,10 @@ class Ontospy(object):
 
     def nextConcept(self, concepturi):
         """Returns the next skos concept in the list of concepts. If it's the last one, returns the first one."""
-        if concepturi == self.skosConcepts[-1].uri:
-            return self.skosConcepts[0]
+        if concepturi == self.all_skos_concepts[-1].uri:
+            return self.all_skos_concepts[0]
         flag = False
-        for x in self.skosConcepts:
+        for x in self.all_skos_concepts:
             if flag == True:
                 return x
             if x.uri == concepturi:
@@ -954,7 +979,7 @@ class Ontospy(object):
         TYPE_MARGIN = 11 # length for owl:class etc..
 
         if not element:	 # first time
-            for x in self.toplayer:
+            for x in self.toplayer_classes:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -973,7 +998,7 @@ class Ontospy(object):
         TYPE_MARGIN = 18 # length for owl:AnnotationProperty etc..
 
         if not element:	 # first time
-            for x in self.toplayerProperties:
+            for x in self.toplayer_properties:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -992,7 +1017,7 @@ class Ontospy(object):
         TYPE_MARGIN = 13 # length for skos:concept
 
         if not element:	 # first time
-            for x in self.toplayerSkosConcepts:
+            for x in self.toplayer_skos:
                 printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
         else:
@@ -1006,9 +1031,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.classes:
-            treedict[0] = self.toplayer
-            for element in self.classes:
+        if self.all_classes:
+            treedict[0] = self.toplayer_classes
+            for element in self.all_classes:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
@@ -1022,9 +1047,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.properties:
-            treedict[0] = self.toplayerProperties
-            for element in self.properties:
+        if self.all_properties:
+            treedict[0] = self.toplayer_properties
+            for element in self.all_properties:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
@@ -1038,9 +1063,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.skosConcepts:
-            treedict[0] = self.toplayerSkosConcepts
-            for element in self.skosConcepts:
+        if self.all_skos_concepts:
+            treedict[0] = self.toplayer_skos
+            for element in self.all_skos_concepts:
                 if element.children():
                     treedict[element] = element.children()
             return treedict
@@ -1055,9 +1080,9 @@ class Ontospy(object):
         Multi inheritance is represented explicitly
         """
         treedict = {}
-        if self.shapes:
-            treedict[0] = self.toplayerShapes
-            for element in self.shapes:
+        if self.all_shapes:
+            treedict[0] = self.toplayer_shapes
+            for element in self.all_shapes:
                 if element.children():
                     treedict[element] = element.children()
             return treedict

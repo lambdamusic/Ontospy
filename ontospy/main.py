@@ -76,9 +76,11 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--save', '-s', is_flag=True, help='SAVE: save a file/folder/url into the local library.')
 @click.option('--reset', '-r', is_flag=True, help='RESET: delete all files in the local library.')
 @click.option('--update', '-u', is_flag=True, help='UPDATE: enter new path for the local library.')
-@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: show entities labels as well as URIs.')
+@click.option('--verbose', '-v', is_flag=True, help='VERBOSE: verbose logs and entities labels.')
 @click.option('--web', '-w', is_flag=True, help='WEB: import ontologies from remote repositories.')
-def main_cli(sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
+@click.option('--shell', '-z', is_flag=True, help='SHELL: launch the interactive shell.')
+@click.pass_context
+def main_cli(ctx, sources=None, library=False, verbose=False, save=False, bootstrap=False, web=False, shell=False, cache=False, update=False, delete=False, reset=False, endpoint=False):
     """
 Ontospy is a command line inspector for RDF/OWL knowledge models.
 
@@ -164,17 +166,21 @@ More info: <ontospy.readthedocs.org>
         action_webimport()
         # raise SystemExit(1)
 
+    elif shell:
+        from extras.shell import launch_shell
+        launch_shell(sources)
+
     else:
-        if sources or endpoint:
+        if sources or (sources and endpoint):
             t = "You passed the arguments:%s" % "".join([ "\n-> <%s>" % str(x) for x in sources])
             click.secho(str(t), fg='green')
             if endpoint:
                 g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
                 printDebug("Extracting classes info")
-                g.extract_classes()
+                g.build_classes()
                 printDebug("..done")
                 printDebug("Extracting properties info")
-                g.extract_properties()
+                g.build_properties()
                 printDebug("..done")
             else:
                 g = Ontospy(uri_or_path=sources, verbose=verbose)
@@ -182,19 +188,8 @@ More info: <ontospy.readthedocs.org>
             shellPrintOverview(g, print_opts)
 
         else:
-            # click.secho("You haven't specified any argument.\nShowing the local library: '%s'" % get_home_location(), fg='red')
-            click.secho("You haven't specified any argument.", fg='red')
-            if click.confirm('Show the local library?'):
-                filename = action_listlocal(all_details=False)
-                if filename:
-                    g = get_pickled_ontology(filename)
-                    if not g:
-                        g = do_pickle_ontology(filename)
-                    shellPrintOverview(g, print_opts)
-            else:
-                printDebug("Goodbye.", "comment")
-                raise SystemExit(1)
-
+            click.echo(ctx.get_help())
+            return
 
 
     # finally: print(some stats.... )

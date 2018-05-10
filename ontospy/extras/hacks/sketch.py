@@ -56,8 +56,8 @@ class Sketch(object):
 	def __init__(self, text=""):
 		super(Sketch, self).__init__()
 
-		self.rdfGraph = rdflib.Graph()
-		self.namespace_manager = NamespaceManager(self.rdfGraph)
+		self.rdflib_graph = rdflib.Graph()
+		self.namespace_manager = NamespaceManager(self.rdflib_graph)
 
 		self.SUPPORTED_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'dot']
 
@@ -82,7 +82,7 @@ class Sketch(object):
 			self.continuousAdd()
 		else:
 			pprefix = ""
-			for x,y in self.rdfGraph.namespaces():
+			for x,y in self.rdflib_graph.namespaces():
 				pprefix += "@prefix %s: <%s> . \n" % (x, y)
 			# add final . if missing
 			if text and (not text.strip().endswith(".")):
@@ -91,7 +91,7 @@ class Sketch(object):
 			text = text.replace(" sub ", " rdfs:subClassOf ")
 			text = text.replace(" class ", " owl:Class ")
 			# finally
-			self.rdfGraph.parse(data=pprefix+text, format="turtle")
+			self.rdflib_graph.parse(data=pprefix+text, format="turtle")
 
 
 	# note: problem here if typying ### on first line!
@@ -109,17 +109,17 @@ class Sketch(object):
 
 	def bind(self, prefixTuple):
 		p, k = prefixTuple
-		self.rdfGraph.bind(p, k)
+		self.rdflib_graph.bind(p, k)
 
 	def clear(self):
 		""""
 		Clears the graph
 			@todo add ability to remove specific triples
 		"""
-		self.rdfGraph.remove((None, None, None))
+		self.rdflib_graph.remove((None, None, None))
 
 
-	def serialize(self, aformat="turtle"):
+	def rdf_source(self, aformat="turtle"):
 		"""
 		Serialize graph using the format required
 		"""
@@ -129,7 +129,7 @@ class Sketch(object):
 			return self.__serializedDot()
 		else:
 			# use stardard rdf serializations
-			return self.rdfGraph.serialize(format=aformat)
+			return self.rdflib_graph.serialize(format=aformat)
 
 	def __serializedDot(self):
 		"""
@@ -140,7 +140,7 @@ class Sketch(object):
 		 }
 		"""
 		temp = ""
-		for x,y,z in self.rdfGraph.triples((None, None, None)):
+		for x,y,z in self.rdflib_graph.triples((None, None, None)):
 			temp += """"%s" -> "%s" [label="%s"];\n""" % (self.namespace_manager.normalizeUri(x), self.namespace_manager.normalizeUri(z), self.namespace_manager.normalizeUri(y))
 		temp = "digraph graphname {\n%s}" % temp
 		return temp
@@ -148,7 +148,7 @@ class Sketch(object):
 
 	def omnigraffle(self):
 		""" tries to open an export directly in omnigraffle """
-		temp = self.serialize("dot")
+		temp = self.rdf_source("dot")
 
 		try:  # try to put in the user/tmp folder
 			from os.path import expanduser
@@ -167,7 +167,7 @@ class Sketch(object):
 
 
 	def show(self, aformat="turtle"):
-		print(self.serialize(aformat))
+		print(self.rdf_source(aformat))
 
 	def docs(self):
 		print(self.__docs__)
@@ -203,7 +203,7 @@ def main(argv=None):
 		print("Argument passing not implemented yet")
 		if False:
 			onto = Model(argv[0])
-			for x in onto.getClasses():
+			for x in onto.get_classes():
 				print(x)
 			onto.buildPythonClasses()
 			s = Sketch()

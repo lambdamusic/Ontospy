@@ -118,7 +118,7 @@ class Shell(cmd.Cmd):
         # useful vars
         self.LOCAL = ONTOSPY_LOCAL
         self.LOCAL_MODELS = manager.get_home_location()
-        self.ontologies = manager.get_localontologies()
+        self.all_ontologies = manager.get_localontologies()
         self.current = None
         self.currentEntity = None
         if uri:
@@ -238,13 +238,13 @@ class Shell(cmd.Cmd):
         """
         if hrlinetop:
             self._print("----------------", "TIP")
-        self._print("Ontologies......: %d" % len(graph.ontologies), "TIP")
-        self._print("Classes.........: %d" % len(graph.classes), "TIP")
-        self._print("Properties......: %d" % len(graph.properties), "TIP")
-        self._print("..annotation....: %d" % len(graph.annotationProperties), "TIP")
-        self._print("..datatype......: %d" % len(graph.datatypeProperties), "TIP")
-        self._print("..object........: %d" % len(graph.objectProperties), "TIP")
-        self._print("Concepts(SKOS)..: %d" % len(graph.skosConcepts), "TIP")
+        self._print("Ontologies......: %d" % len(graph.all_ontologies), "TIP")
+        self._print("Classes.........: %d" % len(graph.all_classes), "TIP")
+        self._print("Properties......: %d" % len(graph.all_properties), "TIP")
+        self._print("..annotation....: %d" % len(graph.all_properties_annotation), "TIP")
+        self._print("..datatype......: %d" % len(graph.all_properties_datatype), "TIP")
+        self._print("..object........: %d" % len(graph.all_properties_object), "TIP")
+        self._print("Concepts(SKOS)..: %d" % len(graph.all_skos_concepts), "TIP")
         self._print("----------------", "TIP")
 
 
@@ -268,7 +268,7 @@ class Shell(cmd.Cmd):
             self._print("Graph: <" + self.current['fullpath'] + ">", 'TIP')
             self._print("----------------", "TIP")
             self._printStats(self.current['graph'])
-            for obj in self.current['graph'].ontologies:
+            for obj in self.current['graph'].all_ontologies:
                 print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
                 # self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
                 # self._print("----------------", "TIP")
@@ -446,7 +446,7 @@ class Shell(cmd.Cmd):
         if self.currentEntity['type'] == 'class':
             if hrlinetop:
                 self._print("----------------")
-            self._print("INSTANCES: [%d]" % len(x.instances, "IMPORTANT")
+            self._print("INSTANCES: [%d]" % len(x.instances, "IMPORTANT"))
             for i in x.instances:
                 self._print(i.qname)
             self._print("----------------")
@@ -530,10 +530,10 @@ class Shell(cmd.Cmd):
         """Dynamically retrieves the next ontology in the list"""
         currentfile = self.current['file']
         try:
-            idx = self.ontologies.index(currentfile)
-            return self.ontologies[idx+1]
+            idx = self.all_ontologies.index(currentfile)
+            return self.all_ontologies[idx+1]
         except:
-            return self.ontologies[0]
+            return self.all_ontologies[0]
 
 
 
@@ -568,11 +568,11 @@ class Shell(cmd.Cmd):
         """try to select an ontology NP: the actual load from FS is in <_load_ontology> """
         try:
             var = int(line)	 # it's a string
-            if var in range(1, len(self.ontologies)+1):
-                self._load_ontology(self.ontologies[var-1])
+            if var in range(1, len(self.all_ontologies)+1):
+                self._load_ontology(self.all_ontologies[var-1])
         except ValueError:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line, "ontology")
@@ -583,17 +583,17 @@ class Shell(cmd.Cmd):
     def _select_class(self, line):
         """
         try to match a class and load it from the graph
-        NOTE: the g.getClass(pattern) method does the heavy lifting
+        NOTE: the g.get_class(pattern) method does the heavy lifting
         """
         g = self.current['graph']
         if not line:
-            out = g.classes
+            out = g.all_classes
             using_pattern=False
         else:
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getClass(line)
+            out = g.get_class(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "class")
@@ -614,13 +614,13 @@ class Shell(cmd.Cmd):
         """try to match a property and load it"""
         g = self.current['graph']
         if not line:
-            out = g.properties
+            out = g.all_properties
             using_pattern=False
         else:
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getProperty(line)
+            out = g.get_property(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "property")
@@ -641,13 +641,13 @@ class Shell(cmd.Cmd):
         """try to match a class and load it"""
         g = self.current['graph']
         if not line:
-            out = g.skosConcepts
+            out = g.all_skos_concepts
             using_pattern=False
         else:
             using_pattern=True
             if line.isdigit():
                 line =	int(line)
-            out = g.getSkosConcept(line)
+            out = g.get_skos(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "concept")
@@ -667,12 +667,12 @@ class Shell(cmd.Cmd):
         """	Delete an ontology
             2016-04-11: not a direct command anymore """
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
 
         else:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line)
@@ -687,7 +687,7 @@ class Shell(cmd.Cmd):
                         os.remove(fullpath)
                         manager.del_pickled_ontology(choice)
                         self._print("<%s> was deleted succesfully." % choice)
-                        self.ontologies = manager.get_localontologies()
+                        self.all_ontologies = manager.get_localontologies()
                     else:
                         return
 
@@ -706,11 +706,11 @@ class Shell(cmd.Cmd):
         """Rename an ontology
             2016-04-11: not a direct command anymore """
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
         else:
             out = []
-            for each in self.ontologies:
+            for each in self.all_ontologies:
                 if line in each:
                     out += [each]
             choice = self._selectFromList(out, line)
@@ -728,7 +728,7 @@ class Shell(cmd.Cmd):
                             os.rename(fullpath, self.LOCAL_MODELS + "/" + var)
                             manager.rename_pickled_ontology(choice, var)
                             self._print("<%s> was renamed succesfully." % choice)
-                            self.ontologies = manager.get_localontologies()
+                            self.all_ontologies = manager.get_localontologies()
                         except:
                             self._print("Not a valid name. An error occurred.")
                             return
@@ -777,7 +777,7 @@ class Shell(cmd.Cmd):
             # self._print("Usage: ls [%s]" % "|".join([x for x in opts]))
 
         elif line[0] == "ontologies":
-            if not self.ontologies:
+            if not self.all_ontologies:
                 self._help_nofiles()
             else:
                 self._select_ontology(_pattern)
@@ -789,21 +789,21 @@ class Shell(cmd.Cmd):
         elif line[0] == "classes":
             g = self.current['graph']
 
-            if g.classes:
+            if g.all_classes:
                 self._select_class(_pattern)
             else:
                 self._print("No classes available.")
 
         elif line[0] == "properties":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 self._select_property(_pattern)
             else:
                 self._print("No properties available.")
 
         elif line[0] == "concepts":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 self._select_concept(_pattern)
             else:
                 self._print("No concepts available.")
@@ -832,7 +832,7 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "classes":
             g = self.current['graph']
-            if g.classes:
+            if g.all_classes:
                 g.printClassTree(showids=False, labels=False, showtype=True)
                 self._print("----------------", "TIP")
             else:
@@ -840,14 +840,14 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "properties":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 g.printPropertyTree(showids=False, labels=False, showtype=True)
             else:
                 self._print("No properties available.")
 
         elif line[0] == "concepts":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 g.printSkosTree(showids=False, labels=False, showtype=True)
             else:
                 self._print("No concepts available.")
@@ -869,7 +869,7 @@ class Shell(cmd.Cmd):
             # self._print("Usage: get [%s] <name>" % "|".join([x for x in opts]))
 
         elif line[0] == "ontology":
-            if not self.ontologies:
+            if not self.all_ontologies:
                 self._help_nofiles()
             else:
                 self._select_ontology(_pattern)
@@ -880,21 +880,21 @@ class Shell(cmd.Cmd):
 
         elif line[0] == "class":
             g = self.current['graph']
-            if g.classes:
+            if g.all_classes:
                 self._select_class(_pattern)
             else:
                 self._print("No classes available.")
 
         elif line[0] == "property":
             g = self.current['graph']
-            if g.properties:
+            if g.all_properties:
                 self._select_property(_pattern)
             else:
                 self._print("No properties available.")
 
         elif line[0] == "concept":
             g = self.current['graph']
-            if g.skosConcepts:
+            if g.all_skos_concepts:
                 self._select_concept(_pattern)
             else:
                 self._print("No concepts available.")
@@ -939,17 +939,17 @@ class Shell(cmd.Cmd):
 
 
         elif line[0] == "toplayer":
-            if g.toplayer:
+            if g.toplayer_classes:
                 self._print("Top Classes\n----------------", "IMPORTANT")
-            for x in g.toplayer:
+            for x in g.toplayer_classes:
                     self._print(x.qname)
-            if g.toplayerProperties:
+            if g.toplayer_properties:
                 self._print("\nTop Properties\n----------------", "IMPORTANT")
-                for x in g.toplayerProperties:
+                for x in g.toplayer_properties:
                     self._print(x.qname)
-            if g.toplayerSkosConcepts:
+            if g.toplayer_skos:
                 self._print("\nTop Concepts (SKOS)\n----------------", "IMPORTANT")
-                for x in g.toplayerSkosConcepts:
+                for x in g.toplayer_skos:
                     self._print(x.qname)
 
         elif line[0] == "namespaces":
@@ -1000,9 +1000,9 @@ class Shell(cmd.Cmd):
 
         try:
             # from ..viz.builder import action_visualize
-            from ontospydocs import action_visualize
+            from ontodocs.core.builder import action_visualize
         except:
-            self._print("You need the ontospy-docs library for this: `pip install ontospy-docs`")
+            self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return
 
         import webbrowser
@@ -1050,7 +1050,7 @@ class Shell(cmd.Cmd):
         else:
             self.help_import()
 
-        self.ontologies = manager.get_localontologies()
+        self.all_ontologies = manager.get_localontologies()
         return
 
 
@@ -1058,7 +1058,7 @@ class Shell(cmd.Cmd):
         """PErform some file operation"""
         opts = self.FILE_OPTS
 
-        if not self.ontologies:
+        if not self.all_ontologies:
             self._help_nofiles()
             return
 
@@ -1098,9 +1098,9 @@ class Shell(cmd.Cmd):
             self.currentEntity['object'].printSerialize(line[0])
 
         else:
-            self._print(g.serialize(format=line[0]))
+            self._print(g.rdf_source(format=line[0]))
             # 2016-05-27: was like this before
-            # for o in g.ontologies:
+            # for o in g.all_ontologies:
             # 	o.printSerialize(line[0])
 
 
@@ -1123,7 +1123,7 @@ class Shell(cmd.Cmd):
             else:
                 print("Not implemented")
         else:
-            if len(self.ontologies) > 1:
+            if len(self.all_ontologies) > 1:
                 nextonto = self._next_ontology()
                 self._load_ontology(nextonto)
             else:
