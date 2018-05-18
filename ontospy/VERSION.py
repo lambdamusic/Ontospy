@@ -11,7 +11,7 @@
 
 
 
-__version__ = "1.9"  # 2018-05-08
+__version__ = "1.9.1"  # Pypi latest: 1.9 - 2018-05-08
 
 __copyright__ = "CopyRight (C) 2015-2018 by Michele Pasin"
 __license__ = "GNU"

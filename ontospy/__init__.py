@@ -5,3 +5,4 @@
 
 from .VERSION import __version__, VERSION
 from .core.ontospy import Ontospy
+from .core.entities import RDF_Entity, Ontology, OntoClass, OntoProperty, OntoSKOSConcept, OntoShape

@@ -528,17 +528,24 @@ class Ontospy(object):
 
 
 
-    def build_entity_from_uri(self, uri):
+    def build_entity_from_uri(self, uri, ontospyClass=None):
         """
-        Extract RDF statements having a URI as subject
+        Extract RDF statements having a URI as subject, then instantiate the RDF_Entity Python object so that it can be queried further.
 
-        Instatiate the RDF_Entity Python object so that it can be queried further.
+        Passing <ontospyClass> allows to instantiate a user-defined RDF_Entity subclass.
 
         NOTE: the entity is not attached to any index. In future version we may create an index for these (individuals?) keeping into account that any existing model entity could be (re)created this way.
         """
+        if not ontospyClass:
+            ontospyClass = RDF_Entity
+        elif not issubclass(ontospyClass, RDF_Entity):
+            click.secho("Error: <%s> is not a subclass of ontospy.RDF_Entity" % str(ontospyClass))
+            return None
+        else:
+            pass
         qres = self.sparqlHelper.entityTriples(uri)
         if qres:
-            entity = RDF_Entity(rdflib.URIRef(uri), None, self.namespaces)
+            entity = ontospyClass(rdflib.URIRef(uri), None, self.namespaces)
             entity.triples = qres
             entity._buildGraph() # force construction of mini graph
             # try to add class info

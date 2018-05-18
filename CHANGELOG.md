@@ -4,6 +4,13 @@ Changelog
 Summary of changes. 
 
 
+May 18, 2018: v1.9.1
+---------------------------------
+* improved ontospy.build_entity_from_uri()
+	* can pass custom ontospy.RDF_Entity class as argument 
+	* example: see `tests/test_methods.test4`
+
+
 May 9, 2018: v1.9
 ---------------------------------
 Refactoring method names:
