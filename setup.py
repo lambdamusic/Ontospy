@@ -97,6 +97,7 @@ setup(
         'rdflib',
         'rdflib-jsonld',
         'SPARQLWrapper',
+        'html5lib',
         'requests',
         'pyfiglet',
         # note: on windows click requires colorama too

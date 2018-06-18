@@ -46,6 +46,16 @@ class RDFLoader(object):
         self.sources_valid = []
         self.sources_invalid = []
 
+    def _fix_default_graph_for_jsonld(self):
+        """
+        2018-06-18
+        Fix for JSONLD loading fails unless you use a ConjunctiveGraph
+        See https://github.com/RDFLib/rdflib/issues/436
+        PS only if current graph is empty!
+        """
+        if not len(self.rdflib_graph):
+            self.rdflib_graph = rdflib.ConjunctiveGraph()
+
     def load(self,
              uri_or_path=None,
              data=None,
@@ -59,6 +69,8 @@ class RDFLoader(object):
             ]
         else:
             self.rdf_format_opts = [rdf_format]
+            if rdf_format == 'json-ld':
+                self._fix_default_graph_for_jsonld()
 
         # URI OR PATH
         if uri_or_path:
@@ -142,6 +154,8 @@ class RDFLoader(object):
         for f in self.rdf_format_opts:
             if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
             try:
+                if f == 'json-ld':
+                    self._fix_default_graph_for_jsonld()
                 self.rdflib_graph.parse(uri, format=f)
                 if verbose: printDebug("..... success!", bold=True)
                 success = True
@@ -168,6 +182,8 @@ class RDFLoader(object):
         for f in self.rdf_format_opts:
             if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
             try:
+                if f == 'json-ld':
+                    self._fix_default_graph_for_jsonld()
                 self.rdflib_graph.parse(data=data, format=f)
                 if verbose: printDebug("..... success!")
                 success = True
