@@ -11,7 +11,7 @@
 
 
 
-__version__ = "1.9.1"  # Pypi latest: https://pypi.org/project/ontospy/
+__version__ = "1.9.2"  # Pypi latest: https://pypi.org/project/ontospy/
 
 __copyright__ = "CopyRight (C) 2015-2018 by Michele Pasin"
 __license__ = "GNU"

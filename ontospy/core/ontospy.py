@@ -51,7 +51,7 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
+    def __init__(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -80,8 +80,8 @@ class Ontospy(object):
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
 
         # finally:
-        if uri_or_path or text or file_obj:
-            self.load_rdf(uri_or_path, text, file_obj, rdf_format, verbose, hide_base_schemas)
+        if uri_or_path or data or file_obj:
+            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose, hide_base_schemas)
             if build_all:
                 self.build_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
         elif sparql_endpoint: # by default entities are not extracted
@@ -105,10 +105,10 @@ class Ontospy(object):
             return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
 
 
-    def load_rdf(self, uri_or_path=None, text=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def load_rdf(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader()
-        loader.load(uri_or_path, text, file_obj, rdf_format, verbose)
+        loader.load(uri_or_path, data, file_obj, rdf_format, verbose)
         self.rdflib_graph = loader.rdflib_graph
         self.sources = loader.sources_valid
         self.sparqlHelper = SparqlHelper(self.rdflib_graph)
