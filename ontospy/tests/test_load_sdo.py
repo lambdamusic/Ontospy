@@ -7,6 +7,7 @@ Run like this:
 
 :path/to/ontospyProject>python -m ontospy.tests.test_load_local
 
+author: Umutcan Simsek
 """
 
 from __future__ import print_function
@@ -21,21 +22,20 @@ from .. core.utils import *
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
-
-class TestLoadOntologies(unittest.TestCase):
+class TestLoadSDO(unittest.TestCase):
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	DATA_FOLDER = dir_path + "/rdf/"
 
 	def test1_load_locally(self):
 		"""
-		Check if the ontologies in /RDF folder load ok
+		Check if schema
 		"""
 		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % self.DATA_FOLDER)
 
 		for f in os.listdir(self.DATA_FOLDER):
-			if not f.startswith('.'):
-				printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
+			if f.startswith('schema'):
+				printDebug("\n*****\nTest: loading schema vocabulary file... > %s\n*****" % str(f), "important")
 
 				o = Ontospy(self.DATA_FOLDER + f, verbose=True)
 

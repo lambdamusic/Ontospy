@@ -13,8 +13,12 @@ michele.pasin@gmail.com
 """
 
 
-
-import sys, os, cmd, random, shutil, platform
+import sys
+import os
+import cmd
+import random
+import shutil
+import platform
 try:
     import urllib2
 except:
@@ -34,7 +38,7 @@ WINDOWS = os.name == 'nt'
 EOL = '\r\n' if WINDOWS and not PY2 else '\n'
 
 
-from .. import * # load top level __init__
+from .. import *  # load top level __init__
 from ..VERSION import VERSION
 
 from ..core import ONTOSPY_LOCAL
@@ -47,16 +51,12 @@ from ..core.utils import *
 from .shell_quotes import *  # quotes
 
 
-
-
 f = Figlet(font='slant')
 _intro_ = """***
 The Command Line Ontology Browser (%s)
 ***											  """
 
 STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % VERSION + Style.RESET_ALL
-
-
 
 
 def _get_prompt(onto="", entity=""):
@@ -83,7 +83,6 @@ def _get_prompt(onto="", entity=""):
     return base_text + onto_text + entity_text + "> "
 
 
-
 class Shell(cmd.Cmd):
     """Simple command processor example."""
 
@@ -97,15 +96,15 @@ class Shell(cmd.Cmd):
     ruler = '-'
     maxcol = 80
 
-    INFO_OPTS = [ 'namespaces', 'toplayer', 'parents', 'children', 'ancestors', 'descendants', 'inferred_usage']
+    INFO_OPTS = ['namespaces', 'toplayer', 'parents',
+                 'children', 'ancestors', 'descendants', 'inferred_usage']
     SERIALIZE_OPTS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
     LS_OPTS = ['ontologies', 'classes', 'properties', 'concepts']
     TREE_OPTS = ['classes', 'properties', 'concepts']
     GET_OPTS = ['ontology', 'class', 'property', 'concept']
     FILE_OPTS = ['rename', 'delete']
-    IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack',]
+    IMPORT_OPTS = ['uri', 'file',  'repo', 'starter-pack', ]
     VISUALIZE_OPTS = []
-
 
     def __init__(self, uri=None):
         """
@@ -124,8 +123,6 @@ class Shell(cmd.Cmd):
         if uri:
             self._load_ontology(uri, preview_mode=True)
         cmd.Cmd.__init__(self)
-
-
 
     # BASE CLASSE OVERRIDES:
     # --------
@@ -147,29 +144,27 @@ class Shell(cmd.Cmd):
                 self.columnize(cmds, maxcol - 1)
                 self.stdout.write("\n")
 
-
     def default(self, line):
         "default message when a command is not recognized"
-        foo = ["Don't recognize that command. Try 'help' for some suggestions.", "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
+        foo = ["Don't recognize that command. Try 'help' for some suggestions.",
+               "That looks like the wrong command", "Are you sure you mean that? Try 'help' for some suggestions."]
         self._print(random.choice(foo))
-
-
 
     # HELPER METHODS
     # --------
 
     def _print(self, ms, style="TIP"):
         """ abstraction for managing color printing """
-        styles1 = {'IMPORTANT' : Style.BRIGHT,
-                    'TIP': Style.DIM,
-                    'URI' : Style.BRIGHT,
-                    'TEXT' : Fore.GREEN,
-                    'MAGENTA' : Fore.MAGENTA ,
-                    'BLUE' : Fore.BLUE ,
-                    'GREEN' : Fore.GREEN ,
-                    'RED' : Fore.RED ,
-                    'DEFAULT' : Style.DIM ,
-                    }
+        styles1 = {'IMPORTANT': Style.BRIGHT,
+                   'TIP': Style.DIM,
+                   'URI': Style.BRIGHT,
+                   'TEXT': Fore.GREEN,
+                   'MAGENTA': Fore.MAGENTA,
+                   'BLUE': Fore.BLUE,
+                   'GREEN': Fore.GREEN,
+                   'RED': Fore.RED,
+                   'DEFAULT': Style.DIM,
+                   }
         try:
             print(styles1[style] + ms + Style.RESET_ALL)
         except:
@@ -178,10 +173,10 @@ class Shell(cmd.Cmd):
     def _printM(self, messages):
         """print a list of strings - for the mom used only by stats printout"""
         if len(messages) == 2:
-            print(Style.BRIGHT + messages[0] + Style.RESET_ALL + Fore.BLUE + messages[1] + Style.RESET_ALL)
+            print(Style.BRIGHT + messages[0] + Style.RESET_ALL +
+                  Fore.BLUE + messages[1] + Style.RESET_ALL)
         else:
             print("Not implemented")
-
 
     def _joinedQnames(self, _list):
         """util for returning a string joinin names of entities *used only in info command*"""
@@ -191,26 +186,22 @@ class Shell(cmd.Cmd):
             s = "; ".join([p for p in _list])
         return s
 
-
-
     def _clear_screen(self):
         """ http://stackoverflow.com/questions/18937058/python-clear-screen-in-shell """
         if platform.system() == "Windows":
-            tmp = os.system('cls') #for window
+            tmp = os.system('cls')  # for window
         else:
-            tmp = os.system('clear') #for Linux
+            tmp = os.system('clear')  # for Linux
         return True
-
 
     def _printTriples(self, entity):
         """ display triples """
         self._print("----------------", "TIP")
-        self._print(unicode(entity.uri) , "IMPORTANT")
+        self._print(unicode(entity.uri), "IMPORTANT")
         for x in entity.triples:
-            self._print("=> " + unicode(x[1]) , "MAGENTA")
-            self._print(".... " + unicode(x[2]) , "GREEN")
+            self._print("=> " + unicode(x[1]), "MAGENTA")
+            self._print(".... " + unicode(x[2]), "GREEN")
         self._print("----------------", "TIP")
-
 
     def _print_entity_intro(self, g=None, entity=None, first_time=True):
         """after a selection, prints on screen basic info about onto or entity, plus change prompt
@@ -230,8 +221,6 @@ class Shell(cmd.Cmd):
             if first_time:
                 self.prompt = _get_prompt(self.current['file'])
 
-
-
     def _printStats(self, graph, hrlinetop=False):
         """ shotcut to pull out useful info for interactive use
         2016-05-11: note this is a local version of graph.printStats()
@@ -247,8 +236,6 @@ class Shell(cmd.Cmd):
         self._print("Concepts(SKOS)..: %d" % len(graph.all_skos_concepts), "TIP")
         self._print("----------------", "TIP")
 
-
-
     def _printDescription(self, hrlinetop=True):
         """generic method to print out a description"""
         if hrlinetop:
@@ -258,10 +245,14 @@ class Shell(cmd.Cmd):
             obj = self.currentEntity['object']
             label = obj.bestLabel() or NOTFOUND
             description = obj.bestDescription() or NOTFOUND
-            print(Style.BRIGHT + "OBJECT TYPE: " + Style.RESET_ALL + Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
-            print(Style.BRIGHT + "URI        : " + Style.RESET_ALL+ Fore.GREEN + "<" + unicode(obj.uri) + ">" + Style.RESET_ALL)
-            print(Style.BRIGHT + "TITLE      : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
-            print(Style.BRIGHT + "DESCRIPTION: " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
+            print(Style.BRIGHT + "OBJECT TYPE: " + Style.RESET_ALL +
+                  Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
+            print(Style.BRIGHT + "URI        : " + Style.RESET_ALL +
+                  Fore.GREEN + "<" + unicode(obj.uri) + ">" + Style.RESET_ALL)
+            print(Style.BRIGHT + "TITLE      : " + Style.RESET_ALL +
+                  Fore.BLACK + label + Style.RESET_ALL)
+            print(Style.BRIGHT + "DESCRIPTION: " + Style.RESET_ALL +
+                  Fore.BLACK + description + Style.RESET_ALL)
 
         else:
             self._clear_screen()
@@ -269,23 +260,24 @@ class Shell(cmd.Cmd):
             self._print("----------------", "TIP")
             self._printStats(self.current['graph'])
             for obj in self.current['graph'].all_ontologies:
-                print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL+ Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
+                print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL +
+                      Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
                 # self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
                 # self._print("----------------", "TIP")
                 label = obj.bestLabel() or NOTFOUND
                 description = obj.bestDescription() or NOTFOUND
-                print(Style.BRIGHT + "Title       : " + Style.RESET_ALL+ Fore.BLACK + label + Style.RESET_ALL)
-                print(Style.BRIGHT + "Description : " + Style.RESET_ALL+ Fore.BLACK + description + Style.RESET_ALL)
+                print(Style.BRIGHT + "Title       : " + Style.RESET_ALL +
+                      Fore.BLACK + label + Style.RESET_ALL)
+                print(Style.BRIGHT + "Description : " + Style.RESET_ALL +
+                      Fore.BLACK + description + Style.RESET_ALL)
         self._print("----------------", "TIP")
         # self._print("----------------", "TIP")
-
-
 
     def _printTaxonomy(self, hrlinetop=True):
         """
         print(a local taxonomy for the object)
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         if hrlinetop:
             self._print("----------------")
@@ -305,19 +297,17 @@ class Shell(cmd.Cmd):
         else:
             for p in parents:
                 self._print(p.qname)
-        self._print("..." + x.qname , "TEXT")
+        self._print("..." + x.qname, "TEXT")
         for c in x.children():
             self._print("......" + c.qname)
         self._print("----------------")
-
-
 
     def _printClassDomain(self, hrlinetop=True, print_inferred=False):
         """
         print(more informative stats about the object)
         2016-06-14: added inferred option
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         x = self.currentEntity['object']
         if self.currentEntity['type'] == 'class':
@@ -327,7 +317,8 @@ class Shell(cmd.Cmd):
             self._print("[%d] Explicitly declared" % len(x.domain_of), "IMPORTANT")
             for i in x.domain_of:
                 if i.ranges:
-                    ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges ])
+                    ranges = ",".join([y.qname if hasattr(y, "qname") else str(y)
+                                       for y in i.ranges])
                 else:
                     ranges = "owl:Thing"
                     # print( Style.RESET_ALL + " => " + Fore.MAGENTA +
@@ -345,7 +336,8 @@ class Shell(cmd.Cmd):
                                     "IMPORTANT")
                         for i in _propslist:
                             if i.ranges:
-                                ranges = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.ranges])
+                                ranges = ",".join([y.qname if hasattr(y, "qname")
+                                                   else str(y) for y in i.ranges])
                             else:
                                 ranges = "owl:Thing"
                                 # print(Style.RESET_ALL + " => " + Fore.MAGENTA +
@@ -353,17 +345,15 @@ class Shell(cmd.Cmd):
                                   i.qname + Style.RESET_ALL + " => " + Style.DIM +
                                   ranges + Style.RESET_ALL)
 
-
             self._print("----------------")
         return
-
 
     def _printClassRange(self, hrlinetop=True, print_inferred=False):
         """
         print(more informative stats about the object)
         2016-06-14: added inferred option
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         x = self.currentEntity['object']
         if self.currentEntity['type'] == 'class':
@@ -373,7 +363,8 @@ class Shell(cmd.Cmd):
             self._print("[%d] Explicitly declared" % len(x.range_of), "IMPORTANT")
             for i in x.range_of:
                 if i.domains:
-                    domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains ])
+                    domains = ",".join([y.qname if hasattr(y, "qname") else str(y)
+                                        for y in i.domains])
                 else:
                     domains = "owl:Thing"
                 print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname +
@@ -389,20 +380,21 @@ class Shell(cmd.Cmd):
                                     "IMPORTANT")
                         for i in _propslist:
                             if i.domains:
-                                domains = ",".join([y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
+                                domains = ",".join(
+                                    [y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
                             else:
                                 domains = "owl:Thing"
-                            print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname  + Style.RESET_ALL + " => " + Fore.GREEN +     								x.qname + Style.RESET_ALL)
+                            print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                                  i.qname + Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
             self._print("----------------")
         return
-
 
     def _printPropertyDomainRange(self, hrlinetop=True):
         """
         print(more informative stats about the object)
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         x = self.currentEntity['object']
         if self.currentEntity['type'] == 'property':
@@ -421,7 +413,7 @@ class Shell(cmd.Cmd):
                     self._print(_name)
             else:
                 self._print("owl:Thing")
-            self._print("  " + x.qname , "TEXT")
+            self._print("  " + x.qname, "TEXT")
             if x.ranges:
                 for d in x.ranges:
                     # for domain/ranges which are not declared classes
@@ -435,12 +427,11 @@ class Shell(cmd.Cmd):
             self._print("----------------")
         return
 
-
     def _printInstances(self, hrlinetop=True):
         """
         print(more informative stats about the object)
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         x = self.currentEntity['object']
         if self.currentEntity['type'] == 'class':
@@ -452,12 +443,11 @@ class Shell(cmd.Cmd):
             self._print("----------------")
         return
 
-
     def _printSourceCode(self, hrlinetop=True):
         """
         print(more informative stats about the object)
         """
-        if not self.currentEntity:	# ==> ontology level
+        if not self.currentEntity:  # ==> ontology level
             return
         x = self.currentEntity['object']
         if hrlinetop:
@@ -468,8 +458,6 @@ class Shell(cmd.Cmd):
         self._print("----------------")
 
         return
-
-
 
     def _selectFromList(self, _list, using_pattern=True, objtype=None):
         """
@@ -482,7 +470,7 @@ class Shell(cmd.Cmd):
         if not _list:
             self._print("No matching items.", "TIP")
             return None
-        if using_pattern and len(_list) == 1: # removed
+        if using_pattern and len(_list) == 1:  # removed
             pass
             # return _list[0]
         if using_pattern:
@@ -493,9 +481,11 @@ class Shell(cmd.Cmd):
         _temp = []
         for el in _list:
             if hasattr(el, 'qname'):
-                _temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el.qname)]
+                _temp += [Fore.BLUE + Style.BRIGHT + "[%d] " %
+                          counter + Style.RESET_ALL + str(el.qname)]
             elif hasattr(el, 'uri'):
-                _temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el.uri)]
+                _temp += [Fore.BLUE + Style.BRIGHT + "[%d] " %
+                          counter + Style.RESET_ALL + str(el.uri)]
             else:
                 _temp += [Fore.BLUE + Style.BRIGHT + "[%d] " % counter + Style.RESET_ALL + str(el)]
             counter += 1
@@ -525,7 +515,6 @@ class Shell(cmd.Cmd):
                 self._select_concept(var)
             return
 
-
     def _next_ontology(self):
         """Dynamically retrieves the next ontology in the list"""
         currentfile = self.current['file']
@@ -535,11 +524,8 @@ class Shell(cmd.Cmd):
         except:
             return self.all_ontologies[0]
 
-
-
     # MAIN METHODS
     # --------
-
 
     def _load_ontology(self, filename, preview_mode=False):
         """
@@ -558,11 +544,10 @@ class Shell(cmd.Cmd):
         else:
             fullpath = filename
             filename = os.path.basename(os.path.normpath(fullpath))
-            g = Ontospy(fullpath)
-        self.current = {'file' : filename, 'fullpath' : fullpath, 'graph': g}
+            g = Ontospy(fullpath, verbose=True)
+        self.current = {'file': filename, 'fullpath': fullpath, 'graph': g}
         self.currentEntity = None
         self._print_entity_intro(g)
-
 
     def _select_ontology(self, line):
         """try to select an ontology NP: the actual load from FS is in <_load_ontology> """
@@ -579,7 +564,6 @@ class Shell(cmd.Cmd):
             if choice:
                 self._load_ontology(choice)
 
-
     def _select_class(self, line):
         """
         try to match a class and load it from the graph
@@ -588,80 +572,81 @@ class Shell(cmd.Cmd):
         g = self.current['graph']
         if not line:
             out = g.all_classes
-            using_pattern=False
+            using_pattern = False
         else:
-            using_pattern=True
+            using_pattern = True
             if line.isdigit():
-                line =	int(line)
+                line = int(line)
             out = g.get_class(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "class")
                 if choice:
-                    self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'class'}
+                    self.currentEntity = {'name': choice.locale or choice.uri,
+                                          'object': choice, 'type': 'class'}
             else:
-                self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'class'}
+                self.currentEntity = {'name': out.locale or out.uri, 'object': out, 'type': 'class'}
             # ..finally:
             if self.currentEntity:
                 self._print_entity_intro(entity=self.currentEntity)
 
-
         else:
             print("not found")
-
 
     def _select_property(self, line):
         """try to match a property and load it"""
         g = self.current['graph']
         if not line:
             out = g.all_properties
-            using_pattern=False
+            using_pattern = False
         else:
-            using_pattern=True
+            using_pattern = True
             if line.isdigit():
-                line =	int(line)
+                line = int(line)
             out = g.get_property(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "property")
                 if choice:
-                    self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'property'}
+                    self.currentEntity = {'name': choice.locale or choice.uri,
+                                          'object': choice, 'type': 'property'}
 
             else:
-                self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'property'}
+                self.currentEntity = {'name': out.locale or out.uri,
+                                      'object': out, 'type': 'property'}
 
             # ..finally:
             if self.currentEntity:
                 self._print_entity_intro(entity=self.currentEntity)
         else:
             print("not found")
-
 
     def _select_concept(self, line):
         """try to match a class and load it"""
         g = self.current['graph']
         if not line:
             out = g.all_skos_concepts
-            using_pattern=False
+            using_pattern = False
         else:
-            using_pattern=True
+            using_pattern = True
             if line.isdigit():
-                line =	int(line)
+                line = int(line)
             out = g.get_skos(line)
         if out:
             if type(out) == type([]):
                 choice = self._selectFromList(out, using_pattern, "concept")
                 if choice:
-                    self.currentEntity = {'name' : choice.locale or choice.uri, 'object' : choice, 'type' : 'concept'}
+                    self.currentEntity = {'name': choice.locale or choice.uri,
+                                          'object': choice, 'type': 'concept'}
             else:
-                self.currentEntity = {'name' : out.locale or out.uri, 'object' : out, 'type' : 'concept'}
+                self.currentEntity = {'name': out.locale or out.uri,
+                                      'object': out, 'type': 'concept'}
             # ..finally:
             if self.currentEntity:
                 self._print_entity_intro(entity=self.currentEntity)
 
         else:
             print("not found")
-
 
     def _delete_file(self, line=""):
         """	Delete an ontology
@@ -701,7 +686,6 @@ class Shell(cmd.Cmd):
 
         return
 
-
     def _rename_file(self, line=""):
         """Rename an ontology
             2016-04-11: not a direct command anymore """
@@ -720,8 +704,8 @@ class Shell(cmd.Cmd):
                 if os.path.isfile(fullpath):
 
                     self._print("--------------")
-                    self._print("Please enter a new name for <%s>, including the extension (blank=abort)"  \
-                        % choice)
+                    self._print("Please enter a new name for <%s>, including the extension (blank=abort)"
+                                % choice)
                     var = input()
                     if var:
                         try:
@@ -745,14 +729,9 @@ class Shell(cmd.Cmd):
 
         return
 
-
-
-
     # COMMANDS
     # --------
     # NOTE: all commands should start with 'do_' and must pass 'line'
-
-
 
     def do_ls(self, line):
         """Shows entities of a given kind."""
@@ -769,7 +748,6 @@ class Shell(cmd.Cmd):
                 return
             else:
                 line = ["classes"]
-
 
         if (not line) or (line[0] not in opts):
             self.help_ls()
@@ -808,9 +786,8 @@ class Shell(cmd.Cmd):
             else:
                 self._print("No concepts available.")
 
-        else: # should never arrive here
+        else:  # should never arrive here
             pass
-
 
     def do_tree(self, line):
         """Shows entities of a given kind."""
@@ -852,7 +829,7 @@ class Shell(cmd.Cmd):
             else:
                 self._print("No concepts available.")
 
-        else: # should never arrive here
+        else:  # should never arrive here
             pass
 
     def do_get(self, line):
@@ -899,10 +876,8 @@ class Shell(cmd.Cmd):
             else:
                 self._print("No concepts available.")
 
-        else: # should never arrive here
+        else:  # should never arrive here
             pass
-
-
 
     def do_info(self, line):
         """Inspect the current entity and display a nice summary of key properties"""
@@ -937,12 +912,11 @@ class Shell(cmd.Cmd):
             # self._printSourceCode(False)
             return
 
-
         elif line[0] == "toplayer":
             if g.toplayer_classes:
                 self._print("Top Classes\n----------------", "IMPORTANT")
             for x in g.toplayer_classes:
-                    self._print(x.qname)
+                self._print(x.qname)
             if g.toplayer_properties:
                 self._print("\nTop Properties\n----------------", "IMPORTANT")
                 for x in g.toplayer_properties:
@@ -986,9 +960,6 @@ class Shell(cmd.Cmd):
 
             return
 
-
-
-
     def do_visualize(self, line):
         """Visualize an ontology - ie wrapper for export command"""
 
@@ -1011,7 +982,6 @@ class Shell(cmd.Cmd):
             webbrowser.open(url)
         return
 
-
     def do_import(self, line):
         """Import an ontology"""
 
@@ -1020,39 +990,39 @@ class Shell(cmd.Cmd):
         if line and line[0] == "starter-pack":
             actions.action_bootstrap()
 
-
         elif line and line[0] == "uri":
-            self._print("------------------\nEnter a valid graph URI: (e.g. http://www.w3.org/2009/08/skos-reference/skos.rdf)")
+            self._print(
+                "------------------\nEnter a valid graph URI: (e.g. http://www.w3.org/2009/08/skos-reference/skos.rdf)")
             var = input()
             if var:
                 if var.startswith("http"):
                     try:
                         actions.action_import(var)
                     except:
-                        self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
+                        self._print(
+                            "OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
                 else:
                     self._print("Not valid. TIP: URIs should start with 'http://'")
 
         elif line and line[0] == "file":
-            self._print("------------------\nEnter a full file path: (e.g. '/Users/mike/Desktop/journals.ttl')")
+            self._print(
+                "------------------\nEnter a full file path: (e.g. '/Users/mike/Desktop/journals.ttl')")
             var = input()
             if var:
                 try:
                     actions.action_import(var)
                 except:
-                    self._print("OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
-
+                    self._print(
+                        "OPS... An Unknown Error Occurred - Aborting installation of <%s>" % var)
 
         elif line and line[0] == "repo":
             actions.action_webimport()
-
 
         else:
             self.help_import()
 
         self.all_ontologies = manager.get_localontologies()
         return
-
 
     def do_file(self, line):
         """PErform some file operation"""
@@ -1074,7 +1044,6 @@ class Shell(cmd.Cmd):
             self._delete_file()
         else:
             return
-
 
     def do_serialize(self, line):
         """Serialize an entity into an RDF flavour"""
@@ -1103,8 +1072,6 @@ class Shell(cmd.Cmd):
             # for o in g.all_ontologies:
             # 	o.printSerialize(line[0])
 
-
-
     def do_next(self, line):
         """Jump to the next entities (ontology, class or property) depending on context"""
         if not self.current:
@@ -1129,7 +1096,6 @@ class Shell(cmd.Cmd):
             else:
                 self._print("Only one ontology available in repository.")
 
-
     def do_back(self, line):
         "Go back one step. From entity => ontology; from ontology => ontospy top level."
         if self.currentEntity:
@@ -1144,14 +1110,12 @@ class Shell(cmd.Cmd):
         self._clear_screen()
         return True
 
-
     def do_zen(self, line):
         """Inspiring quotes for the working ontologist"""
         _quote = random.choice(QUOTES)
         # print(_quote['source'])
         print(Style.DIM + unicode(_quote['text']))
         print(Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL)
-
 
     # 2016-02-12: method taken from https://github.com/xlcnd/isbntools/blob/master/isbntools/bin/repl.py
     # 2016-04-25: hidden
@@ -1177,9 +1141,6 @@ class Shell(cmd.Cmd):
             return
         if err:
             print(err.replace('isbn_', ''))
-
-
-
 
     # HELP METHODS
     # --------
@@ -1238,8 +1199,6 @@ class Shell(cmd.Cmd):
         txt += "==> Use the 'import starter-pack' command to get started."
         self._print(txt)
 
-
-
     # AUTOCOMPLETE METHODS
     # --------
 
@@ -1251,10 +1210,10 @@ class Shell(cmd.Cmd):
         if not text:
             completions = options
         else:
-            completions = [ f
-                            for f in options
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in options
+                           if f.startswith(text)
+                           ]
         return completions
 
     def complete_tree(self, text, line, begidx, endidx):
@@ -1265,10 +1224,10 @@ class Shell(cmd.Cmd):
         if not text:
             completions = options
         else:
-            completions = [ f
-                            for f in options
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in options
+                           if f.startswith(text)
+                           ]
         return completions
 
     def complete_get(self, text, line, begidx, endidx):
@@ -1279,14 +1238,13 @@ class Shell(cmd.Cmd):
         if not text:
             completions = options
         else:
-            completions = [ f
-                            for f in options
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in options
+                           if f.startswith(text)
+                           ]
         return completions
 
     def complete_info(self, text, line, begidx, endidx):
-
         """completion for info command"""
 
         opts = self.INFO_OPTS
@@ -1294,12 +1252,11 @@ class Shell(cmd.Cmd):
         if not text:
             completions = opts
         else:
-            completions = [ f
-                            for f in opts
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in opts
+                           if f.startswith(text)
+                           ]
         return completions
-
 
     def complete_import(self, text, line, begidx, endidx):
         """completion for serialize command"""
@@ -1309,10 +1266,10 @@ class Shell(cmd.Cmd):
         if not text:
             completions = opts
         else:
-            completions = [ f
-                            for f in opts
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in opts
+                           if f.startswith(text)
+                           ]
         return completions
 
     def complete_serialize(self, text, line, begidx, endidx):
@@ -1323,12 +1280,11 @@ class Shell(cmd.Cmd):
         if not text:
             completions = opts
         else:
-            completions = [ f
-                            for f in opts
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in opts
+                           if f.startswith(text)
+                           ]
         return completions
-
 
     def complete_visualize(self, text, line, begidx, endidx):
         """completion for file command"""
@@ -1338,10 +1294,10 @@ class Shell(cmd.Cmd):
         if not text:
             completions = opts
         else:
-            completions = [ f
-                            for f in opts
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in opts
+                           if f.startswith(text)
+                           ]
         return completions
 
     def complete_file(self, text, line, begidx, endidx):
@@ -1352,13 +1308,11 @@ class Shell(cmd.Cmd):
         if not text:
             completions = opts
         else:
-            completions = [ f
-                            for f in opts
-                            if f.startswith(text)
-                            ]
+            completions = [f
+                           for f in opts
+                           if f.startswith(text)
+                           ]
         return completions
-
-
 
 
 def main():
@@ -1372,9 +1326,10 @@ def main():
     Shell().cmdloop()
     raise SystemExit(1)
 
+
 if __name__ == '__main__':
     import sys
     try:
         main()
-    except KeyboardInterrupt as e: # Ctrl-C
+    except KeyboardInterrupt as e:  # Ctrl-C
         raise e
