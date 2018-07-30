@@ -13,6 +13,7 @@ import sys
 import os
 import time
 import optparse
+from itertools import chain
 
 try:
     import urllib2
@@ -551,12 +552,14 @@ class Ontospy(object):
         """
         extract domain/range details and add to Python objects
         """
-        domains = aProp.rdflib_graph.objects(
-            None, rdflib.term.URIRef(u'http://schema.org/domainIncludes'))
-        ranges = aProp.rdflib_graph.objects(
-            None, rdflib.term.URIRef(u'http://schema.org/rangeIncludes'))
-        # domains = aProp.rdflib_graph.objects(None, rdflib.RDFS.domain)
-        # ranges =  aProp.rdflib_graph.objects(None, rdflib.RDFS.range)
+        
+        domains = chain(aProp.rdflib_graph.objects(
+            None, rdflib.term.URIRef(u'http://schema.org/domainIncludes')), aProp.rdflib_graph.objects(
+            None, rdflib.RDFS.domain))
+
+        ranges = chain(aProp.rdflib_graph.objects(
+            None, rdflib.term.URIRef(u'http://schema.org/rangeIncludes')), aProp.rdflib_graph.objects(
+            None, rdflib.RDFS.range))
 
         for x in domains:
             if isBlankNode(x):

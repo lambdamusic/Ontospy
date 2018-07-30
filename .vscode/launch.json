@@ -1,14 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "moduledeb",
             "type": "python",
             "request": "launch",
             "stopOnEntry": true,
             "pythonPath": "${config:python.pythonPath}",
-            "module": "ontospy.extras.shell",
+            "module": "ontospy.tests.test_load_local",
             "cwd": "${workspaceRoot}",
             "args": [
             ],
