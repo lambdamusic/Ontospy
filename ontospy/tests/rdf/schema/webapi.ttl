@@ -1,0 +1,735 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix ns1: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfa: <http://www.w3.org/ns/rdfa#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix webapi: <https://actions.semantify.it/vocab/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+##classes
+schema:WebAPI a rdfs:Class ;
+    rdfs:label "WebAPI" ;
+    dct:source <https://github.com/schemaorg/schemaorg/issues/1423> ;
+    schema:category "issue-1423" ;
+    schema:isPartOf <http://pending.schema.org> ;
+    rdfs:comment "An application programming interface accessible over Web/Internet technologies." ;
+    rdfs:subClassOf schema:Service .
+
+schema:CreativeWork a rdfs:Class ;
+    rdfs:label "CreativeWork" ;
+    dct:source <http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_rNews> ;
+    rdfs:comment "The most generic kind of creative work, including books, movies, photographs, software programs, etc." ;
+    rdfs:subClassOf schema:Thing .
+
+schema:Service a rdfs:Class ;
+    rdfs:label "Service" ;
+    rdfs:comment "A service provided by an organization, e.g. delivery service, print services, etc." ;
+    rdfs:subClassOf schema:Intangible .
+
+schema:Intangible a rdfs:Class ;
+    rdfs:label "Intangible" ;
+    rdfs:comment "A utility class that serves as the umbrella for a number of 'intangible' things such as quantities, structured values, etc." ;
+    rdfs:subClassOf schema:Thing .
+
+schema:Action a rdfs:Class ;
+    rdfs:label "Action" ;
+    dct:source <http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_ActionCollabClass> ;
+    rdfs:comment """An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.<br/><br/>""".
+
+webapi:AuthenticationSpecification a rdfs:Class;
+	rdfs:label "AuthenticationSpecification";
+	rdfs:comment "Specification of the authentication method required to perfom the on a web resource.";
+	rdfs:subClassOf schema:PropertyValue.
+
+webapi:HTTPBasicAuthentication a rdfs:Class;
+	rdfs:label "HTTPBasicAuthentication";
+	rdfs:comment "Values of this specification is mapped to 'Basic <token>' pattern in the Authentication header of a request.";
+	rdfs:subClassOf webapi:AuthenticationSpecification.
+
+webapi:FormBasedAuthentication a rdfs:Class;
+	rdfs:label "FormBasedAuthentication";
+	rdfs:comment "Custom form-based authentication method specification";
+	rdfs:subClassOf webapi:AuthenticationSpecification.
+
+webapi:TokenAuthentication a rdfs:Class;
+	rdfs:label "TokenAuthentication";
+	rdfs:comment "Values of this specification is mapped to 'Bearer <token>' pattern in the Authentication header of a request.";
+	rdfs:subClassOf webapi:AuthenticationSpecification.
+
+
+schema:PropertyValue a rdfs:Class ;
+    rdfs:label "PropertyValue" ;
+    dct:source <http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_GoodRelationsClass> ;
+    rdfs:comment """A property-value pair, e.g. representing a feature of a product or place. Use the 'name' property for the name of the property. If there is an additional human-readable version of the value, put that into the 'description' property.<br/><br/>""".
+
+
+schema:Thing a rdfs:Class ;
+    rdfs:label "Thing" ;
+    rdfs:comment "The most generic type of item." .
+
+##shapes
+
+webapi:ActionsShape a sh:NodeShape;
+sh:targetClass schema:Action;
+sh:property [
+	sh:path webapi:authentication;
+	sh:class webapi:AuthenticationSpecification;
+] .
+
+webapi:FormBasedAuthenticationShape a sh:NodeShape;
+	sh:name "FormBasedAuthenticationShape";
+	sh:description "The shape that defines constraints on the form based authentication descriptions";
+	sh:targetClass webapi:FormBasedAuthentication;
+	sh:property [
+		sh:path webapi:sentIn;
+		sh:in ("header" "body");
+	];
+	sh:property [
+		sh:path schema:name;
+		sh:description "A custom form based authentication must have one name.";
+		sh:class schema:Text;
+		sh:minCount 1;
+		sh:maxCount 1;
+	] .
+
+webapi:AuthenticationSpecificationShape a sh:NodeShape;
+	sh:name "AuthenticationSpecificationShape";
+	sh:description "A shape describing constraints on authentication specifications";
+	sh:targetClass webapi:AuthenticationSpecification;
+	sh:property [
+		sh:path schema:value;
+		sh:description "An authentication specification must have one value.";
+		sh:class schema:Text;
+		sh:minCount 1;
+		sh:maxCount 1;
+	] .
+
+webapi:WebAPIShape a sh:NodeShape;
+	sh:name "WebAPIShape";
+	sh:description "A shape that constrains the WebAPI type.";
+	sh:targetClass schema:WebAPI;
+	sh:property [
+		sh:path schema:documentation;
+		sh:minCount 1;
+		sh:or 
+		(
+			[
+				sh:node webapi:DocumentationShape;
+				sh:class schema:CreativeWork;
+			]
+			[
+				sh:nodeKind sh:IRI;
+			]
+		)
+	] .
+
+webapi:DocumentationShape a sh:NodeShape;
+	sh:name "DocumentationShape";
+	sh:description "A shape for WebAPI documentation";
+	sh:targetObjectsOf schema:documentation;
+	sh:property [
+		sh:path schema:encodingFormat;
+		sh:minCount 1;
+		sh:maxCount 1;
+		sh:in ("application/ld+json" "text/html") #think about this
+	];
+	sh:property [
+		sh:path schema:url;
+		sh:minCount 1;
+		sh:maxCount 1;
+	] .
+
+
+##properties
+schema:documentation a rdf:Property ;
+    rdfs:label "documentation" ;
+    dct:source <https://github.com/schemaorg/schemaorg/issues/1423> ;
+    schema:category "issue-1423" ;
+    schema:domainIncludes schema:WebAPI ;
+    schema:isPartOf <http://pending.schema.org> ;
+    schema:rangeIncludes schema:CreativeWork,
+        schema:URL ;
+    rdfs:comment "Further documentation describing the Web API in more detail." .
+
+schema:brand a rdf:Property ;
+	rdfs:label "brand" ;
+	schema:domainIncludes schema:Person ;
+	schema:rangeIncludes schema:Brand ;
+	rdfs:comment "The brand(s) associated with a product or service, or the brand(s) maintained by an organization or business person." ;
+	schema:domainIncludes schema:Service , schema:Organization , schema:Product ;
+	schema:rangeIncludes schema:Organization .
+
+schema:areaServed a rdf:Property ;
+	rdfs:label "areaServed" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:GeoShape ;
+	rdfs:comment "The geographic area where a service or offered item is provided." ;
+	schema:domainIncludes schema:Organization , schema:Demand , schema:Offer , schema:ContactPoint , schema:DeliveryChargeSpecification ;
+	schema:rangeIncludes schema:Text , schema:Place , schema:AdministrativeArea .
+
+schema:audience a rdf:Property ;
+	rdfs:label "audience" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Audience ;
+	rdfs:comment "An intended audience, i.e. a group for whom something was created." ;
+	schema:domainIncludes schema:Event , schema:CreativeWork , schema:Product , schema:PlayAction , schema:LodgingBusiness .
+
+schema:provider a rdf:Property ;
+	rdfs:label "provider" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller." ;
+	schema:domainIncludes schema:Flight , schema:CreativeWork , schema:Reservation , schema:Invoice , schema:BusTrip , schema:ParcelDelivery , schema:TrainTrip ;
+	schema:rangeIncludes schema:Organization .
+
+schema:logo a rdf:Property ;
+	rdfs:label "logo" ;
+	schema:domainIncludes schema:Brand ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "An associated logo." ;
+	schema:domainIncludes schema:Service , schema:Place , schema:Organization , schema:Product ;
+	schema:rangeIncludes schema:ImageObject .
+
+schema:offers a rdf:Property ;
+	rdfs:label "offers" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Offer ;
+	rdfs:comment "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event." ;
+	schema:domainIncludes schema:Event , schema:CreativeWork , schema:Product , schema:AggregateOffer , schema:MenuItem .
+
+schema:aggregateRating a rdf:Property ;
+	rdfs:label "aggregateRating" ;
+	schema:domainIncludes schema:Brand ;
+	schema:rangeIncludes schema:AggregateRating ;
+	rdfs:comment "The overall rating, based on a collection of reviews or ratings, of the item." ;
+	schema:domainIncludes schema:Service , schema:Place , schema:Event , schema:Organization , schema:CreativeWork , schema:Product , schema:Offer .
+
+schema:category a rdf:Property ;
+	rdfs:label "category" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy." ;
+	schema:domainIncludes schema:Product , schema:Offer , schema:Invoice ;
+	schema:rangeIncludes schema:Text .
+
+schema:isSimilarTo a rdf:Property ;
+	rdfs:label "isSimilarTo" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Service ;
+	rdfs:comment "A pointer to another, functionally similar product (or multiple products)." ;
+	schema:domainIncludes schema:Product ;
+	schema:rangeIncludes schema:Product .
+
+schema:review a rdf:Property ;
+	rdfs:label "review" ;
+	schema:domainIncludes schema:Brand ;
+	schema:rangeIncludes schema:Review ;
+	rdfs:comment "A review of the item." ;
+	schema:domainIncludes schema:Service , schema:Place , schema:Event , schema:Organization , schema:CreativeWork , schema:Product , schema:Offer .
+
+schema:hasOfferCatalog a rdf:Property ;
+	rdfs:label "hasOfferCatalog" ;
+	schema:domainIncludes schema:Person ;
+	schema:rangeIncludes schema:OfferCatalog ;
+	rdfs:comment "Indicates an OfferCatalog listing for this Organization, Person, or Service." ;
+	schema:domainIncludes schema:Service , schema:Organization .
+
+schema:isRelatedTo a rdf:Property ;
+	rdfs:label "isRelatedTo" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Service ;
+	rdfs:comment "A pointer to another, somehow related product (or multiple products)." ;
+	schema:domainIncludes schema:Product ;
+	schema:rangeIncludes schema:Product .
+
+schema:availableChannel a rdf:Property ;
+	rdfs:label "availableChannel" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:ServiceChannel ;
+	rdfs:comment "A means of accessing the service (e.g. a phone bank, a web site, a location, etc.)." .
+
+schema:serviceType a rdf:Property ;
+	rdfs:label "serviceType" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The type of service being offered, e.g. veterans' benefits, emergency relief, etc." .
+
+schema:name a rdf:Property ;
+	rdfs:label "name" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The name of the item." .
+
+schema:disambiguatingDescription a rdf:Property ;
+	rdfs:label "disambiguatingDescription" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation." .
+
+schema:identifier a rdf:Property ;
+	rdfs:label "identifier" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The identifier property represents any kind of identifier for any kind of <a class=\"localLink\" href=\"http://schema.org/Thing\">Thing</a>, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See <a href=\"/docs/datamodel.html#identifierBg\">background notes</a> for more details." ;
+	schema:rangeIncludes schema:URL , schema:PropertyValue .
+
+schema:description a rdf:Property ;
+	rdfs:label "description" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "A description of the item." .
+
+schema:sameAs a rdf:Property ;
+	rdfs:label "sameAs" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website." .
+
+schema:potentialAction a rdf:Property ;
+	rdfs:label "potentialAction" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:Action ;
+	rdfs:comment "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role." .
+
+schema:image a rdf:Property ;
+	rdfs:label "image" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "An image of the item. This can be a <a class=\"localLink\" href=\"http://schema.org/URL\">URL</a> or a fully described <a class=\"localLink\" href=\"http://schema.org/ImageObject\">ImageObject</a>." ;
+	schema:rangeIncludes schema:ImageObject .
+
+schema:additionalType a rdf:Property ;
+	rdfs:label "additionalType" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. In RDFa syntax, it is better to use the native RDFa syntax - the 'typeof' attribute - for multiple types. Schema.org tools may have only weaker understanding of extra types, in particular those defined externally." .
+
+schema:url a rdf:Property ;
+	rdfs:label "url" ;
+	schema:domainIncludes schema:Thing ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "URL of the item." .
+
+schema:accountablePerson a rdf:Property ;
+	rdfs:label "accountablePerson" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "Specifies the Person that is legally accountable for the CreativeWork." .
+
+schema:schemaVersion a rdf:Property ;
+	rdfs:label "schemaVersion" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "Indicates (by URL or string) a particular version of a schema used in some CreativeWork. For example, a document could declare a schemaVersion using an URL such as http://schema.org/version/2.0/ if precise indication of schema version was required by some application." ;
+	schema:rangeIncludes schema:URL .
+
+schema:interactionStatistic a rdf:Property ;
+	rdfs:label "interactionStatistic" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:InteractionCounter ;
+	rdfs:comment "The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used." .
+
+schema:copyrightHolder a rdf:Property ;
+	rdfs:label "copyrightHolder" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The party holding the legal copyright to the CreativeWork." ;
+	schema:rangeIncludes schema:Organization .
+
+schema:comment a rdf:Property ;
+	rdfs:label "comment" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Comment ;
+	rdfs:comment "Comments, typically from users." ;
+	schema:domainIncludes schema:RsvpAction .
+
+schema:inLanguage a rdf:Property ;
+	rdfs:label "inLanguage" ;
+	schema:domainIncludes schema:Event ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>." ;
+	schema:domainIncludes schema:CreativeWork , schema:CommunicateAction , schema:WriteAction ;
+	schema:rangeIncludes schema:Language .
+
+schema:funder a rdf:Property ;
+	rdfs:label "funder" ;
+	schema:domainIncludes schema:Person ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "A person or organization that supports (sponsors) something through some kind of financial contribution." ;
+	schema:domainIncludes schema:Event , schema:Organization , schema:CreativeWork ;
+	schema:rangeIncludes schema:Organization .
+
+schema:sponsor a rdf:Property ;
+	rdfs:label "sponsor" ;
+	schema:domainIncludes schema:Person ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event." ;
+	schema:domainIncludes schema:Event , schema:Organization , schema:CreativeWork ;
+	schema:rangeIncludes schema:Organization .
+
+schema:commentCount a rdf:Property ;
+	rdfs:label "commentCount" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Integer ;
+	rdfs:comment "The number of comments this CreativeWork (e.g. Article, Question or Answer) has received. This is most applicable to works published in Web sites with commenting system; additional comments may exist elsewhere." .
+
+schema:spatialCoverage a rdf:Property ;
+	rdfs:label "spatialCoverage" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Place ;
+	rdfs:comment """The spatialCoverage of a CreativeWork indicates the place(s) which are the focus of the content. It is a subproperty of
+      contentLocation intended primarily for more technical and detailed materials. For example with a Dataset, it indicates
+      areas that the dataset describes: a dataset of New York weather would have spatialCoverage which was the place: the state of New York.""" .
+
+schema:audience a rdf:Property ;
+	rdfs:label "audience" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Audience ;
+	rdfs:comment "An intended audience, i.e. a group for whom something was created." ;
+	schema:domainIncludes schema:Event , schema:CreativeWork , schema:Product , schema:PlayAction , schema:LodgingBusiness .
+
+schema:dateCreated a rdf:Property ;
+	rdfs:label "dateCreated" ;
+	schema:domainIncludes schema:DataFeedItem ;
+	schema:rangeIncludes schema:Date ;
+	rdfs:comment "The date on which the CreativeWork was created or the item was added to a DataFeed." ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:DateTime .
+
+schema:provider a rdf:Property ;
+	rdfs:label "provider" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller." ;
+	schema:domainIncludes schema:Flight , schema:CreativeWork , schema:Reservation , schema:Invoice , schema:BusTrip , schema:ParcelDelivery , schema:TrainTrip ;
+	schema:rangeIncludes schema:Organization .
+
+schema:mainEntity a rdf:Property ;
+	rdfs:label "mainEntity" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "Indicates the primary entity described in some page or other CreativeWork." .
+
+schema:dateModified a rdf:Property ;
+	rdfs:label "dateModified" ;
+	schema:domainIncludes schema:DataFeedItem ;
+	schema:rangeIncludes schema:Date ;
+	rdfs:comment "The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed." ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:DateTime .
+
+schema:offers a rdf:Property ;
+	rdfs:label "offers" ;
+	schema:domainIncludes schema:Service ;
+	schema:rangeIncludes schema:Offer ;
+	rdfs:comment "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event." ;
+	schema:domainIncludes schema:Event , schema:CreativeWork , schema:Product , schema:AggregateOffer , schema:MenuItem .
+
+schema:thumbnailUrl a rdf:Property ;
+	rdfs:label "thumbnailUrl" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "A thumbnail image relevant to the Thing." .
+
+schema:about a rdf:Property ;
+	rdfs:label "about" ;
+	schema:domainIncludes schema:Event ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "The subject matter of the content." ;
+	schema:domainIncludes schema:CreativeWork , schema:CommunicateAction .
+
+schema:award a rdf:Property ;
+	rdfs:label "award" ;
+	schema:domainIncludes schema:Person ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "An award won by or for this item." ;
+	schema:domainIncludes schema:Service , schema:Organization , schema:CreativeWork , schema:Product .
+
+schema:isPartOf a rdf:Property ;
+	rdfs:label "isPartOf" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:CreativeWork ;
+	rdfs:comment "Indicates a CreativeWork that this CreativeWork is (in some sense) part of." .
+
+schema:hasPart a rdf:Property ;
+	rdfs:label "hasPart" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:CreativeWork ;
+	rdfs:comment "Indicates a CreativeWork that is (in some sense) a part of this CreativeWork." .
+
+schema:license a rdf:Property ;
+	rdfs:label "license" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "A license document that applies to this content, typically indicated by URL." ;
+	schema:rangeIncludes schema:CreativeWork .
+
+schema:aggregateRating a rdf:Property ;
+	rdfs:label "aggregateRating" ;
+	schema:domainIncludes schema:Brand ;
+	schema:rangeIncludes schema:AggregateRating ;
+	rdfs:comment "The overall rating, based on a collection of reviews or ratings, of the item." ;
+	schema:domainIncludes schema:Service , schema:Place , schema:Event , schema:Organization , schema:CreativeWork , schema:Product , schema:Offer .
+
+schema:discussionUrl a rdf:Property ;
+	rdfs:label "discussionUrl" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "A link to the page containing the comments of the CreativeWork." .
+
+schema:mentions a rdf:Property ;
+	rdfs:label "mentions" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "Indicates that the CreativeWork contains a reference to, but is not necessarily about a concept." .
+
+schema:datePublished a rdf:Property ;
+	rdfs:label "datePublished" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Date ;
+	rdfs:comment "Date of first broadcast/publication." .
+
+schema:contributor a rdf:Property ;
+	rdfs:label "contributor" ;
+	schema:domainIncludes schema:Event ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "A secondary contributor to the CreativeWork or Event." ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Organization .
+
+schema:temporalCoverage a rdf:Property ;
+	rdfs:label "temporalCoverage" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment """The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in <a href=\"https://en.wikipedia.org/wiki/ISO_8601#Time_intervals\">ISO 8601 time interval format</a>. In
+      the case of a Dataset it will typically indicate the relevant time period in a precise notation (e.g. for a 2011 census dataset, the year 2011 would be written \"2011/2012\"). Other forms of content e.g. ScholarlyArticle, Book, TVSeries or TVEpisode may indicate their temporalCoverage in broader terms - textually or via well-known URL.
+      Written works such as books may sometimes have precise temporal coverage too, e.g. a work set in 1939 - 1945 can be indicated in ISO 8601 interval format format via \"1939/1945\".""" ;
+	schema:rangeIncludes schema:URL , schema:DateTime .
+
+schema:isBasedOn a rdf:Property ;
+	rdfs:label "isBasedOn" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:URL ;
+	rdfs:comment "A resource that was used in the creation of this resource. This term can be repeated for multiple sources. For example, http://example.com/great-multiplication-intro.html." ;
+	schema:rangeIncludes schema:CreativeWork , schema:Product .
+
+schema:review a rdf:Property ;
+	rdfs:label "review" ;
+	schema:domainIncludes schema:Brand ;
+	schema:rangeIncludes schema:Review ;
+	rdfs:comment "A review of the item." ;
+	schema:domainIncludes schema:Service , schema:Place , schema:Event , schema:Organization , schema:CreativeWork , schema:Product , schema:Offer .
+
+
+schema:author a rdf:Property ;
+	rdfs:label "author" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably." ;
+	schema:domainIncludes schema:Rating ;
+	schema:rangeIncludes schema:Organization .
+
+schema:version a rdf:Property ;
+	rdfs:label "version" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Number ;
+	rdfs:comment "The version of the CreativeWork embodied by a specified resource." ;
+	schema:rangeIncludes schema:Text .
+
+schema:text a rdf:Property ;
+	rdfs:label "text" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The textual content of this CreativeWork." .
+
+schema:publisher a rdf:Property ;
+	rdfs:label "publisher" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The publisher of the creative work." ;
+	schema:rangeIncludes schema:Organization .
+
+schema:copyrightYear a rdf:Property ;
+	rdfs:label "copyrightYear" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Number ;
+	rdfs:comment "The year during which the claimed copyright for the CreativeWork was first asserted." .
+
+schema:keywords a rdf:Property ;
+	rdfs:label "keywords" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "Keywords or tags used to describe this content. Multiple entries in a keywords list are typically delimited by commas." .
+
+schema:isAccessibleForFree a rdf:Property ;
+	rdfs:label "isAccessibleForFree" ;
+	schema:domainIncludes schema:Event ;
+	schema:rangeIncludes schema:Boolean ;
+	rdfs:comment "A flag to signal that the publication is accessible for free." ;
+	schema:domainIncludes schema:CreativeWork , schema:PublicationEvent .
+
+schema:sourceOrganization a rdf:Property ;
+	rdfs:label "sourceOrganization" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Organization ;
+	rdfs:comment "The Organization on whose behalf the creator was working." .
+
+schema:editor a rdf:Property ;
+	rdfs:label "editor" ;
+	schema:domainIncludes schema:CreativeWork ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "Specifies the Person who edited the CreativeWork." .
+
+schema:encodingFormat a rdf:Property ;
+    rdfs:label "encodingFormat" ;
+    schema:domainIncludes schema:CreativeWork,
+        schema:MediaObject ;
+    schema:rangeIncludes schema:Text,
+        schema:URL ;
+    rdfs:comment """Media type typically expressed using a MIME format (see <a href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA site</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MDN reference</a>) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).<br/><br/>""".
+
+	schema:termsOfService a rdf:Property ;
+    rdfs:label "termsOfService" ;
+    dct:source <https://github.com/schemaorg/schemaorg/issues/1423> ;
+    schema:category "issue-1423" ;
+    schema:domainIncludes schema:Service ;
+    schema:isPartOf <http://pending.schema.org> ;
+    schema:rangeIncludes schema:Text,
+        schema:URL ;
+    rdfs:comment "Human-readable terms of service documentation." .
+
+	schema:target a rdf:Property ;
+	rdfs:label "target" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:EntryPoint ;
+	rdfs:comment "Indicates a target EntryPoint for an Action." .
+
+
+schema:agent a rdf:Property ;
+	rdfs:label "agent" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "The direct performer or driver of the action (animate or inanimate). e.g. <em>John</em> wrote a book." ;
+	schema:rangeIncludes schema:Organization .
+
+schema:participant a rdf:Property ;
+	rdfs:label "participant" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Person ;
+	rdfs:comment "Other co-agents that participated in the action indirectly. e.g. John wrote a book with <em>Steve</em>." ;
+	schema:rangeIncludes schema:Organization .
+
+schema:object a rdf:Property ;
+	rdfs:label "object" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "The object upon which the action is carried out, whose state is kept intact or changed. Also known as the semantic roles patient, affected or undergoer (which change their state) or theme (which doesn't). e.g. John read <em>a book</em>." .
+
+schema:error a rdf:Property ;
+	rdfs:label "error" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "For failed actions, more information on the cause of the failure." .
+
+schema:instrument a rdf:Property ;
+	rdfs:label "instrument" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "The object that helped the agent perform the action. In the context of web apis, this property can be used with webapi:AuthenticationSpecification" .
+
+schema:actionStatus a rdf:Property ;
+	rdfs:label "actionStatus" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:ActionStatusType ;
+	rdfs:comment "Indicates the current disposition of the Action." .
+
+schema:result a rdf:Property ;
+	rdfs:label "result" ;
+	schema:domainIncludes schema:Action ;
+	schema:rangeIncludes schema:Thing ;
+	rdfs:comment "The result produced in the action. e.g. John wrote <em>a book</em>." .
+
+	schema:value a rdf:Property ;
+	rdfs:label "value" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:Number ;
+	rdfs:comment """<p>The value of the quantitative value or property value node.</p>
+
+<ul>
+<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>
+<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>
+</ul>
+""" ;
+	schema:domainIncludes schema:MonetaryAmount , schema:PropertyValue ;
+	schema:rangeIncludes schema:Text , schema:StructuredValue , schema:Boolean .
+
+schema:unitText a rdf:Property ;
+	rdfs:label "unitText" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment """A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for
+<a href='unitCode'>unitCode</a>.""" ;
+	schema:domainIncludes schema:TypeAndQuantityNode , schema:PropertyValue , schema:UnitPriceSpecification .
+
+schema:valueReference a rdf:Property ;
+	rdfs:label "valueReference" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:QuantitativeValue ;
+	rdfs:comment "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature." ;
+	schema:domainIncludes schema:PropertyValue , schema:QualitativeValue ;
+	schema:rangeIncludes schema:StructuredValue , schema:Enumeration , schema:PropertyValue , schema:QualitativeValue .
+
+schema:minValue a rdf:Property ;
+	rdfs:label "minValue" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:Number ;
+	rdfs:comment "The lower value of some characteristic or property." ;
+	schema:domainIncludes schema:MonetaryAmount , schema:PropertyValueSpecification , schema:PropertyValue .
+
+schema:maxValue a rdf:Property ;
+	rdfs:label "maxValue" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:Number ;
+	rdfs:comment "The upper value of some characteristic or property." ;
+	schema:domainIncludes schema:MonetaryAmount , schema:PropertyValueSpecification , schema:PropertyValue .
+
+schema:propertyID a rdf:Property ;
+	rdfs:label "propertyID" ;
+	schema:domainIncludes schema:PropertyValue ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment """A commonly used identifier for the characteristic represented by the property, e.g. a manufacturer or a standard code for a property. propertyID can be
+(1) a prefixed string, mainly meant to be used with standards for product properties; (2) a site-specific, non-prefixed string (e.g. the primary key of the property or the vendor-specific id of the property), or (3)
+a URL indicating the type of the property, either pointing to an external vocabulary, or a Web resource that describes the property (e.g. a glossary entry).
+Standards bodies should promote a standard prefix for the identifiers of properties from their standards.""" ;
+	schema:rangeIncludes schema:URL .
+
+schema:unitCode a rdf:Property ;
+	rdfs:label "unitCode" ;
+	schema:domainIncludes schema:QuantitativeValue ;
+	schema:rangeIncludes schema:Text ;
+	rdfs:comment "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon." ;
+	schema:domainIncludes schema:TypeAndQuantityNode , schema:PropertyValue , schema:UnitPriceSpecification ;
+	schema:rangeIncludes schema:URL .
+
+webapi:sentIn a rdf:Property;
+	rdfs:label "sentIn";
+	schema:domainIncludes webapi:FormBasedAuthentication;
+	schema:rangeIncludes webapi:Text;
+	rdfs:comment "The part of the HTTP request where the credentials are sent.".
+
+webapi:tokenFormat a rdf:Property;
+	rdfs:label "tokenFormat";
+	schema:domainIncludes webapi:TokenAuthentication;
+	schema:rangeIncludes webapi:Text;
+	rdfs:comment "Format of the bearer token".
+
+webapi:authentication a rdf:Property;
+	rdfs:label "authentication";
+	schema:domainIncludes schema:Action;
+	schema:rangeIncludes webapi:AuthenticationSpecification;
+	rdfs:subPropertyOf schema:instrument ;
+	rdfs:comment "The authentication specification for the action. " .

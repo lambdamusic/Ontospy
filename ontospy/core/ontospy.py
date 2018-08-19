@@ -504,6 +504,12 @@ class Ontospy(object):
                 if aclass:
                     aShape.targetClasses += [aclass]
                     aclass.all_shapes += [aShape]
+                    for propertyUri in aShape.getValuesForProperty(shacl['path']): #add shaped properties of this class. later can be used for ontodocs
+                        propType = self.get_property(str(propertyUri))
+                        if propType:
+                            aclass.shapedProperties += [{'shape': aShape, 'property': propType}]
+
+            
 
         # sort alphabetically
         self.all_shapes = sorted(self.all_shapes, key=lambda x: x.qname)
@@ -729,7 +735,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not uri.startswith("http://") and not uri.startswith("https://"):
                 match = uri
                 uri = None
         if match:
@@ -766,7 +772,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not uri.startswith("http://") and not uri.startswith("https://"):
                 match = uri
                 uri = None
         if match:
