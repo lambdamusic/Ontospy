@@ -144,7 +144,7 @@ Open FOAF vocabulary and save it to the local library:
 
 > ontospy http://xmlns.com/foaf/spec/ -s
 
-More info: <ontospy.readthedocs.org>
+More info: <https://github.com/lambdamusic/ontospy/wiki>
 
 
     """
