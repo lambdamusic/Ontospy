@@ -22,11 +22,10 @@ from ..core.utils import *
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
 
-ENDPOINT = "http://dbpedia.org/sparql"
-# ENDPOINT = "http://192.168.1.64:7200/repositories/scigraph-test"
 
 class TestSparqlStore(unittest.TestCase):
 
+    ENDPOINT = "http://dbpedia.org/sparql"
 
     def test1_load_dbpedia(self):
 
@@ -34,9 +33,9 @@ class TestSparqlStore(unittest.TestCase):
         Check if the dbpedia endpoint loads ok
         "http://dbpedia.org/sparql"
         """
-        printDebug("=================\nTEST: Loading <%s> endpoint.\n=================" % ENDPOINT, "important")
+        printDebug("=================\nTEST: Loading <%s> endpoint.\n=================" % self.ENDPOINT, "important")
 
-        o = Ontospy(sparql_endpoint=ENDPOINT, verbose=True)
+        o = Ontospy(sparql_endpoint=self.ENDPOINT, verbose=True)
 
         print(o), print("---------")
 
@@ -46,10 +45,6 @@ class TestSparqlStore(unittest.TestCase):
                 print(el)
         else:
             print("No results")
-
-        o.extract_classes()
-        for c in o.classes:
-            print(c)
 
 
 

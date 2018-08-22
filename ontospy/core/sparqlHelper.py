@@ -4,7 +4,7 @@
 """
 Python and RDF Utils for OntoSpy
 
-Copyright (c) 2013-2017 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
+Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 
 """
 
@@ -32,24 +32,25 @@ class SparqlHelper(object):
     """
 
 
-    def __init__(self, rdfgraph):
+    def __init__(self, rdfgraph, sparql_endpoint=False):
         super(SparqlHelper, self).__init__()
-        self.rdfgraph = rdfgraph
+        self.rdflib_graph = rdfgraph
+        self.sparql_endpoint = sparql_endpoint
 
         # TODO add 2 versions of queries, one for declared classes only,
         # one with basic (RDFS+?) inference too
         self.inference = False
 
         # Bind a few prefix, namespace pairs for easier sparql querying
-        self.rdfgraph.bind("rdf", rdflib.namespace.RDF)
-        self.rdfgraph.bind("rdfs", rdflib.namespace.RDFS)
-        self.rdfgraph.bind("owl", rdflib.namespace.OWL)
-        self.rdfgraph.bind("skos", rdflib.namespace.SKOS)
-        self.rdfgraph.bind("dc", "http://purl.org/dc/elements/1.1/")
-        self.rdfgraph.bind("vann", "http://purl.org/vocab/vann/")
-        self.rdfgraph.bind("void", "http://rdfs.org/ns/void#")
-        self.rdfgraph.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
-        self.rdfgraph.bind("sh", "http://www.w3.org/ns/shacl#")
+        self.rdflib_graph.bind("rdf", rdflib.namespace.RDF)
+        self.rdflib_graph.bind("rdfs", rdflib.namespace.RDFS)
+        self.rdflib_graph.bind("owl", rdflib.namespace.OWL)
+        self.rdflib_graph.bind("skos", rdflib.namespace.SKOS)
+        self.rdflib_graph.bind("dc", "http://purl.org/dc/elements/1.1/")
+        self.rdflib_graph.bind("vann", "http://purl.org/vocab/vann/")
+        self.rdflib_graph.bind("void", "http://rdfs.org/ns/void#")
+        self.rdflib_graph.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
+        self.rdflib_graph.bind("sh", "http://www.w3.org/ns/shacl#")
 
 
     # ..................
@@ -58,7 +59,7 @@ class SparqlHelper(object):
 
 
     def getOntology(self):
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
             """SELECT DISTINCT ?x
                WHERE {
                   ?x a owl:Ontology
@@ -74,12 +75,15 @@ class SparqlHelper(object):
 
 
     def getShapes(self):
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
             """SELECT DISTINCT ?x
                WHERE {
-                  ?x a sh:Shape .
-                  # ?x sh:targetClass ?class
-               }""")
+                        { ?x a sh:Shape }
+                        union
+                        { ?x a sh:NodeShape }
+                        union
+                        { ?x a sh:PropertyShape }
+                    } """)
         return list(qres)
 
 
@@ -133,7 +137,7 @@ class SparqlHelper(object):
         else:
             query = query % ""
 
-        qres = self.rdfgraph.query(query)
+        qres = self.rdflib_graph.query(query)
         return list(qres)
 
 
@@ -146,7 +150,7 @@ class SparqlHelper(object):
 
         added: { ?y rdf:type ?x }
         """
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x ?c
                  WHERE {
                          {
@@ -183,7 +187,7 @@ class SparqlHelper(object):
 
     def getClassInstances(self, aURI):
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                      { ?x rdf:type <%s> }
@@ -194,7 +198,7 @@ class SparqlHelper(object):
 
     def getClassInstancesCount(self, aURI):
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT (COUNT(?x) AS ?count )
                  WHERE {
                      { ?x rdf:type <%s> }
@@ -210,7 +214,7 @@ class SparqlHelper(object):
 
     def getClassDirectSupers(self, aURI):
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                      { <%s> rdfs:subClassOf ?x }
@@ -225,7 +229,7 @@ class SparqlHelper(object):
         2015-06-03: currenlty not used, inferred from above
         """
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                      { ?x rdfs:subClassOf <%s> }
@@ -241,7 +245,7 @@ class SparqlHelper(object):
         """
         aURI = aURI
         try:
-            qres = self.rdfgraph.query(
+            qres = self.rdflib_graph.query(
                   """SELECT DISTINCT ?x
                      WHERE {
                          { <%s> rdfs:subClassOf+ ?x }
@@ -261,7 +265,7 @@ class SparqlHelper(object):
         """
         aURI = aURI
         try:
-            qres = self.rdfgraph.query(
+            qres = self.rdflib_graph.query(
                   """SELECT DISTINCT ?x
                      WHERE {
                          { ?x rdfs:subClassOf+ <%s> }
@@ -282,7 +286,7 @@ class SparqlHelper(object):
 
     # NOTE this kinf of query could be expanded to classes too!!!
     def getAllProperties(self):
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT ?x ?c WHERE {
                         {
                             { ?x a rdf:Property }
@@ -303,7 +307,7 @@ class SparqlHelper(object):
 
     def getPropDirectSupers(self, aURI):
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                      { <%s> rdfs:subPropertyOf ?x }
@@ -320,7 +324,7 @@ class SparqlHelper(object):
         """
         aURI = aURI
         try:
-            qres = self.rdfgraph.query(
+            qres = self.rdflib_graph.query(
                   """SELECT DISTINCT ?x
                      WHERE {
                          { <%s> rdfs:subPropertyOf+ ?x }
@@ -340,7 +344,7 @@ class SparqlHelper(object):
         """
         aURI = aURI
         try:
-            qres = self.rdfgraph.query(
+            qres = self.rdflib_graph.query(
                   """SELECT DISTINCT ?x
                      WHERE {
                          { ?x rdfs:subPropertyOf+ <%s> }
@@ -361,7 +365,7 @@ class SparqlHelper(object):
 
 
     def getSKOSInstances(self):
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                      { ?x rdf:type skos:Concept }
@@ -373,7 +377,7 @@ class SparqlHelper(object):
 
     def getSKOSDirectSupers(self, aURI):
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                          {
@@ -392,7 +396,7 @@ class SparqlHelper(object):
         2015-08-19: currenlty not used, inferred from above
         """
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """SELECT DISTINCT ?x
                  WHERE {
                          {
@@ -420,11 +424,10 @@ class SparqlHelper(object):
         Note: if a triple object is a blank node (=a nested definition)
         we try to extract all relevant data recursively (does not work with
         sparql endpoins)
-        2015-10-18: updated
         """
 
         aURI = aURI
-        qres = self.rdfgraph.query(
+        qres = self.rdflib_graph.query(
               """CONSTRUCT {<%s> ?y ?z }
                  WHERE {
                      { <%s> ?y ?z }
@@ -438,14 +441,17 @@ class SparqlHelper(object):
             for tripl in triples_list:
                 if isBlankNode(tripl[2]):
                     # print "blank node", str(tripl[2])
-                    temp = [x for x in self.rdfgraph.triples((tripl[2], None, None))]
+                    temp = [x for x in self.rdflib_graph.triples((tripl[2], None, None))]
                     out += temp + recurse(temp)
                 else:
                     pass
             return out
 
-        try:
-            return lres + recurse(lres)
-        except:
-            printDebug("Error extracting blank nodes info", "important")
+        if self.sparql_endpoint:
             return lres
+        else:
+            try:
+                return lres + recurse(lres)
+            except:
+                printDebug("Error extracting blank nodes info", "important")
+                return lres

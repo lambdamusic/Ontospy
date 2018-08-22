@@ -412,7 +412,7 @@ def printBasicInfo(onto):
     """
     Terminal printing of basic ontology information
     """
-    rdfGraph = onto.rdfGraph
+    rdfGraph = onto.rdflib_graph
 
     print("_" * 50, "\n")
     print("TRIPLES = %s" % len(rdfGraph))
@@ -447,7 +447,7 @@ def inferMainPropertyType(uriref):
     Attempt to reduce the property types to 4 main types
     (without the OWL ontology - which would be the propert way)
 
-    In [3]: for x in g.properties:
+    In [3]: for x in g.all_properties:
        ...:		print x.rdftype
        ...:
     http://www.w3.org/2002/07/owl#FunctionalProperty
@@ -761,7 +761,7 @@ def uri2niceString(aUri, namespaces = None):
     elif type(aUri) == rdflib.term.Literal:
         stringa = "\"%s\"" % aUri  # no string casting so to prevent encoding errors
     else:
-        print(type(aUri))
+        # print(type(aUri))
         if type(aUri) == type(u''):
             stringa = aUri
         else:
@@ -802,8 +802,10 @@ def niceString2uri(aUriString, namespaces = None):
 
 
 
-def entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
+def xxx_entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = False, orderProps=[RDF, RDFS, OWL.OWLNS, DC.DCNS]):
     """
+    2018-05-08: can delete? same name as sparqlHelper.entityTriples..
+
     Returns the pred-obj for any given resource, excluding selected ones..
 
     Sorting: by default results are sorted alphabetically and according to namespaces: [RDF, RDFS, OWL.OWLNS, DC.DCNS]
@@ -902,20 +904,25 @@ def shellPrintOverview(g, opts={'labels' : False}):
     # pydoc.pager("SOME_VERY_LONG_TEXT")
 
     """
-    ontologies = g.ontologies
+    ontologies = g.all_ontologies
 
     for o in ontologies:
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
         o.printTriples()
-    if g.classes:
+    if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printClassTree(showids=False, labels=opts['labels'])
-    if g.properties:
+    if g.all_properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printPropertyTree(showids=False, labels=opts['labels'])
-    if g.skosConcepts:
+    if g.all_skos_concepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
         g.printSkosTree(showids=False, labels=opts['labels'])
+    if g.all_shapes:
+        print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10	 + Style.RESET_ALL)
+        for x in g.all_shapes:
+            printDebug("%s" % (x.qname))
+            # printDebug("%s" % (x.bestLabel()), "comment")
 
 
 

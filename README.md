@@ -3,6 +3,10 @@ OntoSpy
 
 Python toolkit for inspecting linked data knowledge models AKA ontologies or vocabularies.
 
+#### Links
+
+* [Pypi home](https://pypi.org/project/ontospy/)
+* [Github home](https://github.com/lambdamusic/ontospy)
 
 Description
 =======

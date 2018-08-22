@@ -5,7 +5,7 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.test_shapes
+:path/to/ontospyProject>python -m ontospy.tests.test_shaped_properties
 
 """
 
@@ -21,17 +21,17 @@ from ..core.utils import *
 # sanity check
 print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
 
-class TestShapes(unittest.TestCase):
+class TestShapedProperties(unittest.TestCase):
 
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
-	DATA_FOLDER = dir_path + "/shapes/"
+	DATA_FOLDER = dir_path + "/rdf/schema/webapi.ttl"
 
 
-	def test1_local_shapes(self):
+	def test_shaped_properties(self):
 
 		"""
-		Check if the shapes in the SciGraph onto are loaded properly
+		Check if the shapes and their properties on a class are loaded properly.
 		"""
 		printDebug("=================\nTEST: Loading ontology & shapes from <%s> folder and printing summary.\n=================" % self.DATA_FOLDER, "important")
 
@@ -40,12 +40,12 @@ class TestShapes(unittest.TestCase):
 		for el in o.stats():
 			print("%s : %d" % (el[0], el[1]))
 
-		for s in o.all_shapes:
-			printDebug("\nSHAPE: %s" % str(s), "green")
-			if s.targetClasses:
-				for x in s.targetClasses:
-					print(".....hasTargetClass: " + str(x))
-					print("     Reverse link: the class has %d associated shape." % len(x.all_shapes))
+		for c in o.all_classes:
+			printDebug("\Class: %s" % str(c), "green")
+			if c.shapedProperties:
+				for x in c.shapedProperties:
+					print(".....hasProperty: " + str(x["property"]))
+					print("     the property has %s associated shapes." % x["shape"])
 			else:
 				print("..... has no target class!")
 
