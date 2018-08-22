@@ -345,9 +345,9 @@ class bcolors:
     BLUE = '\033[94m'  # blue
     GREEN = '\033[92m' # green
     YELLOW = '\033[93m' # yellow
-    RED = '\033[91m'	# red
+    RED = '\033[91m' # red
     ENDC = '\033[0m'
-    BOLD = '\033[1m'	 # bold black
+    BOLD = '\033[1m'  # bold black
     UNDERLINE = '\033[4m'  # underline (note: must be ended)
 
 
@@ -492,7 +492,7 @@ def printGenericTree(element, level=0, showids=True, labels=False, showtype=True
     ID_MARGIN = 5
 
     SHORT_TYPES = {
-        "rdf:Property" : 			"rdf:Property" ,
+        "rdf:Property" :    "rdf:Property" ,
         "owl:AnnotationProperty" :  "owl:Annot.Pr.",
         "owl:DatatypeProperty" :    "owl:DatatypePr.",
         "owl:ObjectProperty" :      "owl:ObjectPr.",
@@ -824,7 +824,7 @@ def xxx_entityTriples(rdfGraph, anEntity, excludeProps=False, excludeBNodes = Fa
     # sorting
     if type(orderProps) == type([]):
         orderedUris = sortByNamespacePrefix([y for y,z in temp], orderProps) # order props only
-        orderedUris = [(n+1, x) for n, x in enumerate(orderedUris)]	 # create form: [(1, 'something'),(2,'bobby'),(3,'suzy'),(4,'crab')]
+        orderedUris = [(n+1, x) for n, x in enumerate(orderedUris)]  # create form: [(1, 'something'),(2,'bobby'),(3,'suzy'),(4,'crab')]
         rank = dict((key, rank) for (rank, key) in orderedUris) # create dict to pass to sorted procedure
         temp = sorted(temp, key=lambda tup: rank.get(tup[0]))
     elif orderProps:  # default to alpha sorting unless False
@@ -909,20 +909,34 @@ def shellPrintOverview(g, opts={'labels' : False}):
     for o in ontologies:
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
         o.printTriples()
+    else:
+        printDebug(".. No Ontology Declaration Found", "comment")
+
     if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printClassTree(showids=False, labels=opts['labels'])
+    else:
+        printDebug(".. No Class Declaration Found", "comment")
+
     if g.all_properties:
-        print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
+        print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printPropertyTree(showids=False, labels=opts['labels'])
+    else:
+        printDebug(".. No Property Declaration Found", "comment")
+
     if g.all_skos_concepts:
-        print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10	 + Style.RESET_ALL)
+        print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printSkosTree(showids=False, labels=opts['labels'])
+    else:
+        printDebug(".. No SKOS Declaration Found", "comment")
+
     if g.all_shapes:
-        print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10	 + Style.RESET_ALL)
+        print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10  + Style.RESET_ALL)
         for x in g.all_shapes:
             printDebug("%s" % (x.qname))
             # printDebug("%s" % (x.bestLabel()), "comment")
+    else:
+        printDebug(".. No SHACL Declaration Found", "comment")
 
 
 
