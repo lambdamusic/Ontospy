@@ -288,6 +288,7 @@ class OntoClass(RDF_Entity):
         self.ontology = None
         self._instances = False  # calc on demand at runtime 
         self.sparqlHelper = None	 # the original graph the class derives from
+        self.shapedProperties = [] #properties of this class that belong to a shape
 
     def __repr__(self):
         return "<Class *%s*>" % ( self.uri)
@@ -316,7 +317,7 @@ class OntoClass(RDF_Entity):
 
 
     def printStats(self):
-        """ shotcut to pull out useful info for interactive use """
+        """ shortcut to pull out useful info for interactive use """
         printDebug("----------------")
         printDebug("Parents......: %d" % len(self.parents()))
         printDebug("Children.....: %d" % len(self.children()))

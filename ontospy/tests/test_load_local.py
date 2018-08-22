@@ -13,8 +13,8 @@ from __future__ import print_function
 
 import unittest, os, sys
 from .. import *
-from ..core import *
-from ..core.utils import *
+from .. core import *
+from .. core.utils import *
 
 
 

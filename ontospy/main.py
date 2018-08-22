@@ -9,7 +9,13 @@ All rights reserved.
 
 from __future__ import print_function
 
-import sys, os, time, optparse, os.path, shutil, requests
+import sys
+import os
+import time
+import optparse
+import os.path
+import shutil
+import requests
 
 try:
     import cPickle
