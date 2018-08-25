@@ -99,6 +99,23 @@ def open():
     # add web option here too?
 
 
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument('sources', nargs=-1)
+@click.option(
+    '--serialize', '-s', help='Serialize: from one serialization to another.')
+@click.pass_context
+def utils(ctx, sources=None, serialize="ttl"):
+    """Desc here
+    """
+    click.echo("Utils group")
+    if sources:
+        action_transform(sources, serialize)
+    else:
+        click.echo(ctx.get_help())
+
+
+#### ORIGINAL VERSION #########
+#####################
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('sources', nargs=-1)
 @click.option(

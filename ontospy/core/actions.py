@@ -54,6 +54,21 @@ from .manager import *
 
 
 
+def action_transform(source, out_fmt="turtle"):
+    """
+    Util: render RDF into a different serialization 
+    """
+    # load RDF only
+    o = Ontospy(uri_or_path=source, build_all=False)
+    s = o.serialize(out_fmt)
+    print(s)
+    # transform
+    # print out
+
+
+
+
+
 
 def action_listlocal(all_details=True):
     " select a file from the local repo "
@@ -337,7 +352,7 @@ def _import_PREFIXCC(keyword=""):
 
     counter = 1
     for x in options:
-        print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL)
+        print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +  x[1], Style.RESET_ALL)
         # print(Fore.BLUE + x[0], " ==> ", x[1])
         counter += 1
 
