@@ -53,7 +53,8 @@ package_data_folders = []
 setup(
     name='ontospy',
     version=VERSIONSTRING,
-    description='Query, inspect and visualize knowledge models encoded as RDF/OWL ontologies.',
+    description=
+    'Query, inspect and visualize knowledge models encoded as RDF/OWL ontologies.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/lambdamusic/ontospy',
@@ -85,7 +86,6 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
     ],
-
     keywords='ontology semantic web linked data rdf owl',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     # List run-time dependencies here.  These will be installed by pip when your
@@ -104,22 +104,18 @@ setup(
         # http://click.pocoo.org/5/utils/#ansi-colors
         'click',
         'colorama',
-		'pyparsing',
-	],
+        'pyparsing',
+    ],
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
     # $ pip install -e .[dev,test]
-    extras_require = {
-	'shell-autocomplete': ['readline']
-    },
-    package_data={
-        'ontospy': package_data_folders
-    },
+    extras_require={'shell-autocomplete': ['readline']},
+    package_data={'ontospy': package_data_folders},
     entry_points={
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
-            'ontospy-shell=ontospy.extras.shell:cli_run_shell',
-            'ontospy=ontospy.main:main_cli'
+            # 'ontospy-shell=ontospy.extras.shell:cli_run_shell',
+            'ontospy=ontospy.cli:main_cli'
         ],
     },
 )
