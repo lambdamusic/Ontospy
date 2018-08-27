@@ -71,6 +71,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group()
 def main_cli():
+    """
+Ontospy is a command line inspector for RDF/OWL models.
+
+Example:
+
+$ ontospy /path/to/mymodel.rdf [UPDATE]\n
+
+Online docs:
+<https://github.com/lambdamusic/ontospy/wiki>
+    """
     click.secho("OntoSpy " + VERSION, bold=True)
     # click.secho("Local library: '%s'" % get_home_location(), fg='white')
     click.secho("------------", fg='white')
@@ -87,9 +97,12 @@ def library():
 
 
 @main_cli.command()
-def shell():
-    click.echo(
-        "Shell: launche the shell. If an arg is provided loads it into it too")
+@click.argument('sources', nargs=-1)
+def shell(sources=None):
+    """Launch the ontospy repl - an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
+    """
+    from extras.shell import launch_shell
+    launch_shell(sources)
 
 
 @main_cli.command()
@@ -102,12 +115,15 @@ def analyze():
 @main_cli.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('sources', nargs=-1)
 @click.option(
-    '--serialize', '-s', help='Serialize: from one serialization to another.')
+    '--serialize',
+    '-s',
+    help=
+    'Parse RDF and print it out in the selected serialization. Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld'
+)
 @click.pass_context
 def utils(ctx, sources=None, serialize="ttl"):
-    """Desc here
+    """Little helper utilities for working with RDF models.
     """
-    click.echo("Utils group")
     if sources:
         action_transform(sources, serialize)
     else:

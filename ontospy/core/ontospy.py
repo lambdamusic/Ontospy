@@ -971,7 +971,7 @@ class Ontospy(object):
     def rdf_source(self, format="turtle"):
         """
         Wrapper for rdflib serializer method.
-        Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
+        Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld [trix not working out of the box]
         """
         return self.rdflib_graph.serialize(format=format)
 
