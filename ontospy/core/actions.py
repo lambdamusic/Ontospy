@@ -11,7 +11,17 @@ from __future__ import print_function
 
 from colorama import Fore, Style
 
-import sys, os, time, optparse, os.path, shutil, requests
+import sys
+import os, os.path
+import time
+import optparse
+import shutil
+import requests
+import platform
+import subprocess
+import rdflib
+import datetime
+
 
 try:
     import cPickle
@@ -34,7 +44,6 @@ try:
 except NameError:
     pass
 
-import time, optparse, os, rdflib, sys, datetime
 
 
 from . import *
@@ -51,6 +60,37 @@ from .manager import *
 # ACTIONS FIRED FROM THE SHELL OR COMMAND LINE
 # note: all actions are loaded in ontospy.py and called from other modules as 'ontospy.action_bootstrap' etc...
 # ===========
+
+
+def action_analyze(sources, endpoint=None):
+    """
+    Load up a model into ontospy and analyze it
+    """
+    for x in sources:
+        click.secho("Parsing %s..." % str(x), fg='white')
+
+    if endpoint:
+        g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
+        printDebug("Extracting classes info")
+        g.build_classes()
+        printDebug("..done")
+        printDebug("Extracting properties info")
+        g.build_properties()
+        printDebug("..done")
+    else:
+        g = Ontospy(uri_or_path=sources, verbose=verbose)
+
+    shellPrintOverview(g, print_opts)
+
+
+def action_reveal_library():
+    path = get_home_location()
+    if platform.system() == "Windows":
+        os.startfile(path)
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
 
 
@@ -156,10 +196,9 @@ def _print_table_ontologies():
 
 
 
-def action_import(location, verbose=True, lock=None):
-    """import files into the local repo
-        <lock> was used by the Threaded routine *now removed* 2016-04-24
-
+def action_import(location, verbose=True):
+    """
+    Import files into the local repo
     """
 
     location = str(location) # prevent errors from unicode being passed
@@ -415,16 +454,6 @@ def action_bootstrap():
 
 
 
-
-#
-# ACTIONS ASSOCIATED TO MANAGER COMMAND
-#
-
-
-
-
-
-
 def action_update_library_location(_location):
     """
     Sets the folder that contains models for the local library
@@ -457,48 +486,6 @@ def action_update_library_location(_location):
 
 
 
-
-
-
-def actions_delete():
-    """
-    delete an ontology from the local repo
-    """
-
-    filename = action_listlocal()
-
-    ONTOSPY_LOCAL_MODELS = get_home_location()
-
-    if filename:
-        fullpath = ONTOSPY_LOCAL_MODELS + filename
-
-        if os.path.exists(fullpath):
-            var = input("Are you sure you want to delete this file? (y/n)")
-            if var == "y":
-                os.remove(fullpath)
-                printDebug("Deleted %s" % fullpath, "important")
-                cachepath = ONTOSPY_LOCAL_CACHE + filename + ".pickle"
-                # @todo: do this operation in /cache...
-                if os.path.exists(cachepath):
-                    os.remove(cachepath)
-                    printDebug("---------")
-                    printDebug("File deleted [%s]" % cachepath, "important")
-
-                return True
-            else:
-                printDebug("Goodbye")
-
-    return False
-
-
-
-
-
-
-def action_erase():
-    """just a wrapper.. possibly to be extended in the future"""
-    get_or_create_home_repo(reset=True)
-    return True
 
 
 
@@ -535,3 +522,45 @@ def action_cache():
 
     else:
         print("Goodbye")
+
+
+
+def actions_delete():
+    """
+    DEPRECATED (v 1.9.4)
+    delete an ontology from the local repo
+    """
+
+    filename = action_listlocal()
+
+    ONTOSPY_LOCAL_MODELS = get_home_location()
+
+    if filename:
+        fullpath = ONTOSPY_LOCAL_MODELS + filename
+
+        if os.path.exists(fullpath):
+            var = input("Are you sure you want to delete this file? (y/n)")
+            if var == "y":
+                os.remove(fullpath)
+                printDebug("Deleted %s" % fullpath, "important")
+                cachepath = ONTOSPY_LOCAL_CACHE + filename + ".pickle"
+                # @todo: do this operation in /cache...
+                if os.path.exists(cachepath):
+                    os.remove(cachepath)
+                    printDebug("---------")
+                    printDebug("File deleted [%s]" % cachepath, "important")
+
+                return True
+            else:
+                printDebug("Goodbye")
+
+    return False
+
+
+def action_erase():
+    """
+    DEPRECATED (v 1.9.4)
+    just a wrapper.. possibly to be extended in the future
+    """
+    get_or_create_home_repo(reset=True)
+    return True

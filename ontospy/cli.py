@@ -68,32 +68,192 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 # http://click.pocoo.org/6/commands/
 # test with python -m ontospy.cli library
 
+##
+## TOP LEVEL COMMAND
+##
 
-@click.group()
-def main_cli():
+
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.option(
+    '--verbose',
+    '-v',
+    is_flag=True,
+    help='Print out extra info and debug messages.')
+@click.pass_context
+def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models.
-
-Example:
-
-$ ontospy /path/to/mymodel.rdf [UPDATE]\n
-
-Online docs:
-<https://github.com/lambdamusic/ontospy/wiki>
+Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <https://github.com/lambdamusic/ontospy/wiki>.
     """
+    sTime = time.time()
+    if ctx.obj is None:  # Doesn't work as of 3.0
+        # https://github.com/pallets/click/issues/888
+        ctx.obj = {}
+    ctx.obj['VERBOSE'] = verbose
+    ctx.obj['STIME'] = sTime
     click.secho("OntoSpy " + VERSION, bold=True)
     # click.secho("Local library: '%s'" % get_home_location(), fg='white')
     click.secho("------------", fg='white')
     # verbose option would go here
 
 
+##
+## LIBRARY COMMAND
+##
+
+
 @main_cli.command()
-def library():
-    click.echo(
-        "Library: here we can add boostrap/cache/delete/list/save/reset/update"
-    )
-    # delete and reset could be unified (reset = delete + *)
-    # by default it shows the library
+@click.option(
+    '--bootstrap',
+    '-b',
+    is_flag=True,
+    help='BOOTSTRAP: bootstrap the local library with a few sample models.')
+@click.option(
+    '--cache',
+    '-c',
+    is_flag=True,
+    help='CACHE: force caching of the local library (for faster loading).')
+@click.option(
+    '--reveal',
+    '-r',
+    is_flag=True,
+    help=
+    'REVEAL: open the local library folder using default app. Note: from v1.9.4 all file management operations should be done via the OS.'
+)
+@click.option(
+    '--directory',
+    '-d',
+    is_flag=True,
+    help=
+    'DIRECTORY: set a (new) home directory for the local library. A valid path must be passed as argument.'
+)
+@click.option(
+    '--save',
+    '-s',
+    is_flag=True,
+    help=
+    'SAVE: import a local or remote RDF file to the local library. If a local folder path is passed, all valid RDF files found in it get imported. If no argument is provided and there is an internet connection, it allows to scan online ontology repositories to find items of interests.'
+)
+@click.argument('filepath', nargs=-1)
+@click.pass_context
+def library(ctx,
+            filepath=None,
+            bootstrap=False,
+            cache=False,
+            reveal=False,
+            save=False,
+            directory=False):
+    """
+    Work with a local library of RDF models. If no option or argument is passed, by default the library contents are listed.
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+
+    if bootstrap:
+        action_bootstrap()
+        printDebug("Tip: you can now load an ontology by typing `ontospy -l`",
+                   "important")
+        # raise SystemExit(1)
+
+    elif cache:
+        action_cache()
+
+    elif directory:
+        if not filepath:
+            printDebug("Please specify a new directory for the local library.",
+                       'important')
+            printDebug(
+                "E.g. 'ontospy library --update /Users/john/ontologies'",
+                'tip')
+            sys.exit(0)
+        else:
+            _location = filepath[0]
+            if _location.endswith("/"):
+                # dont need the final slash
+                _location = _location[:-1]
+            output = action_update_library_location(_location)
+            if output:
+                printDebug(
+                    "Note: no files have been moved or deleted (this has to be done manually)",
+                    "comment")
+                printDebug("----------\n" + "New location: '%s'" % _location,
+                           "important")
+
+            else:
+                printDebug(
+                    "----------\n" + "Please specify an existing folder path.",
+                    "important")
+            raise SystemExit(1)
+
+    elif reveal:
+        action_reveal_library()
+        raise SystemExit(1)
+
+    elif save:
+        if filepath:
+            action_import(filepath[0])
+        else:
+            click.secho(
+                "You provided no arguments - starting web import wizard..",
+                fg='white')
+            action_webimport()
+        raise SystemExit(1)
+
+    else:
+        # by default, show the local library
+        click.secho(
+            "Tip: view all options for the library command with `ontospy library -h`\n-------------",
+            fg='white')
+        click.secho("Local library => '%s'" % get_home_location(), fg='white')
+        filename = action_listlocal(all_details=True)
+
+        if filename:
+            g = get_pickled_ontology(filename)
+            if not g:
+                g = do_pickle_ontology(filename)
+            shellPrintOverview(g, print_opts)
+
+    eTime = time.time()
+    tTime = eTime - sTime
+    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
+##
+## ANALYZE / SCAN COMMAND
+##
+
+
+@main_cli.command()
+@click.argument('sources', nargs=-1)
+@click.option(
+    '--endpoint',
+    '-e',
+    is_flag=True,
+    help='Use to specify that the source url passed is a sparql endpoint')
+@click.pass_context
+def analyze(ctx, sources=None, endpoint=False):
+    """Scan an RDF source for ontology entities and print out a report."
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+    if sources or (sources and endpoint):
+        action_analyze(sources, endpoint)
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+    else:
+        click.echo(ctx.get_help())
+
+
+##
+## SHELL COMMAND
+##
 
 
 @main_cli.command()
@@ -105,14 +265,12 @@ def shell(sources=None):
     launch_shell(sources)
 
 
+##
+## UTILS COMMAND
+##
+
+
 @main_cli.command()
-def analyze():
-    click.echo(
-        "Open: main command for inspecting stuff. HEre we can add --endpoint ")
-    # add web option here too?
-
-
-@main_cli.command(context_settings=CONTEXT_SETTINGS)
 @click.argument('sources', nargs=-1)
 @click.option(
     '--serialize',
@@ -121,13 +279,25 @@ def analyze():
     'Parse RDF and print it out in the selected serialization. Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld'
 )
 @click.pass_context
-def utils(ctx, sources=None, serialize="ttl"):
+def utils(ctx, sources=None, serialize=None):
     """Little helper utilities for working with RDF models.
     """
-    if sources:
-        action_transform(sources, serialize)
-    else:
+    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
+    if not sources:
+        if serialize:
+            click.secho(
+                "What do you want to serialize? Please specify a valid RDF source.",
+                fg='red')
         click.echo(ctx.get_help())
+    else:
+        if not serialize: serialize = "turtle"
+        if serialize not in VALID_FORMATS:
+            click.secho(
+                "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
+                fg='red')
+            return
+        else:
+            action_transform(sources, serialize)
 
 
 if __name__ == '__main__':
