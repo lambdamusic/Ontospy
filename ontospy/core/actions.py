@@ -94,13 +94,13 @@ def action_reveal_library():
 
 
 
-def action_transform(source, out_fmt="turtle"):
+def action_transform(source, out_fmt="turtle", verbose=False):
     """
     Util: render RDF into a different serialization 
     valid options are: xml, n3, turtle, nt, pretty-xml, json-ld
     """
 
-    o = Ontospy(uri_or_path=source, build_all=False)
+    o = Ontospy(uri_or_path=source, verbose=verbose, build_all=False)
     s = o.serialize(out_fmt)
     print(s)
 

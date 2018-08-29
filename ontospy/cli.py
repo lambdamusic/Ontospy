@@ -266,38 +266,74 @@ def shell(sources=None):
 
 
 ##
-## UTILS COMMAND
+## UTILS COMMAND - DEPRECATED
+##
+
+# @main_cli.command()
+# @click.argument('sources', nargs=-1)
+# @click.option(
+#     '--serialize',
+#     '-s',
+#     help=
+#     'Parse RDF and print it out in the selected serialization. Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld'
+# )
+# @click.pass_context
+# def utils(ctx, sources=None, serialize=None):
+#     """Little helper utilities for working with RDF models.
+#     """
+#     VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
+#     if not sources:
+#         if serialize:
+#             click.secho(
+#                 "What do you want to serialize? Please specify a valid RDF source.",
+#                 fg='red')
+#         click.echo(ctx.get_help())
+#     else:
+#         if not serialize: serialize = "turtle"
+#         if serialize not in VALID_FORMATS:
+#             click.secho(
+#                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
+#                 fg='red')
+#             return
+#         else:
+#             action_transform(sources, serialize)
+
+##
+## TRANSFORM COMMAND
 ##
 
 
 @main_cli.command()
-@click.argument('sources', nargs=-1)
-@click.option(
-    '--serialize',
-    '-s',
-    help=
-    'Parse RDF and print it out in the selected serialization. Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld'
-)
+@click.argument('source', nargs=1)
+@click.argument('output_format', nargs=1)
 @click.pass_context
-def utils(ctx, sources=None, serialize=None):
-    """Little helper utilities for working with RDF models.
+def transform(ctx, source, output_format):
+    """Output a different RDF serialization for a given source.
     """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
     VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
-    if not sources:
+    if not source:
         if serialize:
             click.secho(
                 "What do you want to serialize? Please specify a valid RDF source.",
                 fg='red')
         click.echo(ctx.get_help())
     else:
-        if not serialize: serialize = "turtle"
-        if serialize not in VALID_FORMATS:
+        if output_format not in VALID_FORMATS:
             click.secho(
                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
                 fg='red')
             return
         else:
-            action_transform(sources, serialize)
+            action_transform(source, output_format, verbose)
+            eTime = time.time()
+            tTime = eTime - sTime
+            printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime,
+                       "comment")
 
 
 if __name__ == '__main__':

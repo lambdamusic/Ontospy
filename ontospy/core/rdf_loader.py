@@ -116,7 +116,7 @@ class RDFLoader(object):
         :return: None (sets self.rdflib_graph and self.sources_valid)
         """
 
-        if self.verbose: printDebug("----------")
+        # if self.verbose: printDebug("----------")
         if self.verbose: printDebug("Reading: <%s>" % uri, fg="green")
         success = False
 
