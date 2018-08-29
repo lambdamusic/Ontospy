@@ -18,19 +18,16 @@ from .. import *
 from ..core import *
 from ..core.utils import *
 
-
 # sanity check
-print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
-
+print("-------------------\nOntoSpy ", VERSION, "\n-------------------")
 
 
 class MyRDFEntity(ontospy.RDF_Entity):
-
     def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
         super(MyRDFEntity, self).__init__(uri, rdftype, namespaces, ext_model)
 
     def __repr__(self):
-        return "<MyRDFEntity *%s*>" % ( self.uri)
+        return "<MyRDFEntity *%s*>" % (self.uri)
 
     def disjointWith(self):
         """
@@ -40,44 +37,30 @@ class MyRDFEntity(ontospy.RDF_Entity):
         return self.getValuesForProperty(pred)
 
 
-
-
 class TestQuick(unittest.TestCase):
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    DATA_FOLDER = dir_path + "/rdf/"
-    f = DATA_FOLDER + "pizza.ttl"
-    o = Ontospy(f, verbose=True)
+    # code to load resources for multiple tests
 
-    printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
-
-    def test_quick0(self):
-        """
-
-        """
-        print("=================\nQUICK TEST 0 **************")
-        # just showing how to accumulate tests
-
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    # DATA_FOLDER = dir_path + "/rdf/"
+    # f = DATA_FOLDER + "pizza.ttl"
+    # o = Ontospy(f, verbose=True)
+    # printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
 
     def test_quick1(self):
         """
 
         """
-        print("=================\nQUICK TEST 1 **************")
+        print("=================\n*** QUICK TEST 1 ***\n=================\n")
 
-        # e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
+        from ontospy.core.rdf_loader import RDFLoader
+        loader = RDFLoader(verbose=True)
+        loader.load(uri_or_path="/Users/michele.pasin/Desktop/t.jsonld")
+        print(loader.rdflib_graph.serialize(format="turtle"))
 
-        # print(e)
-        # print(e.bestLabel())
-        # print(e.rdf_source())
-
-        e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#FruttiDiMare", MyRDFEntity)
-
-        print(e)
-        print(e.bestLabel())
-        print(e.rdf_source())
-        print(e.disjointWith())
-
+    # def test_quick2(self):
+    #     """Keep adding tests like this"""
+    #     print("=================\n*** QUICK TEST 1 ***\n=================\n")
 
 
 if __name__ == "__main__":
