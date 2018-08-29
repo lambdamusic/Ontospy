@@ -99,12 +99,10 @@ def action_transform(source, out_fmt="turtle"):
     Util: render RDF into a different serialization 
     valid options are: xml, n3, turtle, nt, pretty-xml, json-ld
     """
-    # load RDF only
+
     o = Ontospy(uri_or_path=source, build_all=False)
     s = o.serialize(out_fmt)
     print(s)
-    # transform
-    # print out
 
 
 

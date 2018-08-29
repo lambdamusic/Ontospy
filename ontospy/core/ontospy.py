@@ -108,8 +108,8 @@ class Ontospy(object):
 
     def load_rdf(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """Load an RDF source into an ontospy/rdflib graph"""
-        loader = RDFLoader()
-        loader.load(uri_or_path, data, file_obj, rdf_format, verbose)
+        loader = RDFLoader(verbose=verbose)
+        loader.load(uri_or_path, data, file_obj, rdf_format)
         self.rdflib_graph = loader.rdflib_graph
         self.sources = loader.sources_valid
         self.sparqlHelper = SparqlHelper(self.rdflib_graph)
