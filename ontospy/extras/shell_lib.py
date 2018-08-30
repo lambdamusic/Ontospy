@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 """
-OntoSpy Shell Module
+Ontospy Shell Module
 michele.pasin@gmail.com
 
 # docs:
@@ -56,18 +56,18 @@ _intro_ = """***
 The Command Line Ontology Browser (%s)
 ***											  """
 
-STARTUP_MESSAGE = f.renderText('OntoSpy') + Style.BRIGHT + _intro_ % VERSION + Style.RESET_ALL
+STARTUP_MESSAGE = f.renderText('Ontospy') + Style.BRIGHT + _intro_ % VERSION + Style.RESET_ALL
 
 
 def _get_prompt(onto="", entity=""):
     """
     Global util that changes the prompt contextually
-    :return: [OntoSpy]>(cidoc_crm_v5.0...)>(class:E1.CRM_Entity)>
+    :return: [Ontospy]>(cidoc_crm_v5.0...)>(class:E1.CRM_Entity)>
     """
     base_text, onto_text, entity_text = "", "", ""
     base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.RED, Fore.RED
 
-    base_text = base_color + '[OntoSpy]' + Style.RESET_ALL
+    base_text = base_color + '[Ontospy]' + Style.RESET_ALL
 
     if onto and not entity:
         _tmp = onto_color + '(%s)' % onto
@@ -463,7 +463,7 @@ class Shell(cmd.Cmd):
         """
         Generic method that lets users pick an item from a list via input
         *using_pattern* flag to know if we're showing all choices or not
-        Note: the list items need to be OntoSpy entities.
+        Note: the list items need to be Ontospy entities.
         <objtype>: if specified, it allows incremental search by keeping specifying a
         different pattern.
         """
@@ -1106,7 +1106,7 @@ class Shell(cmd.Cmd):
             self.prompt = _get_prompt()
 
     def do_quit(self, line):
-        "Quit: exit the OntoSpy shell"
+        "Quit: exit the Ontospy shell"
         self._clear_screen()
         return True
 
@@ -1318,10 +1318,10 @@ class Shell(cmd.Cmd):
 def main():
     """ standalone line script """
 
-    print("OntoSpy " + VERSION)
+    print("Ontospy " + VERSION)
 
     Shell()._clear_screen()
-    print(Style.BRIGHT + "** OntoSpy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
+    print(Style.BRIGHT + "** Ontospy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
     # manager.get_or_create_home_repo()
     Shell().cmdloop()
     raise SystemExit(1)

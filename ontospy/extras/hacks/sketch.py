@@ -196,7 +196,7 @@ def main(argv=None):
 
 	"""
 
-	print("OntoSpy " + ontospy.VERSION)
+	print("Ontospy " + ontospy.VERSION)
 	ontospy.get_or_create_home_repo()
 
 	if argv:

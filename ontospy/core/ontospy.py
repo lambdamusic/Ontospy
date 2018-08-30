@@ -108,8 +108,8 @@ class Ontospy(object):
 
     def load_rdf(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
         """Load an RDF source into an ontospy/rdflib graph"""
-        loader = RDFLoader()
-        loader.load(uri_or_path, data, file_obj, rdf_format, verbose)
+        loader = RDFLoader(verbose=verbose)
+        loader.load(uri_or_path, data, file_obj, rdf_format)
         self.rdflib_graph = loader.rdflib_graph
         self.sources = loader.sources_valid
         self.sparqlHelper = SparqlHelper(self.rdflib_graph)
@@ -142,17 +142,6 @@ class Ontospy(object):
             raise
         # don't extract entities by default..
 
-    def rdf_source(self, format="turtle"):
-        """
-        Wrapper for rdflib serializer method.
-        Valid options are: xml, n3, turtle, nt, pretty-xml [trix not working out of the box]
-        """
-        return self.rdflib_graph.serialize(format=format)
-
-    def query(self, stringa):
-        """ wrapper for rdflib sparql query method """
-        qres = self.rdflib_graph.query(stringa)
-        return list(qres)
 
     # ------------
     # === methods to build python objects === #
@@ -509,7 +498,7 @@ class Ontospy(object):
                         if propType:
                             aclass.shapedProperties += [{'shape': aShape, 'property': propType}]
 
-            
+
 
         # sort alphabetically
         self.all_shapes = sorted(self.all_shapes, key=lambda x: x.qname)
@@ -558,7 +547,7 @@ class Ontospy(object):
         """
         extract domain/range details and add to Python objects
         """
-        
+
         domains = chain(aProp.rdflib_graph.objects(
             None, rdflib.term.URIRef(u'http://schema.org/domainIncludes')), aProp.rdflib_graph.objects(
             None, rdflib.RDFS.domain))
@@ -671,39 +660,7 @@ class Ontospy(object):
 
         return _list
 
-    # ------------
-    # === utils === #
-    # ------------
 
-    def stats(self):
-        """ shotcut to pull out useful info for a graph"""
-        out = []
-        out += [("Ontologies", len(self.all_ontologies))]
-        out += [("Triples", self.triplesCount())]
-        out += [("Classes", len(self.all_classes))]
-        out += [("Properties", len(self.all_properties))]
-        out += [("Annotation Properties", len(self.all_properties_annotation))]
-        out += [("Object Properties", len(self.all_properties_object))]
-        out += [("Datatype Properties", len(self.all_properties_datatype))]
-        out += [("Skos Concepts", len(self.all_skos_concepts))]
-        out += [("Data Shapes", len(self.all_shapes))]
-        # out += [("Individuals", len(self.individuals))] @TODO
-        out += [("Data Sources", len(self.sources))]
-        return out
-
-    def triplesCount(self):
-        """
-
-        2016-08-18 the try/except is a dirty solution to a problem
-        emerging with counting graph length on cached Graph objects..
-        """
-        # @todo  investigate what's going on..
-        # click.secho(unicode(type(self.rdflib_graph)), fg="red")
-        try:
-            return len(self.rdflib_graph)
-        except:
-            click.secho("Ontospy: error counting graph length..", fg="red")
-            return 0
 
     # ===============
     # methods for retrieving objects
@@ -945,60 +902,6 @@ class Ontospy(object):
                 flag = True
         return None
 
-    def printClassTree(self, element=None, showids=False, labels=False, showtype=False):
-        """
-        Print nicely into stdout the class tree of an ontology
-
-        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
-        [123]1--
-        [1]123--
-        [12]12--
-        """
-        TYPE_MARGIN = 11  # length for owl:class etc..
-
-        if not element:	 # first time
-            for x in self.toplayer_classes:
-                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
-
-        else:
-            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
-
-    def printPropertyTree(self, element=None, showids=False, labels=False, showtype=False):
-        """
-        Print nicely into stdout the property tree of an ontology
-
-        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
-        [123]1--
-        [1]123--
-        [12]12--
-        """
-        TYPE_MARGIN = 18  # length for owl:AnnotationProperty etc..
-
-        if not element:	 # first time
-            for x in self.toplayer_properties:
-                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
-
-        else:
-            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
-
-    def printSkosTree(self, element=None, showids=False, labels=False, showtype=False):
-        """
-        Print nicely into stdout the SKOS tree of an ontology
-
-        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
-        [123]1--
-        [1]123--
-        [12]12--
-        """
-        TYPE_MARGIN = 13  # length for skos:concept
-
-        if not element:	 # first time
-            for x in self.toplayer_skos:
-                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
-
-        else:
-            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
-
     def ontologyClassTree(self):
         """
         Returns a dict representing the ontology tree
@@ -1058,3 +961,113 @@ class Ontospy(object):
                     treedict[element] = element.children()
             return treedict
         return treedict
+
+
+    # ------------
+    # === utils === #
+    # ------------
+
+
+    def rdf_source(self, format="turtle"):
+        """
+        Wrapper for rdflib serializer method.
+        Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld [trix not working out of the box]
+        """
+        return self.rdflib_graph.serialize(format=format)
+
+    def serialize(self, format="turtle"):
+        "for backward compatibility"
+        return self.rdf_source(format)
+
+    def query(self, stringa):
+        """SPARQL query / wrapper for rdflib sparql query method """
+        qres = self.rdflib_graph.query(stringa)
+        return list(qres)
+    def sparql(self, stringa):
+        "SPARQL query / replacement for query"
+        return self.query(stringa)
+
+    def stats(self):
+        """ shotcut to pull out useful info for a graph"""
+        out = []
+        out += [("Ontologies", len(self.all_ontologies))]
+        out += [("Triples", self.triplesCount())]
+        out += [("Classes", len(self.all_classes))]
+        out += [("Properties", len(self.all_properties))]
+        out += [("Annotation Properties", len(self.all_properties_annotation))]
+        out += [("Object Properties", len(self.all_properties_object))]
+        out += [("Datatype Properties", len(self.all_properties_datatype))]
+        out += [("Skos Concepts", len(self.all_skos_concepts))]
+        out += [("Data Shapes", len(self.all_shapes))]
+        # out += [("Individuals", len(self.individuals))] @TODO
+        out += [("Data Sources", len(self.sources))]
+        return out
+
+    def triplesCount(self):
+        """
+
+        2016-08-18 the try/except is a dirty solution to a problem
+        emerging with counting graph length on cached Graph objects..
+        """
+        # @todo  investigate what's going on..
+        # click.secho(unicode(type(self.rdflib_graph)), fg="red")
+        try:
+            return len(self.rdflib_graph)
+        except:
+            click.secho("Ontospy: error counting graph length..", fg="red")
+            return 0
+
+
+    def printClassTree(self, element=None, showids=False, labels=False, showtype=False):
+        """
+        Print nicely into stdout the class tree of an ontology
+
+        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+        [123]1--
+        [1]123--
+        [12]12--
+        """
+        TYPE_MARGIN = 11  # length for owl:class etc..
+
+        if not element:  # first time
+            for x in self.toplayer_classes:
+                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
+
+        else:
+            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
+
+    def printPropertyTree(self, element=None, showids=False, labels=False, showtype=False):
+        """
+        Print nicely into stdout the property tree of an ontology
+
+        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+        [123]1--
+        [1]123--
+        [12]12--
+        """
+        TYPE_MARGIN = 18  # length for owl:AnnotationProperty etc..
+
+        if not element:  # first time
+            for x in self.toplayer_properties:
+                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
+
+        else:
+            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
+
+    def printSkosTree(self, element=None, showids=False, labels=False, showtype=False):
+        """
+        Print nicely into stdout the SKOS tree of an ontology
+
+        Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+        [123]1--
+        [1]123--
+        [12]12--
+        """
+        TYPE_MARGIN = 13  # length for skos:concept
+
+        if not element:  # first time
+            for x in self.toplayer_skos:
+                printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
+
+        else:
+            printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)

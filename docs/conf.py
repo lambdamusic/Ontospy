@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# OntoSpy documentation build configuration file, created by
+# Ontospy documentation build configuration file, created by
 # sphinx-quickstart on Tue May  5 16:43:29 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -48,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'OntoSpy'
+project = u'Ontospy'
 copyright = u'2015-2018, Michele Pasin'
 author = u'Michele Pasin'
 
@@ -122,8 +122,8 @@ html_theme = 'alabaster'
 html_theme_options = {
     'logo': 'logo.png',
     'github_user': 'lambdamusic',
-    'github_repo': 'OntoSpy',
-	'description' : 'OntoSpy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.'
+    'github_repo': 'Ontospy',
+	'description' : 'Ontospy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -220,7 +220,7 @@ html_sidebars = {
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'OntoSpydoc'
+htmlhelp_basename = 'Ontospydoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -242,7 +242,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'OntoSpy.tex', u'OntoSpy Documentation',
+  (master_doc, 'Ontospy.tex', u'Ontospy Documentation',
    u'Michele Pasin', 'manual'),
 ]
 
@@ -272,7 +272,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ontospy', u'OntoSpy Documentation',
+    (master_doc, 'ontospy', u'Ontospy Documentation',
      [author], 1)
 ]
 
@@ -286,8 +286,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'OntoSpy', u'OntoSpy Documentation',
-   author, 'OntoSpy', 'One line description of project.',
+  (master_doc, 'Ontospy', u'Ontospy Documentation',
+   author, 'Ontospy', 'One line description of project.',
    'Miscellaneous'),
 ]
 

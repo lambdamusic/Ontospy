@@ -37,40 +37,32 @@ class RDFLoader(object):
     Note : you can pass lists, with the effect that the resulting graph
     will be a union of the rdf data contained in each of the arguments
 
+    @TODO: refactor so that verbose is always taken from INIT method
+
     """
 
-    def __init__(self, rdfgraph=None):
+    SERIALIZATIONS = ['turtle', 'xml', 'n3', 'nt', 'json-ld', 'rdfa']
+
+    def __init__(self, rdfgraph=None, verbose=False):
         super(RDFLoader, self).__init__()
 
         self.rdflib_graph = rdfgraph or rdflib.Graph()
         self.sources_valid = []
         self.sources_invalid = []
+        self.verbose = verbose
 
-    def _fix_default_graph_for_jsonld(self):
-        """
-        2018-06-18
-        Fix for JSONLD loading fails unless you use a ConjunctiveGraph
-        See https://github.com/RDFLib/rdflib/issues/436
-        PS only if current graph is empty!
-        """
-        if not len(self.rdflib_graph):
-            self.rdflib_graph = rdflib.ConjunctiveGraph()
+    def _debugGraph(self):
+        """internal util to print out contents of graph"""
+        print("Len of graph: ", len(self.rdflib_graph))
+        for x, y, z in self.rdflib_graph:
+            print(x, y, z)
 
-    def load(self,
-             uri_or_path=None,
-             data=None,
-             file_obj=None,
-             rdf_format="",
-             verbose=False):
+    def load(self, uri_or_path=None, data=None, file_obj=None, rdf_format=""):
 
         if not rdf_format:
-            self.rdf_format_opts = [
-                'xml', 'turtle', 'n3', 'nt', 'rdfa', 'json-ld'
-            ]
+            self.rdf_format_opts = self.SERIALIZATIONS
         else:
             self.rdf_format_opts = [rdf_format]
-            if rdf_format == 'json-ld':
-                self._fix_default_graph_for_jsonld()
 
         # URI OR PATH
         if uri_or_path:
@@ -89,120 +81,110 @@ class RDFLoader(object):
                 # finally:
                 for each in temp:
                     uri = self.resolve_redirects_if_needed(each)
-                    self.load_uri(uri, verbose)
+                    self.load_uri(uri)
 
         # DATA STRING
         elif data:
             if not type(data) in [list, tuple]:
                 data = [data]
             for each in data:
-                self.load_data(each, verbose)
+                self.load_data(each)
 
         # FILE OBJECT
         elif file_obj:
             if not type(file_obj) in [list, tuple]:
                 file_obj = [file_obj]
             for each in file_obj:
-                self.load_file(each, verbose)
+                self.load_file(each)
 
         else:
             raise Exception("You must specify where to load RDF from.")
 
-        if verbose: self.print_summary()
+        if self.verbose: self.print_summary()
 
         return self.rdflib_graph
 
-    def print_summary(self):
+    def load_uri(self, uri):
         """
-        print out stats about loading operation
-        """
-        if self.sources_valid:
-            printDebug(
-                "----------\nLoaded %d triples.\n----------" % len(
-                    self.rdflib_graph),
-                fg='green')
-            printDebug(
-                "RDF sources loaded successfully: %d of %d.\n----------" %
-                (len(self.sources_valid),
-                 len(self.sources_valid) + len(self.sources_invalid)),
-                fg='green')
-            for s in self.sources_valid:
-                printDebug("-> " + s, fg='green')
-        else:
-            printDebug("Sorry - no valid RDF was found", fg='red')
+        Load a single resource into the graph for this object. 
 
-        if self.sources_invalid:
-            printDebug(
-                "----------\nRDF sources failed to load: %d.\n----------" %
-                (len(self.sources_invalid)),
-                fg='red')
-            for s in self.sources_invalid:
-                printDebug("-> " + s, fg="red")
+        Approach: try loading into a temporary graph first, if that succeeds merge it into the main graph. This allows to deal with the JSONLD loading issues which can solved only by using a  ConjunctiveGraph (https://github.com/RDFLib/rdflib/issues/436). Also it deals with the RDFA error message which seems to stick into a graph even if the parse operation fails. 
+        
+        NOTE the final merge operation can be improved as graph-set operations involving blank nodes could case collisions (https://rdflib.readthedocs.io/en/stable/merging.html)  
 
-    def load_uri(self, uri, verbose):
+        :param uri: single RDF source location
+        :return: None (sets self.rdflib_graph and self.sources_valid)
         """
 
-        :param uri:
-        :param rdf_format_opts:
-        :param verbose:
-        :return:
-        """
-
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: <%s>" % uri)
+        # if self.verbose: printDebug("----------")
+        if self.verbose: printDebug("Reading: <%s>" % uri, fg="green")
         success = False
-        for f in self.rdf_format_opts:
-            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
+
+        sorted_fmt_opts = try_sort_fmt_opts(self.rdf_format_opts, uri)
+
+        for f in sorted_fmt_opts:
+            if self.verbose:
+                printDebug(".. trying rdf serialization: <%s>" % f)
             try:
                 if f == 'json-ld':
-                    self._fix_default_graph_for_jsonld()
-                self.rdflib_graph.parse(uri, format=f)
-                if verbose: printDebug("..... success!", bold=True)
+                    if self.verbose:
+                        printDebug(
+                            "Detected JSONLD - loading data into rdflib.ConjunctiveGraph()",
+                            fg='green')
+                    temp_graph = rdflib.ConjunctiveGraph()
+                else:
+                    temp_graph = rdflib.Graph()
+                temp_graph.parse(uri, format=f)
+                if self.verbose: printDebug("..... success!", bold=True)
                 success = True
                 self.sources_valid += [uri]
+                # ok, so merge
+                self.rdflib_graph = self.rdflib_graph + temp_graph
                 break
             except:
-                if verbose: printDebug("..... failed")
+                temp = None
+                if self.verbose: printDebug("..... failed")
+                # self._debugGraph()
 
         if not success == True:
-            self.loading_failed(self.rdf_format_opts, uri=uri)
+            self.loading_failed(sorted_fmt_opts, uri=uri)
             self.sources_invalid += [uri]
 
-    def load_data(self, data, verbose):
+    def load_data(self, data):
         """
 
         :param data:
         :param rdf_format_opts:
-        :param verbose:
         :return:
         """
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: '%s ...'" % data[:10])
+        if self.verbose: printDebug("----------")
+        if self.verbose: printDebug("Reading: '%s ...'" % data[:10])
         success = False
         for f in self.rdf_format_opts:
-            if verbose: printDebug(".. trying rdf serialization: <%s>" % f)
+            if self.verbose:
+                printDebug(".. trying rdf serialization: <%s>" % f)
             try:
                 if f == 'json-ld':
                     self._fix_default_graph_for_jsonld()
                 self.rdflib_graph.parse(data=data, format=f)
-                if verbose: printDebug("..... success!")
+                if self.verbose: printDebug("..... success!")
                 success = True
                 self.sources_valid += ["Data: '%s ...'" % data[:10]]
                 break
             except:
-                if verbose: printDebug("..... failed", "error")
+                if self.verbose: printDebug("..... failed", "error")
 
         if not success == True:
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += ["Data: '%s ...'" % data[:10]]
 
-    def load_file(file_obj, verbose):
+    def load_file(file_obj):
         """
         The type of open file objects such as sys.stdout; alias of the built-in file.
         @TODO: when is this used?
         """
-        if verbose: printDebug("----------")
-        if verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
+        if self.verbose: printDebug("----------")
+        if self.verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
 
         if type(file_obj) == file:
             self.rdflib_graph = self.rdflib_graph + file_obj
@@ -233,6 +215,34 @@ class RDFLoader(object):
 
         return uri
 
+    def print_summary(self):
+        """
+        print out stats about loading operation
+        """
+        if self.sources_valid:
+            printDebug(
+                "----------\nLoaded %d triples.\n----------" % len(
+                    self.rdflib_graph),
+                fg='white')
+            printDebug(
+                "RDF sources loaded successfully: %d of %d." %
+                (len(self.sources_valid),
+                 len(self.sources_valid) + len(self.sources_invalid)),
+                fg='green')
+            for s in self.sources_valid:
+                printDebug("..... '" + s + "'", fg='white')
+            printDebug("----------", fg='white')
+        else:
+            printDebug("Sorry - no valid RDF was found", fg='red')
+
+        if self.sources_invalid:
+            printDebug(
+                "----------\nRDF sources failed to load: %d.\n----------" %
+                (len(self.sources_invalid)),
+                fg='red')
+            for s in self.sources_invalid:
+                printDebug("-> " + s, fg="red")
+
     def loading_failed(self, rdf_format_opts, uri=""):
         """default message if we need to abort loading"""
         if uri:
@@ -258,13 +268,11 @@ class RDFLoader(object):
 @click.option(
     '--trylist', is_flag=True, help='Try loading a predefined list of files.')
 def test(uri_or_path, noverbose, trylist):
-    l = RDFLoader()
+    l = RDFLoader(verbose=not (noverbose))
     if trylist or not uri_or_path:
-        l.load(
-            ["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"],
-            verbose=not (noverbose))
+        l.load(["http://purl.org/dc/terms/", "http://xmlns.com/foaf/spec/"])
     else:
-        l.load(uri_or_path, verbose=not (noverbose))
+        l.load(uri_or_path)
 
 
 if __name__ == '__main__':

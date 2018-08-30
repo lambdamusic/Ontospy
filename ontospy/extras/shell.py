@@ -7,7 +7,7 @@ ONTOSPY
 Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>.
 All rights reserved.
 
-OntoSpy Shell Launcher
+Ontospy Shell Launcher
 
 """
 
@@ -47,7 +47,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.argument('source', nargs=-1)
 def cli_run_shell(source=None):
     """
-This application launches the OntoSpy interactive shell.
+This application launches the Ontospy interactive shell.
 
 Note: if a local path or URI of an RDF model is provided, that gets loaded into the shell by default. E.g.:
 

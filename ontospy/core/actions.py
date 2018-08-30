@@ -11,7 +11,17 @@ from __future__ import print_function
 
 from colorama import Fore, Style
 
-import sys, os, time, optparse, os.path, shutil, requests
+import sys
+import os, os.path
+import time
+import optparse
+import shutil
+import requests
+import platform
+import subprocess
+import rdflib
+import datetime
+
 
 try:
     import cPickle
@@ -34,7 +44,6 @@ try:
 except NameError:
     pass
 
-import time, optparse, os, rdflib, sys, datetime
 
 
 from . import *
@@ -51,6 +60,51 @@ from .manager import *
 # ACTIONS FIRED FROM THE SHELL OR COMMAND LINE
 # note: all actions are loaded in ontospy.py and called from other modules as 'ontospy.action_bootstrap' etc...
 # ===========
+
+
+def action_analyze(sources, endpoint=None):
+    """
+    Load up a model into ontospy and analyze it
+    """
+    for x in sources:
+        click.secho("Parsing %s..." % str(x), fg='white')
+
+    if endpoint:
+        g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
+        printDebug("Extracting classes info")
+        g.build_classes()
+        printDebug("..done")
+        printDebug("Extracting properties info")
+        g.build_properties()
+        printDebug("..done")
+    else:
+        g = Ontospy(uri_or_path=sources, verbose=verbose)
+
+    shellPrintOverview(g, print_opts)
+
+
+def action_reveal_library():
+    path = get_home_location()
+    if platform.system() == "Windows":
+        os.startfile(path)
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
+
+
+
+def action_transform(source, out_fmt="turtle", verbose=False):
+    """
+    Util: render RDF into a different serialization 
+    valid options are: xml, n3, turtle, nt, pretty-xml, json-ld
+    """
+
+    o = Ontospy(uri_or_path=source, verbose=verbose, build_all=False)
+    s = o.serialize(out_fmt)
+    print(s)
+
+
 
 
 
@@ -140,10 +194,9 @@ def _print_table_ontologies():
 
 
 
-def action_import(location, verbose=True, lock=None):
-    """import files into the local repo
-        <lock> was used by the Threaded routine *now removed* 2016-04-24
-
+def action_import(location, verbose=True):
+    """
+    Import files into the local repo
     """
 
     location = str(location) # prevent errors from unicode being passed
@@ -337,7 +390,7 @@ def _import_PREFIXCC(keyword=""):
 
     counter = 1
     for x in options:
-        print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +	 x[1], Style.RESET_ALL)
+        print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter, Style.RESET_ALL + x[0] + " ==> ", Fore.RED +  x[1], Style.RESET_ALL)
         # print(Fore.BLUE + x[0], " ==> ", x[1])
         counter += 1
 
@@ -399,16 +452,6 @@ def action_bootstrap():
 
 
 
-
-#
-# ACTIONS ASSOCIATED TO MANAGER COMMAND
-#
-
-
-
-
-
-
 def action_update_library_location(_location):
     """
     Sets the folder that contains models for the local library
@@ -441,11 +484,52 @@ def action_update_library_location(_location):
 
 
 
+def action_cache_reset():
+    """
+    Delete all contents from cache folder
+    Then re-generate cached version of all models in the local repo
+
+    """
+    printDebug("""The existing cache will be erased and recreated.""")
+    printDebug("""This operation may take several minutes, depending on how many files exist in your local library.""")
+    ONTOSPY_LOCAL_MODELS = get_home_location()
+    # https://stackoverflow.com/questions/185936/how-to-delete-the-contents-of-a-folder-in-python
+    # NOTE This will not only delete the contents but the folder itself as well.
+    shutil.rmtree(ONTOSPY_LOCAL_CACHE_TOP)
+
+    var = input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
+    if var == "y":
+        repo_contents = get_localontologies()
+        print(Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL)
+        for onto in repo_contents:
+            fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
+            try:
+                print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
+                print("Loading graph...")
+                g = Ontospy(fullpath)
+                print("Loaded ", fullpath)
+            except:
+                g = None
+                print("Error parsing file. Please make sure %s contains valid RDF." % fullpath)
+
+            if g:
+                print("Caching...")
+                do_pickle_ontology(onto, g)
+
+        print(Style.BRIGHT + "===Completed===" + Style.RESET_ALL)
+
+    else:
+        print("Goodbye")
+
+
+
+
 
 
 
 def actions_delete():
     """
+    DEPRECATED (v 1.9.4)
     delete an ontology from the local repo
     """
 
@@ -475,47 +559,10 @@ def actions_delete():
     return False
 
 
-
-
-
-
 def action_erase():
-    """just a wrapper.. possibly to be extended in the future"""
+    """
+    DEPRECATED (v 1.9.4)
+    just a wrapper.. possibly to be extended in the future
+    """
     get_or_create_home_repo(reset=True)
     return True
-
-
-
-
-def action_cache():
-    """
-    generate cached version of all graphs in the local repo
-    :return: True
-    """
-    printDebug("""The existing cache will be erased and recreated.""")
-    printDebug("""This operation may take several minutes, depending on how many files exist in your local library.""")
-    ONTOSPY_LOCAL_MODELS = get_home_location()
-
-    var = input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
-    if var == "y":
-        repo_contents = get_localontologies()
-        print(Style.BRIGHT + "\n=====\n%d ontologies available in the local library\n=====" % len(repo_contents) + Style.RESET_ALL)
-        for onto in repo_contents:
-            fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
-            try:
-                print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
-                print("Loading graph...")
-                g = Ontospy(fullpath)
-                print("Loaded ", fullpath)
-            except:
-                g = None
-                print("Error parsing file. Please make sure %s contains valid RDF." % fullpath)
-
-            if g:
-                print("Caching...")
-                do_pickle_ontology(onto, g)
-
-        print(Style.BRIGHT + "===Completed===" + Style.RESET_ALL)
-
-    else:
-        print("Goodbye")

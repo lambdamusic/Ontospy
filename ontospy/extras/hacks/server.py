@@ -86,7 +86,7 @@ def parse_options():
 def main():
 	""" command line script """
 	# boilerplate
-	print("OntoSpy " + ontospy.VERSION)
+	print("Ontospy " + ontospy.VERSION)
 	ontospy.get_or_create_home_repo()
 	ONTOSPY_LOCAL_MODELS = ontospy.get_home_location()
 

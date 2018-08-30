@@ -34,7 +34,7 @@ def main():
     def get_bottom_toolbar_tokens(cli):
         print(cli.__class__)
         print(cli.current_buffer_name)
-        return [(Token.Toolbar, ' OntoSpy ' + VERSION.VERSION)]
+        return [(Token.Toolbar, ' Ontospy ' + VERSION.VERSION)]
 
     text = prompt('Say something: ',
                   get_bottom_toolbar_tokens=get_bottom_toolbar_tokens,
