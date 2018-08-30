@@ -73,27 +73,61 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 ##
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS)
 @click.option(
     '--verbose',
     '-v',
     is_flag=True,
-    help='Print out extra info and debug messages.')
+    help='Print out version info and debug messages.')
 @click.pass_context
 def main_cli(ctx, verbose=False):
     """
 Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <https://github.com/lambdamusic/ontospy/wiki>.
     """
     sTime = time.time()
-    if ctx.obj is None:  # Doesn't work as of 3.0
+    if ctx.obj is None:  # Fix for bug (as of 3.0)
         # https://github.com/pallets/click/issues/888
         ctx.obj = {}
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
-    click.secho("OntoSpy " + VERSION, bold=True)
-    # click.secho("Local library: '%s'" % get_home_location(), fg='white')
-    click.secho("------------", fg='white')
-    # verbose option would go here
+    if verbose:
+        click.secho("OntoSpy " + VERSION, bold=True)
+        click.secho("------------", fg='white')
+    if not verbose and ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+    # else:
+    #     click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+
+
+##
+## CHECK / ANALYZE / SCAN COMMAND
+##
+
+
+@main_cli.command()
+@click.argument('sources', nargs=-1)
+@click.option(
+    '--endpoint',
+    '-e',
+    is_flag=True,
+    help='Use to specify that the source url passed is a sparql endpoint')
+@click.pass_context
+def scan(ctx, sources=None, endpoint=False):
+    """Search an RDF source for ontology entities and print out a report.
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+    if sources or (sources and endpoint):
+        action_analyze(sources, endpoint)
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+    else:
+        click.echo(ctx.get_help())
 
 
 ##
@@ -111,7 +145,9 @@ Ontospy is a command line inspector for RDF/OWL models. Use --help option with o
     '--cache',
     '-c',
     is_flag=True,
-    help='CACHE: force caching of the local library (for faster loading).')
+    help=
+    'CACHE: force reset the cache folder for the local library (used to clean up old files and speed up loading of ontologies).'
+)
 @click.option(
     '--reveal',
     '-r',
@@ -158,7 +194,7 @@ def library(ctx,
         # raise SystemExit(1)
 
     elif cache:
-        action_cache()
+        action_cache_reset()
 
     elif directory:
         if not filepath:
@@ -221,37 +257,6 @@ def library(ctx,
 
 
 ##
-## ANALYZE / SCAN COMMAND
-##
-
-
-@main_cli.command()
-@click.argument('sources', nargs=-1)
-@click.option(
-    '--endpoint',
-    '-e',
-    is_flag=True,
-    help='Use to specify that the source url passed is a sparql endpoint')
-@click.pass_context
-def analyze(ctx, sources=None, endpoint=False):
-    """Scan an RDF source for ontology entities and print out a report."
-    """
-    verbose = ctx.obj['VERBOSE']
-    sTime = ctx.obj['STIME']
-    print_opts = {
-        'labels': verbose,
-    }
-    if sources or (sources and endpoint):
-        action_analyze(sources, endpoint)
-        eTime = time.time()
-        tTime = eTime - sTime
-        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
-
-    else:
-        click.echo(ctx.get_help())
-
-
-##
 ## SHELL COMMAND
 ##
 
@@ -264,39 +269,6 @@ def shell(sources=None):
     from extras.shell import launch_shell
     launch_shell(sources)
 
-
-##
-## UTILS COMMAND - DEPRECATED
-##
-
-# @main_cli.command()
-# @click.argument('sources', nargs=-1)
-# @click.option(
-#     '--serialize',
-#     '-s',
-#     help=
-#     'Parse RDF and print it out in the selected serialization. Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld'
-# )
-# @click.pass_context
-# def utils(ctx, sources=None, serialize=None):
-#     """Little helper utilities for working with RDF models.
-#     """
-#     VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
-#     if not sources:
-#         if serialize:
-#             click.secho(
-#                 "What do you want to serialize? Please specify a valid RDF source.",
-#                 fg='red')
-#         click.echo(ctx.get_help())
-#     else:
-#         if not serialize: serialize = "turtle"
-#         if serialize not in VALID_FORMATS:
-#             click.secho(
-#                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
-#                 fg='red')
-#             return
-#         else:
-#             action_transform(sources, serialize)
 
 ##
 ## TRANSFORM COMMAND
