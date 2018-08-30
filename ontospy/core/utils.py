@@ -2,7 +2,7 @@
 #  -*- coding: UTF-8 -*-
 
 """
-Python and RDF Utils for OntoSpy
+Python and RDF Utils for Ontospy
 
 Copyright (c) 2010-2015 __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 

@@ -19,7 +19,7 @@ from ..core import *
 from ..core.utils import *
 
 # sanity check
-print("-------------------\nOntoSpy ", VERSION, "\n-------------------")
+print("-------------------\nOntospy ", VERSION, "\n-------------------")
 
 
 class MyRDFEntity(ontospy.RDF_Entity):

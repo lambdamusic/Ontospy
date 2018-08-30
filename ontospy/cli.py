@@ -91,7 +91,7 @@ Ontospy is a command line inspector for RDF/OWL models. Use --help option with o
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
     if verbose:
-        click.secho("OntoSpy " + VERSION, bold=True)
+        click.secho("Ontospy " + VERSION, bold=True)
         click.secho("------------", fg='white')
     if not verbose and ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())

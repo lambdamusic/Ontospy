@@ -105,7 +105,7 @@ ontospy.Ontospy
   <file:///Users/michele.pasin/Desktop/test2/grid-ontology-v1rdf/class-facility.html>
 - find a way to shorten long URIs, either preview them or add on the fly prefix namespaces @for later
 - clicking on ontology name open original url
-- clicking on ontospy goes to https://github.com/lambdamusic/OntoSpy
+- clicking on ontospy goes to https://github.com/lambdamusic/Ontospy
 - add tree to properties too
 - allow to click on owl:Thing too to go to top level, create page for it
 
@@ -358,7 +358,7 @@ improved notably support for python 3
 
 - Installed nose for tests - sudo pip install nose
 - Added pull request for python 3.0
-- renamed to OntoSpy
+- renamed to Ontospy
 - updated docs for v 1.6.7
 - PUBLISHED v6.7
 

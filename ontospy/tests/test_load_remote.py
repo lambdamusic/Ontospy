@@ -18,7 +18,7 @@ from ..core.utils import *
 
 
 # sanity check
-print("-------------------\nOntoSpy ",  VERSION, "\n-------------------")
+print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):

@@ -1,4 +1,4 @@
-OntoSpy
+Ontospy
 =======
 
 Python toolkit for inspecting linked data knowledge models AKA ontologies or vocabularies.
@@ -11,7 +11,7 @@ Python toolkit for inspecting linked data knowledge models AKA ontologies or voc
 Description
 =======
 
-OntoSpy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded using W3C Semantic Web standards, that is, RDF or any of its dialects (RDFS, OWL, SKOS).
+Ontospy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded using W3C Semantic Web standards, that is, RDF or any of its dialects (RDFS, OWL, SKOS).
 
 The basic workflow is simple: load a graph by instantiating the ``Ontospy`` class with a file containing RDFS, OWL or SKOS definitions. You get back an object that lets you interrogate the ontology. That's all!
 
@@ -20,4 +20,4 @@ The same functionalities are accessible also via a command line application (`on
 
 More info
 ---------------
-https://github.com/lambdamusic/OntoSpy/wiki
+https://github.com/lambdamusic/Ontospy/wiki
