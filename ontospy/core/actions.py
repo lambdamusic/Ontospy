@@ -484,18 +484,18 @@ def action_update_library_location(_location):
 
 
 
-
-
-
-
-def action_cache():
+def action_cache_reset():
     """
-    generate cached version of all graphs in the local repo
-    :return: True
+    Delete all contents from cache folder
+    Then re-generate cached version of all models in the local repo
+
     """
     printDebug("""The existing cache will be erased and recreated.""")
     printDebug("""This operation may take several minutes, depending on how many files exist in your local library.""")
     ONTOSPY_LOCAL_MODELS = get_home_location()
+    # https://stackoverflow.com/questions/185936/how-to-delete-the-contents-of-a-folder-in-python
+    # NOTE This will not only delete the contents but the folder itself as well.
+    shutil.rmtree(ONTOSPY_LOCAL_CACHE_TOP)
 
     var = input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
     if var == "y":
@@ -520,6 +520,10 @@ def action_cache():
 
     else:
         print("Goodbye")
+
+
+
+
 
 
 
