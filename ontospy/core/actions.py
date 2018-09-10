@@ -105,6 +105,27 @@ def action_transform(source, out_fmt="turtle", verbose=False):
     print(s)
 
 
+def action_jsonld_playground(source_path, verbose=False):
+    """
+    Util: sends a json-ld file to the awesome https://json-ld.org/playground/
+    """
+    import webbrowser
+    BASE_URL = "https://json-ld.org/playground/#startTab=tab-expanded&json-ld="
+    my_file_handle = None
+
+    printDebug("Preparing... : %s" % str(source_path), "comment")
+
+    try:
+        my_file_handle=open(source_path)
+    except IOError:
+        printDebug("------------------\nFile not found or path is incorrect", "important")
+
+    if my_file_handle:
+
+        webbrowser.open(BASE_URL + urllib2.quote(my_file_handle.read()))
+
+
+
 
 
 

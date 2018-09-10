@@ -2,6 +2,10 @@
 
 Summary of changes.
 
+## September 10, 2018: v1.9.5
+
+-   testjsonld command: util to send a jsonld file to https://json-ld.org/playground/
+
 ## August 30, 2018: v1.9.4
 
 -   refactor cli using subcommands

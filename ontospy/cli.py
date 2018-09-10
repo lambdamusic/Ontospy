@@ -308,6 +308,36 @@ def transform(ctx, source, output_format):
                        "comment")
 
 
+##
+## JSONLD PLAYGROUND COMMAND
+##
+
+
+@main_cli.command()
+@click.argument('filepath', nargs=1)
+@click.pass_context
+def testjsonld(ctx, filepath):
+    """Test a JSONLD file using the online playground tool (requires a web connection).
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+
+    if not filepath:
+        if serialize:
+            click.secho(
+                "What do you want to test? Please specify a valid JSONLD source.",
+                fg='red')
+        click.echo(ctx.get_help())
+    else:
+        action_jsonld_playground(filepath, verbose)
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
 if __name__ == '__main__':
     import sys
     try:
