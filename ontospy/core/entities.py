@@ -177,11 +177,13 @@ class RDF_Entity(object):
         out = ""
 
         if test:
-            out = firstEnglishStringInList(test)
+            # out = firstEnglishStringInList(test)
+            out = firstStringInList(test, prefLanguage="nl-nl")
         else:
             test = self.getValuesForProperty(rdflib.namespace.SKOS.prefLabel)
             if test:
-                out = firstEnglishStringInList(test)
+                # out = firstEnglishStringInList(test)
+                out = firstStringInList(test, prefLanguage="nl-nl")
             else:
                 if qname_allowed:
                     out = self.locale
@@ -204,10 +206,12 @@ class RDF_Entity(object):
             if test:
                 if quotes:
                     # return addQuotes(firstEnglishStringInList(test))
-                    return addQuotes(joinStringsInList(test, prefLanguage="en"))
+                    #return addQuotes(joinStringsInList(test, prefLanguage="en"))
+                    return addQuotes(joinStringsInList(test, prefLanguage="nl-nl"))
                 else:
                     # return firstEnglishStringInList(test)
-                    return joinStringsInList(test, prefLanguage="en")
+                    #return joinStringsInList(test, prefLanguage="en")
+                    return joinStringsInList(test, prefLanguage="nl-nl")
         return ""
 
 
