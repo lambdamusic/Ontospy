@@ -2,6 +2,10 @@
 
 Summary of changes.
 
+## October 31, 2018: v1.9.5.1
+
+-   bug fix with urllib.parse.quote (python3)
+
 ## September 10, 2018: v1.9.5
 
 -   testjsonld command: util to send a jsonld file to https://json-ld.org/playground/
