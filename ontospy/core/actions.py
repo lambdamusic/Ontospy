@@ -59,7 +59,7 @@ from .manager import *
 # ===========
 
 
-def action_analyze(sources, endpoint=None):
+def action_analyze(sources, endpoint=None, verbose=False):
     """
     Load up a model into ontospy and analyze it
     """
@@ -437,7 +437,7 @@ def _import_PREFIXCC(keyword=""):
                 continue
 
 
-def action_bootstrap():
+def action_bootstrap(verbose=False):
     """Bootstrap the local REPO with a few cool ontologies"""
     printDebug("The following ontologies will be imported:")
     printDebug("--------------")
@@ -454,7 +454,7 @@ def action_bootstrap():
         for uri in BOOTSTRAP_ONTOLOGIES:
             try:
                 printDebug("--------------")
-                action_import(uri, verbose=False)
+                action_import(uri, verbose)
             except:
                 printDebug(
                     "OPS... An Unknown Error Occurred - Aborting Installation")

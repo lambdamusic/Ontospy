@@ -121,7 +121,7 @@ def scan(ctx, sources=None, endpoint=False):
         'labels': verbose,
     }
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint)
+        action_analyze(sources, endpoint, verbose)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -188,7 +188,7 @@ def library(ctx,
     }
 
     if bootstrap:
-        action_bootstrap()
+        action_bootstrap(verbose)
         printDebug("Tip: you can now load an ontology by typing `ontospy -l`",
                    "important")
         # raise SystemExit(1)
@@ -229,7 +229,7 @@ def library(ctx,
 
     elif save:
         if filepath:
-            action_import(filepath[0])
+            action_import(filepath[0], verbose)
         else:
             click.secho(
                 "You provided no arguments - starting web import wizard..",

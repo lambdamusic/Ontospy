@@ -2,6 +2,10 @@
 
 Summary of changes.
 
+## November 8, 2018: v1.9.5.2
+
+-   bug fix for scan command
+
 ## October 31, 2018: v1.9.5.1
 
 -   bug fix with urllib.parse.quote (python3)
