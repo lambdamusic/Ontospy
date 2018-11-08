@@ -121,7 +121,7 @@ def scan(ctx, sources=None, endpoint=False):
         'labels': verbose,
     }
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, verbose)
+        action_analyze(sources, endpoint, print_opts, verbose)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")

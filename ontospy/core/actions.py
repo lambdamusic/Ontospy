@@ -59,7 +59,7 @@ from .manager import *
 # ===========
 
 
-def action_analyze(sources, endpoint=None, verbose=False):
+def action_analyze(sources, endpoint=None, print_opts=False, verbose=False):
     """
     Load up a model into ontospy and analyze it
     """

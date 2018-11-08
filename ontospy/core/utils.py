@@ -906,6 +906,12 @@ def shellPrintOverview(g, opts={'labels' : False}):
     """
     ontologies = g.all_ontologies
 
+    # get opts
+    try:
+        labels = opts['labels']
+    except:
+        labels = False
+
     for o in ontologies:
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
         o.printTriples()
@@ -914,19 +920,19 @@ def shellPrintOverview(g, opts={'labels' : False}):
 
     if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
-        g.printClassTree(showids=False, labels=opts['labels'])
+        g.printClassTree(showids=False, labels=labels)
     else:
         printDebug(".. No Class Declaration Found", "comment")
 
     if g.all_properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
-        g.printPropertyTree(showids=False, labels=opts['labels'])
+        g.printPropertyTree(showids=False, labels=labels)
     else:
         printDebug(".. No Property Declaration Found", "comment")
 
     if g.all_skos_concepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
-        g.printSkosTree(showids=False, labels=opts['labels'])
+        g.printSkosTree(showids=False, labels=labels)
     else:
         printDebug(".. No SKOS Declaration Found", "comment")
 
