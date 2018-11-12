@@ -279,7 +279,7 @@ def shell(sources=None):
 @click.argument('source', nargs=1)
 @click.argument('output_format', nargs=1)
 @click.pass_context
-def transform(ctx, source, output_format):
+def serialize(ctx, source, output_format):
     """Output a different RDF serialization for a given source.
     """
     verbose = ctx.obj['VERBOSE']
@@ -287,14 +287,14 @@ def transform(ctx, source, output_format):
     print_opts = {
         'labels': verbose,
     }
-    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
+    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
-        if serialize:
-            click.secho(
-                "What do you want to serialize? Please specify a valid RDF source.",
-                fg='red')
+        click.secho(
+            "What do you want to serialize? Please specify a valid RDF source.",
+            fg='red')
         click.echo(ctx.get_help())
     else:
+
         if output_format not in VALID_FORMATS:
             click.secho(
                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
@@ -316,8 +316,8 @@ def transform(ctx, source, output_format):
 @main_cli.command()
 @click.argument('filepath', nargs=1)
 @click.pass_context
-def testjsonld(ctx, filepath):
-    """Test a JSONLD file using the online playground tool (requires a web connection).
+def jsonld(ctx, filepath):
+    """Test a JSONLD file using the online playground tool.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']

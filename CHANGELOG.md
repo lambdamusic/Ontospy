@@ -2,6 +2,10 @@
 
 Summary of changes.
 
+## November 12, 2018: v1.9.5.3
+
+-   refactoring and tested integration with ontodocs
+
 ## November 8, 2018: v1.9.5.2
 
 -   bug fix for scan command
