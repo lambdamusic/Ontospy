@@ -2,9 +2,11 @@
 
 Summary of changes.
 
-## November 12, 2018: v1.9.5.3
+## November 12, 2018: v1.9.6
 
 -   refactoring and tested integration with ontodocs
+-   allow calling dataviz (ontodocs) from CLI
+-   bug fixing
 
 ## November 8, 2018: v1.9.5.2
 
