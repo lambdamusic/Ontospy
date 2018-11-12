@@ -35,6 +35,13 @@ except NameError:
 # ===========
 
 
+def is_http(stringa):
+    if stringa:
+        if stringa.startswith("http://") or stringa.startswith("https://"):
+            return True
+    return False
+
+
 
 def safe_str(u, errors="replace"):
     """Safely print the given string.
@@ -916,25 +923,25 @@ def shellPrintOverview(g, opts={'labels' : False}):
         print(Style.BRIGHT + "\nOntology Annotations\n-----------" + Style.RESET_ALL)
         o.printTriples()
     else:
-        printDebug(".. No Ontology Declaration Found", "comment")
+        printDebug("-" * 10 + "\n.. No Ontology Declaration Found", "comment")
 
     if g.all_classes:
         print(Style.BRIGHT + "\nClass Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printClassTree(showids=False, labels=labels)
     else:
-        printDebug(".. No Class Declaration Found", "comment")
+        printDebug("-" * 10 + "\n.. No Class Declaration Found", "comment")
 
     if g.all_properties:
         print(Style.BRIGHT + "\nProperty Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printPropertyTree(showids=False, labels=labels)
     else:
-        printDebug(".. No Property Declaration Found", "comment")
+        printDebug("-" * 10 + "\n.. No Property Declaration Found", "comment")
 
     if g.all_skos_concepts:
         print(Style.BRIGHT + "\nSKOS Taxonomy\n" + "-" * 10  + Style.RESET_ALL)
         g.printSkosTree(showids=False, labels=labels)
     else:
-        printDebug(".. No SKOS Declaration Found", "comment")
+        printDebug("-" * 10 + "\n.. No SKOS Declaration Found", "comment")
 
     if g.all_shapes:
         print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10  + Style.RESET_ALL)
@@ -942,7 +949,7 @@ def shellPrintOverview(g, opts={'labels' : False}):
             printDebug("%s" % (x.qname))
             # printDebug("%s" % (x.bestLabel()), "comment")
     else:
-        printDebug(".. No SHACL Declaration Found", "comment")
+        printDebug("-" * 10 + "\n.. No SHACL Declaration Found", "comment")
 
 
 

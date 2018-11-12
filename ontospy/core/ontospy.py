@@ -294,7 +294,7 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_classes += [aClass]
                     aClass.ontology = onto
@@ -367,7 +367,7 @@ class Ontospy(object):
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
             for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_properties += [aProp]
                     aProp.ontology = onto
@@ -427,7 +427,7 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_skos_concepts += [aConcept]
                     aConcept.ontology = onto
@@ -692,7 +692,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://") and not uri.startswith("https://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -729,7 +729,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://") and not uri.startswith("https://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -766,7 +766,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -801,7 +801,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -847,7 +847,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
