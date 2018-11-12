@@ -345,3 +345,92 @@ if __name__ == '__main__':
         sys.exit(0)
     except KeyboardInterrupt as e:  # Ctrl-C
         raise e
+
+##
+## VIZ COMMAND (wrapper around ontodocs)
+##
+
+
+@main_cli.command()
+@click.argument('source', nargs=-1)
+@click.option('--outputpath', '-o', help='Output path (default: home folder).')
+@click.option(
+    '--title', '-t', help='Title for the visualization (default=graph uri).')
+@click.option(
+    '--theme',
+    help=
+    'CSS Theme for the html-complex visualization (random=use a random theme).'
+)
+@click.option(
+    '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
+@click.pass_context
+def viz(ctx, source=None, outputpath="", title="", theme="", showthemes=False):
+    """Visualize a model using ontodocs library
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+
+    try:
+        import ontodocs
+        from ontodocs.core.builder import action_visualize
+    except:
+        click.secho(
+            "WARNING: the ontodocs library is required for this functionality.",
+            fg="red")
+        click.secho("Install with `pip install ontodocs -U`")
+        sys.exit(0)
+
+    if showthemes:
+        # from .core.builder import show_themes
+        show_themes()
+        sys.exit(0)
+
+    if theme and theme == "random":
+        # from .core.builder import random_theme
+        theme = ontodocs.random_theme()
+
+    if outputpath:
+        if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
+            click.secho(
+                "WARNING: the -o option must include a valid directory path.",
+                fg="red")
+            sys.exit(0)
+
+    if not source:
+        # ask to show local library
+        click.secho("You haven't specified any argument.", fg='red')
+        click.secho(
+            "Please select an ontology from the local OntoSpy library.")
+
+    if source and len(source) > 1:
+        click.secho(
+            'Note: currently only one argument can be passed', fg='red')
+
+    # note: the local ontospy library gets displayed via this method too
+    url = action_visualize(
+        source,
+        fromshell=False,
+        path=outputpath,
+        title=title,
+        theme=theme,
+        verbose=verbose)
+
+    if url:  # open browser
+        import webbrowser
+        webbrowser.open(url)
+
+    eTime = time.time()
+    tTime = eTime - sTime
+    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
+if __name__ == '__main__':
+    import sys
+    try:
+        main_cli(prog_name='ontospy')
+        sys.exit(0)
+    except KeyboardInterrupt as e:  # Ctrl-C
+        raise e
