@@ -72,7 +72,10 @@ class RDF_Entity(object):
         if self.triples:
             if not self.rdflib_graph:
                 self._buildGraph()
-            return self.rdflib_graph.serialize(format=format).decode('utf-8')
+            s = self.rdflib_graph.serialize(format=format)
+            if isinstance(s, bytes):
+                s = s.decode('utf-8')
+            return s
         else:
             return None
 

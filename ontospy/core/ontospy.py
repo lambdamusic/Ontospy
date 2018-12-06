@@ -981,7 +981,11 @@ class Ontospy(object):
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld [trix not working out of the box]
         """
-        return self.rdflib_graph.serialize(format=format).decode('utf-8')
+        s = self.rdflib_graph.serialize(format=format)
+        if isinstance(s, bytes):
+            s = s.decode('utf-8')
+        return s
+
 
     def serialize(self, format="turtle"):
         "for backward compatibility"
