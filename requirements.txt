@@ -1,12 +1,12 @@
-rdflib==4.2.1
-rdflib-jsonld==0.4.0
-SPARQLWrapper==1.8.0
-html5lib==1.0.1
-requests==2.12.4
-pyfiglet==0.7.5
-click==6.6
-colorama==0.3.7
-pyparsing==2.1.10
-keepalive==0.5
+rdflib>=4.2.1
+rdflib-jsonld>=0.4.0
+SPARQLWrapper>=1.8.0
+html5lib>=1.0.1
+requests>=2.12.4
+pyfiglet>=0.7.5
+click>=6.6
+colorama>=0.3.7
+pyparsing>=2.1.10
+keepalive>=0.5
 # unidecode==0.4.19
 # readline==6.2.4.1  # optional, for shell autocomplete
