@@ -265,6 +265,7 @@ class Ontospy(object):
         self.all_classes = []  # @todo: keep adding?
 
         qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
+        print("rdflib query done")
 
         for class_tuple in qres:
 
@@ -284,9 +285,11 @@ class Ontospy(object):
                 if _type == rdflib.OWL.Class:
                     test_existing_cl.rdftype = rdflib.OWL.Class
 
+        print("classes created")
+
         # add more data
         for aClass in self.all_classes:
-
+            print("enriching class", aClass)
             aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph()  # force construction of mini graph
 
@@ -316,6 +319,7 @@ class Ontospy(object):
         self.all_classes = sorted(self.all_classes, key=lambda x: x.qname)
 
         # compute top layer
+        print("calc toplayer")
         exit = []
         for c in self.all_classes:
             if not c.parents():
@@ -338,6 +342,7 @@ class Ontospy(object):
         self.all_properties_datatype = []
 
         qres = self.sparqlHelper.getAllProperties()
+        print("rdflib query done")
 
         for candidate in qres:
 
@@ -349,10 +354,11 @@ class Ontospy(object):
                 # update it
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
                     test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
+        print("properties created")
 
         # add more data
         for aProp in self.all_properties:
-
+            print("enriching prop..", aProp)
             if aProp.rdftype == rdflib.OWL.DatatypeProperty:
                 self.all_properties_datatype += [aProp]
             elif aProp.rdftype == rdflib.OWL.AnnotationProperty:
@@ -391,6 +397,7 @@ class Ontospy(object):
         self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
 
         # computer top layer for properties
+        print("calc toplayer")
         exit = []
         for c in self.all_properties:
             if not c.parents():
@@ -404,6 +411,7 @@ class Ontospy(object):
         self.all_skos_concepts = []  # @todo: keep adding?
 
         qres = self.sparqlHelper.getSKOSInstances()
+        print("rdflib query done")
 
         for candidate in qres:
 
@@ -413,12 +421,12 @@ class Ontospy(object):
                 self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
             else:
                 pass
-
+        print("concepts created")
         # add more data
         skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
 
         for aConcept in self.all_skos_concepts:
-
+            print("enriching concept...", aConcept)
             aConcept.rdftype = skos['Concept']
             aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
             aConcept._buildGraph()  # force construction of mini graph
@@ -973,7 +981,7 @@ class Ontospy(object):
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld [trix not working out of the box]
         """
-        return self.rdflib_graph.serialize(format=format)
+        return self.rdflib_graph.serialize(format=format).decode('utf-8')
 
     def serialize(self, format="turtle"):
         "for backward compatibility"

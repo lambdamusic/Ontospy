@@ -2,6 +2,11 @@
 
 Summary of changes.
 
+## December, 2018: v1.9.7
+
+-   removed support for Python 2
+-   fixed issue with serialization print
+
 ## November 12, 2018: v1.9.6
 
 -   refactoring and tested integration with ontodocs
