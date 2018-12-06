@@ -519,6 +519,10 @@ def firstStringInList(literalEntities, prefLanguage="en"):
     return match
 
 
+def firstEnglishStringInList(literalEntities, ):
+    return firstStringInList(literalEntities, "en")
+
+
 def joinStringsInList(literalEntities, prefLanguage="en"):
     """
     from a list of literals, returns the ones in prefLanguage joined up.
@@ -539,9 +543,6 @@ def joinStringsInList(literalEntities, prefLanguage="en"):
 
     return " - ".join([x for x in match])
 
-
-def firstEnglishStringInList(literalEntities, ):
-    return firstStringInList(literalEntities, "en")
 
 
 def sortByNamespacePrefix(urisList, nsList):
