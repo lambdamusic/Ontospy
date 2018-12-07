@@ -4,6 +4,8 @@ Summary of changes.
 
 ## December, 2018: v1.9.7
 
+@TODO in DEV remove debug lines for speed testing
+
 -   removed support for Python 2
 -   fixed issue with serialization print
 -   comments all go to sterr by default
