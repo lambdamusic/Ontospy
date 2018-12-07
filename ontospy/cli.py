@@ -364,8 +364,9 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def viz(ctx, source=None, outputpath="", title="", theme="", showthemes=False):
-    """Visualize a model using ontodocs library
+def docs(ctx, source=None, outputpath="", title="", theme="",
+         showthemes=False):
+    """Generate documentation for an ontology in html or markdown format
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
