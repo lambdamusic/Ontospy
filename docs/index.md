@@ -16,10 +16,10 @@ Also:
 ## Index
 
 -   [Overview](index.html)
--   [Installation](installation.html)
--   [Command Line](commandline.html)
--   [Tips and Tricks](tipsandtricks.html)
--   [Changelog](changelog.html)
+-   [Installation](pages/installation.html)
+-   [Command Line](pages/commandline.html)
+-   [Tips and Tricks](pages/tipsandtricks.html)
+-   [Changelog](pages/changelog.html)
 
 ## In a nutshell
 
