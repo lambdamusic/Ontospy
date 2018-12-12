@@ -5,7 +5,7 @@
 
 ### Installation:
 
-Once you have a package manager installed, get OntoSpy from the Python Package Index:
+Once you have a package manager installed, get Ontospy from the Python Package Index:
 
 ```easy_install ontospy``` or ```pip install ontospy```
 

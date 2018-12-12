@@ -1,19 +1,8 @@
-## Welcome to OntoSpy's documentation!
+## Welcome to Ontospy's documentation!
 
-OntoSpy is a lightweight Python library and command line tool for inspecting and visualizing vocabularies encoded in the [RDF family of languages](https://en.wikipedia.org/wiki/Resource_Description_Framework) .
+Ontospy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the [RDF family of languages](https://en.wikipedia.org/wiki/Resource_Description_Framework) .
 
-Quick Links:
-
--   Github: https://github.com/lambdamusic/ontospy
--   CheeseShop: https://pypi.python.org/pypi/ontospy
--   Homepage: http://www.michelepasin.org/projects/ontospy
-
-Also:
-
--   Video: https://vimeo.com/169707591
--   Sample outputs of `ontospy-viz`: http://www.michelepasin.org/support/ontospy-examples/index.html
-
-## Index
+#### Index
 
 -   [Overview](index.html)
 -   [Installation](pages/installation.html)
@@ -21,9 +10,13 @@ Also:
 -   [Tips and Tricks](pages/tipsandtricks.html)
 -   [Changelog](pages/changelog.html)
 
+> Note [1]: as of version 1.9.4, some parts of this documentation are slightly out of date. Sorry we're working on it!
+
+> Note [2]: as of version 1.8, Ontospy includes only the core Python API for manipulating ontologies - all the visualization functionalities have been moved to the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library.
+
 ## In a nutshell
 
-OntoSpy can be used either as an interactive command line interface (a
+Ontospy can be used either as an interactive command line interface (a
 [repl](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>)) or as a Python package.
 
 Calling the `ontospy` command from a terminal window launches a utility for scanning a knowledge model encoded in RDF (or any of its dialects e.g. RDFS, OWL or SKOS).
@@ -34,22 +27,11 @@ For example, if you pass a valid graph URI e.g.
 ontospy http://purl.org/spar/frbr
 ```
 
-OntoSpy will attempt to extract and print out any ontology-related information contained in that graph.
+Ontospy will attempt to extract and print out any ontology-related information contained in that graph.
 
-Many other options are available, in particular OntoSpy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
+Many other options are available, in particular Ontospy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
 [![OntospyVideo](./wiki/images/ontospyvideo.jpg)](https://vimeo.com/169707591)
-
-## Is OntoSpy for me?
-
-Here are some reasons why you should use it:
-
--   You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary.
--   You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.
--   You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization.
--   You love the command line and would never leave it no matter what.
-
-> note: OntoSpy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
 
 ## Quick example
 
@@ -166,3 +148,28 @@ Let's take a look at the [Friend Of A Friend](http://semanticweb.org/wiki/FOAF) 
     Out[11]:
     [<Class *http://xmlns.com/foaf/0.1/Image*>,
      <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
+
+## Is Ontospy for me?
+
+Here are some reasons why you should use it:
+
+-   You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary.
+-   You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.
+-   You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization (UPDATE: check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library for this!).
+-   You love the command line and would never leave it no matter what.
+
+> note: Ontospy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
+
+## Quick Links:
+
+-   Github: https://github.com/lambdamusic/ontospy
+-   CheeseShop: https://pypi.python.org/pypi/ontospy
+-   Homepage: http://www.michelepasin.org/projects/ontospy
+
+Also:
+
+-   Video: https://vimeo.com/169707591
+
+## Generating ontology documentation
+
+-   Check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library which builds on OntoSpy and permits to quickly generate documentation like [in these examples](http://www.michelepasin.org/support/ontospy-examples/index.html)

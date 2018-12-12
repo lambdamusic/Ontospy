@@ -2,9 +2,9 @@ This page shows how to use Ontospy from the command line.
 
 These are the commands available:
 
-- `ontospy`: used to launch the OntoSpy parser.
-- `ontospy-shell`: used to launch the OntoSpy command line interface.
-- `ontospy-viz`: used to the launch the OntoSpy visualization library.
+- `ontospy`: used to launch the Ontospy parser.
+- `ontospy-shell`: used to launch the Ontospy command line interface.
+- `ontospy-viz`: used to the launch the Ontospy visualization library.
 
 
 > Note
@@ -159,7 +159,7 @@ Time:      3.42s
 > ontospy-shell -h
 Usage: ontospy-shell [OPTIONS] [SOURCE]...
 
-  This application launches the OntoSpy interactive shell.
+  This application launches the Ontospy interactive shell.
 
   Note: if a local path or URI of an RDF model is provided, that gets loaded
   into the shell by default. E.g.:
@@ -175,33 +175,3 @@ Calling `ontospy-shell` without any argument launches the shell. The shell is an
 [![OntospyVideo](./wiki/images/ontospyvideo.jpg)](https://vimeo.com/169707591)
 
 > Note: you can pass an argument in order to pre-load an RDF graph into the interactive session.
-
-
-### The ontospy-viz command
-
-This utility allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
-
-```
-> ontospy-viz -h
-Usage: ontospy-viz [OPTIONS] [SOURCE]...
-
-  This application allows to create html or markdown documentation for an
-  RDF model. Example:
-
-  > ontospy-viz http://www.w3.org/2008/05/skos# --theme random -o
-  ~/Desktop/skos
-
-Options:
-  -l, --library          List ontologies saved in the local library.
-  -o, --outputpath TEXT  Output path (default: home folder).
-  --title TEXT           Title for the visualization (default=graph uri).
-  --theme TEXT           CSS Theme for the html-complex visualization
-                         (random=use a random theme).
-  --showthemes           Show the available CSS theme choices.
-  -v, --verbose          Verbose mode.
-  -h, --help             Show this message and exit.
-```
-
-For some examples of what the outputs visualizations look like, please see this link:
-
-http://www.michelepasin.org/support/ontospy-examples/index.html
