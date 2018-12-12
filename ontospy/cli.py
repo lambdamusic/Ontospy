@@ -90,9 +90,9 @@ Ontospy is a command line inspector for RDF/OWL models. Use --help option with o
         ctx.obj = {}
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
-    if verbose:
-        click.secho("Ontospy " + VERSION, bold=True)
-        click.secho("------------", fg='white')
+
+    click.secho("Ontospy " + VERSION, fg='white')
+    # click.secho("------------", fg='white')
     if not verbose and ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
     # else:
@@ -266,7 +266,7 @@ def library(ctx,
 def shell(sources=None):
     """Launch the ontospy repl - an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
     """
-    from extras.shell import launch_shell
+    from .extras.shell import launch_shell
     launch_shell(sources)
 
 
@@ -364,8 +364,9 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def viz(ctx, source=None, outputpath="", title="", theme="", showthemes=False):
-    """Visualize a model using ontodocs library
+def docs(ctx, source=None, outputpath="", title="", theme="",
+         showthemes=False):
+    """Generate documentation for an ontology in html or markdown format
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
