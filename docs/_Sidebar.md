@@ -1,0 +1,1 @@
+OntoSpy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the RDF family of languages.
