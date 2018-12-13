@@ -1,18 +1,16 @@
 ## Welcome to Ontospy's documentation!
 
-Ontospy is a lightweight Python library and command line tool for inspecting vocabularies encoded in the [RDF family of languages](https://en.wikipedia.org/wiki/Resource_Description_Framework) .
+Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
 
-#### Index
+> Note: this documentation is a work in progress.
 
--   [Overview](index.html)
--   [Installation](pages/installation.html)
--   [Command Line](pages/commandline.html)
--   [Tips and Tricks](pages/tipsandtricks.html)
+##### Index
+
+-   [In a nutshell](#in-a-nutshell)
+-   [Installation](#installation)
+-   [Misc](#misc)
 -   [Changelog](pages/changelog.html)
-
-> Note [1]: as of version 1.9.4, some parts of this documentation are slightly out of date. Sorry we're working on it!
-
-> Note [2]: as of version 1.8, Ontospy includes only the core Python API for manipulating ontologies - all the visualization functionalities have been moved to the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library.
+    <!-- -   [Command Line](pages/commandline.html) -->
 
 ## In a nutshell
 
@@ -31,7 +29,28 @@ Ontospy will attempt to extract and print out any ontology-related information c
 
 Many other options are available, in particular Ontospy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
-[![OntospyVideo](./wiki/images/ontospyvideo.jpg)](https://vimeo.com/169707591)
+[![OntospyVideo](static/ontospyvideo.jpg)](https://vimeo.com/169707591)
+
+## Installation
+
+Prerequisites:
+
+-   Python (3.x)
+-   A python package manager: [setuptools](https://pypi.python.org/pypi/setuptools) or [pip](https://pip.pypa.io/en/stable/installing/).
+
+Once you have a package manager installed, get Ontospy from the Python Package Index:
+
+`easy_install ontospy` or `pip install ontospy`
+
+The python library, its dependencies and all of its command-line executables will be installed.
+
+**Upgrading**
+
+If you’re upgrading from an older version, make sure you use the -U flag:
+
+```
+pip install ontospy -U
+```
 
 ## Quick example
 
@@ -159,6 +178,14 @@ Here are some reasons why you should use it:
 -   You love the command line and would never leave it no matter what.
 
 > note: Ontospy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
+
+## Misc
+
+If you are using El Capitan your installation line probably will look like this
+
+    > sudo pip install ontospy -U --user python
+
+This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899), more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan)
 
 ## Quick Links:
 
