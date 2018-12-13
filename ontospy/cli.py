@@ -7,8 +7,6 @@ All rights reserved.
 
 """
 
-from __future__ import print_function
-
 import sys
 import os
 import time
@@ -64,7 +62,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 #
 ##################
 #
-# 2018-08-23: trying to restructure the cli using command groups
+# 2018-08-23: restructuring the cli using command groups
 # http://click.pocoo.org/6/commands/
 # test with python -m ontospy.cli library
 
@@ -82,7 +80,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <http://lambdamusic.github.io/Ontospy/>.
+Ontospy is a command line inspector for RDF/OWL models. Use the --help option with one of the commands listed below to find out more, or visit http://lambdamusic.github.io/Ontospy 
     """
     sTime = time.time()
     if ctx.obj is None:  # Fix for bug (as of 3.0)

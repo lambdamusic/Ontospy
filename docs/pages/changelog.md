@@ -8,6 +8,8 @@ Summary of changes.
 -   fixed issue with serialization print
 -   comments all go to sterr by default
     => eg now easier to to `ontospy serialize foaf.rdf json-ld > ~/foaf.json`
+-   embedded ontodocs plugin within main source code
+    -   requires install with [HTML] flag
 
 ## November 12, 2018: v1.9.6
 

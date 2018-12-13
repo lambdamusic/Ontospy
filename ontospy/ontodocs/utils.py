@@ -1,22 +1,15 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 
-# from . import *  # imports __init__
-# from .. import main
-
 import json
-
-
-
 
 # ===========
 # Utilities
 # ===========
 
 
-
 def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
-	"""
+    """
 	  For d3s examples all we need is a json with name, children and size .. eg
 
 	  {
@@ -36,43 +29,39 @@ def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
 		},
 		etc...
 	"""
-	out = []
-	if not old:
-		old = toplayer
-	for x in old:
-		d = {}
-		# print "*" * level, x.label
-		d['qname'] = x.qname
-		d['name'] = x.bestLabel(quotes=False).replace("_", " ")
-		d['objid'] = x.id
-		if x.children() and level < MAX_DEPTH:
-			d['size'] = len(x.children()) + 5	 # fake size
-			d['realsize'] = len(x.children())        # real size
-			d['children'] = build_D3treeStandard(x.children(), MAX_DEPTH, level+1)
-		else:
-			d['size'] = 1	 # default size
-			d['realsize'] = 0	 # default size
-		out += [d]
+    out = []
+    if not old:
+        old = toplayer
+    for x in old:
+        d = {}
+        # print "*" * level, x.label
+        d['qname'] = x.qname
+        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['objid'] = x.id
+        if x.children() and level < MAX_DEPTH:
+            d['size'] = len(x.children()) + 5  # fake size
+            d['realsize'] = len(x.children())  # real size
+            d['children'] = build_D3treeStandard(x.children(), MAX_DEPTH,
+                                                 level + 1)
+        else:
+            d['size'] = 1  # default size
+            d['realsize'] = 0  # default size
+        out += [d]
 
-
-	return out
-
-
+    return out
 
 
 # note: duplicate of templatetagg so to avoid circular imports
 def truncchar_inverse(value, arg):
-	if len(value) < arg:
-		return value
-	else:
-		x = len(value) - arg
-		return '...' + value[x:]
-
-
+    if len(value) < arg:
+        return value
+    else:
+        x = len(value) - arg
+        return '...' + value[x:]
 
 
 def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
-	"""
+    """
 	  Similar to standar d3, but nodes with children need to be duplicated otherwise they are
 	   not depicted explicitly but just color coded
 
@@ -97,39 +86,35 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
 		 ]},
 		etc...
 	"""
-	out = []
-	if not old:
-		old = toplayer
-	for x in old:
-		d = {}
-		# print "*" * level, x.label
-		d['qname'] = x.qname
-		d['name'] = x.bestLabel(quotes=False).replace("_", " ")
-		d['objid'] = x.id
-		if x.children() and level < MAX_DEPTH:
-			duplicate_row = {}
-			duplicate_row['qname'] = x.qname
-			duplicate_row['name'] = x.bestLabel(quotes=False).replace("_", " ")
-			duplicate_row['objid'] = x.id
-			duplicate_row['size'] = len(x.children()) + 5	 # fake size
-			duplicate_row['realsize'] = len(x.children())        # real size
-			out += [duplicate_row]
-			d['children'] = build_D3bubbleChart(x.children(), MAX_DEPTH, level+1)
-		else:
-			d['size'] = 1	 # default size
-			d['realsize'] = 0	 # default size
-		out += [d]
+    out = []
+    if not old:
+        old = toplayer
+    for x in old:
+        d = {}
+        # print "*" * level, x.label
+        d['qname'] = x.qname
+        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['objid'] = x.id
+        if x.children() and level < MAX_DEPTH:
+            duplicate_row = {}
+            duplicate_row['qname'] = x.qname
+            duplicate_row['name'] = x.bestLabel(quotes=False).replace("_", " ")
+            duplicate_row['objid'] = x.id
+            duplicate_row['size'] = len(x.children()) + 5  # fake size
+            duplicate_row['realsize'] = len(x.children())  # real size
+            out += [duplicate_row]
+            d['children'] = build_D3bubbleChart(x.children(), MAX_DEPTH,
+                                                level + 1)
+        else:
+            d['size'] = 1  # default size
+            d['realsize'] = 0  # default size
+        out += [d]
 
-	return out
-
-
-
-
-
+    return out
 
 
 def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
-	"""
+    """
 	Create the JSON needed by the treePie viz
 	http://bl.ocks.org/adewes/4710330/94a7c0aeb6f09d681dbfdd0e5150578e4935c6ae
 
@@ -144,25 +129,22 @@ def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
 	]
 
 	"""
-	d = {}
-	if not old:
-		old = toplayer
-	for x in old:
-		label = x.bestLabel(quotes=False).replace("_", " ")
-		if x.children() and level < MAX_DEPTH:
-			size = len(x.children())
-			d[x.qname] = [label, [size, size],
-						  build_D3treepie(x.children(), MAX_DEPTH, level + 1)]
-		else:
-			size = 1
-			d[x.qname] = [label, [size, size], {}]
+    d = {}
+    if not old:
+        old = toplayer
+    for x in old:
+        label = x.bestLabel(quotes=False).replace("_", " ")
+        if x.children() and level < MAX_DEPTH:
+            size = len(x.children())
+            d[x.qname] = [
+                label, [size, size],
+                build_D3treepie(x.children(), MAX_DEPTH, level + 1)
+            ]
+        else:
+            size = 1
+            d[x.qname] = [label, [size, size], {}]
 
-	return d
-
-
-
-
-
+    return d
 
 
 ##################
@@ -173,7 +155,7 @@ def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
 
 
 def formatHTML_EntityTreeTable(treedict, element=0):
-	""" outputs an html tree representation based on the dictionary we get from the Inspector
+    """ outputs an html tree representation based on the dictionary we get from the Inspector
 	object....
 
 	EG:
@@ -212,46 +194,40 @@ def formatHTML_EntityTreeTable(treedict, element=0):
 	Note: The top level owl:Thing never appears as a link.
 
 	"""
-	# ontoFile = onto.ontologyMaskedLocation or onto.ontologyPhysicalLocation
-	# if not treedict:
-	# 	treedict = onto.ontologyClassTree()
-	stringa = """<table class="h">"""
-	for x in treedict[element]:
-		if x.qname == "owl:Thing":
-			stringa += """<tr>
+    # ontoFile = onto.ontologyMaskedLocation or onto.ontologyPhysicalLocation
+    # if not treedict:
+    # 	treedict = onto.ontologyClassTree()
+    stringa = """<table class="h">"""
+    for x in treedict[element]:
+        if x.qname == "owl:Thing":
+            stringa += """<tr>
 							<td class="tc" colspan=4><a>%s</a></td>
 						  </tr>""" % (truncchar_inverse(x.qname, 50))
-		else:
-			stringa += """<tr>
+        else:
+            stringa += """<tr>
 							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
-						  </tr>""" % (x.uri, x.slug,
-									  truncchar_inverse(x.qname, 50))
+						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.qname, 50))
 
-		if treedict.get(x, None):
-			stringa += """ <tr>
+        if treedict.get(x, None):
+            stringa += """ <tr>
 							<td class="space"></td>
 							<td class="bar"></td>
 							<td class="space"></td>
 							<td>%s</td>
 							</tr>""" % formatHTML_EntityTreeTable(treedict, x)
 
-		# stringa += formatHTML_ClassTree(onto, treedict, x)
-		# stringa += "</li>"
-	stringa += "</table>"
-	return stringa
-
-
-
-
-
+        # stringa += formatHTML_ClassTree(onto, treedict, x)
+        # stringa += "</li>"
+    stringa += "</table>"
+    return stringa
 
 
 def get_onto_for_testing(TEST_ONLINE=False):
-	"Wrapper for util script used in viz main methods"
-	if TEST_ONLINE:
-		from ontospy import Ontospy
-		g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
-	else:
-		from ontospy.core.manager import get_random_ontology
-		uri, g = get_random_ontology(50)
-	return g
+    "Wrapper for util script used in viz main methods"
+    if TEST_ONLINE:
+        from ontospy import Ontospy
+        g = Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
+    else:
+        from ontospy.core.manager import get_random_ontology
+        uri, g = get_random_ontology(50)
+    return g
