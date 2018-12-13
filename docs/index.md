@@ -4,13 +4,17 @@ Ontospy is a lightweight Python library and command line tool for working with v
 
 > Note: this documentation is a work in progress.
 
-##### Index
+## Index
 
--   [In a nutshell](#in-a-nutshell)
--   [Installation](#installation)
--   [Misc](#misc)
--   [Changelog](pages/changelog.html)
-    <!-- -   [Command Line](pages/commandline.html) -->
+- [Welcome to Ontospy's documentation!](#welcome-to-ontospys-documentation)
+- [Index](#index)
+- [In a nutshell](#in-a-nutshell)
+- [Installation](#installation)
+- [Quick example](#quick-example)
+- [Is Ontospy for me?](#is-ontospy-for-me)
+- [Miscellaneous Tips](#miscellaneous-tips)
+- [Generating ontology documentation](#generating-ontology-documentation)
+- [Quick Links](#quick-links)
 
 ## In a nutshell
 
@@ -22,10 +26,10 @@ Calling the `ontospy` command from a terminal window launches a utility for scan
 For example, if you pass a valid graph URI e.g.
 
 ```
-ontospy http://purl.org/spar/frbr
+ontospy scan http://purl.org/spar/frbr
 ```
 
-Ontospy will attempt to extract and print out any ontology-related information contained in that graph.
+Ontospy will extract and print out any ontology-related information contained in that graph.
 
 Many other options are available, in particular Ontospy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
@@ -179,7 +183,7 @@ Here are some reasons why you should use it:
 
 > note: Ontospy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
 
-## Misc
+## Miscellaneous Tips
 
 If you are using El Capitan your installation line probably will look like this
 
@@ -187,16 +191,24 @@ If you are using El Capitan your installation line probably will look like this
 
 This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899), more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan)
 
-## Quick Links:
-
--   Github: https://github.com/lambdamusic/ontospy
--   CheeseShop: https://pypi.python.org/pypi/ontospy
--   Homepage: http://www.michelepasin.org/projects/ontospy
-
-Also:
-
--   Video: https://vimeo.com/169707591
-
 ## Generating ontology documentation
 
 -   Check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library which builds on OntoSpy and permits to quickly generate documentation like [in these examples](http://www.michelepasin.org/support/ontospy-examples/index.html)
+
+## Quick Links
+
+-   Github: [https://github.com/lambdamusic/ontospy](https://github.com/lambdamusic/ontospy)
+-   CheeseShop: [https://pypi.python.org/pypi/ontospy](https://pypi.python.org/pypi/ontospy)
+-   Homepage: [http://www.michelepasin.org/projects/ontospy](http://www.michelepasin.org/projects/ontospy)
+
+Also:
+
+-   Video: [https://vimeo.com/169707591](https://vimeo.com/169707591)
+
+Issues or questions?
+
+-   Then head over to the [issues](https://github.com/lambdamusic/Ontospy/issues) page.
+
+What's changed recently?
+
+-   Please have a look at the [Changelog](pages/changelog.html)
