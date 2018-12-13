@@ -24,6 +24,17 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
+# Get the requirements from txt file
+REQUIREMENTS_DATA = []
+with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+    for l in f.readlines():
+        if not l.startswith("#"):
+            if (">=" in l): 
+                REQUIREMENTS_DATA.append([l.split(">=")[0]])
+            elif ("=" in l):
+                REQUIREMENTS_DATA.append([l.split("=")[0]])
+    
+
 
 
 def get_package_folders(top_folder, root_path):
@@ -94,23 +105,13 @@ setup(
     # requirements files see:
     # http://python-packaging-user-guide.readthedocs.org/en/latest/requirements/
     # NOTE: packages are installed in reverse order
-    install_requires=[
-        'rdflib',
-        'rdflib-jsonld',
-        'SPARQLWrapper',
-        'html5lib',
-        'requests',
-        'pyfiglet',
-        # note: on windows click requires colorama too
-        # http://click.pocoo.org/5/utils/#ansi-colors
-        'click',
-        'colorama',
-        'pyparsing',
-    ],
+    install_requires= REQUIREMENTS_DATA,
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
     # $ pip install -e .[dev,test]
-    extras_require={'shell-autocomplete': ['readline']},
+    extras_require={
+        'SHELL': ['readline']
+        },
     package_data={'ontospy': package_data_folders},
     entry_points={
         'console_scripts': [

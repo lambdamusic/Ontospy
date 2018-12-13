@@ -5,8 +5,7 @@ html5lib>=1.0.1
 requests>=2.20.0
 pyfiglet>=0.7.5
 click>=6.6
-colorama>=0.3.7
+colorama>=0.3.7 # note: on windows click requires colorama too http://click.pocoo.org/5/utils/#ansi-colors
 pyparsing>=2.1.10
 keepalive>=0.5
-# unidecode==0.4.19
 # readline==6.2.4.1  # optional, for shell autocomplete
