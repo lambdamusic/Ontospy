@@ -58,6 +58,14 @@ If you’re upgrading from an older version, make sure you use the -U flag:
 pip install ontospy -U
 ```
 
+**Gerating Documentation**
+
+If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you need to install the HTML extension too:
+
+```
+pip install ontospy[HTML]
+```
+
 ## Quick example
 
 If used as a Python package, the basic workflow is the following: load a graph by instantiating the `Ontospy` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
