@@ -7,8 +7,6 @@ All rights reserved.
 
 """
 
-from __future__ import print_function
-
 import sys
 import os
 import time
@@ -64,7 +62,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 #
 ##################
 #
-# 2018-08-23: trying to restructure the cli using command groups
+# 2018-08-23: restructuring the cli using command groups
 # http://click.pocoo.org/6/commands/
 # test with python -m ontospy.cli library
 
@@ -82,7 +80,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <http://lambdamusic.github.io/Ontospy/>.
+Ontospy is a command line inspector for RDF/OWL models. Use the --help option with one of the commands listed below to find out more, or visit http://lambdamusic.github.io/Ontospy 
     """
     sTime = time.time()
     if ctx.obj is None:  # Fix for bug (as of 3.0)
@@ -364,7 +362,7 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def docs(ctx, source=None, outputpath="", title="", theme="",
+def html(ctx, source=None, outputpath="", title="", theme="",
          showthemes=False):
     """Generate documentation for an ontology in html or markdown format
     """
@@ -374,14 +372,17 @@ def docs(ctx, source=None, outputpath="", title="", theme="",
         'labels': verbose,
     }
 
+    # from .ontodocs import *
+    from .ontodocs.builder import action_visualize
+
     try:
-        import ontodocs
-        from ontodocs.core.builder import action_visualize
+        # check that we have the required dependencies
+        import django
     except:
         click.secho(
-            "WARNING: the ontodocs library is required for this functionality.",
+            "WARNING: this functionality requires the Django package and other extra dependecies.",
             fg="red")
-        click.secho("Install with `pip install ontodocs -U`")
+        click.secho("Install with `pip install ontospy[HTML] -U`")
         sys.exit(0)
 
     if showthemes:

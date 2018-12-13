@@ -58,6 +58,14 @@ If you’re upgrading from an older version, make sure you use the -U flag:
 pip install ontospy -U
 ```
 
+**Gerating Documentation**
+
+If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you need to install the HTML extension too:
+
+```
+pip install ontospy[HTML]
+```
+
 ## Quick example
 
 If used as a Python package, the basic workflow is the following: load a graph by instantiating the `Ontospy` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
@@ -197,7 +205,7 @@ This is due to the new [System Integrity Protection](https://support.apple.com/e
 
 Ontospy can be used to generate HTML ontology documentation pretty easily.
 
-This functionality relies on another library called [OntoDocs](https://github.com/lambdamusic/Ontodocs) but I'm currenlty working on bringing it back within Ontospy as an add-on, essentially because it's easier to maintain.
+This functionality relies on a module called _ontodocs_ that used to be maintained as a separate library but is noe merged with ontospy (essentially because it's easier to maintain it this way).
 
 **Examples**
 
@@ -208,11 +216,13 @@ That's the kind of documentation OntoDocs can generate out-of-the-box. For even 
 
 **Installation**
 
+By default the libraries needed by this module (Django and Pygments) are not installed, so you have to add them like this:
+
 ```
-pip install ontodocs -U
+pip install ontospy[HTML] -U
 ```
 
-Ontodocs allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
+Ontospy allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
 
 ```
 > ontospy viz -h
@@ -237,7 +247,7 @@ This is how you would invoke a visualization from a script:
 
 ```
 import ontospy
-from ontodocs.viz.viz_html_single import *
+from ontospy.ontodocs.viz.viz_html_single import *
 
 g = ontospy.Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
 

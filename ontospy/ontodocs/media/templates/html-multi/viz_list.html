@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+  {% with thispage="visualizations" %}
+      {% include "navbar.html" %}
+  {% endwith %}
+
+{% endblock navbar %}
+
+
+
+{% block sidebar %}
+
+    {% with thispage="visualizations" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+  {% block bodycontent %}
+
+
+
+
+
+
+    <div class="row">
+        <a name="1"></a>
+    <h3 class="text-muted" style="margin-top: 50px;">Subject ontology
+        <span class="glyphicon glyphicon-info-sign jstooltip icon-xxs"  title="Visualizations of the taxonomy of subject areas used to index content on nature.com"></span>
+    </h3>
+    <hr>
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Main view</h5>
+
+
+          <a href="#" title="Main view: A visualization of the subject ontology that combines HTML trees with some interactive visualizations.">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_tree.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Collapsible tree</h5>
+
+
+          <a href="#" title="Collapsible tree: Classic tree visualization, obtained using D3 collapsible tree plugin: http://bl.ocks.org/mbostock/4339083">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_d3tree.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Bar hierarchy</h5>
+
+
+          <a href="#" title="Bar hierarchy: One level at-a-time visualization, obtained using D3&#39;s plugin http://bl.ocks.org/mbostock/1283663. ">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_d3barHierarchy.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Icicle</h5>
+
+
+          <a href="#" title="Icicle: Tree map visualization, obrained via Jit plugin: https://philogb.github.io/jit/static/v20/Jit/Examples/Icicle/example1.html">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_jitIcicle.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Partition table</h5>
+
+
+          <a href="#" title="Partition table: Another tree map visualization, with D3&#39;s plugin: http://mbostock.github.io/d3/talk/20111018/partition.html">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_d3partitionTable.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Rotating Cluster</h5>
+
+
+          <a href="#" title="Rotating Cluster: Tree plotted on a circle, obtained with D3 plugin: http://mbostock.github.io/d3/talk/20111018/cluster.html">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_d3cluster.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Sunburst Tree</h5>
+
+
+          <a href="#" title="Sunburst Tree: Tree map plotted on a wheel: http://bl.ocks.org/mbostock/4348373">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_sunburstWheel.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Hierarchical pie chart </h5>
+
+
+          <a href="#" title="Hierarchical pie chart : Tree plotted on an interactive pie chart: http://bl.ocks.org/mbostock/4348373">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_hiearchicalPieChart.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+
+    <div class="col-md-4 img-container">
+
+        <div class="">
+
+
+          <h5 class="text-warning">Bubble chart</h5>
+
+
+          <a href="#" title="Bubble chart: A bubble chart, obtained via D3&#39;s plugin http://bl.ocks.org/mbostock/4063269">
+
+            <img class="img-responsive" src="{{STATIC_URL}}img/app_manager/app_bubblechartsubjects.png" alt="Icon" />
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}

@@ -145,7 +145,7 @@ def action_listlocal(all_details=True):
                 "------------------\nSelect a model by typing its number: (enter=quit)",
                 "important")
             var = input()
-            if var == "":
+            if var == "" or var == "q":
                 return None
             else:
                 try:

@@ -1,0 +1,90 @@
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a class="navbar-brand" id="menu-toggle" title="Toggle sidebar">
+        {# Ontospy#}
+        <span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+      </a>
+    </div>
+    <div id="navbar" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li {% ifequal thispage "home" %}class="active"{% endifequal %}><a href="index.html"><code style="font-size: 115%;">{{docs_title}}</code></a></li>
+        {# <li {% ifequal thispage "about" %}class="active"{% endifequal %} ><a href="#">About</a></li>#}
+
+       {# <li><a href="#menu-toggle" id="menu-toggle">Toggle Menu</a></li>#}
+
+
+        <li {% ifequal thispage "entities-az" %}class="active"{% endifequal %} ><a href="entities-az.html">Entities A-Z</a></li>
+        {% if ontospy_graph.all_classes%}
+        <li {% ifequal thispage "classes" %}class="active"{% endifequal %}><a href="entities-tree-classes.html">Classes</a></li>
+        {% endif %}
+        {% if ontospy_graph.all_properties %}
+        <li {% ifequal thispage "properties" %}class="active"{% endifequal %}><a href="entities-tree-properties.html">Properties</a></li>
+        {% endif %}
+        {% if ontospy_graph.all_skos_concepts %}
+        <li {% ifequal thispage "concepts" %}class="active"{% endifequal %}><a href="entities-tree-concepts.html">SKOS</a></li>
+        {% endif %}
+        {% if ontospy_graph.all_shapes%}
+        <li {% ifequal thispage "shapes" %}class="active"{% endifequal %}><a href="entities-tree-shapes.html">Shapes</a></li>
+        {% endif %}
+        <li {% ifequal thispage "statistics" %}class="active"{% endifequal %} ><a href="statistics.html">Statistics</a></li>
+
+
+{% if 0 %}
+        <li class="dropdown {% if thispage == "classes" or thispage == "properties" or thispage == "concepts" %}active{% endif %} " >
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Entities Tree <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            {% if ontospy_graph.all_classes%}
+            <li><a {% ifequal thispage "classes" %}class="active"{% endifequal %}href="entities-tree-classes.html">Classes</a>
+            </li>
+            {% endif %}
+            {% if ontospy_graph.all_properties %}
+            <li><a {% ifequal thispage "properties" %}class="active"{% endifequal %} href="entities-tree-properties.html">Properties</a>
+            </li>
+            {% endif %}
+            {% if ontospy_graph.all_skos_concepts %}
+            <li><a {% ifequal thispage "concepts" %}class="active"{% endifequal %}href="entities-tree-concepts.html">Concepts</a>
+            </li>
+            {% endif %}
+          </ul>
+      </li>
+{% endif %}
+
+{% if 0 %}
+        <li {% ifequal thispage "visualizations" %}class="active"{% endifequal %} ><a href="visualizations.html">Visualizations</a></li>
+
+          <li class="dropdown" >
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Nav header</li>
+            <li><a href="#">Separated link</a></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+{% endif %}
+      </ul>
+      {% if 0 %}
+      <form class="navbar-form navbar-right" action="" method="get">
+        <div class="form-group">
+          <input type="text" name="q" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Go</button>
+      </form>
+      {% endif %}
+    </div><!--/.nav-collapse -->
+
+  </div>
+</nav>

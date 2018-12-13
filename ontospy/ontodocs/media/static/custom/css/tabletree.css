@@ -1,0 +1,69 @@
+
+
+/* css for class and property trees using schema.org style */
+
+table.h, .h tr, .h td
+	{
+		border: none;
+		margin: 0;
+		padding: 0;
+		border-collapse: collapse;
+	font-size: 16px;
+	line-height: 22px;
+	}
+.h .space
+	{
+		width: 20px
+	}
+.h .bar
+	{
+		background-color: #000;
+		width: 1px
+	}
+.h .tc
+	{
+		text-indent: -21px;
+		padding-left: 21px
+	}
+
+
+ table.h a:link
+{
+/*    color: #d9230f;*/
+	text-decoration: none;
+	border-bottom: dotted 1px ; /*#d9230f*/
+}
+ table.h a:visited
+{
+/*    color: #990000;*/
+	text-decoration: none;
+	border-bottom: dotted 1px;  /*#990000*/
+}
+table.h a:hover
+{
+	border-bottom: none;
+/*    color: #fff;*/
+/*    background-color: #d9230f;*/
+	text-decoration: none;
+}
+
+
+ table.h.propcolor a:link
+{
+/*    color: darkcyan;*/
+	text-decoration: none;
+	border-bottom: dotted 1px green;
+}
+ table.h.propcolor a:visited
+{
+/*    color: darkgreen;*/
+	text-decoration: none;
+	border-bottom: dotted 1px #990000;
+}
+table.h.propcolor a:hover
+{
+/*    background-color: darkcyan;*/
+	border-bottom: none;
+/*    color: #fff;*/
+	text-decoration: none;
+}

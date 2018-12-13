@@ -3,7 +3,7 @@ from codecs import open  # To use a consistent encoding
 from os import path
 import os
 
-here = path.abspath(path.dirname(__file__))
+HERE = path.abspath(path.dirname(__file__))
 
 # trick to manage package versions in one place only
 # http://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
@@ -20,13 +20,13 @@ else:
 
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
-# Get the requirements from txt file
+# Parse requirements.txt file so to have one single source of truth
 REQUIREMENTS_DATA = []
-with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+with open(path.join(HERE, 'requirements.txt'), encoding='utf-8') as f:
     for l in f.readlines():
         if not l.startswith("#"):
             if (">=" in l):
@@ -57,7 +57,17 @@ def get_package_folders(top_folder, root_path):
     return out
 
 
-package_data_folders = []
+
+PROJECT_ROOT = os.path.join(HERE, "ontospy") # should be top level always
+DATA_STATIC_FILES = os.path.join(PROJECT_ROOT, "ontodocs", "media", "static")
+DATA_TEMPLATE_FILES = os.path.join(PROJECT_ROOT, "ontodocs", "media", "templates")
+# dynamically generate list of data folders
+PACKAGE_DATA_FOLDERS = get_package_folders(
+    DATA_STATIC_FILES, PROJECT_ROOT) + get_package_folders(
+        DATA_TEMPLATE_FILES, PROJECT_ROOT)
+
+if True:
+    print(PACKAGE_DATA_FOLDERS)
 
 
 
@@ -114,7 +124,7 @@ setup(
         'HTML': ['Django>=1.10.3', 'Pygments==2.1.3'],
     },
     package_data={
-        'ontospy': package_data_folders
+        'ontospy': PACKAGE_DATA_FOLDERS
         },
     entry_points={
         'console_scripts': [
