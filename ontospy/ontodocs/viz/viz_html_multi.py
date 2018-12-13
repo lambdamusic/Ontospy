@@ -9,10 +9,9 @@
 import os, sys
 import json
 
-from ..core import *
-from ..core.utils import *
-from ..core.builder import *  # loads and sets up Django
-from ..core.viz_factory import VizFactory
+from ..utils import *
+from ..builder import *  # loads and sets up Django
+from ..viz_factory import VizFactory
 
 
 

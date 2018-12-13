@@ -10,10 +10,9 @@
 import os, sys
 import json
 
-from ..core import *
-from ..core.utils import *
-from ..core.builder import *  # loads and sets up Django
-from ..core.viz_factory import VizFactory
+from ..utils import *
+from ..builder import *  # loads and sets up Django
+from ..viz_factory import VizFactory
 
 
 
@@ -67,12 +66,12 @@ class D3TreeViz(VizFactory):
 
         extra_context = {
                         "ontograph": self.ontospy_graph,
-    					"TOTAL_CLASSES": c_total,
-    					"TOTAL_PROPERTIES": p_total,
-    					"TOTAL_CONCEPTS": s_total,
-    					'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
-    					'JSON_DATA_PROPERTIES' : JSON_DATA_PROPERTIES,
-    					'JSON_DATA_CONCEPTS' : JSON_DATA_CONCEPTS,
+         "TOTAL_CLASSES": c_total,
+         "TOTAL_PROPERTIES": p_total,
+         "TOTAL_CONCEPTS": s_total,
+         'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
+         'JSON_DATA_PROPERTIES' : JSON_DATA_PROPERTIES,
+         'JSON_DATA_CONCEPTS' : JSON_DATA_CONCEPTS,
                         }
 
         # Ontology - MAIN PAGE

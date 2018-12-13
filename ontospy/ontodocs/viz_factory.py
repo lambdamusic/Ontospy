@@ -3,13 +3,10 @@
 #
 #
 
-
-
-from .. import *
-from ..core.utils import *
-
+from .. import * # import main ontospy VERSION 
+from ..core.utils import *  
+from .builder import ONTODOCS_VIZ_TEMPLATES, ONTODOCS_VIZ_STATIC
 from .utils import *
-
 
 # Fix Python 2.x.
 try:
@@ -33,7 +30,6 @@ else:
     from django.conf import settings
     from django.template import Context, Template
 
-
 import zipfile
 import os, sys
 import shutil
@@ -42,14 +38,12 @@ from pygments import highlight
 from pygments.lexers.rdf import TurtleLexer
 from pygments.formatters import HtmlFormatter
 
-
 try:
     from .CONFIG import VISUALIZATIONS_LIST
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
     click.secho("Visualizations configuration file not found.", fg="red")
     raise
-
 
 
 class VizFactory(object):
@@ -63,7 +57,7 @@ class VizFactory(object):
         self.title = ''
         self.ontospy_graph = ontospy_graph
         self.static_files = []
-        self.static_url = "" # one used in templates
+        self.static_url = ""  # one used in templates
         self.final_url = None
         self.output_path = None
         self.output_path_static = None
@@ -110,7 +104,6 @@ class VizFactory(object):
         main_url = self._save2File(contents, f, self.output_path)
         return main_url
 
-
     def _renderTemplate(self, template_name, extraContext=None):
         """
 
@@ -125,7 +118,6 @@ class VizFactory(object):
             context.update(extraContext)
         contents = safe_str(t.render(context))
         return contents
-
 
     def _buildStaticFiles(self):
         """ move over static files so that relative imports work
@@ -156,9 +148,8 @@ class VizFactory(object):
                     printDebug("..cleaning up")
                     os.remove(dest_f)
                     # http://superuser.com/questions/104500/what-is-macosx-folder
-                    shutil.rmtree(os.path.join(self.output_path_static, "__MACOSX"))
-
-
+                    shutil.rmtree(
+                        os.path.join(self.output_path_static, "__MACOSX"))
 
     def preview(self):
         if self.final_url:
@@ -167,14 +158,13 @@ class VizFactory(object):
         else:
             printDebug("Nothing to preview")
 
-
     def _build_basic_context(self):
         """
         Return a standard dict used in django as a template context
         """
         # printDebug(str(self.ontospy_graph.toplayer_classes))
         topclasses = self.ontospy_graph.toplayer_classes[:]
-        if len(topclasses) < 3: # massage the toplayer!
+        if len(topclasses) < 3:  # massage the toplayer!
             for topclass in self.ontospy_graph.toplayer_classes:
                 for child in topclass.children():
                     if child not in topclasses: topclasses.append(child)
@@ -196,13 +186,13 @@ class VizFactory(object):
             "properties": self.ontospy_graph.all_properties,
             "objproperties": self.ontospy_graph.all_properties_object,
             "dataproperties": self.ontospy_graph.all_properties_datatype,
-            "annotationproperties": self.ontospy_graph.all_properties_annotation,
+            "annotationproperties":
+            self.ontospy_graph.all_properties_annotation,
             "skosConcepts": self.ontospy_graph.all_skos_concepts,
             "instances": []
         }
 
         return context_data
-
 
     def _save2File(self, contents, filename, path):
         filename = os.path.join(path, filename)
@@ -218,12 +208,12 @@ class VizFactory(object):
         """
         if not output_path:
             # output_path = self.output_path_DEFAULT
-            output_path = os.path.join(self.output_path_DEFAULT, slugify(unicode(self.title)))
+            output_path = os.path.join(self.output_path_DEFAULT,
+                                       slugify(unicode(self.title)))
         if os.path.exists(output_path):
             shutil.rmtree(output_path)
         os.makedirs(output_path)
         return output_path
-
 
     def highlight_code(self, ontospy_entity):
         """
@@ -231,11 +221,13 @@ class VizFactory(object):
         using Pygments CSS
         """
         try:
-            pygments_code = highlight(ontospy_entity.rdf_source(), TurtleLexer(), HtmlFormatter())
+            pygments_code = highlight(ontospy_entity.rdf_source(),
+                                      TurtleLexer(), HtmlFormatter())
             pygments_code_css = HtmlFormatter().get_style_defs('.highlight')
-            return {"pygments_code": pygments_code,
-                    "pygments_code_css": pygments_code_css
-                            }
+            return {
+                "pygments_code": pygments_code,
+                "pygments_code_css": pygments_code_css
+            }
         except Exception as e:
             printDebug("Error: Pygmentize Failed", "red")
             return {}

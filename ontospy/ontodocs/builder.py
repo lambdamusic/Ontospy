@@ -212,19 +212,19 @@ def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
     this_viz = VISUALIZATIONS_LIST[viz_index]
 
     if this_viz['ID'] == "html-simple":
-        from ..viz.viz_html_single import HTMLVisualizer
+        from .viz.viz_html_single import HTMLVisualizer
         v = HTMLVisualizer(g, title)
 
     elif this_viz['ID'] == "html-complex":
-        from ..viz.viz_html_multi import KompleteViz
+        from .viz.viz_html_multi import KompleteViz
         v = KompleteViz(g, title, theme)
 
     elif this_viz['ID'] == "markdown":
-        from ..viz.viz_markdown import MarkdownViz
+        from .viz.viz_markdown import MarkdownViz
         v = MarkdownViz(g, title)
 
     elif this_viz['ID'] == "d3-tree":
-        from ..viz.viz_d3tree import D3TreeViz
+        from .viz.viz_d3tree import D3TreeViz
         v = D3TreeViz(g, title)
 
     else:

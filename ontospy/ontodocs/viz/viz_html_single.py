@@ -1,20 +1,15 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 
-
-
 # ==================
 # VIZ HTML SINGLE - outputs documentation within a single HTML page
 # ==================
 
-
 import os, sys
 
-from ..core import *
-from ..core.utils import *
-from ..core.builder import *  # loads and sets up Django
-from ..core.viz_factory import VizFactory
-
+from ..utils import *
+from ..builder import *  # loads and sets up Django
+from ..viz_factory import VizFactory
 
 
 class HTMLVisualizer(VizFactory):
@@ -22,7 +17,6 @@ class HTMLVisualizer(VizFactory):
     A simple html rendering in one single page
 
     """
-
 
     def __init__(self, ontospy_graph, title=""):
         """
@@ -33,8 +27,6 @@ class HTMLVisualizer(VizFactory):
         self.main_file_name = "index.html"
 
 
-
-
 # if called directly, for testing purposes run the basic HTML rendering
 
 if __name__ == '__main__':
@@ -43,7 +35,7 @@ if __name__ == '__main__':
 
     try:
 
-        g = get_onto_for_testing(TEST_ONLINE) # from core.utils
+        g = get_onto_for_testing(TEST_ONLINE)  # from core.utils
 
         v = HTMLVisualizer(g)
         v.build()
