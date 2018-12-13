@@ -35,7 +35,7 @@ Ontospy will extract and print out any ontology-related information contained in
 
 Many other options are available, in particular Ontospy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
-[![OntospyVideo](static/ontospyvideo.jpg)](https://vimeo.com/169707591)
+[![OntospyVideo](static/ontospyvideo_sm.jpg)](https://vimeo.com/169707591)
 
 ## Installation
 
