@@ -195,7 +195,57 @@ This is due to the new [System Integrity Protection](https://support.apple.com/e
 
 ## Generating ontology documentation
 
--   Check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library which builds on OntoSpy and permits to quickly generate documentation like [in these examples](http://www.michelepasin.org/support/ontospy-examples/index.html)
+Ontospy can be used to generate HTML ontology documentation pretty easily.
+
+This functionality relies on another library called [OntoDocs](https://github.com/lambdamusic/Ontodocs) but I'm currenlty working on bringing it back within Ontospy as an add-on, essentially because it's easier to maintain.
+
+**Examples**
+
+-   [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) documentation.
+-   [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) documentation.
+
+That's the kind of documentation OntoDocs can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
+
+**Installation**
+
+```
+pip install ontodocs -U
+```
+
+Ontodocs allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
+
+```
+> ontospy viz -h
+Usage: ontospy viz [OPTIONS] [SOURCE]...
+
+  Visualize a model using ontodocs library
+
+Options:
+  -o, --outputpath TEXT  Output path (default: home folder).
+  -t, --title TEXT       Title for the visualization (default=graph uri).
+  --theme TEXT           CSS Theme for the html-complex visualization
+                         (random=use a random theme).
+  --showthemes           Show the available CSS theme choices.
+  -h, --help             Show this message and exit.
+```
+
+The library is not really meant to be used programmatically, but I'm sure there are a few constructs in there which can be reused.
+
+In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontodocs/blob/master/ontodocs/core/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
+
+This is how you would invoke a visualization from a script:
+
+```
+import ontospy
+from ontodocs.viz.viz_html_single import *
+
+g = ontospy.Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
+
+v = HTMLVisualizer(g) # => instantiate the visualization object
+v.build() # => render visualization. You can pass an 'output_path' parameter too
+v.preview() # => open in browser
+
+```
 
 ## Quick Links
 
