@@ -2,9 +2,9 @@
 
 Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
 
-![logo](static/logo.png)
+![logo](static/logo_sm.jpg)
 
-> Note: this documentation is a work in progress.
+> Note: some of this documentation is not valid anymore but I'm in the process of updating it
 
 ## Index
 
