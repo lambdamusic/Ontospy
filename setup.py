@@ -113,7 +113,9 @@ setup(
         'SHELL': ['readline'],
         'HTML': ['Django>=1.10.3', 'Pygments==2.1.3'],
     },
-    package_data={'ontospy': package_data_folders},
+    package_data={
+        'ontospy': package_data_folders
+        },
     entry_points={
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
