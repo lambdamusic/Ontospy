@@ -17,4 +17,4 @@ The same functionalities are accessible also via a command line application (`on
 
 ## More info
 
-https://github.com/lambdamusic/Ontospy/wiki
+http://lambdamusic.github.io/Ontospy/

@@ -82,7 +82,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <https://github.com/lambdamusic/ontospy/wiki>.
+Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <http://lambdamusic.github.io/Ontospy/>.
     """
     sTime = time.time()
     if ctx.obj is None:  # Fix for bug (as of 3.0)
