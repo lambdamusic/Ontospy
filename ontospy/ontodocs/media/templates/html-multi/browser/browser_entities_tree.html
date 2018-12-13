@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+  {% with thispage=treetype %}
+      {% include "navbar.html" %}
+  {% endwith %}
+
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+
+    {% with thispage=treetype %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+{% block bodycontent %}
+
+
+
+    {% with thispage=treetype %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
+
+
+
+
+  <div class="page-header">
+
+      <h3>{{treetype|capfirst}} Tree
+      </h3>
+      <input id="search-input" type="text" class="form-control" placeholder="Filter...">
+
+  </div>
+
+
+
+     <div class="row"><div class="col-md-12">
+        <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Tree</h3>
+      </div>
+      <div class="panel-body entities-list">
+
+          {{treeTable|safe}}
+
+
+      </div>
+    </div>
+     </div></div>
+
+
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
+
+
+{% block extrajs %}
+
+<script type="text/javascript">
+
+// http://stackoverflow.com/questions/9127498/how-to-perform-a-real-time-search-and-filter-on-a-html-table
+
+  $('#search-input').keyup(function() {
+
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    // var $rows = $(this).next(".entities-list").find("div");
+    var $rows = $(this).parent().next().find(".entities-list tr");
+
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+</script>
+
+
+
+<!-- Scroll Sidebar Script -->
+{# Convention is to have sidebar menu li items with id "sd_XXXX"#}
+<script type="text/javascript">
+
+  $(document).ready(function (){
+    $('#sidebar-wrapper').animate({
+        scrollTop: $("#sd_{{treetype}}").offset().top - 100
+    }, 100);
+  });
+
+</script>
+
+
+{% endblock extrajs %}

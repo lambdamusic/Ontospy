@@ -1,0 +1,252 @@
+{# the template used for shunter / nature.com/ontologies  #}
+
+
+
+<style type="text/css" media="screen">
+.small-font {font-size: 60%;}
+.margin-top-50 {margin-top: 50px;}
+</style>
+
+{% if metadata %}
+
+<div id="metadata_div" class="margin-top-50">
+
+        <a name="ont_metadata"></a>
+	<h1 class="standard-space-below line-below">Ontology Metadata
+        <small class="small-font">&nbsp;&nbsp;(<a href="#top">top</a>)</small>
+        </h1>
+	
+	<dl class="grid grid-12 standard-space-below box-light">
+
+		{% for each in metadata %}
+
+			<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{each.0}}</span></dt>
+			<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{each.1}}</span></dd>
+		
+
+		{% endfor %}
+	</dl>
+
+</div>
+
+{% endif %}
+
+
+<a name="ont_terms"></a>
+<h1 class="standard-space-below line-below margin-top-50">Ontology Terms
+<small class="small-font">&nbsp;&nbsp;(<a href="#top">top</a>)</small>
+</h1>
+
+<p>Ontology terms are listed below by OWL structural entity type.</p>
+
+<ul class="line-below standard-space-below pb20">
+	{% if classes %}<li><a href="#classes">Classes</a></li>{% endif %}
+	{% if objproperties %}<li><a href="#objprop">Object Properties</a></li>{% endif %}
+	{% if dataproperties %}<li><a href="#dataprop">Datatype properties</a></li>{% endif %}
+	{% if annotationproperties %}<li><a href="#annprop">Annotation properties</a></li>{% endif %}
+	{% if instances %}<li><a href="#instances">Instances</a></li>{% endif %}
+</ul>
+
+
+{% if classes %}
+
+<div id="classes_div"  class="margin-top-50">
+	<a name="classes"></a>
+	<h1 class="standard-space-below line-below">Classes
+	        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+	</h1>
+	
+	<ul class="summary_section grid grid-12 line-below standard-space-below clean-list horizontal-list pb20">
+		{% for each in classes  %}
+			<li class="mr10"><a href="#{{each.classname}}">{{each.classname}}</a></li>
+		{% endfor %}			
+	</ul>
+	
+
+
+		{% for each in classes  %}
+			<a name="{{each.classname}}"></a>
+			<h2>{{each.classname}}
+				<small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+			</h2>
+		
+			<dl class="grid grid-12 standard-space-below box-light">
+			{% for xx in each.alltriples %}
+	
+				<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{xx.0}}</span></dt>
+				<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{xx.1}}</span></dd>
+				
+
+	
+			{% endfor %}
+			</dl>
+		
+
+		{% endfor %}
+</div>
+
+{% endif %}
+
+
+{% if objproperties %}
+	
+<div id="objproperties_div"  class="margin-top-50">
+	<a name="objprop"></a>
+	<h1 class="standard-space-below line-below">Object Properties
+	        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+	</h1>
+	
+	
+	<ul class="summary_section grid grid-12 line-below standard-space-below clean-list horizontal-list pb20">
+		{% for each in objproperties  %}
+			<li class="mr10"><a href="#{{each.propname}}">{{each.propname}}</a></li>
+		{% endfor %}			
+	</ul>
+	
+
+		{% for each in objproperties  %}
+			<a name="{{each.propname}}"></a>
+			<h2>{{each.propname}}
+				<small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+			</h2>
+		
+			<dl class="grid grid-12 standard-space-below box-light">
+			{% for xx in each.alltriples %}
+	
+				<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{xx.0}}</span></dt>
+				<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{xx.1}}</span></dd>
+				
+
+	
+			{% endfor %}
+			</dl>
+			
+
+		{% endfor %}
+</div>
+{% endif %}
+
+
+
+{% if dataproperties %}
+<div id="dataproperties_div" class="margin-top-50">
+	<a name="dataprop"></a>
+	<h1 class="standard-space-below line-below">Datatype Properties
+	        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+	</h1>
+
+
+	<ul class="summary_section grid grid-12 line-below standard-space-below clean-list horizontal-list pb20">
+		{% for each in dataproperties  %}
+			<li class="mr10"><a href="#{{each.propname}}">{{each.propname}}</a></li>
+		{% endfor %}			
+	</ul>
+	
+	
+		{% for each in dataproperties  %}
+			
+			<a name="{{each.propname}}"></a>
+			<h2>{{each.propname}}
+	                        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+			</h2>
+		
+			<dl class="grid grid-12 standard-space-below box-light">
+			{% for xx in each.alltriples %}
+	
+				<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{xx.0}}</span></dt>
+				<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{xx.1}}</span></dd>
+				
+
+	
+			{% endfor %}
+			</dl>
+							
+
+		{% endfor %}
+</div>
+	
+{% endif %}	
+	
+	
+
+{% if annotationproperties %}
+
+<div id="annotationproperties_div" class="margin-top-50">
+	
+	<a name="annprop"></a>
+	<h1 class="standard-space-below line-below">Annotation Properties
+	        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+	</h1>
+
+
+	<ul class="summary_section grid grid-12 line-below standard-space-below clean-list horizontal-list pb20">
+		{% for each in annotationproperties  %}
+			<li class="mr10"><a href="#{{each.propname}}">{{each.propname}}</a</li>
+		{% endfor %}			
+	</ul>
+
+		{% for each in annotationproperties  %}
+			
+			<a name="{{each.propname}}"></a>
+			<h2>{{each.propname}}
+	                        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+			</h2>
+		
+			<dl class="grid grid-12 standard-space-below box-light">
+			{% for xx in each.alltriples %}
+	
+				<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{xx.0}}</span></dt>
+				<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{xx.1}}</span></dd>
+				
+
+	
+			{% endfor %}
+			</dl>
+			
+
+		{% endfor %}
+</div>
+
+{% endif %}	
+	
+
+
+{% if instances %}
+
+<div id="instances_div" class="margin-top-50">
+	
+	<a name="instances"></a>
+	<h1 class="standard-space-below line-below">Instances
+	        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+	</h1>
+	
+	<ul class="summary_section grid grid-12 line-below standard-space-below clean-list horizontal-list pb20">
+		{% for each in instances  %}
+			<li class="mr10"><a href="#{{each.instancename}}">{{each.instancename}}</a></li>
+		{% endfor %}			
+	</ul>
+
+		{% for each in instances  %}
+			
+			<a name="{{each.instancename}}"></a>
+			<h2>{{each.instancename}}
+	                        <small class="small-font">&nbsp;&nbsp;(<a href="#ont_terms">terms</a>)</small>
+			</h2>
+		
+			<dl class="grid grid-12 standard-space-below box-light">
+			{% for xx in each.alltriples %}
+	
+				<dt class="grid-ng grid-ng-3 box-light line-above"><span class="pa10 pin-left">{{xx.0}}</span></dt>
+				<dd class="grid-ng grid-ng-9 last box-dark line-above"><span class="pa10 pin-left">{{xx.1}}</span></dd>
+				
+
+	
+			{% endfor %}
+			</dl>
+
+		{% endfor %}
+		
+</div>
+
+{% endif %}
+

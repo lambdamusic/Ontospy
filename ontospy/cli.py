@@ -364,7 +364,7 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def docs(ctx, source=None, outputpath="", title="", theme="",
+def html(ctx, source=None, outputpath="", title="", theme="",
          showthemes=False):
     """Generate documentation for an ontology in html or markdown format
     """
@@ -374,14 +374,17 @@ def docs(ctx, source=None, outputpath="", title="", theme="",
         'labels': verbose,
     }
 
+    # from .ontodocs import *
+    from .ontodocs.builder import action_visualize
+
     try:
-        import ontodocs
-        from ontodocs.core.builder import action_visualize
+        # check that we have the required dependencies
+        import django
     except:
         click.secho(
-            "WARNING: the ontodocs library is required for this functionality.",
+            "WARNING: this functionality requires the Django package and other extra dependecies.",
             fg="red")
-        click.secho("Install with `pip install ontodocs -U`")
+        click.secho("Install with `pip install ontospy[HTML] -U`")
         sys.exit(0)
 
     if showthemes:

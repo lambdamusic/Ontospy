@@ -1,0 +1,942 @@
+@prefix :            <http://ns.nature.com/terms/> .
+@prefix bibo:        <http://purl.org/ontology/bibo/> .
+@prefix dc:          <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms:     <http://purl.org/dc/terms/> .
+@prefix foaf:        <http://xmlns.com/foaf/0.1/> .
+@prefix npg:         <http://ns.nature.com/terms/> .
+@prefix npgd:        <http://ns.nature.com/datasets/> .
+@prefix npgg:        <http://ns.nature.com/graphs/> .
+@prefix owl:         <http://www.w3.org/2002/07/owl#> .
+@prefix prism:       <http://prismstandard.org/namespaces/basic/2.1/> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:        <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann:        <http://purl.org/vocab/vann/> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix article-types: <http://ns.nature.com/article-types/> .
+
+article-types:
+    npg:webpage <http://www.nature.com/ontologies/models/article-types/> ;
+    dc:date "2015-08-17T06:12:02.390-04:00" ;
+    dc:publisher "Macmillan Publishers Limited" ;
+    dc:rights "This work is distributed under a Creative Commons Zero 1.0 (CC0 1.0) Public Domain Dedication <http://creativecommons.org/publicdomain/zero/1.0/>."@en ;
+    dcterms:license <http://creativecommons.org/publicdomain/zero/1.0/> ;
+    vann:preferredNamespacePrefix "article-types" ;
+    vann:preferredNamespaceUri "http://ns.nature.com/article-types/" ;
+    a owl:Ontology, skos:ConceptScheme ;
+    owl:imports <http://ns.nature.com/terms/> ;
+    owl:versionInfo "1.9.45" ;
+    skos:definition "The ArticleTypes Ontology is a categorization of kinds of publication which are used to index and group content published by Macmillan Science and Education."@en ;
+    skos:prefLabel "ArticleTypes Ontology"@en .
+
+article-types:abstracts-collection
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "abstracts-collection" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-highlights ;
+    skos:definition "The :abstracts-collection article-type denotes a collection of abstracts from a recent conference."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Abstracts Collection"@en .
+
+article-types:addendum
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "addendum" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:amendments-and-corrections ;
+    skos:definition "The :addendum article-type denotes a notification of a (usually) peer-reviewed addition of information to a paper, usually in response to readers' request for clarification. Addenda are published only rarely and only when the editors decide that the addendum is crucial to the reader's understanding of a significant part of the published contribution. An addendum can consist of: (i) information not available at the time of publication (but not merely because more data has become available), or (ii) an editor’s note concerning breaches of policy (such as refusal to share reagents)."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Addendum"@en .
+
+article-types:advertising-feature
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "advertising-feature" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:advertorial ;
+    skos:definition "The :advertising-feature article-type denotes an article describing an organisation's involvement in a field of likely interest to a substantial sector of the target readership. The content, for which the advertiser retains full responsibility, should summarise the work of the organisation, without providing any details of primary research findings."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Advertising Feature"@en .
+
+article-types:advertorial
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "advertorial" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:miscellaneous ;
+    skos:definition "The :advertorial article-type groups together article-types including the :advertising-feature article-type."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:advertising-feature ;
+    skos:prefLabel "Advertorial"@en .
+
+article-types:amendments-and-corrections
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "amendments-and-corrections" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-and-reviews ;
+    skos:definition "The :amendments-and-corrections article-type groups together article-types including the :addendum, :corrigendum, :erratum, :correction and :retraction article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:addendum, article-types:correction, article-types:corrigendum, article-types:erratum, article-types:retraction ;
+    skos:prefLabel "Amendments and Corrections"@en .
+
+article-types:analysis
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "analysis" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :analysis article-type denotes an article describing analysis of existing data (typically large data sets from high-throughput platforms) or new data obtained through comparative analysis of technologies, methods or reagents of key importance to the field of research. The conclusions should be sufficiently novel and arresting to appeal to a substantial sector of the target audience."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Analysis"@en .
+
+article-types:article
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "article" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :article article-type denotes a relatively complete, comprehensive report of original research. An article usually has a fairly complex narrative that is based on multiple techniques and/or approaches."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:letter ;
+    skos:prefLabel "Article"@en .
+
+article-types:blog-post
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "blog-post" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:blogs ;
+    skos:definition "The :blog-post article-type denotes an article published on a blog. A blog is an internet-based discussion or informational site that comprises discrete entries (blog posts) typically displayed in reverse chronological order."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Blog Post"@en .
+
+article-types:blogs
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "blogs" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:miscellaneous ;
+    skos:definition "The :blogs article-type groups together article-types including the :blog-post article-type."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:blog-post ;
+    skos:prefLabel "Blogs"@en .
+
+article-types:book-review
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "book-review" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:books-and-arts ;
+    skos:definition "The :book-review article-type denotes a review of an agenda-setting book."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Book Review"@en .
+
+article-types:books-and-arts
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "books-and-arts" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :books-and-arts article-type denotes an essay or review of an agenda-setting book, film, or cultural event. The :books-and-arts article-type also groups together article-types including the :books-and-arts and :book-review article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:book-review ;
+    skos:prefLabel "Books and Arts"@en .
+
+article-types:brief-communication
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "brief-communication" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :brief-communication article-type denotes a concise report of research of high quality and broad interest to a journal’s target audience. Given that a brief communication is less substantial than an article, authors should be able to justify why a focused report of their original research findings is warranted instead of the more comprehensive coverage suitable for an article."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:data-report ;
+    skos:prefLabel "Brief Communication"@en .
+
+article-types:brief-communications-arising
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "brief-communications-arising" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :brief-communications-arising article-type denotes a peer-reviewed communication published in response to a previously published research article."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Brief Communications Arising"@en .
+
+article-types:case-based-learning
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "case-based-learning" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:case-report ;
+    skos:definition "The :case-based-learning article-type denotes a case report with a particular educational focus."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Case-based Learning"@en .
+
+article-types:case-report
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "case-report" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :case-report article-type denotes a detailed report of the symptoms, signs, diagnosis, treatment, and follow-up of an individual patient. A case report may contain a demographic profile of the patient and usually describes an unusual or novel occurrence. Some case reports also contain a literature review of other reported cases."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:case-based-learning, article-types:clinical-cases ;
+    skos:prefLabel "Case Report"@en .
+
+article-types:clinical-cases
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "clinical-cases" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:case-report ;
+    skos:definition "The :clinical-cases article-type denotes a report, which describes the findings, clinical course, and prognosis of a case. The :clinical-cases article-type is an alternative to the :case-report article-type."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Clinical Cases"@en .
+
+article-types:comment
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "comment" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comments-and-opinion ;
+    skos:definition "The :comment article-type generally denotes an agenda-setting, authoritative, informed and often provocative expert piece calling for action on topical issues pertaining to scientific research and its political, ethical and social ramifications. They are written to be accessible and appealing to the entire target readership of the journal and propose a detailed solution rather than simply providing a snapshot of the problem. Alternatively the :comment article-type can denote a writerly historical narrative or conceptual or philosophical argument of pressing contemporary relevance, told with authority, colour, vivacity and personal voice. These attempt to bring an original perspective before the widest readership, through erudite reasoning and telling examples."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:building-a-business, article-types:patent ;
+    skos:prefLabel "Comment"@en .
+
+article-types:comments-and-opinion
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "comments-and-opinion" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :comments-and-opinion article-type groups together article-types including the :comment, :obituary, :q-and-a article-types, etc."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:comment, article-types:crossword, article-types:fiction, article-types:obituary, article-types:q-and-a ;
+    skos:prefLabel "Comments and Opinion"@en .
+
+article-types:conference-proceeding
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "conference-proceeding" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :conference-proceeding article-type denotes an article of original research published in the context of an academic conference."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Conference Proceeding"@en .
+
+article-types:consensus-statement
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "consensus-statement" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:reviews ;
+    skos:definition "The :consensus-statement article-type denotes an article with the form of a diagnosis/treatment/management guideline (usually society-endorsed), expert consensus document, position paper, scientific statement, standards paper, or white paper. A consensus statement should present a balanced review put together by a taskforce of people from various institutes, rather than from one group, and can be evidence-based or eminence-based. It represents a consensus recommendation."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:white-paper ;
+    skos:prefLabel "Consensus Statement"@en .
+
+article-types:correction
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "correction" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:amendments-and-corrections ;
+    skos:definition "The :correction article-type denotes a notification of errors in less scholarly article-types (e.g., :editorial, :comment, :correspondence, :news-and-views) compared with the :erratum and :corrigendum article-types which are used to indicate errors related to primary research. A correction might, for instance, be used to denote inaccuracies in author names and affiliations, errors that affect the credit given to a person or damage someone’s reputation, or significant misquotations."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Correction"@en .
+
+article-types:correspondence
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "correspondence" ;
+    npg:isLeaf true ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :correspondence article-type denotes arresting and timely comments on material published in the journal (including right-of-reply) as well as anything of likely interest to the readers, such as policy debates and community announcements."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Correspondence"@en .
+
+article-types:corrigendum
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "corrigendum" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:amendments-and-corrections ;
+    skos:definition "The :corrigendum article-type denotes a notification of an important error made by the author(s) that affects the publication record or the scientific integrity of the paper, or the reputation of the authors or the journal. In cases where co-authors disagree, the editors will take advice from independent peer-reviewers and impose the appropriate amendment, noting the dissenting author(s) in the text of the published version."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Corrigendum"@en .
+
+article-types:crossword
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "crossword" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comments-and-opinion ;
+    skos:definition "The :crossword article-type denotes a word puzzle, usually focused on a particular theme relevant to the target readership."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Crossword"@en .
+
+article-types:data-descriptor
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "data-descriptor" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :data-descriptor article-type denotes an article describing one or more unprocessed experimental or observational data sets, with a strong emphasis on the adequacy of the methods used to collect the data and technical analysis to support its suitability for re-use by others. A data descriptor will never describe tests of new hypotheses or include extensive analyses aimed at providing conceptual insights."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Data Descriptor"@en .
+
+article-types:editorial
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "editorial" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :editorial article-type denotes an article conveying an authoritative opinion that will, at the least, crystallize a current issue of concern and, at best, inspire action by key individuals or groups. Editorial articles are the voice of the journal. An editorial can also deliver an introduction or overview of the content of an issue."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Editorial"@en .
+
+article-types:erratum
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "erratum" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:amendments-and-corrections ;
+    skos:definition "The :erratum article-type denotes a notification of an important error made by the journal that affects the publication record or the scientific integrity of the paper, or the reputation of the authors, or of the journal."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Erratum"@en .
+
+article-types:feature
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "feature" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:special-features ;
+    skos:definition "The :feature article-type denotes an article of long-form journalism that provides an in-depth account of new ideas and approaches in science, the dynamics of the research community, and interactions between science and society. Intended to complement the emerging scientific developments reported in research articles, this format provides ‘inside’ access to topical subjects in science and scientific research: how it works, its challenges and its controversies."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Feature"@en .
+
+article-types:fiction
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "fiction" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comments-and-opinion ;
+    skos:definition "The :fiction article-type denotes a fictional self-contained story, typically with a stronger scientific basis than fiction characteristic of the outright fantasy, slipstream, or horror genres."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Fiction"@en .
+
+article-types:hypothesis
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "hypothesis" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :hypothesis article-type denotes a proposal that is consistent with published literature, but for which empirical evidence has not yet been obtained. The purpose would be to inspire experimental research."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Hypothesis"@en .
+
+article-types:image
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "image" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :image article-type denotes a striking photograph or composite figure, accompanied by a limited amount of explanatory text, which highlights a notable phenomenon likely to be of general interest to the target readership."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Image"@en .
+
+article-types:journal-club
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "journal-club" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-highlights ;
+    skos:definition "The :journal-club article-type denotes an article that conveys a summary of achievements of selected new research papers."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Journal Club"@en .
+
+article-types:laboratory-methods
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "laboratory-methods" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:protocol ;
+    skos:definition "The :laboratory-methods article-type denotes an article that provides step-by-step descriptions of procedures that readers can take to the laboratory or clinic and immediately apply in their own research. The :laboratory-methods article-type is an alternative to the :protocol article-type."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Laboratory Methods"@en .
+
+article-types:letter
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "letter" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:article ;
+    skos:definition "The :letter article-type denotes a report of original research that is shorter in format than an article."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Letter"@en .
+
+article-types:meeting-report
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "meeting-report" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-views ;
+    skos:definition "The :meeting-report article-type denotes an account of proceedings at a recent conference of broad interest to the target readership of the journal."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Meeting Report"@en .
+
+article-types:mini-review
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "mini-review" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:review-article ;
+    skos:definition "The :mini-review article-type denotes a review with a more concise format compared with a standard review article."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Mini Review"@en .
+
+article-types:miscellaneous
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "miscellaneous" ;
+    npg:isLeaf false ;
+    npg:isRoot true ;
+    npg:treeDepth 0 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:definition "The :miscellaneous article-type is a high-level grouping of article-types that do not fit under the :news-and-comment or :research-and-reviews article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:advertorial, article-types:blogs, article-types:multimedia, article-types:special-features, article-types:unmapped ;
+    skos:prefLabel "Miscellaneous"@en ;
+    skos:topConceptOf <http://ns.nature.com/article-types/> .
+
+article-types:multimedia
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "multimedia" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:miscellaneous ;
+    skos:definition "The :multimedia article-type groups together article-types including the :video, :podcast and :webcast article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:podcast, article-types:poster, article-types:video, article-types:webcast ;
+    skos:prefLabel "Multimedia"@en .
+
+article-types:news
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "news" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :news article-type denotes timely briefings and analysis on a wide range of topics (research, policy, business, society, academic communities) important to the target audience of a journal. The :news article-type also groups together all news article-types including the :news and :news-analysis article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:news-analysis, article-types:news-in-brief ;
+    skos:prefLabel "News"@en .
+
+article-types:news-analysis
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "news-analysis" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news ;
+    skos:definition "The :news-analysis article-type denotes in-depth analysis of the most important news."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "News Analysis"@en .
+
+article-types:news-and-comment
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "news-and-comment" ;
+    npg:isLeaf false ;
+    npg:isRoot true ;
+    npg:treeDepth 0 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:definition "The :news-and-comment article-type is a high level grouping of article-types including the :news, :editorial, :correspondence, :comments-and-opinion, :news-and-views, :research-highlights, and :books-and-arts article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:books-and-arts, article-types:comments-and-opinion, article-types:correspondence, article-types:editorial, article-types:news, article-types:news-and-views, article-types:research-highlights ;
+    skos:prefLabel "News and Comment"@en ;
+    skos:topConceptOf <http://ns.nature.com/article-types/> .
+
+article-types:news-and-views
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "news-and-views" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :news-and-views article-type denotes an authoritative, but readable and objective, account of cutting-edge research, usually as originally reported in a paper published in the same issue or elsewhere. It is not peer-reviewed and, depending on the preference of the journal, may always be invited/commissioned by the editor(s). The :news-and-views article-type also groups together article-types including the :news-and-views, :thread and :meeting-report article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:meeting-report, article-types:thread ;
+    skos:prefLabel "News and Views"@en .
+
+article-types:news-in-brief
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "news-in-brief" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news ;
+    skos:definition "The :news-in-brief article-type denotes a succinct summary of all the most important news stories that emerged since the previous issue. It might include teasers to stories that appear at greater length elsewhere and will devote briefs to stories that address key reader interests."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "News in Brief"@en .
+
+article-types:obituary
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "obituary" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comments-and-opinion ;
+    skos:definition "The :obituary article-type denotes a snapshot of the work and influence of a prominent figure who had a major impact on their field."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Obituary"@en .
+
+article-types:patent
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "patent" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comment ;
+    skos:definition "The :patent article-type denotes an article containing expert insight and analysis of legal issues including patenting and licensing. Written by specialists in the field, patent articles are an informative guide to these legal aspects of research and industry."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Patent"@en .
+
+article-types:perspective
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "perspective" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:reviews ;
+    skos:definition "The :perspective article-type denotes a scholarly review and discussion of the primary research literature that does not meet the criteria for a review article - either because the scope is too narrow, or a primary purpose of the piece is to advocate a controversial position or a speculative hypothesis, or to discuss work primarily from one or a few research groups. Perspectives tend to be more forward looking and/or speculative than reviews and may take a narrower field of view. They may be opinionated but should remain balanced, and are intended to stimulate discussion and consideration of new approaches to investigation and understanding of a field."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Perspective"@en .
+
+article-types:podcast
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "podcast" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:multimedia ;
+    skos:definition "The :podcast article-type denotes an episode of a podcast: a series of audio or video files subscribed to and downloaded through web syndication or streamed online to a computer or mobile device. An episode might be produced on a routine (e.g. weekly or monthly) basis or associated with a particular subject."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Podcast"@en .
+
+article-types:poster
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "poster" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:multimedia ;
+    skos:definition "The :poster article-type denotes an illustrated summary of a topic of broad interest to the target readership of the journal."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:prime-view ;
+    skos:prefLabel "Poster"@en .
+
+article-types:prime-view
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "prime-view" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 3 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:poster ;
+    skos:definition "The :prime-view article-type denotes an illustrated summary of a primer article that is prepared by in-house editors. 'PrimeView' is a brand exclusive to Nature Reviews Disease Primers."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "PrimeView"@en .
+
+article-types:primer
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "primer" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:reviews ;
+    skos:definition "The :primer article-type denotes a review that describes an important, but usually technically complex, concept in an easily understood way. Accessibility to an audience with a relatively low level of expertise in the subject (no more than basic undergraduate training) is a defining feature."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Primer"@en .
+
+article-types:protocol
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "protocol" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:protocols ;
+    skos:definition "The :protocol article-type denotes a 'recipe'-style step-by-step description of a procedure of potentially broad interest to the target readership of the journal."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:laboratory-methods ;
+    skos:prefLabel "Protocol"@en .
+
+article-types:protocols
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "protocols" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-and-reviews ;
+    skos:definition "The :protocols article-type groups together article-types including the :protocol article-type."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:protocol ;
+    skos:prefLabel "Protocols"@en .
+
+article-types:q-and-a
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "q-and-a" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:comments-and-opinion ;
+    skos:definition "The :q-and-a article-type denotes an interview that is presented in the format of a series of questions and answers."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Q&A"@en .
+
+article-types:research
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "research" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-and-reviews ;
+    skos:definition "The :research article-type groups together primary research article-types including the :article, :brief-communication and :case-report article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:analysis, article-types:article, article-types:brief-communication, article-types:brief-communications-arising, article-types:case-report, article-types:conference-proceeding, article-types:data-descriptor, article-types:gene-card-update, article-types:hypothesis, article-types:image, article-types:resource, article-types:technical-report ;
+    skos:prefLabel "Research"@en .
+
+article-types:research-and-reviews
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "research-and-reviews" ;
+    npg:isLeaf false ;
+    npg:isRoot true ;
+    npg:treeDepth 0 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:definition "The :research-and-reviews article-type is a high-level grouping of article-types that includes all research and reviews content."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:amendments-and-corrections, article-types:protocols, article-types:research, article-types:reviews ;
+    skos:prefLabel "Research and Reviews"@en ;
+    skos:topConceptOf <http://ns.nature.com/article-types/> .
+
+article-types:research-highlight
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "research-highlight" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-highlights ;
+    skos:definition "The :research-highlight article-type denotes an article written by journalists to convey a summary of achievements of selected new research papers. A research highlight explains a complex, important piece of research in a way that makes it enticingly comprehensible to all readers."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Research Highlight"@en .
+
+article-types:research-highlights
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "research-highlights" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-comment ;
+    skos:definition "The :research-highlights article-type groups together article-types including the :research-highlights and :abstracts-collection article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:abstracts-collection, article-types:journal-club, article-types:research-highlight ;
+    skos:prefLabel "Research Highlights"@en .
+
+article-types:resource
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "resource" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :resource article-type denotes a large data set or collection of physical entities (e.g., cell lines, mutants, or antibodies) likely to be of broad significance to a community. In contrast with a data descriptor, a resource will usually include data and analysis that demonstrates its enabling potential."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Resource"@en .
+
+article-types:retraction
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "retraction" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:amendments-and-corrections ;
+    skos:definition "The :retraction article-type denotes a notification of invalid results, which is necessary when either the main point of the paper or most of the paper is either based on artefact or found to be a result of scientific misconduct. All authors must be notified and either sign the retraction or provide a short statement explaining why they will not, which is also published. In some cases authors may refuse to retract. If, for example, an institutional investigation has found the authors guilty of fraud or fabrication and determined that the integrity of the paper is completely undermined, and the editors cannot obtain an author retraction, then editors (or 'the journal') may retract the paper themselves."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Retraction"@en .
+
+article-types:review-article
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "review-article" ;
+    npg:isLeaf false ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:reviews ;
+    skos:definition "The :review-article article-type denotes an authoritative, balanced, and scholarly survey aimed at informing a broad readership of developments in a field in which there have been recent, important advances. The requirement for balance need not prevent authors from proposing specific viewpoints, but if there are controversies in the field, the authors must treat them in an even-handed way. Language should be simple, novel concepts defined and specialist terminology explained."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:mini-review ;
+    skos:prefLabel "Review Article"@en .
+
+article-types:reviews
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "reviews" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research-and-reviews ;
+    skos:definition "The :reviews article-type groups together article-types including the :review-article, :perspective, :primer, and :consensus-statement article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:consensus-statement, article-types:perspective, article-types:primer, article-types:review-article ;
+    skos:prefLabel "Reviews"@en .
+
+article-types:special-features
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "special-features" ;
+    npg:isLeaf false ;
+    npg:isPrimaryArticleType true ;
+    npg:isRoot false ;
+    npg:treeDepth 1 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:miscellaneous ;
+    skos:definition "The :special-features article-type groups together article-types including the :feature and :technology-feature article-types."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:narrower article-types:feature, article-types:overview, article-types:technology-feature ;
+    skos:prefLabel "Special Features"@en .
+
+article-types:technical-report
+    npg:hasRoot article-types:research-and-reviews ;
+    npg:id "technical-report" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:research ;
+    skos:definition "The :technical-report article-type denotes a first report of a technique that is likely to be influential to a substantial sector of the journal audience, and which might include a discovery that demonstrates the usefulness of the technique."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Technical Report"@en .
+
+article-types:technology-feature
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "technology-feature" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:special-features ;
+    skos:definition "The :technology-feature article-type denotes a review of the latest technologies, products, and instruments in fast-moving fields of research. A technology feature presents an in-depth explanation of a specific area of technology development along with examples of the latest advances taking place in both the academic and commercial spaces."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Technology Feature"@en .
+
+article-types:thread
+    npg:hasRoot article-types:news-and-comment ;
+    npg:id "thread" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:news-and-views ;
+    skos:definition "The :thread article-type denotes an editorial synthesis composed of content excerpted from a group of current papers (typically at least five), and tied together by a minimal supporting narrative. The purpose of a thread is to display editorial content in a new way, which facilitates discovery and provides a snapshot of a specific scientific theme across multiple papers. It is not intended to present a new analysis, the evolution of a concept over time, or to editorialize the articles. Therefore, the narrative itself should not contain figures or data tables, although it may contain an illustration if it helps the primary purpose of synthesis. Typically, the proportion of narrative should not exceed 20% of the thread. The article excerpts are verbatim quotes and display items. They can be sourced from NPG journals and from other publishers as long as the appropriate rights have been obtained and the provenance is fully referenced. The narrative is written by an external author or an editor and its primary function is to help readers navigate across this horizontal slice of content."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Thread"@en .
+
+article-types:video
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "video" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:multimedia ;
+    skos:definition "The :video article-type denotes a broadcast of moving visual images."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Video"@en .
+
+article-types:webcast
+    npg:hasRoot article-types:miscellaneous ;
+    npg:id "webcast" ;
+    npg:isLeaf true ;
+    npg:isRoot false ;
+    npg:treeDepth 2 ;
+    a npg:ArticleType , skos:Concept ;
+    rdfs:isDefinedBy <http://ns.nature.com/article-types/> ;
+    skos:broader article-types:multimedia ;
+    skos:definition "The :webcast article-type denotes a media presentation distributed over the Internet using streaming media technology to distribute a single content source to many simultaneous viewers."@en ;
+    skos:inScheme <http://ns.nature.com/article-types/> ;
+    skos:prefLabel "Webcast"@en .
+

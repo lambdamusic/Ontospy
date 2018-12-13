@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+  {% with thispage="entities-az" %}
+      {% include "navbar.html" %}
+  {% endwith %}
+
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+
+    {% with thispage="entities-az" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+{% block bodycontent %}
+
+
+    {% with thispage="entities-az" %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
+
+
+
+        <div class="page-header">
+
+            <h3>Entities A-Z
+{#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
+            </h3>
+            <input id="search-input" type="text" class="form-control" placeholder="Filter...">
+
+        </div>
+
+
+      <div class="row">
+
+        {# first column #}
+        <div class="col-md-6">
+
+        {% if ontospy_graph.all_classes%}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Classes ({{ ontospy_graph.all_classes|length }})</h3>
+            </div>
+            <div class="panel-body entities-list" style="overflow: auto;">
+               <dl>
+
+               {% for each in ontospy_graph.all_classes %}
+                   <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
+                   <dd>
+{#                       {{ each.bestDescription|default:"[no definition]" }}#}
+                   </dd>
+
+               {% endfor %}
+
+              </dl>
+            </div>
+          </div>
+            </div>
+          </div>
+          {% endif %}
+
+
+
+           {% if ontospy_graph.all_skos_concepts %}
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Concepts ({{ ontospy_graph.all_skos_concepts|length }})</h3>
+                </div>
+                <div class="panel-body entities-list" style="overflow: auto;">
+                   <dl>
+
+                   {% for each in ontospy_graph.all_skos_concepts  %}
+                       <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
+                       <dd>
+{#                           {{ each.bestDescription|default:"[no definition]" }}#}
+                       </dd>
+
+                   {% endfor %}
+
+                  </dl>
+                </div>
+              </div>
+                </div>
+              </div>
+        {% endif %}
+
+
+
+
+        </div>
+         {# END first column #}
+
+
+        {# second column #}
+        <div class="col-md-6">
+
+
+           {% if ontospy_graph.all_properties %}
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Properties ({{ ontospy_graph.all_properties|length }})</h3>
+                </div>
+                <div class="panel-body entities-list" style="overflow: auto;">
+                   <dl>
+
+                   {% for each in ontospy_graph.all_properties  %}
+                       <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
+                       <dd>
+{#                           {{ each.bestDescription|default:"[no definition]" }}#}
+                       </dd>
+
+                   {% endfor %}
+
+                  </dl>
+                </div>
+              </div>
+                </div>
+              </div>
+        {% endif %}
+
+
+
+
+
+       {% if ontospy_graph.all_shapes%}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Shapes ({{ ontospy_graph.all_shapes|length }})</h3>
+            </div>
+            <div class="panel-body entities-list" style="overflow: auto;">
+               <dl>
+
+               {% for each in ontospy_graph.all_shapes %}
+                   <dt><a href="{{each.slug}}.html">{{each.qname}}</a></dt>
+                   <dd>
+{#                           {{ each.bestDescription|default:"[no definition]" }}#}
+                   </dd>
+
+               {% endfor %}
+
+              </dl>
+            </div>
+          </div>
+            </div>
+          </div>
+    {% endif %}
+
+
+
+
+        </div>
+         {# END second column #}
+
+      </div>
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
+
+{% block extrajs %}
+
+<script type="text/javascript">
+
+// http://stackoverflow.com/questions/9127498/how-to-perform-a-real-time-search-and-filter-on-a-html-table
+
+  $('#search-input').keyup(function() {
+
+    var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+    // var $rows = $(this).next(".entities-list").find("div");
+    var $rows = $(this).parent().next().find(".entities-list dt");
+
+    $rows.show().filter(function() {
+        var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+        return !~text.indexOf(val);
+    }).hide();
+});
+
+
+</script>
+
+
+{% endblock extrajs %}
