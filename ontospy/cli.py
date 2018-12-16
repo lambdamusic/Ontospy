@@ -312,25 +312,44 @@ def serialize(ctx, source, output_format):
 
 
 @main_cli.command()
-@click.argument('filepath', nargs=1)
+@click.option(
+    '--jsonld',
+    '-j',
+    is_flag=True,
+    help=
+    'JSONLD: util for testing a json-ld file using the online playground tool.'
+)
+@click.argument('filepath', nargs=-1)
 @click.pass_context
-def jsonld(ctx, filepath):
-    """Test a JSONLD file using the online playground tool.
+def utils(
+        ctx,
+        filepath=None,
+        jsonld=False,
+):
+    """Miscellaneous utilities.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
     }
+    DONE_ACTION = False
 
-    if not filepath:
-        if serialize:
+    if jsonld:
+        if not filepath:
             click.secho(
                 "What do you want to test? Please specify a valid JSONLD source.",
                 fg='red')
-        click.echo(ctx.get_help())
+        else:
+            filepath = filepath[0]
+            action_jsonld_playground(filepath, verbose)
+            DONE_ACTION = True
+
     else:
-        action_jsonld_playground(filepath, verbose)
+        click.secho("You haven't specified any utils command.")
+        click.echo(ctx.get_help())
+
+    if DONE_ACTION:
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -362,8 +381,12 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def html(ctx, source=None, outputpath="", title="", theme="",
-         showthemes=False):
+def quickdocs(ctx,
+              source=None,
+              outputpath="",
+              title="",
+              theme="",
+              showthemes=False):
     """Generate documentation for an ontology in html or markdown format
     """
     verbose = ctx.obj['VERBOSE']
