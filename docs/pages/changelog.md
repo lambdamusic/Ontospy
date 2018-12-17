@@ -12,7 +12,7 @@ Summary of changes.
     -   requires install with [HTML] flag
 -   'utils' and 'quickdocs' commands added to CLI
 -   CLI: all commands when called default to HELP
--
+-   fix bug for retrieving ontologies from online repos
 
 ## November 12, 2018: v1.9.6
 

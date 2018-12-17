@@ -395,8 +395,10 @@ def _import_LOV(
                           "\n---------" + Style.RESET_ALL)
                     action_analyze([ontouri])
                     if click.confirm(
-                            '=====\nDo you want to save to your local library?'):
+                            '=====\nDo you want to save to your local library?'
+                    ):
                         action_import(ontouri)
+                    return
                 except:
                     print("Error retrieving file. Import failed.")
                     continue
@@ -444,8 +446,10 @@ def _import_PREFIXCC(keyword=""):
                 print(Fore.RED + "\n---------\n" + ontouri + "\n---------" +
                       Style.RESET_ALL)
                 action_analyze([ontouri])
-                if click.confirm('=====\nDo you want to save to your local library?'):
+                if click.confirm(
+                        '=====\nDo you want to save to your local library?'):
                     action_import(ontouri)
+                return
             except:
                 print("Error retrieving file. Import failed.")
                 continue

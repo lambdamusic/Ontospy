@@ -41,7 +41,14 @@ class RDFLoader(object):
 
     """
 
-    SERIALIZATIONS = ['turtle', 'xml', 'n3', 'nt', 'json-ld', 'rdfa']
+    SERIALIZATIONS = [
+        'xml',
+        'n3',
+        'nt',
+        'json-ld',
+        'turtle',
+        'rdfa',
+    ]
 
     def __init__(self, rdfgraph=None, verbose=False):
         super(RDFLoader, self).__init__()
