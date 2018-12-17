@@ -30,7 +30,9 @@ except ImportError:
 try:
     import urllib2
 except ImportError:
-    import urllib as urllib2
+    print("python3")
+    import urllib.request
+    from urllib.request import urlopen
 
 try:
     from urllib import quote  # Python 2.X
@@ -219,14 +221,21 @@ def action_import(location, verbose=True):
     # 1) extract file from location and save locally
     ONTOSPY_LOCAL_MODELS = get_home_location()
     fullpath = ""
+
     try:
         if location.startswith("www."):  #support for lazy people
             location = "http://%s" % str(location)
         if location.startswith("http"):
-            # print("here")
+            print("here")
             headers = {'Accept': "application/rdf+xml"}
-            req = urllib2.Request(location, headers=headers)
-            res = urllib2.urlopen(req)
+            try:
+                # Py2
+                req = urllib2.request(location, headers=headers)
+                res = urllib2.urlopen(req)
+            except:
+                # Py3
+                req = urllib.request.Request(location, headers=headers)
+                res = urlopen(req)
             final_location = res.geturl()  # after 303 redirects
             printDebug("Saving data from <%s>" % final_location, "green")
             # filename = final_location.split("/")[-1] or final_location.split("/")[-2]
@@ -239,7 +248,7 @@ def action_import(location, verbose=True):
 
             # print("==DEBUG", final_location, "**", filename,"**", fullpath)
 
-            file_ = open(fullpath, 'w')
+            file_ = open(fullpath, 'wb')
             file_.write(res.read())
             file_.close()
         else:
@@ -384,7 +393,10 @@ def _import_LOV(
                     ontouri = options[_id - 1]['uri']
                     print(Fore.RED + "\n---------\n" + ontouri +
                           "\n---------" + Style.RESET_ALL)
-                    action_import(ontouri)
+                    action_analyze([ontouri])
+                    if click.confirm(
+                            '=====\nDo you want to save to your local library?'):
+                        action_import(ontouri)
                 except:
                     print("Error retrieving file. Import failed.")
                     continue
@@ -431,7 +443,9 @@ def _import_PREFIXCC(keyword=""):
                 ontouri = options[_id - 1][1]
                 print(Fore.RED + "\n---------\n" + ontouri + "\n---------" +
                       Style.RESET_ALL)
-                action_import(ontouri)
+                action_analyze([ontouri])
+                if click.confirm('=====\nDo you want to save to your local library?'):
+                    action_import(ontouri)
             except:
                 print("Error retrieving file. Import failed.")
                 continue

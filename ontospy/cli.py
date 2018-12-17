@@ -47,10 +47,10 @@ SHELL_EXAMPLES = """
 Quick Examples:
 
   > ontospy ~/Desktop/mymodel.rdf          # ==> inspect a local RDF file
-  > ontospy -l                             # ==> list ontologies available in the local library
-  > ontospy -s http://xmlns.com/foaf/spec/ # ==> download FOAF vocabulary and save it in library
+  > ontospy lib -s                             # ==> list ontologies available in the local library
+  > ontospy lib --save http://xmlns.com/foaf/spec/ # ==> download FOAF vocabulary and save it in library
 
-More info: <ontospy.readthedocs.org>
+More info: <http://lambdamusic.github.io/Ontospy/>
 ------------
 """
 
@@ -113,7 +113,7 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
 @click.option(
     '--bootstrap',
     is_flag=True,
-    help='BOOTSTRAP: bootstrap the local library with a few sample models.')
+    help='BOOTSTRAP: bootstrap the local library with popular ontologies.')
 @click.option(
     '--cache',
     is_flag=True,
@@ -140,14 +140,14 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
 )
 @click.argument('filepath', nargs=-1)
 @click.pass_context
-def library(ctx,
-            filepath=None,
-            bootstrap=False,
-            cache=False,
-            reveal=False,
-            show=False,
-            save=False,
-            directory=False):
+def lib(ctx,
+        filepath=None,
+        bootstrap=False,
+        cache=False,
+        reveal=False,
+        show=False,
+        save=False,
+        directory=False):
     """
     Work with a local library of RDF models. If no option or argument is passed, by default the library contents are listed.
     """
@@ -156,14 +156,17 @@ def library(ctx,
     print_opts = {
         'labels': verbose,
     }
+    DONE_ACTION = False
 
     if bootstrap:
+        DONE_ACTION = True
         action_bootstrap(verbose)
         printDebug("Tip: you can now load an ontology by typing `ontospy -l`",
                    "important")
         # raise SystemExit(1)
 
     elif cache:
+        DONE_ACTION = True
         action_cache_reset()
 
     elif directory:
@@ -199,12 +202,12 @@ def library(ctx,
 
     elif save:
         if filepath:
+            DONE_ACTION = True
             action_import(filepath[0], verbose)
         else:
             click.secho(
-                "You provided no arguments - starting web import wizard..",
+                "You provided no arguments - please specify what to save..",
                 fg='white')
-            action_webimport()
         raise SystemExit(1)
 
     elif show:
@@ -212,6 +215,7 @@ def library(ctx,
         filename = action_listlocal(all_details=True)
 
         if filename:
+            DONE_ACTION = True
             g = get_pickled_ontology(filename)
             if not g:
                 g = do_pickle_ontology(filename)
@@ -221,9 +225,12 @@ def library(ctx,
         click.echo(ctx.get_help())
         return
 
-    eTime = time.time()
-    tTime = eTime - sTime
-    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+    if DONE_ACTION:
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+    else:
+        printDebug("Goodbye", "comment")
 
 
 ##
@@ -281,8 +288,8 @@ def shell(sources=None):
 @click.option('-f', '--output_format', default='turtle')
 # @click.argument('output_format', nargs=1)
 @click.pass_context
-def serialize(ctx, source, output_format):
-    """Output a different RDF serialization for a given source.
+def serial(ctx, source, output_format):
+    """Serialize an RDF graph to a format of choice.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
@@ -322,12 +329,19 @@ def serialize(ctx, source, output_format):
     help=
     'JSONLD: util for testing a json-ld file using the online playground tool.'
 )
+@click.option(
+    '--discover',
+    '-d',
+    is_flag=True,
+    help='DISCOVER: find ontologies in online repositories like LOV or Prefix.cc'
+)
 @click.argument('filepath', nargs=-1)
 @click.pass_context
 def utils(
         ctx,
         filepath=None,
         jsonld=False,
+        discover=False,
 ):
     """Miscellaneous utilities.
     """
@@ -347,7 +361,9 @@ def utils(
             filepath = filepath[0]
             action_jsonld_playground(filepath, verbose)
             DONE_ACTION = True
-
+    elif discover:
+        DONE_ACTION = True
+        action_webimport()
     else:
         click.secho("You haven't specified any utils command.")
         click.echo(ctx.get_help())

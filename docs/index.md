@@ -261,7 +261,7 @@ v.preview() # => open in browser
 
 -   Github: [https://github.com/lambdamusic/ontospy](https://github.com/lambdamusic/ontospy)
 -   CheeseShop: [https://pypi.python.org/pypi/ontospy](https://pypi.python.org/pypi/ontospy)
--   Homepage: [http://www.michelepasin.org/projects/ontospy](http://www.michelepasin.org/projects/ontospy)
+-   Docs: [http://lambdamusic.github.io/Ontospy/](http://lambdamusic.github.io/Ontospy/)
 
 Also:
 
