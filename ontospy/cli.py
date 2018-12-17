@@ -98,71 +98,42 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
 
 
 ##
-## CHECK / ANALYZE / SCAN COMMAND
-##
-
-
-@main_cli.command()
-@click.argument('sources', nargs=-1)
-@click.option(
-    '--endpoint',
-    '-e',
-    is_flag=True,
-    help='Use to specify that the source url passed is a sparql endpoint')
-@click.pass_context
-def scan(ctx, sources=None, endpoint=False):
-    """Search an RDF source for ontology entities and print out a report.
-    """
-    verbose = ctx.obj['VERBOSE']
-    sTime = ctx.obj['STIME']
-    print_opts = {
-        'labels': verbose,
-    }
-    if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose)
-        eTime = time.time()
-        tTime = eTime - sTime
-        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
-
-    else:
-        click.echo(ctx.get_help())
-
-
-##
 ## LIBRARY COMMAND
 ##
 
 
 @main_cli.command()
 @click.option(
+    '--show',
+    '-s',
+    is_flag=True,
+    help=
+    'SHOW: list all ontologies stored in the local library and prompt which one to open.'
+)
+@click.option(
     '--bootstrap',
-    '-b',
     is_flag=True,
     help='BOOTSTRAP: bootstrap the local library with a few sample models.')
 @click.option(
     '--cache',
-    '-c',
     is_flag=True,
     help=
     'CACHE: force reset the cache folder for the local library (used to clean up old files and speed up loading of ontologies).'
 )
 @click.option(
-    '--reveal',
-    '-r',
-    is_flag=True,
-    help=
-    'REVEAL: open the local library folder using default app. Note: from v1.9.4 all file management operations should be done via the OS.'
-)
-@click.option(
     '--directory',
-    '-d',
     is_flag=True,
     help=
     'DIRECTORY: set a (new) home directory for the local library. A valid path must be passed as argument.'
 )
 @click.option(
+    '--reveal',
+    is_flag=True,
+    help=
+    'REVEAL: open the local library folder using the OS. Note: from v1.9.4 all file management operations should be done via the OS.'
+)
+@click.option(
     '--save',
-    '-s',
     is_flag=True,
     help=
     'SAVE: import a local or remote RDF file to the local library. If a local folder path is passed, all valid RDF files found in it get imported. If no argument is provided and there is an internet connection, it allows to scan online ontology repositories to find items of interests.'
@@ -174,6 +145,7 @@ def library(ctx,
             bootstrap=False,
             cache=False,
             reveal=False,
+            show=False,
             save=False,
             directory=False):
     """
@@ -235,11 +207,7 @@ def library(ctx,
             action_webimport()
         raise SystemExit(1)
 
-    else:
-        # by default, show the local library
-        click.secho(
-            "Tip: view all options for the library command with `ontospy library -h`\n-------------",
-            fg='white')
+    elif show:
         click.secho("Local library => '%s'" % get_home_location(), fg='white')
         filename = action_listlocal(all_details=True)
 
@@ -249,9 +217,44 @@ def library(ctx,
                 g = do_pickle_ontology(filename)
             shellPrintOverview(g, print_opts)
 
+    else:
+        click.echo(ctx.get_help())
+        return
+
     eTime = time.time()
     tTime = eTime - sTime
     printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
+##
+## CHECK / ANALYZE / SCAN COMMAND
+##
+
+
+@main_cli.command()
+@click.argument('sources', nargs=-1)
+@click.option(
+    '--endpoint',
+    '-e',
+    is_flag=True,
+    help='Use to specify that the source url passed is a sparql endpoint')
+@click.pass_context
+def scan(ctx, sources=None, endpoint=False):
+    """Search an RDF source for ontology entities and print out a report.
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+    if sources or (sources and endpoint):
+        action_analyze(sources, endpoint, print_opts, verbose)
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+    else:
+        click.echo(ctx.get_help())
 
 
 ##
@@ -269,13 +272,14 @@ def shell(sources=None):
 
 
 ##
-## TRANSFORM COMMAND
+## SERIALIZE COMMAND
 ##
 
 
 @main_cli.command()
-@click.argument('source', nargs=1)
-@click.argument('output_format', nargs=1)
+@click.argument('source', nargs=-1)
+@click.option('-f', '--output_format', default='turtle')
+# @click.argument('output_format', nargs=1)
 @click.pass_context
 def serialize(ctx, source, output_format):
     """Output a different RDF serialization for a given source.
@@ -285,14 +289,11 @@ def serialize(ctx, source, output_format):
     print_opts = {
         'labels': verbose,
     }
+    output_format = output_format
     VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
-        click.secho(
-            "What do you want to serialize? Please specify a valid RDF source.",
-            fg='red')
         click.echo(ctx.get_help())
     else:
-
         if output_format not in VALID_FORMATS:
             click.secho(
                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
@@ -302,12 +303,14 @@ def serialize(ctx, source, output_format):
             action_transform(source, output_format, verbose)
             eTime = time.time()
             tTime = eTime - sTime
-            printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime,
-                       "comment")
+            printDebug(
+                "\n-----------\n" + "Serialized <%s> to '%s'" %
+                (" ".join([x for x in source]), output_format), "comment")
+            printDebug("Time:	   %0.2fs" % tTime, "comment")
 
 
 ##
-## JSONLD PLAYGROUND COMMAND
+## UTILS COMMAND
 ##
 
 
@@ -364,7 +367,7 @@ if __name__ == '__main__':
         raise e
 
 ##
-## VIZ COMMAND (wrapper around ontodocs)
+## GENDOCS COMMAND (wrapper around ontodocs)
 ##
 
 
@@ -381,12 +384,12 @@ if __name__ == '__main__':
 @click.option(
     '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
 @click.pass_context
-def quickdocs(ctx,
-              source=None,
-              outputpath="",
-              title="",
-              theme="",
-              showthemes=False):
+def gendocs(ctx,
+            source=None,
+            outputpath="",
+            title="",
+            theme="",
+            showthemes=False):
     """Generate documentation for an ontology in html or markdown format
     """
     verbose = ctx.obj['VERBOSE']
@@ -395,8 +398,7 @@ def quickdocs(ctx,
         'labels': verbose,
     }
 
-    # from .ontodocs import *
-    from .ontodocs.builder import action_visualize
+    from .ontodocs.builder import action_visualize, show_themes, random_theme
 
     try:
         # check that we have the required dependencies
@@ -408,13 +410,15 @@ def quickdocs(ctx,
         click.secho("Install with `pip install ontospy[HTML] -U`")
         sys.exit(0)
 
+    if not source and not showthemes:
+        click.echo(ctx.get_help())
+        return
+
     if showthemes:
-        # from .core.builder import show_themes
         show_themes()
         sys.exit(0)
 
     if theme and theme == "random":
-        # from .core.builder import random_theme
         theme = ontodocs.random_theme()
 
     if outputpath:
@@ -423,12 +427,6 @@ def quickdocs(ctx,
                 "WARNING: the -o option must include a valid directory path.",
                 fg="red")
             sys.exit(0)
-
-    if not source:
-        # ask to show local library
-        click.secho("You haven't specified any argument.", fg='red')
-        click.secho(
-            "Please select an ontology from the local OntoSpy library.")
 
     if source and len(source) > 1:
         click.secho(
