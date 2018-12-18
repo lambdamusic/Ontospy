@@ -121,8 +121,12 @@ class Ontospy(object):
 
         Note: we're using a 'SPARQLUpdateStore' backend instead of 'SPARQLStore' cause otherwise authentication fails (https://github.com/RDFLib/rdflib/issues/755)
 
+        @TODO this error seems to be fixed in upcoming rdflib versions
+        https://github.com/RDFLib/rdflib/pull/744
+
         """
         try:
+            # graph = rdflib.Graph('SPARQLStore')
             # graph = rdflib.ConjunctiveGraph('SPARQLStore')
             graph = rdflib.ConjunctiveGraph('SPARQLUpdateStore')
 
