@@ -30,7 +30,7 @@ except ImportError:
 try:
     import urllib2
 except ImportError:
-    print("python3")
+    # print("python3")
     import urllib.request
     from urllib.request import urlopen
 
