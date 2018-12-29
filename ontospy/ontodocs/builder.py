@@ -81,6 +81,13 @@ except:  # Mother of all exceptions
     raise
 
 
+def show_types():
+    for n, t in enumerate(VISUALIZATIONS_LIST):
+        printDebug("%d. %s" % (n + 1, t['Title']), "green")
+    printDebug("Note: select a viz type by using its numerical index.",
+               "comment")
+
+
 def show_themes():
     for t in BOOTSWATCH_THEMES:
         printDebug(t, "green")
@@ -127,71 +134,18 @@ def ask_visualization():
                 continue
 
 
-# MAIN METHOD
-
-
-def action_visualize(args,
-                     fromshell=False,
-                     path=None,
-                     title="",
-                     theme="",
-                     verbose=False):
+def select_visualization(n):
     """
-    export model into another format eg html, d3 etc...
-    <fromshell> : the local name is being passed from ontospy shell
+    get viz choice based on numerical index
     """
-
-    # get argument
-    if not (args):
-        ontouri = ontospy_actions.action_listlocal(all_details=False)
-        if ontouri:
-            islocal = True
-        else:
-            raise SystemExit(1)
-    elif fromshell:
-        ontouri = args
-        islocal = True
-    else:
-        ontouri = args[0]
-        islocal = False
-
-    # select a visualization
-    viztype = ask_visualization()
-    if viztype == "":
-        return None
-        # raise SystemExit, 1
-
-    # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
-    USE_CACHE = False
-    # get ontospy graph
-    if islocal and USE_CACHE:
-        g = get_pickled_ontology(ontouri)
-        if not g:
-            g = do_pickle_ontology(ontouri)
-    else:
-        printDebug("Loading graph...", dim=True)
-        if islocal:
-            g = Ontospy(
-                os.path.join(ontospy_manager.get_home_location(), ontouri),
-                verbose=verbose)
-        else:
-            g = Ontospy(ontouri, verbose=verbose)
-
-    # put in home folder by default: <ontouri>/<viztype>/files..
-    if not path:
-        from os.path import expanduser
-        home = expanduser("~")
-        onto_path = slugify(unicode(ontouri))
-        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype]['Title']))
-        path = os.path.join(home, "ontospy-viz/" + onto_path + "/" + viz_path)
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-    # url  = build_viz(ontouri, g, viztype, path)
-    printDebug("Building visualization...", dim=True)
-    url = build_visualization(ontouri, g, viztype, path, title, theme)
-
-    return url
+    try:
+        n = int(n) - 1
+        test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
+        return n
+    except:
+        printDebug("Invalid viz-type option. Valid options are:", "red")
+        show_types()
+        raise SystemExit(1)
 
 
 # ===========
@@ -224,8 +178,32 @@ def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
         v = MarkdownViz(g, title)
 
     elif this_viz['ID'] == "d3-tree":
-        from .viz.viz_d3tree import D3TreeViz
-        v = D3TreeViz(g, title)
+        from .viz.viz_d3tree import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "d3-bubble-chart":
+        from .viz.viz_d3bubbleChart import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "d3-pack-hierarchy":
+        from .viz.viz_d3packHierarchy import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "d3-bar-hierarchy":
+        from .viz.viz_d3barHierarchy import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "d3-partition-table":
+        from .viz.viz_d3partitionTable import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "d3-rotating-cluster":
+        from .viz.viz_d3rotatingCluster import Dataviz
+        v = Dataviz(g, title)
+
+    elif this_viz['ID'] == "sigma-force-directed":
+        from .viz.viz_sigmajs import Dataviz
+        v = Dataviz(g, title)
 
     else:
         return False
@@ -257,7 +235,7 @@ def saveVizGithub(contents, ontouri):
             'content':
             """The MIT License (MIT)
 
-Copyright (c) 2016 OntoSpy project [http://ontospy.readthedocs.org/]
+Copyright (c) 2016 OntoSpy project [http://lambdamusic.github.io/Ontospy//]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

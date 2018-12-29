@@ -599,3 +599,55 @@ def action_erase():
     """
     get_or_create_home_repo(reset=True)
     return True
+
+
+def action_visualize(args,
+                     fromshell=False,
+                     path=None,
+                     title="",
+                     viztype="",
+                     theme="",
+                     verbose=False):
+    """
+    export model into another format eg html, d3 etc...
+    <fromshell> : the local name is being passed from ontospy shell
+    """
+
+    from ..ontodocs.builder import ask_visualization, select_visualization, VISUALIZATIONS_LIST, build_visualization
+
+    if fromshell:
+        ontouri = args
+        islocal = True
+    else:
+        ontouri = args[0]
+        islocal = False
+
+    # select a visualization
+    if viztype:
+        viztype = select_visualization(viztype)
+    else:
+        viztype = ask_visualization()
+        if viztype == "":
+            return None
+        # raise SystemExit, 1
+
+    # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
+    # get ontospy graph
+    printDebug("Loading graph...", dim=True)
+    g = Ontospy(ontouri, verbose=verbose)
+
+    # put in home folder by default: <ontouri>/<viztype>/files..
+    if not path:
+        from os.path import expanduser
+        home = expanduser("~")
+        onto_path = slugify(unicode(ontouri))
+        viz_path = slugify(unicode(VISUALIZATIONS_LIST[viztype]['Title']))
+        path = os.path.join(home, "ontospy-viz/" + onto_path + "/" + viz_path)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    # url  = build_viz(ontouri, g, viztype, path)
+    printDebug("Building visualization...", dim=True)
+    url = build_visualization(ontouri, g, viztype, path, title, theme)
+
+    return url

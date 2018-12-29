@@ -18,7 +18,7 @@ from ..viz_factory import VizFactory
 
 
 
-class SigmaViz(VizFactory):
+class Dataviz(VizFactory):
     """
     Sigma JS
 
@@ -29,7 +29,7 @@ class SigmaViz(VizFactory):
         """
         Init
         """
-        super(SigmaViz, self).__init__(ontospy_graph, title)
+        super(Dataviz, self).__init__(ontospy_graph, title)
         self.static_files = ["libs/sigma", "libs/jquery"]
 
 
@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
         g = get_onto_for_testing(TEST_ONLINE)
 
-        v = SigmaViz(g, title="")
+        v = Dataviz(g, title="")
         v.build()
         v.preview()
 

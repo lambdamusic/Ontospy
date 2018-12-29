@@ -13,7 +13,7 @@ from ..viz_factory import VizFactory
 # ===========
 
 
-class D3RotatingClusterViz(VizFactory):
+class Dataviz(VizFactory):
     """
     D3 rotating cluster
 
@@ -23,7 +23,7 @@ class D3RotatingClusterViz(VizFactory):
         """
         Init
         """
-        super(D3RotatingClusterViz, self).__init__(ontospy_graph, title)
+        super(Dataviz, self).__init__(ontospy_graph, title)
         self.static_files = ["libs/d3-v3", "libs/jquery"]
 
     def _buildTemplates(self):
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
         g = get_onto_for_testing(TEST_ONLINE)
 
-        v = D3RotatingClusterViz(g, title="")
+        v = Dataviz(g, title="")
         v.build()
         v.preview()
 

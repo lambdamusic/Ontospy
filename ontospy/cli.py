@@ -98,6 +98,127 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
 
 
 ##
+## GENDOCS COMMAND (wrapper around ontodocs)
+##
+
+
+@main_cli.command()
+@click.argument('source', nargs=-1)
+@click.option(
+    '--outputpath',
+    '-o',
+    help=
+    'OUTPUT-PATH: where to save the visualization files (default: home folder).'
+)
+@click.option(
+    '--type',
+    help=
+    'VIZ-TYPE: specify which viz type to use as an integer (eg 1=single-page html, 2=multi-page etc..).'
+)
+@click.option(
+    '--title',
+    help='TITLE: custom title for the visualization (default=graph uri).')
+@click.option(
+    '--theme',
+    help=
+    'THEME: bootstrap css style for the html-multi-page visualization (random=use a random theme).'
+)
+@click.option(
+    '--lib',
+    is_flag=True,
+    help='LIBRARY: choose an ontology from the local library.')
+@click.option(
+    '--showtypes',
+    is_flag=True,
+    help='SHOW-TYPES: show the available visualization types.')
+@click.option(
+    '--showthemes',
+    is_flag=True,
+    help='SHOW-THEMES: show the available css theme choices.')
+@click.pass_context
+def gendocs(ctx,
+            source=None,
+            outputpath="",
+            lib=False,
+            type="",
+            title="",
+            theme="",
+            showthemes=False,
+            showtypes=False):
+    """Generate documentation for an ontology in html or markdown format
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+
+    from .ontodocs.builder import show_themes, random_theme, show_types
+
+    try:
+        # check that we have the required dependencies
+        import django
+    except:
+        click.secho(
+            "WARNING: this functionality requires the Django package and other extra dependecies.",
+            fg="red")
+        click.secho("Install with `pip install ontospy[HTML] -U`")
+        sys.exit(0)
+
+    if not source and not showthemes and not showtypes and not lib:
+        click.echo(ctx.get_help())
+        return
+
+    if showthemes:
+        show_themes()
+        sys.exit(0)
+
+    if showtypes:
+        show_types()
+        sys.exit(0)
+
+    if theme and theme == "random":
+        theme = random_theme()
+
+    if outputpath:
+        if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
+            click.secho(
+                "WARNING: the -o option must include a valid directory path.",
+                fg="red")
+            sys.exit(0)
+
+    if source and len(source) > 1:
+        click.secho(
+            'Note: currently only one argument can be passed', fg='red')
+
+    if lib:
+        click.secho("Local library => '%s'" % get_home_location(), fg='white')
+        ontouri = action_listlocal(all_details=False)
+        if ontouri:
+            source = [os.path.join(get_home_location(), ontouri)]
+        else:
+            raise SystemExit(1)
+
+    # note: the local ontospy library gets displayed via this method too
+    url = action_visualize(
+        source,
+        fromshell=False,
+        path=outputpath,
+        title=title,
+        viztype=type,
+        theme=theme,
+        verbose=verbose)
+
+    if url:  # open browser
+        import webbrowser
+        webbrowser.open(url)
+
+    eTime = time.time()
+    tTime = eTime - sTime
+    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
+##
 ## LIBRARY COMMAND
 ##
 
@@ -381,90 +502,6 @@ if __name__ == '__main__':
         sys.exit(0)
     except KeyboardInterrupt as e:  # Ctrl-C
         raise e
-
-##
-## GENDOCS COMMAND (wrapper around ontodocs)
-##
-
-
-@main_cli.command()
-@click.argument('source', nargs=-1)
-@click.option('--outputpath', '-o', help='Output path (default: home folder).')
-@click.option(
-    '--title', '-t', help='Title for the visualization (default=graph uri).')
-@click.option(
-    '--theme',
-    help=
-    'CSS Theme for the html-complex visualization (random=use a random theme).'
-)
-@click.option(
-    '--showthemes', is_flag=True, help='Show the available CSS theme choices.')
-@click.pass_context
-def gendocs(ctx,
-            source=None,
-            outputpath="",
-            title="",
-            theme="",
-            showthemes=False):
-    """Generate documentation for an ontology in html or markdown format
-    """
-    verbose = ctx.obj['VERBOSE']
-    sTime = ctx.obj['STIME']
-    print_opts = {
-        'labels': verbose,
-    }
-
-    from .ontodocs.builder import action_visualize, show_themes, random_theme
-
-    try:
-        # check that we have the required dependencies
-        import django
-    except:
-        click.secho(
-            "WARNING: this functionality requires the Django package and other extra dependecies.",
-            fg="red")
-        click.secho("Install with `pip install ontospy[HTML] -U`")
-        sys.exit(0)
-
-    if not source and not showthemes:
-        click.echo(ctx.get_help())
-        return
-
-    if showthemes:
-        show_themes()
-        sys.exit(0)
-
-    if theme and theme == "random":
-        theme = ontodocs.random_theme()
-
-    if outputpath:
-        if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
-            click.secho(
-                "WARNING: the -o option must include a valid directory path.",
-                fg="red")
-            sys.exit(0)
-
-    if source and len(source) > 1:
-        click.secho(
-            'Note: currently only one argument can be passed', fg='red')
-
-    # note: the local ontospy library gets displayed via this method too
-    url = action_visualize(
-        source,
-        fromshell=False,
-        path=outputpath,
-        title=title,
-        theme=theme,
-        verbose=verbose)
-
-    if url:  # open browser
-        import webbrowser
-        webbrowser.open(url)
-
-    eTime = time.time()
-    tTime = eTime - sTime
-    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
-
 
 if __name__ == '__main__':
     import sys

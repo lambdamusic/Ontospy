@@ -2,6 +2,11 @@
 
 Summary of changes.
 
+## December, 2018: v1.9.8
+
+-   small bug fixes
+-   refactor action visualize / activated 'alpha' dataviz
+
 ## December, 2018: v1.9.7
 
 -   removed support for Python 2

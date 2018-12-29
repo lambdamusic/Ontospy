@@ -13,7 +13,7 @@ from ..viz_factory import VizFactory
 # ===========
 
 
-class D3BubbleChartViz(VizFactory):
+class Dataviz(VizFactory):
     """
     D3 Bubbles
 
@@ -23,7 +23,7 @@ class D3BubbleChartViz(VizFactory):
         """
         Init
         """
-        super(D3BubbleChartViz, self).__init__(ontospy_graph, title)
+        super(Dataviz, self).__init__(ontospy_graph, title)
         self.static_files = ["libs/d3-v3", "libs/jquery"]
 
     def _buildTemplates(self):
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
         g = get_onto_for_testing(TEST_ONLINE)
 
-        v = D3BubbleChartViz(g, title="")
+        v = Dataviz(g, title="")
         v.build()
         v.preview()
 
