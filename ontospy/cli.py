@@ -365,7 +365,7 @@ def lib(ctx,
     '--endpoint',
     '-e',
     is_flag=True,
-    help='Use to specify that the source url passed is a sparql endpoint')
+    help='ENDPOINT: the source url passed is a sparql endpoint')
 @click.pass_context
 def scan(ctx, sources=None, endpoint=False):
     """Search an RDF source for ontology entities and print out a report.
@@ -406,7 +406,11 @@ def shell(sources=None):
 
 @main_cli.command()
 @click.argument('source', nargs=-1)
-@click.option('-f', '--output_format', default='turtle')
+@click.option(
+    '-f',
+    '--output_format',
+    default='turtle',
+    help='OUTPUT-FORMAT: the serialization format (default=turtle)')
 # @click.argument('output_format', nargs=1)
 @click.pass_context
 def serial(ctx, source, output_format):

@@ -6,6 +6,7 @@ Summary of changes.
 
 -   small bug fixes
 -   refactor action visualize / activated 'alpha' dataviz
+    -   allow to pass viztype from command line
 
 ## December, 2018: v1.9.7
 
