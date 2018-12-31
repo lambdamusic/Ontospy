@@ -54,7 +54,17 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
+    def __init__(self,
+                 uri_or_path=None,
+                 data=None,
+                 file_obj=None,
+                 rdf_format="",
+                 verbose=False,
+                 hide_base_schemas=True,
+                 hide_implicit_types=True,
+                 sparql_endpoint=None,
+                 credentials=None,
+                 build_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -84,11 +94,16 @@ class Ontospy(object):
 
         # finally:
         if uri_or_path or data or file_obj:
-            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose, hide_base_schemas)
+            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose,
+                          hide_base_schemas, hide_implicit_types)
             if build_all:
-                self.build_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
+                self.build_all(
+                    verbose=verbose,
+                    hide_base_schemas=hide_base_schemas,
+                    hide_implicit_types=hide_implicit_types)
         elif sparql_endpoint:  # by default entities are not extracted
-            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
+            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas,
+                             hide_implicit_types, credentials)
         else:
             pass
 
@@ -106,7 +121,14 @@ class Ontospy(object):
         else:
             return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
 
-    def load_rdf(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def load_rdf(self,
+                 uri_or_path=None,
+                 data=None,
+                 file_obj=None,
+                 rdf_format="",
+                 verbose=False,
+                 hide_base_schemas=True,
+                 hide_implicit_types=True):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader(verbose=verbose)
         loader.load(uri_or_path, data, file_obj, rdf_format)
@@ -115,7 +137,11 @@ class Ontospy(object):
         self.sparqlHelper = SparqlHelper(self.rdflib_graph)
         self.namespaces = sorted(self.rdflib_graph.namespaces())
 
-    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True, credentials=None):
+    def load_sparql(self,
+                    sparql_endpoint,
+                    verbose=False,
+                    hide_base_schemas=True,
+                    hide_implicit_types=True, credentials=None):
         """
         Set up a SPARQLStore backend as a virtual ontospy graph
 
@@ -151,7 +177,10 @@ class Ontospy(object):
     # === methods to build python objects === #
     # ------------
 
-    def build_all(self, verbose=False, hide_base_schemas=True):
+    def build_all(self,
+                  verbose=False,
+                  hide_base_schemas=True,
+                  hide_implicit_types=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -163,7 +192,7 @@ class Ontospy(object):
         if verbose:
             printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
-        self.build_classes(hide_base_schemas)
+        self.build_classes(hide_base_schemas, hide_implicit_types)
         if verbose:
             printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
@@ -254,7 +283,7 @@ class Ontospy(object):
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
 
-    def build_classes(self, hide_base_schemas=True):
+    def build_classes(self, hide_base_schemas=True, hide_implicit_types=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -268,7 +297,8 @@ class Ontospy(object):
 
         self.all_classes = []  # @todo: keep adding?
 
-        qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
+        qres = self.sparqlHelper.getAllClasses(hide_base_schemas,
+                                               hide_implicit_types)
         # print("rdflib query done")
 
         for class_tuple in qres:

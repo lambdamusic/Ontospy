@@ -73,12 +73,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS)
 @click.option(
-    '--verbose',
-    '-v',
+    '--extra',
+    '-x',
     is_flag=True,
-    help='Print out version info and debug messages.')
+    help=
+    'EXTRA-DATA: by default only declared classes/properties get extracted, but with this option all implicit types and predicates are returned.'
+)
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
-def main_cli(ctx, verbose=False):
+def main_cli(ctx, extra=False, verbose=False):
     """
 Ontospy is a command line inspector for RDF/OWL models. Use the --help option with one of the commands listed below to find out more, or visit http://lambdamusic.github.io/Ontospy 
     """
@@ -86,6 +90,7 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
     if ctx.obj is None:  # Fix for bug (as of 3.0)
         # https://github.com/pallets/click/issues/888
         ctx.obj = {}
+    ctx.obj['EXTRA'] = extra
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
 
@@ -148,6 +153,7 @@ def gendocs(ctx,
     """Generate documentation for an ontology in html or markdown format
     """
     verbose = ctx.obj['VERBOSE']
+    extra = ctx.obj['EXTRA']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
@@ -273,6 +279,7 @@ def lib(ctx,
     Work with a local library of RDF models. If no option or argument is passed, by default the library contents are listed.
     """
     verbose = ctx.obj['VERBOSE']
+    extra = ctx.obj['EXTRA']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
@@ -355,7 +362,7 @@ def lib(ctx,
 
 
 ##
-## CHECK / ANALYZE / SCAN COMMAND
+## SCAN COMMAND
 ##
 
 
@@ -370,13 +377,15 @@ def lib(ctx,
 def scan(ctx, sources=None, endpoint=False):
     """Search an RDF source for ontology entities and print out a report.
     """
+    extra = ctx.obj['EXTRA']
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
+        'extra': extra,
     }
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose)
+        action_analyze(sources, endpoint, print_opts, verbose, extra)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -416,6 +425,7 @@ def shell(sources=None):
 def serial(ctx, source, output_format):
     """Serialize an RDF graph to a format of choice.
     """
+    extra = ctx.obj['EXTRA']
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
@@ -470,6 +480,7 @@ def utils(
 ):
     """Miscellaneous utilities.
     """
+    extra = ctx.obj['EXTRA']
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {

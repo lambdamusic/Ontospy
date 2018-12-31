@@ -72,9 +72,10 @@ class SparqlHelper(object):
     # RDF/OWL CLASSES
     # ..................
 
-    def getAllClasses(self, hide_base_schemas=True):
+    def getAllClasses(self, hide_base_schemas=True, hide_implicit_types=True):
         """
-        hide_base_schemas: by default, obscure all RDF/RDFS/OWL/XML stuff
+        * hide_base_schemas: by default, obscure all RDF/RDFS/OWL/XML stuff
+        * hide_implicit_types: don't make any inference based on rdf:type declarations
         """
         query = """SELECT DISTINCT ?x ?c
                  WHERE {
@@ -90,8 +91,7 @@ class SparqlHelper(object):
                              { ?y rdfs:domain ?x }
                              union
                              { ?y rdfs:range ?x }
-                            #  union
-                            #  { ?y rdf:type ?x }
+                             %s
                          } .
 
                          OPTIONAL { ?x a ?c } 
@@ -102,8 +102,8 @@ class SparqlHelper(object):
                  }
                  ORDER BY  ?x
                  """
-        if hide_base_schemas:
-            query = query % """FILTER(
+
+        BIT_BASE_SCHEMAS = """FILTER(
                      !STRSTARTS(STR(?x), "http://www.w3.org/2002/07/owl")
                      && !STRSTARTS(STR(?x), "http://www.w3.org/1999/02/22-rdf-syntax-ns")
                      && !STRSTARTS(STR(?x), "http://www.w3.org/2000/01/rdf-schema")
@@ -111,8 +111,17 @@ class SparqlHelper(object):
                      && !STRSTARTS(STR(?x), "http://www.w3.org/XML/1998/namespace")
                      && (!isBlank(?x))
                       ) ."""
-        else:
-            query = query % ""
+        BIT_IMPLICIT_TYPES = """union
+                             { ?y rdf:type ?x }"""
+
+        if hide_base_schemas == False:  # ..then do not filter out XML stuff
+            BIT_BASE_SCHEMAS = ""
+        if hide_implicit_types == True:  # .. then do not add extra clause
+            BIT_IMPLICIT_TYPES = ""
+
+        query = query % (BIT_IMPLICIT_TYPES, BIT_BASE_SCHEMAS)
+
+        # print(query)
 
         qres = self.rdflib_graph.query(query)
         return list(qres)

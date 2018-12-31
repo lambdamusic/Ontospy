@@ -61,15 +61,30 @@ from .manager import *
 # ===========
 
 
-def action_analyze(sources, endpoint=None, print_opts=False, verbose=False):
+def action_analyze(sources,
+                   endpoint=None,
+                   print_opts=False,
+                   verbose=False,
+                   extra=False):
     """
     Load up a model into ontospy and analyze it
     """
     for x in sources:
         click.secho("Parsing %s..." % str(x), fg='white')
 
+    if extra:
+        hide_base_schemas = False
+        hide_implicit_types = False
+    else:
+        hide_base_schemas = True
+        hide_implicit_types = True
+
     if endpoint:
-        g = Ontospy(sparql_endpoint=sources[0], verbose=verbose)
+        g = Ontospy(
+            sparql_endpoint=sources[0],
+            verbose=verbose,
+            hide_base_schemas=hide_base_schemas,
+            hide_implicit_types=hide_implicit_types)
         printDebug("Extracting classes info")
         g.build_classes()
         printDebug("..done")
@@ -77,7 +92,11 @@ def action_analyze(sources, endpoint=None, print_opts=False, verbose=False):
         g.build_properties()
         printDebug("..done")
     else:
-        g = Ontospy(uri_or_path=sources, verbose=verbose)
+        g = Ontospy(
+            uri_or_path=sources,
+            verbose=verbose,
+            hide_base_schemas=hide_base_schemas,
+            hide_implicit_types=hide_implicit_types)
 
     shellPrintOverview(g, print_opts)
 
