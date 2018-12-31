@@ -75,16 +75,19 @@ def action_analyze(sources,
     if extra:
         hide_base_schemas = False
         hide_implicit_types = False
+        hide_implicit_preds = False
     else:
         hide_base_schemas = True
         hide_implicit_types = True
+        hide_implicit_preds = True
 
     if endpoint:
         g = Ontospy(
             sparql_endpoint=sources[0],
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
-            hide_implicit_types=hide_implicit_types)
+            hide_implicit_types=hide_implicit_types,
+            hide_implicit_preds=hide_implicit_preds)
         printDebug("Extracting classes info")
         g.build_classes()
         printDebug("..done")
@@ -96,7 +99,8 @@ def action_analyze(sources,
             uri_or_path=sources,
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
-            hide_implicit_types=hide_implicit_types)
+            hide_implicit_types=hide_implicit_types,
+            hide_implicit_preds=hide_implicit_preds)
 
     shellPrintOverview(g, print_opts)
 

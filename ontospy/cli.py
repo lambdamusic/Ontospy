@@ -340,7 +340,7 @@ def lib(ctx,
 
     elif show:
         click.secho("Local library => '%s'" % get_home_location(), fg='white')
-        filename = action_listlocal(all_details=True)
+        filename = action_listlocal(all_details=False)
 
         if filename:
             DONE_ACTION = True

@@ -62,6 +62,7 @@ class Ontospy(object):
                  verbose=False,
                  hide_base_schemas=True,
                  hide_implicit_types=True,
+                 hide_implicit_preds=True,
                  sparql_endpoint=None,
                  credentials=None,
                  build_all=True):
@@ -95,15 +96,17 @@ class Ontospy(object):
         # finally:
         if uri_or_path or data or file_obj:
             self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose,
-                          hide_base_schemas, hide_implicit_types)
+                          hide_base_schemas, hide_implicit_types,
+                          hide_implicit_preds)
             if build_all:
                 self.build_all(
                     verbose=verbose,
                     hide_base_schemas=hide_base_schemas,
-                    hide_implicit_types=hide_implicit_types)
+                    hide_implicit_types=hide_implicit_types,
+                    hide_implicit_preds=hide_implicit_preds)
         elif sparql_endpoint:  # by default entities are not extracted
             self.load_sparql(sparql_endpoint, verbose, hide_base_schemas,
-                             hide_implicit_types, credentials)
+                             hide_implicit_types, hide_implicit_preds, credentials)
         else:
             pass
 
@@ -128,7 +131,8 @@ class Ontospy(object):
                  rdf_format="",
                  verbose=False,
                  hide_base_schemas=True,
-                 hide_implicit_types=True):
+                 hide_implicit_types=True,
+                 hide_implicit_preds=True):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader(verbose=verbose)
         loader.load(uri_or_path, data, file_obj, rdf_format)
@@ -141,7 +145,8 @@ class Ontospy(object):
                     sparql_endpoint,
                     verbose=False,
                     hide_base_schemas=True,
-                    hide_implicit_types=True, credentials=None):
+                    hide_implicit_types=True,
+                    hide_implicit_preds=True, credentials=None):
         """
         Set up a SPARQLStore backend as a virtual ontospy graph
 
@@ -180,7 +185,8 @@ class Ontospy(object):
     def build_all(self,
                   verbose=False,
                   hide_base_schemas=True,
-                  hide_implicit_types=True):
+                  hide_implicit_types=True,
+                  hide_implicit_preds=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -196,7 +202,7 @@ class Ontospy(object):
         if verbose:
             printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
-        self.build_properties()
+        self.build_properties(hide_implicit_preds)
         if verbose:
             printDebug("Properties.........: %d" % len(self.all_properties), "comment")
         if verbose:
@@ -360,7 +366,7 @@ class Ontospy(object):
                 exit += [c]
         self.toplayer_classes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
-    def build_properties(self):
+    def build_properties(self, hide_implicit_preds=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -375,7 +381,7 @@ class Ontospy(object):
         self.all_properties_object = []
         self.all_properties_datatype = []
 
-        qres = self.sparqlHelper.getAllProperties()
+        qres = self.sparqlHelper.getAllProperties(hide_implicit_preds)
         # print("rdflib query done")
 
         for candidate in qres:

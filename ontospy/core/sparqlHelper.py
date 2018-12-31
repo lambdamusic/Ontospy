@@ -54,21 +54,6 @@ class SparqlHelper(object):
         return list(qres)
 
     # ..................
-    # DATA SHAPES
-    # ..................
-
-    def getShapes(self):
-        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
-               WHERE {
-                        { ?x a sh:Shape }
-                        union
-                        { ?x a sh:NodeShape }
-                        union
-                        { ?x a sh:PropertyShape }
-                    } """)
-        return list(qres)
-
-    # ..................
     # RDF/OWL CLASSES
     # ..................
 
@@ -136,6 +121,146 @@ class SparqlHelper(object):
                  """ % (aURI))
         return list(qres)
 
+    def getClassDirectSupers(self, aURI):
+        aURI = aURI
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
+                 WHERE {
+                     { <%s> rdfs:subClassOf ?x }
+                     FILTER (!isBlank(?x))
+                 } ORDER BY ?x
+                 """ % (aURI))
+        return list(qres)
+
+    # ..................
+    # RDF PROPERTIES
+    # ..................
+
+    def getAllProperties(self, hide_implicit_preds=True):
+        query = """SELECT ?x ?c WHERE {
+                        {
+                            { ?x a rdf:Property }
+                             UNION
+                             { ?x a owl:ObjectProperty }
+                             UNION
+                             { ?x a owl:DatatypeProperty }
+                             UNION
+                             { ?x a owl:AnnotationProperty }
+                             %s
+                        } .
+                        OPTIONAL  {?x a ?c}
+                        FILTER(!isBlank(?x)
+                       ) .
+                    } ORDER BY	?c ?x
+                 """
+
+        BIT_IMPLICIT_PREDICATES = """union
+                             { ?a ?x ?b }"""
+        if hide_implicit_preds:
+            BIT_IMPLICIT_PREDICATES = ""
+        query = query % BIT_IMPLICIT_PREDICATES
+        # print(query)
+        qres = self.rdflib_graph.query(query)
+        return list(qres)
+
+    def getPropDirectSupers(self, aURI):
+        aURI = aURI
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
+                 WHERE {
+                     { <%s> rdfs:subPropertyOf ?x }
+                     FILTER (!isBlank(?x))
+                 } ORDER BY ?x
+                 """ % (aURI))
+        return list(qres)
+
+    # ..................
+    # SKOS
+    # ..................
+
+    def getSKOSInstances(self):
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
+                 WHERE {
+                     { ?x rdf:type skos:Concept }
+                     FILTER (!isBlank(?x))
+                 } ORDER BY ?x
+                 """)
+        return list(qres)
+
+    def getSKOSDirectSupers(self, aURI):
+        aURI = aURI
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
+                 WHERE {
+                         {
+                             { <%s> skos:broader ?x }
+                             UNION
+                             { ?x skos:narrower <%s> }
+                         }
+                     FILTER (!isBlank(?x))
+                 } ORDER BY ?x
+                 """ % (aURI, aURI))
+        return list(qres)
+
+    # ..................
+    # SHACL SHAPES
+    # ..................
+
+    def getShapes(self):
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
+               WHERE {
+                        { ?x a sh:Shape }
+                        union
+                        { ?x a sh:NodeShape }
+                        union
+                        { ?x a sh:PropertyShape }
+                    } """)
+        return list(qres)
+
+    # ..................
+    # UTILS
+    # ..................
+
+    def entityTriples(self, aURI):
+        """ Builds all triples for an entity
+        Note: if a triple object is a blank node (=a nested definition)
+        we try to extract all relevant data recursively (does not work with
+        sparql endpoins)
+        """
+
+        aURI = aURI
+        qres = self.rdflib_graph.query("""CONSTRUCT {<%s> ?y ?z }
+                 WHERE {
+                     { <%s> ?y ?z }
+                 }
+                 """ % (aURI, aURI))
+        lres = list(qres)
+
+        def recurse(triples_list):
+            """ uses the rdflib <triples> method to pull out all blank nodes info"""
+            out = []
+            for tripl in triples_list:
+                if isBlankNode(tripl[2]):
+                    # print "blank node", str(tripl[2])
+                    temp = [
+                        x for x in self.rdflib_graph.triples((tripl[2], None,
+                                                              None))
+                    ]
+                    out += temp + recurse(temp)
+                else:
+                    pass
+            return out
+
+        if self.sparql_endpoint:
+            return lres
+        else:
+            try:
+                return lres + recurse(lres)
+            except:
+                printDebug("Error extracting blank nodes info", "important")
+                return lres
+
+    # ..................
+    # UNUSED OR LEGACY
+    # ..................
+
     def getClassInstancesCount(self, aURI):
         aURI = aURI
         qres = self.rdflib_graph.query("""SELECT (COUNT(?x) AS ?count )
@@ -149,16 +274,6 @@ class SparqlHelper(object):
         except:
             printDebug("Error with <getClassInstancesCount>")
             return 0
-
-    def getClassDirectSupers(self, aURI):
-        aURI = aURI
-        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
-                 WHERE {
-                     { <%s> rdfs:subClassOf ?x }
-                     FILTER (!isBlank(?x))
-                 } ORDER BY ?x
-                 """ % (aURI))
-        return list(qres)
 
     def getClassDirectSubs(self, aURI):
         """
@@ -213,39 +328,6 @@ class SparqlHelper(object):
             qres = []
         return list(qres)
 
-    # ..................
-    # RDF PROPERTIES
-    # ..................
-
-    # NOTE this kind of query could be expanded to classes too!!!
-    def getAllProperties(self):
-        qres = self.rdflib_graph.query("""SELECT ?x ?c WHERE {
-                        {
-                            { ?x a rdf:Property }
-                             UNION
-                             { ?x a owl:ObjectProperty }
-                             UNION
-                             { ?x a owl:DatatypeProperty }
-                             UNION
-                             { ?x a owl:AnnotationProperty }
-                        } .
-                        ?x a ?c
-                     FILTER(!isBlank(?x)
-                       ) .
-                    } ORDER BY	?c ?x
-                 """)
-        return list(qres)
-
-    def getPropDirectSupers(self, aURI):
-        aURI = aURI
-        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
-                 WHERE {
-                     { <%s> rdfs:subPropertyOf ?x }
-                     FILTER (!isBlank(?x))
-                 } ORDER BY ?x
-                 """ % (aURI))
-        return list(qres)
-
     def getPropAllSupers(self, aURI):
         """
         note: requires SPARQL 1.1
@@ -286,33 +368,6 @@ class SparqlHelper(object):
             qres = []
         return list(qres)
 
-    # ..................
-    # SKOS	: 2015-08-19
-    # ..................
-
-    def getSKOSInstances(self):
-        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
-                 WHERE {
-                     { ?x rdf:type skos:Concept }
-                     FILTER (!isBlank(?x))
-                 } ORDER BY ?x
-                 """)
-        return list(qres)
-
-    def getSKOSDirectSupers(self, aURI):
-        aURI = aURI
-        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
-                 WHERE {
-                         {
-                             { <%s> skos:broader ?x }
-                             UNION
-                             { ?x skos:narrower <%s> }
-                         }
-                     FILTER (!isBlank(?x))
-                 } ORDER BY ?x
-                 """ % (aURI, aURI))
-        return list(qres)
-
     def getSKOSDirectSubs(self, aURI):
         """
         2015-08-19: currenlty not used, inferred from above
@@ -329,46 +384,3 @@ class SparqlHelper(object):
                  }
                  """ % (aURI, aURI))
         return list(qres)
-
-    # ..................
-    # UTILS
-    # ..................
-
-    def entityTriples(self, aURI):
-        """ Builds all triples for an entity
-        Note: if a triple object is a blank node (=a nested definition)
-        we try to extract all relevant data recursively (does not work with
-        sparql endpoins)
-        """
-
-        aURI = aURI
-        qres = self.rdflib_graph.query("""CONSTRUCT {<%s> ?y ?z }
-                 WHERE {
-                     { <%s> ?y ?z }
-                 }
-                 """ % (aURI, aURI))
-        lres = list(qres)
-
-        def recurse(triples_list):
-            """ uses the rdflib <triples> method to pull out all blank nodes info"""
-            out = []
-            for tripl in triples_list:
-                if isBlankNode(tripl[2]):
-                    # print "blank node", str(tripl[2])
-                    temp = [
-                        x for x in self.rdflib_graph.triples((tripl[2], None,
-                                                              None))
-                    ]
-                    out += temp + recurse(temp)
-                else:
-                    pass
-            return out
-
-        if self.sparql_endpoint:
-            return lres
-        else:
-            try:
-                return lres + recurse(lres)
-            except:
-                printDebug("Error extracting blank nodes info", "important")
-                return lres
