@@ -77,7 +77,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     '-x',
     is_flag=True,
     help=
-    'EXTRA-DATA: by default only declared classes/properties get extracted, but with this option all implicit types and predicates are returned.'
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
 )
 @click.option(
     '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
