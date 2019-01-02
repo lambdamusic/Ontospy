@@ -7,6 +7,8 @@ Summary of changes.
 -   small bug fixes
 -   refactor action visualize / activated 'alpha' dataviz
     -   allow to pass viztype from command line
+-   implicit/explicit classes and predicates switch '-x'
+    -   this is useful to inspect a small RDF snippet for example too see what predicates are being used
 
 ## December, 2018: v1.9.7
 

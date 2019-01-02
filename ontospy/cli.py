@@ -402,7 +402,7 @@ def scan(ctx, sources=None, endpoint=False):
 @main_cli.command()
 @click.argument('sources', nargs=-1)
 def shell(sources=None):
-    """Launch the ontospy repl - an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
+    """Launch the ontospy repl, an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
     """
     from .extras.shell import launch_shell
     launch_shell(sources)
@@ -461,9 +461,7 @@ def serial(ctx, source, output_format):
     '--jsonld',
     '-j',
     is_flag=True,
-    help=
-    'JSONLD: util for testing a json-ld file using the online playground tool.'
-)
+    help='JSONLD: test a json-ld file using the online playground tool.')
 @click.option(
     '--discover',
     '-d',
