@@ -8,8 +8,8 @@
 - [Installation](#installation)
 - [Quick example](#quick-example)
 - [Is Ontospy for me?](#is-ontospy-for-me)
+- [Generating Ontology Documentation](#generating-ontology-documentation)
 - [Miscellaneous Tips](#miscellaneous-tips)
-- [Generating ontology documentation](#generating-ontology-documentation)
 - [Quick Links](#quick-links)
 
 ## Welcome to Ontospy's documentation!
@@ -28,7 +28,7 @@ Calling the `ontospy` command from a terminal window launches a utility for scan
 For example, if you pass a valid graph URI e.g.
 
 ```
-ontospy scan http://purl.org/spar/frbr
+$ ontospy scan http://purl.org/spar/frbr
 ```
 
 Ontospy will extract and print out any ontology-related information contained in that graph.
@@ -44,26 +44,34 @@ Prerequisites:
 -   Python (3.x)
 -   A python package manager: [setuptools](https://pypi.python.org/pypi/setuptools) or [pip](https://pip.pypa.io/en/stable/installing/).
 
-Once you have a package manager installed, get Ontospy from the Python Package Index:
+**Full Version**
 
-`easy_install ontospy` or `pip install ontospy`
+Once you have a package manager installed, get Ontospy from the Python Package Index.
 
-The python library, its dependencies and all of its command-line executables will be installed.
+If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you want to install the FULL version of the library like this:
+
+```
+$ pip install ontospy[FULL]
+```
+
+The full version includes more files (eg html templates) and it has a larger footprint as it relies on Django and other libraries.
+
+**Lightweight Version**
+
+If you want less library dependencies (eg because you want to include Ontospy in another project and don't care about html documentation), you can simply install the core library only:
+
+```
+$ pip install ontospy
+```
+
+The python library, its dependencies and all of its command-line executables will be installed. The only thing which is left out is the documentation-generation feature.
 
 **Upgrading**
 
 If you’re upgrading from an older version, make sure you use the -U flag:
 
 ```
-pip install ontospy -U
-```
-
-**Gerating Documentation**
-
-If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you need to install the HTML extension too:
-
-```
-pip install ontospy[HTML]
+$ pip install ontospy -U
 ```
 
 ## Quick example
@@ -73,114 +81,150 @@ If used as a Python package, the basic workflow is the following: load a graph b
 Let's take a look at the [Friend Of A Friend](http://semanticweb.org/wiki/FOAF) vocabulary.
 
     In [1]: import ontospy
-    INFO:rdflib:RDFLib Version: 4.2.0
 
-    In [2]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/")
+    In [2]: ontospy.__version__
+    Out[2]: '1.9.8'
+
+    In [3]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/", verbose=True)
+    Reading: <http://xmlns.com/foaf/0.1/>
+    .. trying rdf serialization: <xml>
+    ..... success!
     ----------
-    Loaded 631 triples from <http://xmlns.com/foaf/0.1/>
-    started scanning...
+    Loaded 631 triples.
     ----------
-    Ontologies found...: 1
-    Classes found......: 14
-    Properties found...: 67
-    Annotation.........: 7
-    Datatype...........: 26
-    Object.............: 34
-    SKOS Concepts......: 0
+    RDF sources loaded successfully: 1 of 1.
+    ..... 'http://xmlns.com/foaf/0.1/'
+    ----------
+    Scanning entities...
+    ----------
+    Ontologies.........: 1
+    Classes............: 15
+    Properties.........: 67
+    ..annotation.......: 7
+    ..datatype.........: 26
+    ..object...........: 34
+    Concepts (SKOS)....: 0
+    Shapes (SHACL).....: 0
     ----------
 
-    In [3]: model.classes
-    Out[3]:
-    [<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-     <Class *http://xmlns.com/foaf/0.1/Agent*>,
-     <Class *http://xmlns.com/foaf/0.1/Document*>,
-     <Class *http://xmlns.com/foaf/0.1/Group*>,
-     <Class *http://xmlns.com/foaf/0.1/Image*>,
-     <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-     <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-     <Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
-     <Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
-     <Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
-     <Class *http://xmlns.com/foaf/0.1/Organization*>,
-     <Class *http://xmlns.com/foaf/0.1/Person*>,
-     <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
-     <Class *http://xmlns.com/foaf/0.1/Project*>]
-
-    In [4]: model.properties
+    In [4]: model.all_classes
     Out[4]:
+    [<Class *http://xmlns.com/foaf/0.1/Agent*>,
+    <Class *http://xmlns.com/foaf/0.1/Document*>,
+    <Class *http://xmlns.com/foaf/0.1/Group*>,
+    <Class *http://xmlns.com/foaf/0.1/Image*>,
+    <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+    <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+    <Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
+    <Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
+    <Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
+    <Class *http://xmlns.com/foaf/0.1/Organization*>,
+    <Class *http://xmlns.com/foaf/0.1/Person*>,
+    <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
+    <Class *http://xmlns.com/foaf/0.1/Project*>,
+    <Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+    <Class *http://www.w3.org/2004/02/skos/core#Concept*>]
+
+    In [5]: model.all_properties_object
+    Out[5]:
     [<Property *http://xmlns.com/foaf/0.1/account*>,
-     <Property *http://xmlns.com/foaf/0.1/accountName*>,
-     <Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
-     <Property *http://xmlns.com/foaf/0.1/age*>,
-     <Property *http://xmlns.com/foaf/0.1/aimChatID*>,
-     <Property *http://xmlns.com/foaf/0.1/based_near*>,
-     <Property *http://xmlns.com/foaf/0.1/birthday*>,
-     <Property *http://xmlns.com/foaf/0.1/currentProject*>,
-     <Property *http://xmlns.com/foaf/0.1/depiction*>,
-    	### etc....
-    	]
+    <Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
+    <Property *http://xmlns.com/foaf/0.1/based_near*>,
+    <Property *http://xmlns.com/foaf/0.1/currentProject*>,
+    <Property *http://xmlns.com/foaf/0.1/depiction*>,
+    <Property *http://xmlns.com/foaf/0.1/depicts*>,
+    <Property *http://xmlns.com/foaf/0.1/focus*>,
+    <Property *http://xmlns.com/foaf/0.1/fundedBy*>,
+    <Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
+    <Property *http://xmlns.com/foaf/0.1/homepage*>,
+    <Property *http://xmlns.com/foaf/0.1/img*>,
+    <Property *http://xmlns.com/foaf/0.1/interest*>,
+    <Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
+    <Property *http://xmlns.com/foaf/0.1/knows*>,
+    <Property *http://xmlns.com/foaf/0.1/logo*>,
+    <Property *http://xmlns.com/foaf/0.1/made*>,
+    <Property *http://xmlns.com/foaf/0.1/maker*>,
+    <Property *http://xmlns.com/foaf/0.1/mbox*>,
+    <Property *http://xmlns.com/foaf/0.1/member*>,
+    <Property *http://xmlns.com/foaf/0.1/openid*>,
+    <Property *http://xmlns.com/foaf/0.1/page*>,
+    <Property *http://xmlns.com/foaf/0.1/pastProject*>,
+    <Property *http://xmlns.com/foaf/0.1/phone*>,
+    <Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
+    <Property *http://xmlns.com/foaf/0.1/publications*>,
+    <Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
+    <Property *http://xmlns.com/foaf/0.1/theme*>,
+    <Property *http://xmlns.com/foaf/0.1/thumbnail*>,
+    <Property *http://xmlns.com/foaf/0.1/tipjar*>,
+    <Property *http://xmlns.com/foaf/0.1/topic*>,
+    <Property *http://xmlns.com/foaf/0.1/topic_interest*>,
+    <Property *http://xmlns.com/foaf/0.1/weblog*>,
+    <Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
+    <Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>]
 
-    In [5]: model.printClassTree()
-    [1]    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
-    [12]   ----_file_:Person
-    [2]    _file_:Agent
-    [4]    ----_file_:Group
-    [11]   ----_file_:Organization
-    [12]   ----_file_:Person
-    [3]    _file_:Document
-    [5]    ----_file_:Image
-    [13]   ----_file_:PersonalProfileDocument
-    [6]    _file_:LabelProperty
-    [7]    _file_:OnlineAccount
-    [8]    ----_file_:OnlineChatAccount
-    [9]    ----_file_:OnlineEcommerceAccount
-    [10]   ----_file_:OnlineGamingAccount
-    [14]   _file_:Project
+    In [6]: model.printClassTree()
+    foaf:Agent
+    ----foaf:Group
+    ----foaf:Organization
+    ----foaf:Person
+    foaf:Document
+    ----foaf:Image
+    ----foaf:PersonalProfileDocument
+    foaf:LabelProperty
+    foaf:OnlineAccount
+    ----foaf:OnlineChatAccount
+    ----foaf:OnlineEcommerceAccount
+    ----foaf:OnlineGamingAccount
+    foaf:Project
+    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+    ----foaf:Person
+    skos:Concept
 
-
-    In [6]: model.toplayer
-    Out[6]:
-    [<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-     <Class *http://xmlns.com/foaf/0.1/Agent*>,
-     <Class *http://xmlns.com/foaf/0.1/Document*>,
-     <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-     <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-     <Class *http://xmlns.com/foaf/0.1/Project*>]
-
-    In [7]: model.getClass("document")
+    In [7]: model.toplayer_classes
     Out[7]:
+    [<Class *http://xmlns.com/foaf/0.1/Agent*>,
+    <Class *http://xmlns.com/foaf/0.1/Document*>,
+    <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+    <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+    <Class *http://xmlns.com/foaf/0.1/Project*>,
+    <Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+    <Class *http://www.w3.org/2004/02/skos/core#Concept*>]
+
+    In [8]: model.get_class('document')
+    Out[8]:
     [<Class *http://xmlns.com/foaf/0.1/Document*>,
-     <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
+    <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 
-    In [8]: a_class = _[0]
+    In [9]: c1 = _[1]
 
-    In [9]: print(a_class.serialize())
-    @prefix ns1: <http://www.w3.org/2002/07/owl#> .
-    @prefix ns2: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+    In [10]: print(c1.rdf_source())
+    @prefix dc: <http://purl.org/dc/elements/1.1/> .
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .
     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
     @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix sh: <http://www.w3.org/ns/shacl#> .
+    @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+    @prefix vann: <http://purl.org/vocab/vann/> .
+    @prefix void: <http://rdfs.org/ns/void#> .
+    @prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+    @prefix wot: <http://xmlns.com/wot/0.1/> .
     @prefix xml: <http://www.w3.org/XML/1998/namespace> .
     @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-    <http://xmlns.com/foaf/0.1/Document> a rdfs:Class,
-            ns1:Class ;
-        rdfs:label "Document" ;
-        rdfs:comment "A document." ;
-        rdfs:isDefinedBy <http://xmlns.com/foaf/0.1/> ;
-        ns1:disjointWith <http://xmlns.com/foaf/0.1/Organization>,
-            <http://xmlns.com/foaf/0.1/Project> ;
-        ns1:equivalentClass <http://schema.org/CreativeWork> ;
-        ns2:term_status "stable" .
+    foaf:PersonalProfileDocument a rdfs:Class,
+            owl:Class ;
+        rdfs:label "PersonalProfileDocument" ;
+        rdfs:comment "A personal profile RDF document." ;
+        rdfs:subClassOf foaf:Document ;
+        vs:term_status "testing" .
 
 
+    In [11]: c1.parents()
+    Out[11]: [<Class *http://xmlns.com/foaf/0.1/Document*>]
 
-    In [10]: a_class.parents()
-    Out[10]: []
-
-    In [11]: a_class.children()
-    Out[11]:
-    [<Class *http://xmlns.com/foaf/0.1/Image*>,
-     <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
+    In [12]: c1.children()
+    Out[12]: []
 
 ## Is Ontospy for me?
 
@@ -193,55 +237,57 @@ Here are some reasons why you should use it:
 
 > note: Ontospy does not offer any ontology-editing features
 
-## Miscellaneous Tips
-
-If you are using El Capitan your installation line probably will look like this
-
-    > sudo pip install ontospy -U --user python
-
-This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899), more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan)
-
-## Generating ontology documentation
-
-Ontospy can be used to generate HTML ontology documentation pretty easily.
-
-This functionality relies on a module called _ontodocs_ that used to be maintained as a separate library but is noe merged with ontospy (essentially because it's easier to maintain it this way).
-
-**Examples**
-
--   [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) documentation.
--   [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) documentation.
-
-That's the kind of documentation OntoDocs can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
-
-**Installation**
-
-By default the libraries needed by this module (Django and Pygments) are not installed, so you have to add them like this:
-
-```
-pip install ontospy[HTML] -U
-```
+## Generating Ontology Documentation
 
 Ontospy allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
 
-```
-> ontospy viz -h
-Usage: ontospy viz [OPTIONS] [SOURCE]...
+One can then manually customize these outputs by editing the source html files.
 
-  Visualize a model using ontodocs library
+For example:
+
+-   [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) documentation
+-   [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) documentation
+
+That's the kind of documentation OntoDocs can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
+
+> Note: this functionality relies on a module called _ontodocs_, which up to version 1.9.7 used to be a separate library but it's now part of the core library.
+
+**Installation**
+
+By default the libraries needed by this feature (Django and Pygments) are not installed, so you have to add them like this:
+
+```
+$ pip install ontospy[FULL] -U
+```
+
+This feature is normally used from the command line:
+
+```
+$ ontospy gendocs
+
+Ontospy v1.9.8
+Usage: ontospy gendocs [OPTIONS] [SOURCE]...
+
+  Generate documentation for an ontology in html or markdown format
 
 Options:
-  -o, --outputpath TEXT  Output path (default: home folder).
-  -t, --title TEXT       Title for the visualization (default=graph uri).
-  --theme TEXT           CSS Theme for the html-complex visualization
-                         (random=use a random theme).
-  --showthemes           Show the available CSS theme choices.
+  -o, --outputpath TEXT  OUTPUT-PATH: where to save the visualization files
+                         (default: home folder).
+  --type TEXT            VIZ-TYPE: specify which viz type to use as an integer
+                         (eg 1=single-page html, 2=multi-page etc..).
+  --title TEXT           TITLE: custom title for the visualization
+                         (default=graph uri).
+  --theme TEXT           THEME: bootstrap css style for the html-multi-page
+                         visualization (random=use a random theme).
+  --lib                  LIBRARY: choose an ontology from the local library.
+  --showtypes            SHOW-TYPES: show the available visualization types.
+  --showthemes           SHOW-THEMES: show the available css theme choices.
   -h, --help             Show this message and exit.
 ```
 
-The library is not really meant to be used programmatically, but I'm sure there are a few constructs in there which can be reused.
+This feature is not really meant to be used programmatically, but I'm sure there are a few constructs in there which can be reused.
 
-In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontodocs/blob/master/ontodocs/core/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
+In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontospy/blob/master/ontospy/ontodocs/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
 
 This is how you would invoke a visualization from a script:
 
@@ -256,6 +302,14 @@ v.build() # => render visualization. You can pass an 'output_path' parameter too
 v.preview() # => open in browser
 
 ```
+
+## Miscellaneous Tips
+
+If you are using OSx El Capitan your installation line probably will look like this
+
+    > sudo pip install ontospy -U --user python
+
+This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899) (more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan))
 
 ## Quick Links
 

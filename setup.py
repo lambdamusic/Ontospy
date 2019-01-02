@@ -121,7 +121,7 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'SHELL': ['readline'],
-        'HTML': ['Django>=1.10.3', 'Pygments==2.1.3'],
+        'FULL': ['Django>=1.10.3', 'Pygments==2.1.3'],
     },
     package_data={
         'ontospy': PACKAGE_DATA_FOLDERS
