@@ -3,22 +3,22 @@
 ## Index
 
 - [Index](#index)
-- [Welcome to Ontospy's documentation!](#welcome-to-ontospys-documentation)
-- [In a nutshell](#in-a-nutshell)
+- [Welcome to Ontospy's Documentation!](#welcome-to-ontospys-documentation)
+- [In a Nutshell](#in-a-nutshell)
 - [Installation](#installation)
-- [Quick example](#quick-example)
-- [Is Ontospy for me?](#is-ontospy-for-me)
+- [Quick Example](#quick-example)
+- [Is Ontospy for Me?](#is-ontospy-for-me)
 - [Generating Ontology Documentation](#generating-ontology-documentation)
 - [Miscellaneous Tips](#miscellaneous-tips)
 - [Quick Links](#quick-links)
 
-## Welcome to Ontospy's documentation!
+## Welcome to Ontospy's Documentation!
 
 Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
 
 > Note: this documentation is still a work-in-progress
 
-## In a nutshell
+## In a Nutshell
 
 Ontospy can be used either as an interactive command line interface (a
 [repl](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>)) or as a Python package.
@@ -74,7 +74,7 @@ If you’re upgrading from an older version, make sure you use the -U flag:
 $ pip install ontospy -U
 ```
 
-## Quick example
+## Quick Example
 
 If used as a Python package, the basic workflow is the following: load a graph by instantiating the `Ontospy` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
 
@@ -226,7 +226,7 @@ Let's take a look at the [Friend Of A Friend](http://semanticweb.org/wiki/FOAF) 
     In [12]: c1.children()
     Out[12]: []
 
-## Is Ontospy for me?
+## Is Ontospy for Me?
 
 Here are some reasons why you should use it:
 
