@@ -1,15 +1,9 @@
-## Welcome to Ontospy's documentation!
-
-Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
-
 ![logo](static/logo_sm.jpg)
-
-> Note: some of this documentation is not valid anymore but I'm in the process of updating it
 
 ## Index
 
-- [Welcome to Ontospy's documentation!](#welcome-to-ontospys-documentation)
 - [Index](#index)
+- [Welcome to Ontospy's documentation!](#welcome-to-ontospys-documentation)
 - [In a nutshell](#in-a-nutshell)
 - [Installation](#installation)
 - [Quick example](#quick-example)
@@ -17,6 +11,12 @@ Ontospy is a lightweight Python library and command line tool for working with v
 - [Miscellaneous Tips](#miscellaneous-tips)
 - [Generating ontology documentation](#generating-ontology-documentation)
 - [Quick Links](#quick-links)
+
+## Welcome to Ontospy's documentation!
+
+Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
+
+> Note: this documentation is still a work-in-progress
 
 ## In a nutshell
 
@@ -191,7 +191,7 @@ Here are some reasons why you should use it:
 -   You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization (UPDATE: check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library for this!).
 -   You love the command line and would never leave it no matter what.
 
-> note: Ontospy does not offer any ontology-editing features, nor it can be used to interrogate a triplestore.
+> note: Ontospy does not offer any ontology-editing features
 
 ## Miscellaneous Tips
 

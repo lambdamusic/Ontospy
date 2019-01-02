@@ -395,7 +395,7 @@ def scan(ctx, sources=None, endpoint=False):
 
 
 ##
-## SHELL COMMAND
+## SHELL COMMAN/'
 ##
 
 
