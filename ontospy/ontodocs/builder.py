@@ -221,8 +221,8 @@ def saveVizGithub(contents, ontouri):
     DEPRECATED on 2016-11-16
     Was working but had a dependecies on package 'uritemplate.py' which caused problems at installation time
     """
-    title = "OntoSpy: ontology export"
-    readme = """This ontology documentation was automatically generated with OntoSpy (https://github.com/lambdamusic/OntoSpy).
+    title = "Ontospy: ontology export"
+    readme = """This ontology documentation was automatically generated with Ontospy (https://github.com/lambdamusic/Ontospy).
 	The graph URI is: %s""" % str(ontouri)
     files = {
         'index.html': {
@@ -235,7 +235,7 @@ def saveVizGithub(contents, ontouri):
             'content':
             """The MIT License (MIT)
 
-Copyright (c) 2016 OntoSpy project [http://lambdamusic.github.io/Ontospy//]
+Copyright (c) 2016 Ontospy project [http://lambdamusic.github.io/Ontospy/]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
