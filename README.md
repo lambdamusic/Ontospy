@@ -7,6 +7,7 @@ Python library and command-line interface for inspecting and visualizing RDF mod
 -   [Pypi](https://pypi.org/project/ontospy/)
 -   [Github](https://github.com/lambdamusic/ontospy)
 -   [Docs](http://lambdamusic.github.io/Ontospy/)
+-   [YouTube Video](https://youtu.be/MkKrtVHi_Ks)
 
 # Description
 
