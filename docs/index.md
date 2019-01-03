@@ -232,7 +232,7 @@ Here are some reasons why you should use it:
 
 -   You are developing a Python application that needs to extract schema information from an RDF, SKOS or OWL vocabulary.
 -   You have a bunch of RDF vocabularies you regularly need to interrogate, but do not want to load a full-blown ontology editor like Protege.
--   You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization (UPDATE: check out the [OntoDocs](https://github.com/lambdamusic/Ontodocs) library for this!).
+-   You need to quickly generate documentation for an ontology, either as simple html pages or via some more elaborate interactive visualization.
 -   You love the command line and would never leave it no matter what.
 
 > note: Ontospy does not offer any ontology-editing features
@@ -248,9 +248,9 @@ For example:
 -   [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) documentation
 -   [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) documentation
 
-That's the kind of documentation OntoDocs can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
+That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
 
-> Note: this functionality relies on a module called _ontodocs_, which up to version 1.9.7 used to be a separate library but it's now part of the core library.
+> Note: this functionality relies on a module called _ontodocs_, which used to be a separate library. As of version 1.9.8 this module has been incorporated in Ontospy, but can be installed on-demand.
 
 **Installation**
 
