@@ -819,6 +819,14 @@ def shellPrintOverview(g, opts={'labels': False}):
     except:
         labels = False
 
+    print(Style.BRIGHT + "Namespaces\n-----------" + Style.RESET_ALL)
+    if g.namespaces:
+        for p, u in g.namespaces:
+            row = Fore.GREEN + "%s" % p + Fore.BLACK + "  %s" % u + Fore.RESET
+            print(row)
+    else:
+        printDebug("None found", "comment")
+
     print(Style.BRIGHT + "\nOntologies\n-----------" + Style.RESET_ALL)
     if ontologies:
         for o in ontologies:

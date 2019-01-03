@@ -10,6 +10,8 @@ Summary of changes.
 -   implicit/explicit classes and predicates switch '-x'
     -   this is useful to inspect a small RDF snippet for example too see what predicates are being used
 -   option to show raw RDF data (-r)
+-   improvements to shell command
+-   namespaces printed out by default
 
 ## December, 2018: v1.9.7
 
