@@ -65,20 +65,21 @@ def _get_prompt(onto="", entity=""):
     :return: [Ontospy]>(cidoc_crm_v5.0...)>(class:E1.CRM_Entity)>
     """
     base_text, onto_text, entity_text = "", "", ""
-    base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.RED, Fore.RED
+    base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.BLACK + Style.DIM, Fore.BLACK
 
-    base_text = base_color + '[Ontospy]' + Style.RESET_ALL
+    if not onto and not entity:
+        base_text = base_color + '[Ontospy]' + Style.RESET_ALL
 
     if onto and not entity:
         _tmp = onto_color + '(%s)' % onto
-        onto_text = ">" + _tmp + Style.RESET_ALL
+        onto_text = _tmp + Style.RESET_ALL
 
     if entity:
         _tmp = onto_color + Style.BRIGHT + '(%s)' % truncate(onto, 15)
-        onto_text = ">" + _tmp + Style.RESET_ALL
+        onto_text = _tmp + Style.RESET_ALL
 
         _tmp2 = entity_color + '(%s:%s)' % (entity['type'], entity['name'])
-        entity_text = ">" + _tmp2 + Style.RESET_ALL
+        entity_text = "-" + _tmp2 + Style.RESET_ALL
 
     return base_text + onto_text + entity_text + "> "
 
