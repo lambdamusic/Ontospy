@@ -544,7 +544,6 @@ def joinStringsInList(literalEntities, prefLanguage="en"):
     return " - ".join([x for x in match])
 
 
-
 def sortByNamespacePrefix(urisList, nsList):
     """
         Given an ordered list of namespaces prefixes, order a list of uris based on that.
@@ -693,7 +692,9 @@ def uri2niceString(aUri, namespaces=None):
     if not namespaces:
         namespaces = NAMESPACES_DEFAULT
 
-    if type(aUri) == rdflib.term.URIRef:
+    if not aUri:
+        stringa = ""
+    elif type(aUri) == rdflib.term.URIRef:
         # we have a URI: try to create a qName
         stringa = aUri.toPython()
         for aNamespaceTuple in namespaces:

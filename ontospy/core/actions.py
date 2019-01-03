@@ -65,7 +65,8 @@ def action_analyze(sources,
                    endpoint=None,
                    print_opts=False,
                    verbose=False,
-                   extra=False):
+                   extra=False,
+                   raw=False):
     """
     Load up a model into ontospy and analyze it
     """
@@ -81,7 +82,12 @@ def action_analyze(sources,
         hide_implicit_types = True
         hide_implicit_preds = True
 
-    if endpoint:
+    if raw:
+        o = Ontospy(uri_or_path=sources, verbose=verbose, build_all=False)
+        s = o.serialize()
+        print(s)
+        return
+    elif endpoint:
         g = Ontospy(
             sparql_endpoint=sources[0],
             verbose=verbose,
@@ -115,7 +121,7 @@ def action_reveal_library():
         subprocess.Popen(["xdg-open", path])
 
 
-def action_transform(source, out_fmt="turtle", verbose=False):
+def action_serialize(source, out_fmt="turtle", verbose=False):
     """
     Util: render RDF into a different serialization 
     valid options are: xml, n3, turtle, nt, pretty-xml, json-ld
@@ -249,7 +255,7 @@ def action_import(location, verbose=True):
         if location.startswith("www."):  #support for lazy people
             location = "http://%s" % str(location)
         if location.startswith("http"):
-            print("here")
+            # print("here")
             headers = {'Accept': "application/rdf+xml"}
             try:
                 # Py2

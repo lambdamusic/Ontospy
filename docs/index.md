@@ -25,10 +25,10 @@ Ontospy can be used either as an interactive command line interface (a
 
 Calling the `ontospy` command from a terminal window launches a utility for scanning a knowledge model encoded in RDF (or any of its dialects e.g. RDFS, OWL or SKOS).
 
-For example, if you pass a valid graph URI e.g.
+For example, if you pass a valid graph URI:
 
 ```
-$ ontospy scan http://purl.org/spar/frbr
+$ ontospy ex http://purl.org/spar/frbr  # ex = examine
 ```
 
 Ontospy will extract and print out any ontology-related information contained in that graph.

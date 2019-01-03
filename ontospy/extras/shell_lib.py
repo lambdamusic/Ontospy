@@ -552,7 +552,7 @@ class Shell(cmd.Cmd):
     def _select_ontology(self, line):
         """try to select an ontology NP: the actual load from FS is in <_load_ontology> """
         try:
-            var = int(line)	 # it's a string
+            var = int(line)  # it's a string
             if var in range(1, len(self.all_ontologies)+1):
                 self._load_ontology(self.all_ontologies[var-1])
         except ValueError:
@@ -900,7 +900,7 @@ class Shell(cmd.Cmd):
             self._printPropertyDomainRange(False)
             # self._printSourceCode(False)
             if self.currentEntity and self.currentEntity['type'] == 'class':
-                self._print("Tip: type 'info inferred_usage' to show inherited properties")
+                self._print("Tip: type 'info inferred_usage' to show inherited properties\n----------------")
 
         elif line[0] == "inferred_usage":
             if self.currentEntity:  # @todo only for classes?

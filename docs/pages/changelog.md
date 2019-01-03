@@ -9,6 +9,7 @@ Summary of changes.
     -   allow to pass viztype from command line
 -   implicit/explicit classes and predicates switch '-x'
     -   this is useful to inspect a small RDF snippet for example too see what predicates are being used
+-   option to show raw RDF data (-r)
 
 ## December, 2018: v1.9.7
 

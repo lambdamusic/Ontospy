@@ -44,6 +44,7 @@ from .core.manager import *
 from .core.utils import *
 
 SHELL_EXAMPLES = """
+#### LEGACY
 Quick Examples:
 
   > ontospy ~/Desktop/mymodel.rdf          # ==> inspect a local RDF file
@@ -73,24 +74,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS)
 @click.option(
-    '--extra',
-    '-x',
-    is_flag=True,
-    help=
-    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
-)
-@click.option(
     '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
-def main_cli(ctx, extra=False, verbose=False):
+def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models. Use the --help option with one of the commands listed below to find out more, or visit http://lambdamusic.github.io/Ontospy 
+Ontospy allows to extract and visualise ontology information included in RDF data. Use one of the commands listed below to find out more, or visit http://lambdamusic.github.io/ontospy 
     """
     sTime = time.time()
     if ctx.obj is None:  # Fix for bug (as of 3.0)
         # https://github.com/pallets/click/issues/888
         ctx.obj = {}
-    ctx.obj['EXTRA'] = extra
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
 
@@ -100,6 +93,50 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
         click.echo(ctx.get_help())
     # else:
     #     click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+
+
+##
+## EXAMINE COMMAND
+##
+
+
+@main_cli.command()
+@click.argument('sources', nargs=-1)
+@click.option(
+    '--extra',
+    '-x',
+    is_flag=True,
+    help=
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
+    '--raw',
+    '-r',
+    is_flag=True,
+    help='RAW-DATA: print out the raw RDF data received.')
+@click.option(
+    '--endpoint',
+    '-e',
+    is_flag=True,
+    help='ENDPOINT: the url passed is a sparql endpoint (beta).')
+@click.pass_context
+def ex(ctx, sources=None, endpoint=False, raw=False, extra=False):
+    """EXAMINE: do a quick scan of an RDF source and print out a report.
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+        'extra': extra,
+    }
+    if sources or (sources and endpoint):
+        action_analyze(sources, endpoint, print_opts, verbose, extra, raw)
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+    else:
+        click.echo(ctx.get_help())
 
 
 ##
@@ -114,6 +151,13 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
     '-o',
     help=
     'OUTPUT-PATH: where to save the visualization files (default: home folder).'
+)
+@click.option(
+    '--extra',
+    '-x',
+    is_flag=True,
+    help=
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
 )
 @click.option(
     '--type',
@@ -144,16 +188,16 @@ Ontospy is a command line inspector for RDF/OWL models. Use the --help option wi
 def gendocs(ctx,
             source=None,
             outputpath="",
+            extra=False,
             lib=False,
             type="",
             title="",
             theme="",
             showthemes=False,
             showtypes=False):
-    """Generate documentation for an ontology in html or markdown format
+    """GENDOCS: generate documentation in html or markdown format.
     """
     verbose = ctx.obj['VERBOSE']
-    extra = ctx.obj['EXTRA']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
@@ -238,6 +282,13 @@ def gendocs(ctx,
     'SHOW: list all ontologies stored in the local library and prompt which one to open.'
 )
 @click.option(
+    '--extra',
+    '-x',
+    is_flag=True,
+    help=
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
     '--bootstrap',
     is_flag=True,
     help='BOOTSTRAP: bootstrap the local library with popular ontologies.')
@@ -269,6 +320,7 @@ def gendocs(ctx,
 @click.pass_context
 def lib(ctx,
         filepath=None,
+        extra=False,
         bootstrap=False,
         cache=False,
         reveal=False,
@@ -276,10 +328,9 @@ def lib(ctx,
         save=False,
         directory=False):
     """
-    Work with a local library of RDF models. If no option or argument is passed, by default the library contents are listed.
+    LIBRARY: work with a local library of RDF models.
     """
     verbose = ctx.obj['VERBOSE']
-    extra = ctx.obj['EXTRA']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
@@ -362,39 +413,6 @@ def lib(ctx,
 
 
 ##
-## SCAN COMMAND
-##
-
-
-@main_cli.command()
-@click.argument('sources', nargs=-1)
-@click.option(
-    '--endpoint',
-    '-e',
-    is_flag=True,
-    help='ENDPOINT: the source url passed is a sparql endpoint')
-@click.pass_context
-def scan(ctx, sources=None, endpoint=False):
-    """Search an RDF source for ontology entities and print out a report.
-    """
-    extra = ctx.obj['EXTRA']
-    verbose = ctx.obj['VERBOSE']
-    sTime = ctx.obj['STIME']
-    print_opts = {
-        'labels': verbose,
-        'extra': extra,
-    }
-    if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose, extra)
-        eTime = time.time()
-        tTime = eTime - sTime
-        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
-
-    else:
-        click.echo(ctx.get_help())
-
-
-##
 ## SHELL COMMAN/'
 ##
 
@@ -402,7 +420,7 @@ def scan(ctx, sources=None, endpoint=False):
 @main_cli.command()
 @click.argument('sources', nargs=-1)
 def shell(sources=None):
-    """Launch the ontospy repl, an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
+    """SHELL: launch ontospy's interactive mode. If an rdf source path is provided the shell is preloaded with it."
     """
     from .extras.shell import launch_shell
     launch_shell(sources)
@@ -422,10 +440,9 @@ def shell(sources=None):
     help='OUTPUT-FORMAT: the serialization format (default=turtle)')
 # @click.argument('output_format', nargs=1)
 @click.pass_context
-def serial(ctx, source, output_format):
-    """Serialize an RDF graph to a format of choice.
+def ser(ctx, source, output_format):
+    """SERIALIZE: tranform an RDF graph to a format of choice.
     """
-    extra = ctx.obj['EXTRA']
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
@@ -442,7 +459,7 @@ def serial(ctx, source, output_format):
                 fg='red')
             return
         else:
-            action_transform(source, output_format, verbose)
+            action_serialize(source, output_format, verbose)
             eTime = time.time()
             tTime = eTime - sTime
             printDebug(
@@ -476,9 +493,8 @@ def utils(
         jsonld=False,
         discover=False,
 ):
-    """Miscellaneous utilities.
+    """UTILS: miscellaneous bits and pieces.
     """
-    extra = ctx.obj['EXTRA']
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
