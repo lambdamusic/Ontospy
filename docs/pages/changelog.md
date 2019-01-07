@@ -2,6 +2,11 @@
 
 Summary of changes.
 
+## December, 2018: v1.9.8.1
+
+-   ad hoc ordering of commands
+-   examine becomes scan
+
 ## December, 2018: v1.9.8
 
 -   small bug fixes
