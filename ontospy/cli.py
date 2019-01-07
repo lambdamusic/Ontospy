@@ -60,19 +60,50 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 ##################
 #
 #  COMMAND LINE MAIN METHODS
-#
-##################
-#
-# 2018-08-23: restructuring the cli using command groups
 # http://click.pocoo.org/6/commands/
 # test with python -m ontospy.cli library
+#
+##################
+
+##
+## WRAPPER
+# so that commands are listed in order of appearance
+# https://github.com/pallets/click/issues/513
+##
+##
+
+from collections import OrderedDict
+
+
+class NaturalOrderGroup(click.Group):
+    """Command group trying to list subcommands in the order they were added.
+
+    Make sure you initialize the `self.commands` with OrderedDict instance.
+
+    With decorator, use::
+
+        @click.group(cls=NaturalOrderGroup, commands=OrderedDict())
+    """
+
+    def list_commands(self, ctx):
+        """List command names as they are in commands dict.
+
+        If the dict is OrderedDict, it will preserve the order commands
+        were added.
+        """
+        return self.commands.keys()
+
 
 ##
 ## TOP LEVEL COMMAND
 ##
 
 
-@click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS)
+@click.group(
+    cls=NaturalOrderGroup,
+    commands=OrderedDict(),
+    invoke_without_command=True,
+    context_settings=CONTEXT_SETTINGS)
 @click.option(
     '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
@@ -96,7 +127,7 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
 
 
 ##
-## EXAMINE COMMAND
+## SCAN COMMAND
 ##
 
 
@@ -120,8 +151,8 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     is_flag=True,
     help='ENDPOINT: the url passed is a sparql endpoint (beta).')
 @click.pass_context
-def ex(ctx, sources=None, endpoint=False, raw=False, extra=False):
-    """EXAMINE: do a quick scan of an RDF source and print out a report.
+def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
+    """SCAN: get ontology data from RDF source and print out a report.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
