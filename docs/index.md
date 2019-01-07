@@ -28,7 +28,7 @@ Calling the `ontospy` command from a terminal window launches a utility for scan
 For example, if you pass a valid graph URI:
 
 ```
-$ ontospy ex http://purl.org/spar/frbr  # ex = examine
+$ ontospy scan http://purl.org/spar/frbr
 ```
 
 Ontospy will extract and print out any ontology-related information contained in that graph.
