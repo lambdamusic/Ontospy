@@ -92,15 +92,16 @@ def get_localontologies(pattern=""):
     "returns a list of file names in the ontologies folder (not the full path)"
     res = []
     ONTOSPY_LOCAL_MODELS = get_home_location()
-    if os.path.exists(ONTOSPY_LOCAL_MODELS):
-        for f in os.listdir(ONTOSPY_LOCAL_MODELS):
-            if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
-                if not f.startswith(".") and not f.endswith(".pickle"):
-                    if not pattern:
+    if not os.path.exists(ONTOSPY_LOCAL_MODELS):
+        get_or_create_home_repo()
+    for f in os.listdir(ONTOSPY_LOCAL_MODELS):
+        if os.path.isfile(os.path.join(ONTOSPY_LOCAL_MODELS, f)):
+            if not f.startswith(".") and not f.endswith(".pickle"):
+                if not pattern:
+                    res += [f]
+                else:
+                    if pattern in f:
                         res += [f]
-                    else:
-                        if pattern in f:
-                            res += [f]
     return res
 
 

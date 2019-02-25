@@ -162,7 +162,7 @@ def action_listlocal(all_details=True):
     # printDebug("------------------", 'comment')
     if not options:
         printDebug(
-            "Your local library is empty. Use 'ontospy --bootstrap' to add some ontologies to it."
+            "Your local library is empty. Use 'ontospy lib --bootstrap' to add some ontologies to it."
         )
         return
     else:

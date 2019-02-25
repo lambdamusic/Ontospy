@@ -43,17 +43,6 @@ from .core.ontospy import Ontospy
 from .core.manager import *
 from .core.utils import *
 
-SHELL_EXAMPLES = """
-#### LEGACY
-Quick Examples:
-
-  > ontospy ~/Desktop/mymodel.rdf          # ==> inspect a local RDF file
-  > ontospy lib -s                             # ==> list ontologies available in the local library
-  > ontospy lib --save http://xmlns.com/foaf/spec/ # ==> download FOAF vocabulary and save it in library
-
-More info: <http://lambdamusic.github.io/Ontospy/>
-------------
-"""
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -371,7 +360,7 @@ def lib(ctx,
     if bootstrap:
         DONE_ACTION = True
         action_bootstrap(verbose)
-        printDebug("Tip: you can now load an ontology by typing `ontospy -l`",
+        printDebug("Tip: you can now load an ontology by typing `ontospy lib -s`",
                    "important")
         # raise SystemExit(1)
 
@@ -383,9 +372,6 @@ def lib(ctx,
         if not filepath:
             printDebug("Please specify a new directory for the local library.",
                        'important')
-            printDebug(
-                "E.g. 'ontospy library --update /Users/john/ontologies'",
-                'tip')
             sys.exit(0)
         else:
             _location = filepath[0]
