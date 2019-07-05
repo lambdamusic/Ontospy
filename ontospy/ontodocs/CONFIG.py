@@ -22,6 +22,11 @@ VISUALIZATIONS_LIST = {
                            "Title": "D3 Dendogram",
                            "Description": "@todo",
                        },
+{
+                           "ID": "d3-treeNL",
+                           "Title": "D3 Dendogram NL labels",
+                           "Description": "@todo",
+                       },
                        {
                            "ID": "d3-bubble-chart",
                            "Title": "D3 Bubble chart [alpha]",
