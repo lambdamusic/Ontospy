@@ -65,20 +65,21 @@ def _get_prompt(onto="", entity=""):
     :return: [Ontospy]>(cidoc_crm_v5.0...)>(class:E1.CRM_Entity)>
     """
     base_text, onto_text, entity_text = "", "", ""
-    base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.RED, Fore.RED
+    base_color, onto_color, entity_color = Fore.RED + Style.BRIGHT, Fore.BLACK + Style.DIM, Fore.BLACK
 
-    base_text = base_color + '[Ontospy]' + Style.RESET_ALL
+    if not onto and not entity:
+        base_text = base_color + '[Ontospy]' + Style.RESET_ALL
 
     if onto and not entity:
         _tmp = onto_color + '(%s)' % onto
-        onto_text = ">" + _tmp + Style.RESET_ALL
+        onto_text = _tmp + Style.RESET_ALL
 
     if entity:
         _tmp = onto_color + Style.BRIGHT + '(%s)' % truncate(onto, 15)
-        onto_text = ">" + _tmp + Style.RESET_ALL
+        onto_text = _tmp + Style.RESET_ALL
 
         _tmp2 = entity_color + '(%s:%s)' % (entity['type'], entity['name'])
-        entity_text = ">" + _tmp2 + Style.RESET_ALL
+        entity_text = "-" + _tmp2 + Style.RESET_ALL
 
     return base_text + onto_text + entity_text + "> "
 
@@ -552,7 +553,7 @@ class Shell(cmd.Cmd):
     def _select_ontology(self, line):
         """try to select an ontology NP: the actual load from FS is in <_load_ontology> """
         try:
-            var = int(line)	 # it's a string
+            var = int(line)  # it's a string
             if var in range(1, len(self.all_ontologies)+1):
                 self._load_ontology(self.all_ontologies[var-1])
         except ValueError:
@@ -900,7 +901,7 @@ class Shell(cmd.Cmd):
             self._printPropertyDomainRange(False)
             # self._printSourceCode(False)
             if self.currentEntity and self.currentEntity['type'] == 'class':
-                self._print("Tip: type 'info inferred_usage' to show inherited properties")
+                self._print("Tip: type 'info inferred_usage' to show inherited properties\n----------------")
 
         elif line[0] == "inferred_usage":
             if self.currentEntity:  # @todo only for classes?
@@ -971,7 +972,7 @@ class Shell(cmd.Cmd):
 
         try:
             # from ..viz.builder import action_visualize
-            from ontodocs.core.builder import action_visualize
+            from ..ontodocs.builder import action_visualize
         except:
             self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return

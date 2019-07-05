@@ -1,0 +1,451 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+    {% with thispage="statistics" %}
+
+    {% include "navbar.html" %}
+
+    {% endwith %}
+
+{% endblock navbar %}
+
+
+{% block sidebar %}
+
+    {% with thispage="statistics" %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+{% block bodycontent %}
+
+
+
+    {% with thispage="statistics" %}
+        {% include "breadcrumbs.html" %}
+    {% endwith %}
+
+
+
+
+        <div class="page-header">
+
+            <h3>Statistics
+{#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
+            </h3>
+
+        </div>
+
+{% if  0 %}
+        <div class="row">
+            <div class="container">
+            <div class="col-md-12">
+                {% include "onto_header.html" %}
+                <hr>
+            </div>
+            </div>
+
+        </div>
+{% endif %}
+
+
+      <div class="row">
+
+        {# first column #}
+        <div class="col-md-6">
+
+
+            <div class="row"><div class="col-md-12">
+                <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Entity Types</h3>
+              </div>
+              <div class="panel-body">
+
+
+                  <div class="row">
+
+
+                      <div class="col-md-12 ">
+                          <br />
+                          <canvas id="entitiesBarChart" ></canvas>
+                      </div>
+
+
+
+                  </div>
+
+
+              </div>
+            </div>
+             </div></div>
+
+
+
+
+
+              <div class="row"><div class="col-md-12">
+                 <div class="panel panel-default">
+               <div class="panel-heading">
+                 <h3 class="panel-title">Triples</h3>
+               </div>
+               <div class="panel-body">
+
+                   <div class="col-sm-3 col-md-3 ">
+                       <p id="chartsLegend">
+                           <span class="text-muted" style="text-transform: uppercase;">Triples</span>
+                           <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount}}</span>
+                       </p>
+                   </div>
+
+   	        	<canvas id="triplesStats" ></canvas>
+
+               </div>
+             </div>
+              </div></div>
+
+
+
+
+        </div>
+         {# END first column #}
+
+
+        {# second column #}
+        <div class="col-md-6">
+
+
+
+
+        {% if topclasses %}
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Top Classes</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="row">
+
+
+                    <div class="col-md-12 ">
+
+                        <span class="text-muted">NOTE: size = number of sub-classes</span>
+                        <br />
+                        <canvas id="toplayerChart" ></canvas>
+
+
+                    </div>
+
+
+
+                </div>
+
+            </div>
+          </div>
+          </div></div>
+        {% endif %}
+
+
+
+
+        {% if ontospy_graph.toplayer_skos %}
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Top Layer: SKOS</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="row">
+
+
+                    <div class="col-md-12 ">
+
+                        <span class="text-muted">NOTE: size = number of sub-classes</span>
+                        <br />
+                        <canvas id="toplayerChartSKOS"></canvas>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+          </div>
+          </div></div>
+        {% endif %}
+
+
+
+
+        </div>
+         {# END second column #}
+
+      </div>
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
+
+{% block extrajs %}
+
+
+
+<script type="text/javascript">
+
+    // utility to assign colors dynamically at js level
+
+    function getColor(i) {
+        var colors = [["#F7464A", "#FF5A5E"],    // color , highlightColor
+                       ["#46BFBD", "#5AD3D1"],
+                       ["#FDB45C", "#FFC870"],
+                       ["#6588A8", "#CCD3FF"],
+                       ["#6960EC", "#736AFF"],
+                       ["#FFA62F", "#FBB917"],
+                       ["#7D0552", "#7E354D"],
+                       ["#FDB45C", "#FFC870"],
+                        ];
+        return colors[i]
+    }
+
+
+
+// FIRST CHART : types of entities
+
+
+	var ctx = document.getElementById("entitiesBarChart").getContext("2d");
+
+    var data = {
+    // labels: ["January", "February", "March", "April", "May", "June", "July"],
+    labels: [
+             {% for each in stats %}
+                {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources"  %}"{{each.0}}"
+                    {% if not forloop.last %} , {% endif %}
+                {% endif %}
+            {% endfor %}
+    ],
+    datasets: [
+        {
+            label: "Entities Count",
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1,
+          // data: [65, 59, 80, 81, 56, 55, 40],
+            data: [
+             {% for each in stats %}
+                {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources" %}{{each.1}}
+                    {% if not forloop.last %} , {% endif %}
+                {% endif %}
+            {% endfor %}
+                 ],
+            }
+        ]
+        };
+
+    var myBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+        legend: {
+            display: false,
+        }
+        }
+    });
+
+
+
+
+// SECOND CHART : top layer Classes
+
+	{% if topclasses %}
+
+    var ctx2 = document.getElementById("toplayerChart").getContext("2d");
+
+    var data2 = {
+            datasets: [{
+                data: [
+                    {% for class in topclasses%}{{ class.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                  // navy
+                  "#000080",
+                  // blue
+                  "#0000FF",
+                  // teal
+                  "#008080",
+                  // aqua
+                  "#00FFFF",
+                    // maroon
+                    "#800000",
+                    // red
+                    "#FF0000",
+                    // purple
+                    "#800080",
+                    // fuchsia
+                    "#FF00FF",
+                    // green
+                    "#008000",
+                    // lime
+                    "#00FF00",
+                    // olive
+                    "#808000",
+                    // yellow
+                    "#FFFF00",
+                    // black
+                    "#000000",
+                    // silver
+                    "#C0C0C0",
+                    // gray
+                    "#808080",
+                    // white
+                    "#FFFFFF"
+                  ],
+                label: 'Top Layer' // for legend
+            }],
+            labels: [
+                {% for class in topclasses %}"{{class.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            ]
+        };
+    var myPolarChart = new Chart(ctx2, {
+    type: 'polarArea',
+    data: data2,
+    options: {
+        legend: {
+            display: true,
+        }
+        }
+    });
+
+    {% endif %}
+
+
+
+
+// SECOND CHART : top layer SKOS
+
+{% if ontospy_graph.toplayer_skos %}
+
+    var ctx2skos = document.getElementById("toplayerChartSKOS").getContext("2d");
+
+    var data2skos = {
+            datasets: [{
+                data: [
+                    {% for concept in ontospy_graph.toplayer_skos %}{{ concept.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    "#FF6384",
+                    "#4BC0C0",
+                    "#FFCE56",
+                    "#E7E9ED",
+                    "#36A2EB"
+                ],
+                label: 'Top Layer' // for legend
+            }],
+            labels: [
+                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            ]
+        };
+    var myPolarChart = new Chart(ctx2skos, {
+    type: 'polarArea',
+    data: data2skos,
+    options: {
+        legend: {
+            display: true,
+        }
+        }
+    });
+
+    {% endif %}
+
+
+
+
+
+
+// THIRD CHART: triples
+
+	var ctxTriples = document.getElementById("triplesStats").getContext("2d");
+	var dataTriples = {
+    labels: ["Triples"],
+    datasets: [
+                {
+                    label: "Triples Count",
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255,99,132,1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1,
+                    data: [{{ontospy_graph.triplesCount}}],
+                }
+            ]
+        };
+
+    var myBarChart = new Chart(ctxTriples, {
+    type: 'bar',
+    data: dataTriples,
+    options: {
+        legend: {
+            display: false,
+            },
+        scales: {
+            yAxes: [{
+                stacked: true
+            }]
+        }
+        }
+    });
+
+
+
+
+</script>
+
+
+
+{% endblock extrajs %}

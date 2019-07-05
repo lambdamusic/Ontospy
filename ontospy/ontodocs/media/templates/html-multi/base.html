@@ -1,0 +1,318 @@
+{# Bootstrap 3.3.7 #}
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{{STATIC_URL}}libs/img/favicon.ico">
+
+	{% block pagetitle %}
+		<title>Ontospy > {{docs_title}}</title>
+	{% endblock pagetitle %}
+
+    <!-- Bootstrap core CSS -->
+    <!-- <link href="{{STATIC_URL}}libs/bootstrap-3_3_7-dist/css/bootstrap.min.css" rel="stylesheet">  -->
+    <!-- Bootswatch:  -->
+    <!-- cerulean  | cyborg |  flatly |  lumen |  sandstone |   spacelab  |  yeti | cosmo |  darkly |  paper | simplex | superhero |  journal | readable  |   slate |  united -->
+    <link href="{{STATIC_URL}}libs/bootswatch3_2/{{theme}}/bootstrap.min.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/simple-sidebar.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/familytree.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}custom/css/tabletree.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{STATIC_URL}}libs/bootstrap-3_3_7-dist/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{STATIC_URL}}custom/css/sticky-footer-navbar.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<style type="text/css">
+
+  .lead-plus {font-size: 26.5px;}
+  .label-xs {font-size: 10px;}
+  .label-dark {background: #2c3e50; color: white; padding: 1px;}
+  .margin50 {margin-top: 50px; margin-bottom: 50px;}
+
+  .namespaces {background: #ced2d6; width: 100%;}
+{#  .footer {background-color: #2c3e50;}#}
+
+  /*so that the d3plus tooltip panel doesnt cover the top banner*/
+  .navbar {z-index: 3000;}
+
+
+  .panel-body dt {margin-top: 5px;}
+  .page-header  {margin-top: 30px;}
+  #wrapper {margin-top: 50px;}
+
+  .implementation-panel {
+    overflow: auto;
+    /*max-height: 500px;*/
+  }
+
+  tr.table-classproperties {
+      /*background: #f5f5f5;*/
+  }
+  tr.table-classproperties th {
+      font-size: 80%;
+      font-weight: normal;
+  }
+
+
+  tr.table-inheritanceinfo {
+      /*background: #f5f5f5;*/
+      text-align: left;
+  }
+
+  tr.table-inheritanceinfo th {
+      font-size: 90%;
+      font-weight: normal;
+  }
+
+
+  .breadcrumb {
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+
+  .breadcrumb a {
+      text-transform: capitalize;
+  }
+  .breadcrumb li {
+      text-transform: none;
+      /*so to catch the uri @todo improve*/
+  }
+
+
+  .fromclass_link {
+    /*color: white;
+    text-decoration: underline;*/
+    /*background: #1c1e52;*/
+    color: inherit;
+    /*padding: 1px;*/
+  }
+
+		.mythumbnail {
+			display: block;
+			padding: 13px;
+			margin-bottom: 30px;
+			line-height: 13.428571;
+			background-color: #fff;
+			border: 1px solid #ddd;
+			border-radius: 30px;
+		}
+
+		.mythumbnail:hover {
+			background: lightyellow;
+			text-decoration: none;
+		}
+
+
+		.img-container{
+		    height:100%;
+			overflow: hidden;
+		    max-height:200px;
+			padding: 10px;
+/*			margin: 20px 0px 20px 0px;*/
+			border: 1em #EAE5E5 solid;
+		}
+
+		.img-container:hover {
+			border: 1px grey solid;
+		}
+
+		img{
+/*		    height:100% !important;*/
+		}
+
+
+		.icon-xxs {
+			font-size: 15px;
+		}
+
+
+    /* dropdown open on hover */
+
+    @media (min-width: 979px) {
+      ul.nav li.dropdown:hover > ul.dropdown-menu {
+        display: block;
+      }
+    }
+
+
+
+/*pygments css*/
+{{pygments_code_css}}
+
+/*overloading this class from pygments*/
+.highlight {
+  overflow: auto;
+}
+
+
+
+{% if theme == "slate" or  theme == "darkly"  or  theme == "superhero"  %}
+/* override default footer background for dark themes only */
+.footer {
+  background-color: inherit;
+}
+{% endif %}
+
+
+
+
+</style>
+
+
+
+
+
+  </head>
+
+  <body>
+
+{% block navbar %}
+
+    {% include "navbar.html" %}
+
+
+{% endblock navbar %}
+
+
+{# SIDEBAR OPEN CLOSE operates from here with class="toggled" when closed #}
+
+{# previous version: #}
+{# <div id="wrapper" {% if not index_page_flag  %}class="toggled"{% endif %}>#}
+
+<div id="wrapper" class="toggled">
+
+
+    {% block sidebar %}
+
+      {% include "sidebar.html" %}
+
+    {% endblock sidebar %}
+
+
+    <!-- Begin page content -->
+    <div class="container" id="page-content-wrapper">
+
+      {% if 0 %}
+      <button id="menu-toggle" type="button" name="button" class="btn btn-xs btn-default margin-bottom-50" style="margin-top: 20px;">Toggle sidebar</button>
+      {% endif %}
+
+	{% block bodycontent %}
+
+
+
+	{% endblock bodycontent %}
+
+
+	</div><!-- /#page-content-wrapper -->
+
+
+  {% block abovefooter %}
+
+
+
+  {% endblock abovefooter %}
+
+
+
+
+  <footer class="footer">
+    <div class="container">
+    {% block footer %}
+      <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="http://lambdamusic.github.io/Ontospy/">Ontospy</a> ({{ontodocs_version}})</p>
+
+    {% endblock footer %}
+    </div>
+  </footer>
+
+
+</div><!-- /#wrapper -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{{STATIC_URL}}libs/jquery/1_12_4/jquery.min.js"></script>
+<script src="{{STATIC_URL}}libs/bootstrap-3_3_7-dist/js/bootstrap.min.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{{STATIC_URL}}libs/bootstrap-3_3_7-dist/js/ie10-viewport-bug-workaround.js"></script>
+
+<script src="{{ STATIC_URL }}libs/chartjs-2_4_0/chart.bundle.js"></script>
+
+
+<!-- Menu Toggle Script -->
+<script>
+$("#menu-toggle").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+});
+</script>
+
+
+
+
+<script type="text/javascript">
+
+$('#search-input-sidebar').keyup(function() {
+
+  var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+  // var $rows = $(this).next(".entities-list").find("div");
+  var $rows = $(this).parent().parent().find("li.second-level");
+
+  $rows.show().filter(function() {
+      var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+      return !~text.indexOf(val);
+  }).hide();
+});
+
+</script>
+
+
+
+{% if main_entity %}
+  <!-- Scroll Sidebar Script -->
+
+  {# Convention is to have sidebar menu li items with id "sd_XXXX"#}
+  {# Entity pages get the script below - other pages need duplication unfortunately #}
+
+  <script type="text/javascript">
+
+    $(document).ready(function (){
+      $('#sidebar-wrapper').animate({
+          scrollTop: $("#sd_{{main_entity.id}}").offset().top - 100
+      }, 100);
+    });
+
+  </script>
+
+{% endif %}
+
+
+
+{% block extrajs %}
+
+
+
+{% endblock extrajs %}
+
+
+
+
+
+  </body>
+</html>

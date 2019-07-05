@@ -7,8 +7,6 @@ All rights reserved.
 
 """
 
-from __future__ import print_function
-
 import sys
 import os
 import time
@@ -45,44 +43,62 @@ from .core.ontospy import Ontospy
 from .core.manager import *
 from .core.utils import *
 
-SHELL_EXAMPLES = """
-Quick Examples:
-
-  > ontospy ~/Desktop/mymodel.rdf          # ==> inspect a local RDF file
-  > ontospy -l                             # ==> list ontologies available in the local library
-  > ontospy -s http://xmlns.com/foaf/spec/ # ==> download FOAF vocabulary and save it in library
-
-More info: <ontospy.readthedocs.org>
-------------
-"""
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 ##################
 #
 #  COMMAND LINE MAIN METHODS
-#
-##################
-#
-# 2018-08-23: trying to restructure the cli using command groups
 # http://click.pocoo.org/6/commands/
 # test with python -m ontospy.cli library
+#
+##################
+
+##
+## WRAPPER
+# so that commands are listed in order of appearance
+# https://github.com/pallets/click/issues/513
+##
+##
+
+from collections import OrderedDict
+
+
+class NaturalOrderGroup(click.Group):
+    """Command group trying to list subcommands in the order they were added.
+
+    Make sure you initialize the `self.commands` with OrderedDict instance.
+
+    With decorator, use::
+
+        @click.group(cls=NaturalOrderGroup, commands=OrderedDict())
+    """
+
+    def list_commands(self, ctx):
+        """List command names as they are in commands dict.
+
+        If the dict is OrderedDict, it will preserve the order commands
+        were added.
+        """
+        return self.commands.keys()
+
 
 ##
 ## TOP LEVEL COMMAND
 ##
 
 
-@click.group(invoke_without_command=True, context_settings=CONTEXT_SETTINGS)
+@click.group(
+    cls=NaturalOrderGroup,
+    commands=OrderedDict(),
+    invoke_without_command=True,
+    context_settings=CONTEXT_SETTINGS)
 @click.option(
-    '--verbose',
-    '-v',
-    is_flag=True,
-    help='Print out version info and debug messages.')
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
 def main_cli(ctx, verbose=False):
     """
-Ontospy is a command line inspector for RDF/OWL models. Use --help option with one of the commands listed below to find out more. Or visit <https://github.com/lambdamusic/ontospy/wiki>.
+Ontospy allows to extract and visualise ontology information included in RDF data. Use one of the commands listed below to find out more, or visit http://lambdamusic.github.io/ontospy 
     """
     sTime = time.time()
     if ctx.obj is None:  # Fix for bug (as of 3.0)
@@ -90,9 +106,9 @@ Ontospy is a command line inspector for RDF/OWL models. Use --help option with o
         ctx.obj = {}
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
-    if verbose:
-        click.secho("Ontospy " + VERSION, bold=True)
-        click.secho("------------", fg='white')
+
+    click.secho("Ontospy " + VERSION, fg='white')
+    # click.secho("------------", fg='white')
     if not verbose and ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
     # else:
@@ -100,28 +116,41 @@ Ontospy is a command line inspector for RDF/OWL models. Use --help option with o
 
 
 ##
-## CHECK / ANALYZE / SCAN COMMAND
+## SCAN COMMAND
 ##
 
 
 @main_cli.command()
 @click.argument('sources', nargs=-1)
 @click.option(
+    '--extra',
+    '-x',
+    is_flag=True,
+    help=
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
+    '--raw',
+    '-r',
+    is_flag=True,
+    help='RAW-DATA: print out the raw RDF data received.')
+@click.option(
     '--endpoint',
     '-e',
     is_flag=True,
-    help='Use to specify that the source url passed is a sparql endpoint')
+    help='ENDPOINT: the url passed is a sparql endpoint (beta).')
 @click.pass_context
-def scan(ctx, sources=None, endpoint=False):
-    """Search an RDF source for ontology entities and print out a report.
+def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
+    """SCAN: get ontology data from RDF source and print out a report.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
+        'extra': extra,
     }
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint)
+        action_analyze(sources, endpoint, print_opts, verbose, extra, raw)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -131,55 +160,62 @@ def scan(ctx, sources=None, endpoint=False):
 
 
 ##
-## LIBRARY COMMAND
+## GENDOCS COMMAND (wrapper around ontodocs)
 ##
 
 
 @main_cli.command()
+@click.argument('source', nargs=-1)
 @click.option(
-    '--bootstrap',
-    '-b',
-    is_flag=True,
-    help='BOOTSTRAP: bootstrap the local library with a few sample models.')
-@click.option(
-    '--cache',
-    '-c',
-    is_flag=True,
+    '--outputpath',
+    '-o',
     help=
-    'CACHE: force reset the cache folder for the local library (used to clean up old files and speed up loading of ontologies).'
+    'OUTPUT-PATH: where to save the visualization files (default: home folder).'
 )
 @click.option(
-    '--reveal',
-    '-r',
+    '--extra',
+    '-x',
     is_flag=True,
     help=
-    'REVEAL: open the local library folder using default app. Note: from v1.9.4 all file management operations should be done via the OS.'
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
 )
 @click.option(
-    '--directory',
-    '-d',
-    is_flag=True,
+    '--type',
     help=
-    'DIRECTORY: set a (new) home directory for the local library. A valid path must be passed as argument.'
+    'VIZ-TYPE: specify which viz type to use as an integer (eg 1=single-page html, 2=multi-page etc..).'
 )
 @click.option(
-    '--save',
-    '-s',
-    is_flag=True,
+    '--title',
+    help='TITLE: custom title for the visualization (default=graph uri).')
+@click.option(
+    '--theme',
     help=
-    'SAVE: import a local or remote RDF file to the local library. If a local folder path is passed, all valid RDF files found in it get imported. If no argument is provided and there is an internet connection, it allows to scan online ontology repositories to find items of interests.'
+    'THEME: bootstrap css style for the html-multi-page visualization (random=use a random theme).'
 )
-@click.argument('filepath', nargs=-1)
+@click.option(
+    '--lib',
+    is_flag=True,
+    help='LIBRARY: choose an ontology from the local library.')
+@click.option(
+    '--showtypes',
+    is_flag=True,
+    help='SHOW-TYPES: show the available visualization types.')
+@click.option(
+    '--showthemes',
+    is_flag=True,
+    help='SHOW-THEMES: show the available css theme choices.')
 @click.pass_context
-def library(ctx,
-            filepath=None,
-            bootstrap=False,
-            cache=False,
-            reveal=False,
-            save=False,
-            directory=False):
-    """
-    Work with a local library of RDF models. If no option or argument is passed, by default the library contents are listed.
+def gendocs(ctx,
+            source=None,
+            outputpath="",
+            extra=False,
+            lib=False,
+            type="",
+            title="",
+            theme="",
+            showthemes=False,
+            showtypes=False):
+    """GENDOCS: generate documentation in html or markdown format.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
@@ -187,22 +223,155 @@ def library(ctx,
         'labels': verbose,
     }
 
+    from .ontodocs.builder import show_themes, random_theme, show_types
+
+    try:
+        # check that we have the required dependencies
+        import django
+    except:
+        click.secho(
+            "WARNING: this functionality requires the Django package and other extra dependecies.",
+            fg="red")
+        click.secho("Install with `pip install ontospy[HTML] -U`")
+        sys.exit(0)
+
+    if not source and not showthemes and not showtypes and not lib:
+        click.echo(ctx.get_help())
+        return
+
+    if showthemes:
+        show_themes()
+        sys.exit(0)
+
+    if showtypes:
+        show_types()
+        sys.exit(0)
+
+    if theme and theme == "random":
+        theme = random_theme()
+
+    if outputpath:
+        if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
+            click.secho(
+                "WARNING: the -o option must include a valid directory path.",
+                fg="red")
+            sys.exit(0)
+
+    if source and len(source) > 1:
+        click.secho(
+            'Note: currently only one argument can be passed', fg='red')
+
+    if lib:
+        click.secho("Local library => '%s'" % get_home_location(), fg='white')
+        ontouri = action_listlocal(all_details=False)
+        if ontouri:
+            source = [os.path.join(get_home_location(), ontouri)]
+        else:
+            raise SystemExit(1)
+
+    # note: the local ontospy library gets displayed via this method too
+    url = action_visualize(
+        source,
+        fromshell=False,
+        path=outputpath,
+        title=title,
+        viztype=type,
+        theme=theme,
+        verbose=verbose)
+
+    if url:  # open browser
+        import webbrowser
+        webbrowser.open(url)
+
+    eTime = time.time()
+    tTime = eTime - sTime
+    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+
+
+##
+## LIBRARY COMMAND
+##
+
+
+@main_cli.command()
+@click.option(
+    '--show',
+    '-s',
+    is_flag=True,
+    help=
+    'SHOW: list all ontologies stored in the local library and prompt which one to open.'
+)
+@click.option(
+    '--extra',
+    '-x',
+    is_flag=True,
+    help=
+    'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
+    '--bootstrap',
+    is_flag=True,
+    help='BOOTSTRAP: bootstrap the local library with popular ontologies.')
+@click.option(
+    '--cache',
+    is_flag=True,
+    help=
+    'CACHE: force reset the cache folder for the local library (used to clean up old files and speed up loading of ontologies).'
+)
+@click.option(
+    '--directory',
+    is_flag=True,
+    help=
+    'DIRECTORY: set a (new) home directory for the local library. A valid path must be passed as argument.'
+)
+@click.option(
+    '--reveal',
+    is_flag=True,
+    help=
+    'REVEAL: open the local library folder using the OS. Note: from v1.9.4 all file management operations should be done via the OS.'
+)
+@click.option(
+    '--save',
+    is_flag=True,
+    help=
+    'SAVE: import a local or remote RDF file to the local library. If a local folder path is passed, all valid RDF files found in it get imported. If no argument is provided and there is an internet connection, it allows to scan online ontology repositories to find items of interests.'
+)
+@click.argument('filepath', nargs=-1)
+@click.pass_context
+def lib(ctx,
+        filepath=None,
+        extra=False,
+        bootstrap=False,
+        cache=False,
+        reveal=False,
+        show=False,
+        save=False,
+        directory=False):
+    """
+    LIBRARY: work with a local library of RDF models.
+    """
+    verbose = ctx.obj['VERBOSE']
+    sTime = ctx.obj['STIME']
+    print_opts = {
+        'labels': verbose,
+    }
+    DONE_ACTION = False
+
     if bootstrap:
-        action_bootstrap()
-        printDebug("Tip: you can now load an ontology by typing `ontospy -l`",
+        DONE_ACTION = True
+        action_bootstrap(verbose)
+        printDebug("Tip: you can now load an ontology by typing `ontospy lib -s`",
                    "important")
         # raise SystemExit(1)
 
     elif cache:
+        DONE_ACTION = True
         action_cache_reset()
 
     elif directory:
         if not filepath:
             printDebug("Please specify a new directory for the local library.",
                        'important')
-            printDebug(
-                "E.g. 'ontospy library --update /Users/john/ontologies'",
-                'tip')
             sys.exit(0)
         else:
             _location = filepath[0]
@@ -229,70 +398,76 @@ def library(ctx,
 
     elif save:
         if filepath:
-            action_import(filepath[0])
+            DONE_ACTION = True
+            action_import(filepath[0], verbose)
         else:
             click.secho(
-                "You provided no arguments - starting web import wizard..",
+                "You provided no arguments - please specify what to save..",
                 fg='white')
-            action_webimport()
         raise SystemExit(1)
 
-    else:
-        # by default, show the local library
-        click.secho(
-            "Tip: view all options for the library command with `ontospy library -h`\n-------------",
-            fg='white')
+    elif show:
         click.secho("Local library => '%s'" % get_home_location(), fg='white')
-        filename = action_listlocal(all_details=True)
+        filename = action_listlocal(all_details=False)
 
         if filename:
+            DONE_ACTION = True
             g = get_pickled_ontology(filename)
             if not g:
                 g = do_pickle_ontology(filename)
             shellPrintOverview(g, print_opts)
 
-    eTime = time.time()
-    tTime = eTime - sTime
-    printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+    else:
+        click.echo(ctx.get_help())
+        return
+
+    if DONE_ACTION:
+        eTime = time.time()
+        tTime = eTime - sTime
+        printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
+    else:
+        printDebug("Goodbye", "comment")
 
 
 ##
-## SHELL COMMAND
+## SHELL COMMAN/'
 ##
 
 
 @main_cli.command()
 @click.argument('sources', nargs=-1)
 def shell(sources=None):
-    """Launch the ontospy repl - an interactive shell for querying ontologies. If an rdf source path is provided the repl is preloaded with it."
+    """SHELL: launch ontospy's interactive mode. If an rdf source path is provided the shell is preloaded with it."
     """
-    from extras.shell import launch_shell
+    from .extras.shell import launch_shell
     launch_shell(sources)
 
 
 ##
-## TRANSFORM COMMAND
+## SERIALIZE COMMAND
 ##
 
 
 @main_cli.command()
-@click.argument('source', nargs=1)
-@click.argument('output_format', nargs=1)
+@click.argument('source', nargs=-1)
+@click.option(
+    '-f',
+    '--output_format',
+    default='turtle',
+    help='OUTPUT-FORMAT: the serialization format (default=turtle)')
+# @click.argument('output_format', nargs=1)
 @click.pass_context
-def transform(ctx, source, output_format):
-    """Output a different RDF serialization for a given source.
+def ser(ctx, source, output_format):
+    """SERIALIZE: tranform an RDF graph to a format of choice.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
     }
-    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld']
+    output_format = output_format
+    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
-        if serialize:
-            click.secho(
-                "What do you want to serialize? Please specify a valid RDF source.",
-                fg='red')
         click.echo(ctx.get_help())
     else:
         if output_format not in VALID_FORMATS:
@@ -301,42 +476,78 @@ def transform(ctx, source, output_format):
                 fg='red')
             return
         else:
-            action_transform(source, output_format, verbose)
+            action_serialize(source, output_format, verbose)
             eTime = time.time()
             tTime = eTime - sTime
-            printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime,
-                       "comment")
+            printDebug(
+                "\n-----------\n" + "Serialized <%s> to '%s'" %
+                (" ".join([x for x in source]), output_format), "comment")
+            printDebug("Time:	   %0.2fs" % tTime, "comment")
 
 
 ##
-## JSONLD PLAYGROUND COMMAND
+## UTILS COMMAND
 ##
 
 
 @main_cli.command()
-@click.argument('filepath', nargs=1)
+@click.option(
+    '--jsonld',
+    '-j',
+    is_flag=True,
+    help='JSONLD: test a json-ld file using the online playground tool.')
+@click.option(
+    '--discover',
+    '-d',
+    is_flag=True,
+    help='DISCOVER: find ontologies in online repositories like LOV or Prefix.cc'
+)
+@click.argument('filepath', nargs=-1)
 @click.pass_context
-def testjsonld(ctx, filepath):
-    """Test a JSONLD file using the online playground tool (requires a web connection).
+def utils(
+        ctx,
+        filepath=None,
+        jsonld=False,
+        discover=False,
+):
+    """UTILS: miscellaneous bits and pieces.
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
     }
+    DONE_ACTION = False
 
-    if not filepath:
-        if serialize:
+    if jsonld:
+        if not filepath:
             click.secho(
                 "What do you want to test? Please specify a valid JSONLD source.",
                 fg='red')
-        click.echo(ctx.get_help())
+        else:
+            filepath = filepath[0]
+            action_jsonld_playground(filepath, verbose)
+            DONE_ACTION = True
+    elif discover:
+        DONE_ACTION = True
+        action_webimport()
     else:
-        action_jsonld_playground(filepath, verbose)
+        click.secho("You haven't specified any utils command.")
+        click.echo(ctx.get_help())
+
+    if DONE_ACTION:
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
 
+
+if __name__ == '__main__':
+    import sys
+    try:
+        main_cli(prog_name='ontospy')
+        sys.exit(0)
+    except KeyboardInterrupt as e:  # Ctrl-C
+        raise e
 
 if __name__ == '__main__':
     import sys

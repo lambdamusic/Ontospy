@@ -54,7 +54,18 @@ class Ontospy(object):
 
     """
 
-    def __init__(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True, sparql_endpoint=None, credentials=None, build_all=True):
+    def __init__(self,
+                 uri_or_path=None,
+                 data=None,
+                 file_obj=None,
+                 rdf_format="",
+                 verbose=False,
+                 hide_base_schemas=True,
+                 hide_implicit_types=True,
+                 hide_implicit_preds=True,
+                 sparql_endpoint=None,
+                 credentials=None,
+                 build_all=True):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -84,11 +95,18 @@ class Ontospy(object):
 
         # finally:
         if uri_or_path or data or file_obj:
-            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose, hide_base_schemas)
+            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose,
+                          hide_base_schemas, hide_implicit_types,
+                          hide_implicit_preds)
             if build_all:
-                self.build_all(verbose=verbose, hide_base_schemas=hide_base_schemas)
+                self.build_all(
+                    verbose=verbose,
+                    hide_base_schemas=hide_base_schemas,
+                    hide_implicit_types=hide_implicit_types,
+                    hide_implicit_preds=hide_implicit_preds)
         elif sparql_endpoint:  # by default entities are not extracted
-            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas, credentials)
+            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas,
+                             hide_implicit_types, hide_implicit_preds, credentials)
         else:
             pass
 
@@ -106,7 +124,15 @@ class Ontospy(object):
         else:
             return "<Ontospy object created but not initialized (use the `load_rdf` method to load an rdf schema)>"
 
-    def load_rdf(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", verbose=False, hide_base_schemas=True):
+    def load_rdf(self,
+                 uri_or_path=None,
+                 data=None,
+                 file_obj=None,
+                 rdf_format="",
+                 verbose=False,
+                 hide_base_schemas=True,
+                 hide_implicit_types=True,
+                 hide_implicit_preds=True):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader(verbose=verbose)
         loader.load(uri_or_path, data, file_obj, rdf_format)
@@ -115,14 +141,23 @@ class Ontospy(object):
         self.sparqlHelper = SparqlHelper(self.rdflib_graph)
         self.namespaces = sorted(self.rdflib_graph.namespaces())
 
-    def load_sparql(self, sparql_endpoint, verbose=False, hide_base_schemas=True, credentials=None):
+    def load_sparql(self,
+                    sparql_endpoint,
+                    verbose=False,
+                    hide_base_schemas=True,
+                    hide_implicit_types=True,
+                    hide_implicit_preds=True, credentials=None):
         """
         Set up a SPARQLStore backend as a virtual ontospy graph
 
         Note: we're using a 'SPARQLUpdateStore' backend instead of 'SPARQLStore' cause otherwise authentication fails (https://github.com/RDFLib/rdflib/issues/755)
 
+        @TODO this error seems to be fixed in upcoming rdflib versions
+        https://github.com/RDFLib/rdflib/pull/744
+
         """
         try:
+            # graph = rdflib.Graph('SPARQLStore')
             # graph = rdflib.ConjunctiveGraph('SPARQLStore')
             graph = rdflib.ConjunctiveGraph('SPARQLUpdateStore')
 
@@ -147,7 +182,11 @@ class Ontospy(object):
     # === methods to build python objects === #
     # ------------
 
-    def build_all(self, verbose=False, hide_base_schemas=True):
+    def build_all(self,
+                  verbose=False,
+                  hide_base_schemas=True,
+                  hide_implicit_types=True,
+                  hide_implicit_preds=True):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -159,11 +198,11 @@ class Ontospy(object):
         if verbose:
             printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
-        self.build_classes(hide_base_schemas)
+        self.build_classes(hide_base_schemas, hide_implicit_types)
         if verbose:
             printDebug("Classes............: %d" % len(self.all_classes), "comment")
 
-        self.build_properties()
+        self.build_properties(hide_implicit_preds)
         if verbose:
             printDebug("Properties.........: %d" % len(self.all_properties), "comment")
         if verbose:
@@ -250,7 +289,7 @@ class Ontospy(object):
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
 
-    def build_classes(self, hide_base_schemas=True):
+    def build_classes(self, hide_base_schemas=True, hide_implicit_types=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-05-25: optimized via sparql queries in order to remove BNodes
@@ -264,7 +303,9 @@ class Ontospy(object):
 
         self.all_classes = []  # @todo: keep adding?
 
-        qres = self.sparqlHelper.getAllClasses(hide_base_schemas=hide_base_schemas)
+        qres = self.sparqlHelper.getAllClasses(hide_base_schemas,
+                                               hide_implicit_types)
+        # print("rdflib query done")
 
         for class_tuple in qres:
 
@@ -284,9 +325,11 @@ class Ontospy(object):
                 if _type == rdflib.OWL.Class:
                     test_existing_cl.rdftype = rdflib.OWL.Class
 
+        # print("classes created")
+
         # add more data
         for aClass in self.all_classes:
-
+            # print("enriching class", aClass)
             aClass.triples = self.sparqlHelper.entityTriples(aClass.uri)
             aClass._buildGraph()  # force construction of mini graph
 
@@ -294,7 +337,7 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aClass.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_classes += [aClass]
                     aClass.ontology = onto
@@ -316,13 +359,14 @@ class Ontospy(object):
         self.all_classes = sorted(self.all_classes, key=lambda x: x.qname)
 
         # compute top layer
+        # print("calc toplayer")
         exit = []
         for c in self.all_classes:
             if not c.parents():
                 exit += [c]
         self.toplayer_classes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
-    def build_properties(self):
+    def build_properties(self, hide_implicit_preds=True):
         """
         2015-06-04: removed sparql 1.1 queries
         2015-06-03: analogous to get classes
@@ -337,7 +381,8 @@ class Ontospy(object):
         self.all_properties_object = []
         self.all_properties_datatype = []
 
-        qres = self.sparqlHelper.getAllProperties()
+        qres = self.sparqlHelper.getAllProperties(hide_implicit_preds)
+        # print("rdflib query done")
 
         for candidate in qres:
 
@@ -349,10 +394,11 @@ class Ontospy(object):
                 # update it
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
                     test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
+        # print("properties created")
 
         # add more data
         for aProp in self.all_properties:
-
+            # print("enriching prop..", aProp)
             if aProp.rdftype == rdflib.OWL.DatatypeProperty:
                 self.all_properties_datatype += [aProp]
             elif aProp.rdftype == rdflib.OWL.AnnotationProperty:
@@ -367,7 +413,7 @@ class Ontospy(object):
 
             # attach to an ontology [2015-06-15: no property type distinction yet]
             for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_properties += [aProp]
                     aProp.ontology = onto
@@ -391,6 +437,7 @@ class Ontospy(object):
         self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
 
         # computer top layer for properties
+        # print("calc toplayer")
         exit = []
         for c in self.all_properties:
             if not c.parents():
@@ -404,6 +451,7 @@ class Ontospy(object):
         self.all_skos_concepts = []  # @todo: keep adding?
 
         qres = self.sparqlHelper.getSKOSInstances()
+        # print("rdflib query done")
 
         for candidate in qres:
 
@@ -413,12 +461,12 @@ class Ontospy(object):
                 self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
             else:
                 pass
-
+        # print("concepts created")
         # add more data
         skos = rdflib.Namespace('http://www.w3.org/2004/02/skos/core#')
 
         for aConcept in self.all_skos_concepts:
-
+            # print("enriching concept...", aConcept)
             aConcept.rdftype = skos['Concept']
             aConcept.triples = self.sparqlHelper.entityTriples(aConcept.uri)
             aConcept._buildGraph()  # force construction of mini graph
@@ -427,7 +475,7 @@ class Ontospy(object):
 
             # attach to an ontology
             for uri in aConcept.getValuesForProperty(rdflib.RDFS.isDefinedBy):
-                onto = self.get_ontology(str(uri))
+                onto = self.get_ontology(uri=str(uri))
                 if onto:
                     onto.all_skos_concepts += [aConcept]
                     aConcept.ontology = onto
@@ -692,7 +740,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://") and not uri.startswith("https://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -729,7 +777,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://") and not uri.startswith("https://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -766,7 +814,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -801,7 +849,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -847,7 +895,7 @@ class Ontospy(object):
         if type(id) == type("string"):
             uri = id
             id = None
-            if not uri.startswith("http://"):
+            if not is_http(uri):
                 match = uri
                 uri = None
         if match:
@@ -973,7 +1021,11 @@ class Ontospy(object):
         Wrapper for rdflib serializer method.
         Valid options are: xml, n3, turtle, nt, pretty-xml, json-ld [trix not working out of the box]
         """
-        return self.rdflib_graph.serialize(format=format)
+        s = self.rdflib_graph.serialize(format=format)
+        if isinstance(s, bytes):
+            s = s.decode('utf-8')
+        return s
+
 
     def serialize(self, format="turtle"):
         "for backward compatibility"
