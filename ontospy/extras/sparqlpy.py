@@ -268,7 +268,7 @@ def parse_options():
 
 	if len(args) < 1:
 		parser.print_help()
-		raise SystemExit, 1
+		raise SystemExit(1)
 
 	return opts, args
 
@@ -332,5 +332,5 @@ if __name__ == "__main__":
     try:
         main()
         sys.exit(0)
-    except KeyboardInterrupt, e: # Ctrl-C
+    except KeyboardInterrupt as e: # Ctrl-C
         raise e

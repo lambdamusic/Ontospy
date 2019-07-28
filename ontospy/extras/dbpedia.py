@@ -98,10 +98,10 @@ def parse_options():
 
     if len(args) > 0:  #dont take no args
         parser.print_help()
-        raise SystemExit, 1
+        raise SystemExit(1)
     if not (opts.query or opts.describe or opts.alltriples or opts.ontology):
         parser.print_help()
-        raise SystemExit, 1
+        raise SystemExit(1)
     return opts, args
 
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     try:
         main()
         sys.exit(0)
-    except KeyboardInterrupt, e: # Ctrl-C
+    except KeyboardInterrupt as e: # Ctrl-C
         raise e
 
 
