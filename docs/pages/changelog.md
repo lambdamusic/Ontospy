@@ -131,7 +131,7 @@ ontospy.Ontospy
 ## March 17, 2017
 
 -   wiki online
--   removed dependency on readline
+-   removed dependency on readline for non-shell usage
 -   version 1.7.6 published
 
 ## February 27, 2017

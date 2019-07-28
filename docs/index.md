@@ -44,17 +44,7 @@ Prerequisites:
 -   Python (3.x)
 -   A python package manager: [setuptools](https://pypi.python.org/pypi/setuptools) or [pip](https://pip.pypa.io/en/stable/installing/).
 
-**Full Version**
-
-Once you have a package manager installed, get Ontospy from the Python Package Index.
-
-If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you want to install the FULL version of the library like this:
-
-```
-$ pip install ontospy[FULL]
-```
-
-The full version includes more files (eg html templates) and it has a larger footprint as it relies on Django and other libraries.
+Once you have a package manager installed, simply install Ontospy from the Python Package Index. There are three library versions you can choose from.
 
 **Lightweight Version**
 
@@ -65,6 +55,27 @@ $ pip install ontospy
 ```
 
 The python library, its dependencies and all of its command-line executables will be installed. The only thing which is left out is the documentation-generation feature.
+
+**Lightweight Version plus Shell**
+
+The 'shell' or interactive command line interface requires the [readline](https://pypi.org/project/readline/) module, a set of functions for use by applications that allow users to edit command lines as they are typed in.  
+
+This module is optionally installed with Ontospy like this:
+
+```
+$ pip install ontospy[SHELL]
+```
+
+**Full Version**
+
+If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you should install the FULL version of the library like this:
+
+```
+$ pip install ontospy[FULL]
+```
+
+The full version includes more files (eg html templates) and it has a larger footprint as it relies on Django and other libraries. 
+
 
 **Upgrading**
 
