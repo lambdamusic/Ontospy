@@ -2,20 +2,26 @@
 
 Summary of changes.
 
+## July, 2019: v1.9.8.3
+
+-  `gendocs` option: `no browser` prevents opening html viz in browser 
+-  `gendocs -l` added as shortcut of `--lib`
+
+
 ## December, 2018: v1.9.8.1
 
 -   ad hoc ordering of commands
--   examine becomes scan
+-   examine becomes `scan`
 
 ## December, 2018: v1.9.8
 
 -   small bug fixes
 -   refactor action visualize / activated 'alpha' dataviz
     -   allow to pass viztype from command line
--   implicit/explicit classes and predicates switch '-x'
+-   implicit/explicit classes and predicates switch `-x`
     -   this is useful to inspect a small RDF snippet for example too see what predicates are being used
--   option to show raw RDF data (-r)
--   improvements to shell command
+-   option to show raw RDF data `-r`
+-   improvements to `shell` command
 -   namespaces printed out by default
 
 ## December, 2018: v1.9.7
@@ -25,8 +31,8 @@ Summary of changes.
 -   comments all go to sterr by default
     => eg now easier to to `ontospy serialize foaf.rdf json-ld > ~/foaf.json`
 -   embedded ontodocs plugin within main source code
-    -   requires install with [HTML] flag
--   'utils' and 'quickdocs' commands added to CLI
+    -   requires install with `[HTML]` flag
+-   `utils` and `quickdocs` commands added to CLI
 -   CLI: all commands when called default to HELP
 -   fix bug for retrieving ontologies from online repos
 
@@ -46,7 +52,7 @@ Summary of changes.
 
 ## September 10, 2018: v1.9.5
 
--   testjsonld command: util to send a jsonld file to https://json-ld.org/playground/
+-   `testjsonld` command: util to send a jsonld file to https://json-ld.org/playground/
 
 ## August 30, 2018: v1.9.4
 

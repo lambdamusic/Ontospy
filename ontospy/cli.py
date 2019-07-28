@@ -167,6 +167,11 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
 @main_cli.command()
 @click.argument('source', nargs=-1)
 @click.option(
+    '-l',
+    '--lib',
+    is_flag=True,
+    help='LIBRARY: choose an ontology from your local library.')
+@click.option(
     '--outputpath',
     '-o',
     help=
@@ -190,12 +195,12 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
 @click.option(
     '--theme',
     help=
-    'THEME: bootstrap css style for the html-multi-page visualization (random=use a random theme).'
+    'THEME: select bootstrap style (only for the html-multi-page visualization). Default: simplex (random=use a random theme).'
 )
 @click.option(
-    '--lib',
+    '--nobrowser',
     is_flag=True,
-    help='LIBRARY: choose an ontology from the local library.')
+    help="NO-BROWSER: prevents opening the html output in the browser by default.")
 @click.option(
     '--showtypes',
     is_flag=True,
@@ -206,13 +211,14 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
     help='SHOW-THEMES: show the available css theme choices.')
 @click.pass_context
 def gendocs(ctx,
+            lib=False,
             source=None,
             outputpath="",
             extra=False,
-            lib=False,
             type="",
             title="",
             theme="",
+            nobrowser=False,
             showthemes=False,
             showtypes=False):
     """GENDOCS: generate documentation in html or markdown format.
@@ -279,7 +285,7 @@ def gendocs(ctx,
         theme=theme,
         verbose=verbose)
 
-    if url:  # open browser
+    if url and (not nobrowser):  # open browser
         import webbrowser
         webbrowser.open(url)
 
@@ -430,7 +436,7 @@ def lib(ctx,
 
 
 ##
-## SHELL COMMAN/'
+## SHELL COMMAND'
 ##
 
 
