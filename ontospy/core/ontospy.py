@@ -950,7 +950,7 @@ class Ontospy(object):
                 flag = True
         return None
 
-    def ontologyClassTree(self):
+    def ontologyClassTree(self, repeatChildren=True):
         """
         Returns a dict representing the ontology tree
         Top level = {0:[top classes]}
@@ -960,12 +960,20 @@ class Ontospy(object):
         if self.all_classes:
             treedict[0] = self.toplayer_classes
             for element in self.all_classes:
-                if element.children():
-                    treedict[element] = element.children()
+                if repeatChildren:
+                    if element.children():
+                        treedict[element] = element.children()
+                else:
+                    treedict[element] = list()
+                    children_set = set(element.children())
+                    for e in element.children():
+                        parents_set = set(e.parents())
+                        if not children_set.intersection(parents_set):
+                            treedict[element].append(e)
             return treedict
         return treedict
 
-    def ontologyPropTree(self):
+    def ontologyPropTree(self, repeatChildren=True):
         """
         Returns a dict representing the ontology tree
         Top level = {0:[top properties]}
@@ -975,12 +983,20 @@ class Ontospy(object):
         if self.all_properties:
             treedict[0] = self.toplayer_properties
             for element in self.all_properties:
-                if element.children():
-                    treedict[element] = element.children()
+                if repeatChildren:
+                    if element.children():
+                        treedict[element] = element.children()
+                else:
+                    treedict[element] = list()
+                    children_set = set(element.children())
+                    for e in element.children():
+                        parents_set = set(e.parents())
+                        if not children_set.intersection(parents_set):
+                            treedict[element].append(e)
             return treedict
         return treedict
 
-    def ontologyConceptTree(self):
+    def ontologyConceptTree(self, repeatChildren=True):
         """
         Returns a dict representing the skos tree
         Top level = {0:[top concepts]}
@@ -990,8 +1006,16 @@ class Ontospy(object):
         if self.all_skos_concepts:
             treedict[0] = self.toplayer_skos
             for element in self.all_skos_concepts:
-                if element.children():
-                    treedict[element] = element.children()
+                if repeatChildren:
+                    if element.children():
+                        treedict[element] = element.children()
+                else:
+                    treedict[element] = list()
+                    children_set = set(element.children())
+                    for e in element.children():
+                        parents_set = set(e.parents())
+                        if not children_set.intersection(parents_set):
+                            treedict[element].append(e)
             return treedict
         return treedict
 
