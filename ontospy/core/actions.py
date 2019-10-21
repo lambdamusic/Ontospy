@@ -259,7 +259,7 @@ def action_import(location, verbose=True):
             headers = {'Accept': "application/rdf+xml"}
             try:
                 # Py2
-                req = urllib2.request(location, headers=headers)
+                req = urllib2.Request(location, headers=headers)
                 res = urllib2.urlopen(req)
             except:
                 # Py3
