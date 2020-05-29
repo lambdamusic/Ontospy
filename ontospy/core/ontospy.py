@@ -14,6 +14,10 @@ import os
 import time
 import optparse
 from itertools import chain
+from multiprocessing import Process, Pipe, Queue, Lock, Manager
+from joblib import Parallel, delayed
+
+num_cores = multiprocessing.cpu_count()
 
 try:
     import urllib2
@@ -227,6 +231,7 @@ class Ontospy(object):
         if verbose:
             printDebug("----------", "comment")
 
+        return Parallel(n_jobs=num_cores)(delayed(processInput)(i) for i in inputs)
     def build_ontologies(self, exclude_BNodes=False, return_string=False):
         """
         Extract ontology instances info from the graph, then creates python objects for them.
@@ -239,51 +244,49 @@ class Ontospy(object):
 
         Hence there is some logic to deal with these edge cases.
         """
-        out = []
-
-        qres = self.sparqlHelper.getOntology()
-
-        if qres:
-            # NOTE: SPARQL returns a list of rdflib.query.ResultRow (~ tuples..)
-
-            for candidate in qres:
-                if isBlankNode(candidate[0]):
-                    if exclude_BNodes:
-                        continue
-                    else:
-                        checkDC_ID = [x for x in self.rdflib_graph.objects(
-                            candidate[0], rdflib.namespace.DC.identifier)]
-                        if checkDC_ID:
-                            out += [Ontology(checkDC_ID[0], namespaces=self.namespaces), ]
-                        else:
-                            vannprop = rdflib.URIRef(
-                                "http://purl.org/vocab/vann/preferredNamespaceUri")
-                            vannpref = rdflib.URIRef(
-                                "http://purl.org/vocab/vann/preferredNamespacePrefix")
-                            checkDC_ID = [x for x in self.rdflib_graph.objects(
-                                candidate[0], vannprop)]
-                            if checkDC_ID:
-                                checkDC_prefix = [
-                                    x for x in self.rdflib_graph.objects(candidate[0], vannpref)]
-                                if checkDC_prefix:
-                                    out += [Ontology(checkDC_ID[0],
-                                                     namespaces=self.namespaces,
-                                                     prefPrefix=checkDC_prefix[0])]
+        p = Process(target = out, args=(qres))
+        p.start()
+        for candidate in qres:
+                        if isBlankNode(candidate[0]):
+                            if exclude_BNodes:
+                                continue
+                            else:
+                                checkDC_ID = [x for x in self.rdflib_graph.objects(
+                                    candidate[0], rdflib.namespace.DC.identifier)]
+                                if checkDC_ID:
+                                    out += [Ontology(checkDC_ID[0], namespaces=self.namespaces), ]
                                 else:
-                                    out += [Ontology(checkDC_ID[0], namespaces=self.namespaces)]
+                                    vannprop = rdflib.URIRef(
+                                        "http://purl.org/vocab/vann/preferredNamespaceUri")
+                                    vannpref = rdflib.URIRef(
+                                        "http://purl.org/vocab/vann/preferredNamespacePrefix")
+                                    checkDC_ID = [x for x in self.rdflib_graph.objects(
+                                        candidate[0], vannprop)]
+                                    if checkDC_ID:
+                                        checkDC_prefix = [
+                                            x for x in self.rdflib_graph.objects(candidate[0], vannpref)]
+                                        if checkDC_prefix:
+                                            out += [Ontology(checkDC_ID[0],
+                                                             namespaces=self.namespaces,
+                                                             prefPrefix=checkDC_prefix[0])]
+                                        else:
+                                            out += [Ontology(checkDC_ID[0], namespaces=self.namespaces)]
+
+                        else:
+                            out += [Ontology(candidate[0], namespaces=self.namespaces)]
 
                 else:
-                    out += [Ontology(candidate[0], namespaces=self.namespaces)]
+                    pass
+                    # printDebug("No owl:Ontologies found")
 
-        else:
-            pass
-            # printDebug("No owl:Ontologies found")
+                # finally... add all annotations/triples
+                self.all_ontologies = out
+                for onto in self.all_ontologies:
+                    onto.triples = self.sparqlHelper.entityTriples(onto.uri)
+                    onto._buildGraph()  # force construction of mini graph
 
-        # finally... add all annotations/triples
-        self.all_ontologies = out
-        for onto in self.all_ontologies:
-            onto.triples = self.sparqlHelper.entityTriples(onto.uri)
-            onto._buildGraph()  # force construction of mini graph
+
+        p.stop()
 
     #
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
@@ -306,6 +309,8 @@ class Ontospy(object):
         qres = self.sparqlHelper.getAllClasses(hide_base_schemas,
                                                hide_implicit_types)
         # print("rdflib query done")
+
+
 
         for class_tuple in qres:
 
