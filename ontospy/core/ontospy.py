@@ -79,6 +79,7 @@ class Ontospy(object):
         self.namespaces = []
         # entities buckets start with 'all_'
         self.all_ontologies = []
+        self.my_instances = {}
         self.all_classes = []
         self.all_properties = []
         self.all_properties_annotation = []
@@ -92,6 +93,7 @@ class Ontospy(object):
         self.toplayer_skos = []
         self.toplayer_shapes = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
+
 
         # finally:
         if uri_or_path or data or file_obj:
@@ -289,6 +291,29 @@ class Ontospy(object):
     #  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
     #
 
+
+    #MODIFICATION
+    def build_all_instances(self):
+
+        for cls in self.all_classes: #Retrieves all classes and their instances
+            for inst in cls.instances:
+
+                qres = self.sparqlHelper.getInstanceProperties(inst.uri) #Queries to SELECT all properties of a given instance
+
+                for x in qres:
+                    prop = OntoProperty(x[0],cls.uri,self.namespaces)
+                    obj = RDF_Entity(x[1],cls.uri,self.namespaces)
+                    if(prop.qname=="rdf:type"):
+                        continue
+                    inst.properties.append((prop,obj))                 
+
+                if(inst in self.my_instances): #Add this instance and corresponding class to the instance list
+                    self.my_instances[inst].add(cls)
+                else:
+                    self.my_instances[inst]=set()
+
+
+                
     def build_classes(self, hide_base_schemas=True, hide_implicit_types=True):
         """
         2015-06-04: removed sparql 1.1 queries
@@ -365,6 +390,7 @@ class Ontospy(object):
             if not c.parents():
                 exit += [c]
         self.toplayer_classes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+        self.build_all_instances() #MODIFICATION
 
     def build_properties(self, hide_implicit_preds=True):
         """
@@ -713,6 +739,39 @@ class Ontospy(object):
     # ===============
     # methods for retrieving objects
     # ================
+
+    def get_ints(self, id=None, uri=None, match=None):
+        
+        if not id and not uri and not match:
+            return None
+
+        if type(id) == type("string"):
+            uri = id
+            id = None
+            if not is_http(uri):
+                match = uri
+                uri = None
+        if match:
+            if type(match) != type("string"):
+                return []
+            res = []
+            if ":" in match:  # qname
+                for x in self.all_ints:
+                    if match.lower() in x.qname.lower():
+                        res += [x]
+            else:
+                for x in self.all_ints:
+                    if match.lower() in x.uri.lower():
+                        res += [x]
+            return res
+        else:
+            for x in self.all_ints:
+                if id and x.id == id:
+                    return x
+                if uri and x.uri.lower() == uri.lower():
+                    return x
+            return None
+
 
     def get_class(self, id=None, uri=None, match=None):
         """

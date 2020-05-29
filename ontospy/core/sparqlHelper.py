@@ -57,6 +57,30 @@ class SparqlHelper(object):
     # RDF/OWL CLASSES
     # ..................
 
+    #MODIFICATION
+    def getAllInstances(self):
+        query = """
+                 SELECT DISTINCT ?x
+                 WHERE {
+                        ?x a owl:NamedIndividual
+                 }
+                 ORDER BY  ?x
+                 """
+        # print(query)
+
+        qres = self.rdflib_graph.query(query)
+        return list(qres)
+
+    #MODIFICATION
+    def getInstanceProperties(self,aURI):
+        aURI = aURI
+        qres = self.rdflib_graph.query("""SELECT DISTINCT ?x ?y
+                 WHERE {
+                        <%s> ?x ?y
+                 }""" % (aURI))
+        return list(qres)
+
+
     def getAllClasses(self, hide_base_schemas=True, hide_implicit_types=True):
         """
         * hide_base_schemas: by default, obscure all RDF/RDFS/OWL/XML stuff

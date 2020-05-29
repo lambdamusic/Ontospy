@@ -67,6 +67,8 @@ class RDF_Entity(object):
         self._parents = []
         # self.siblings = []
 
+        self.properties = [] #MODIFICATION
+
     def rdf_source(self, format="turtle"):
         """ xml, n3, turtle, nt, pretty-xml, trix are built in"""
         if self.triples:
@@ -265,6 +267,7 @@ class Ontology(RDF_Entity):
         printDebug("Properties..: %d" % len(self.all_properties))
 
 
+
 class OntoClass(RDF_Entity):
     """
     Python representation of a generic class within an ontology.
@@ -343,6 +346,8 @@ class OntoClass(RDF_Entity):
         printDebug(self.uri, "green")
         self.printStats()
         # self.printGenericTree()
+
+
 
 
 class OntoProperty(RDF_Entity):
