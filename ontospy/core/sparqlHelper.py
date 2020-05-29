@@ -104,9 +104,10 @@ class SparqlHelper(object):
         if hide_implicit_types == True:  # .. then do not add extra clause
             BIT_IMPLICIT_TYPES = ""
 
+        #print(query)
         query = query % (BIT_IMPLICIT_TYPES, BIT_BASE_SCHEMAS)
-
-        # print(query)
+        #print("==================================================================")
+        #print(query)
 
         qres = self.rdflib_graph.query(query)
         return list(qres)
@@ -164,12 +165,14 @@ class SparqlHelper(object):
 
     def getPropDirectSupers(self, aURI):
         aURI = aURI
+        #print(aURI)
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
                  WHERE {
                      { <%s> rdfs:subPropertyOf ?x }
                      FILTER (!isBlank(?x))
                  } ORDER BY ?x
                  """ % (aURI))
+        #print(list(qres))
         return list(qres)
 
     # ..................
@@ -384,3 +387,10 @@ class SparqlHelper(object):
                  }
                  """ % (aURI, aURI))
         return list(qres)
+
+    def myquery(self,query):
+        #print(query)
+        qres = self.rdflib_graph.query(query)
+        return(qres)
+            #print("%s" % row)
+

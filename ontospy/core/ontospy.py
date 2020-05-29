@@ -65,7 +65,8 @@ class Ontospy(object):
                  hide_implicit_preds=True,
                  sparql_endpoint=None,
                  credentials=None,
-                 build_all=True):
+                 build_all=True
+                 ):
         """
         Load the graph in memory, then setup all necessary attributes.
         """
@@ -92,6 +93,9 @@ class Ontospy(object):
         self.toplayer_skos = []
         self.toplayer_shapes = []
         self.OWLTHING = OntoClass(rdflib.OWL.Thing, rdflib.OWL.Class, self.namespaces)
+        # SPARQL Query
+        self.query_file = ""
+        
 
         # finally:
         if uri_or_path or data or file_obj:
@@ -103,7 +107,8 @@ class Ontospy(object):
                     verbose=verbose,
                     hide_base_schemas=hide_base_schemas,
                     hide_implicit_types=hide_implicit_types,
-                    hide_implicit_preds=hide_implicit_preds)
+                    hide_implicit_preds=hide_implicit_preds
+                    )
         elif sparql_endpoint:  # by default entities are not extracted
             self.load_sparql(sparql_endpoint, verbose, hide_base_schemas,
                              hide_implicit_types, hide_implicit_preds, credentials)
@@ -186,7 +191,8 @@ class Ontospy(object):
                   verbose=False,
                   hide_base_schemas=True,
                   hide_implicit_types=True,
-                  hide_implicit_preds=True):
+                  hide_implicit_preds=True
+                  ):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -220,12 +226,13 @@ class Ontospy(object):
         if verbose:
             printDebug("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
 
-        # self.__computeTopLayer()
 
         self.__computeInferredProperties()
 
         if verbose:
             printDebug("----------", "comment")
+
+    
 
     def build_ontologies(self, exclude_BNodes=False, return_string=False):
         """
@@ -306,16 +313,19 @@ class Ontospy(object):
         qres = self.sparqlHelper.getAllClasses(hide_base_schemas,
                                                hide_implicit_types)
         # print("rdflib query done")
+        #print(qres)
 
         for class_tuple in qres:
 
             _uri = class_tuple[0]
+            #print(_uri)
             try:
                 _type = class_tuple[1]
             except:
                 _type = ""
 
             test_existing_cl = self.get_class(uri=_uri)
+            #print(test_existing_cl)
             if not test_existing_cl:
                 # create it
                 ontoclass = OntoClass(_uri, _type, self.namespaces)
@@ -1123,3 +1133,20 @@ class Ontospy(object):
 
         else:
             printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
+
+
+    def query_graph(self):
+        f=open(self.query_file, "r")
+        if f.mode == 'r':
+            contents =f.read()
+        qres = self.sparqlHelper.myquery(contents)  
+        f=open("query_results.txt", "w")
+        f.write("Number of Entries = "+str(len(qres))+"\n")
+        for row in qres:
+            print()
+            f.write("\n")
+            for i in range(len(row)):
+                print("%s" % row[i], end=", ")
+                f.write("%s" % row[i]+", ")
+        f.write("")
+        print()
