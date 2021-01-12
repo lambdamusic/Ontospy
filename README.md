@@ -2,6 +2,7 @@
 
 Python library and command-line interface for inspecting and visualizing RDF models.
 
+
 #### Links
 
 -   [Pypi](https://pypi.org/project/ontospy/)
@@ -17,6 +18,9 @@ The basic workflow is simple: load a graph by instantiating the `Ontospy` class 
 
 The same functionalities are accessible also via a command line application (`ontospy`). This is an interactive environment (like a repl) that allows to load ontologies from a local repository, interrogate them and cache them so that they can be quickly reloaded for inspection later on.
 
+[![Downloads](https://pepy.tech/badge/ontospy)](https://pepy.tech/project/ontospy)
+
+
 ## Generating ontology documentation
 
 Ontospy can be used to generate HTML documentation for an ontology pretty easily. E.g. see the [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) ontology, or [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) ontology.
@@ -27,6 +31,10 @@ This functionality relies on a module called _ontodocs_, which used to be mainta
 
 For more examples of the kind of documentation that can be generated out-of-the-box, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
 
-## More info
+## Status
+
+I have little time to spend on this project these days, so I'm mainly focusing on bug fixes and maintenance. Happy to review PRs if you want to add more functionalities! 
+
+## Documentation
 
 http://lambdamusic.github.io/Ontospy/

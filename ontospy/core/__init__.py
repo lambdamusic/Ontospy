@@ -34,12 +34,7 @@ from .utils import printDebug
 # ***
 # ===========
 
-import socket
-hostname = socket.gethostname()
-if hostname in ("L7898", "Tartaruga"):
-    GLOBAL_DISABLE_CACHE = False  # set to True for testing
-else:
-    GLOBAL_DISABLE_CACHE = False
+GLOBAL_DISABLE_CACHE = False
 
 # ===========
 # ===========
