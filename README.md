@@ -33,6 +33,8 @@ For more examples of the kind of documentation that can be generated out-of-the-
 
 ## Status
 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+
 I have little time to spend on this project these days, so I'm mainly focusing on bug fixes and maintenance. Happy to review PRs if you want to add more functionalities! 
 
 ## Documentation
