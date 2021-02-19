@@ -36,7 +36,7 @@
 
             <h1>
 {#                Property: #}
-                {{each.qname}}
+                {{each.bestLabel}}
                 {% if not each.children  %}
                     <small class="label label-info label-xs ">leaf node</small>
                   {% endif %}
@@ -56,14 +56,14 @@
 
                         <li>
 
-                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a>
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.bestLabel}}</a>
 
                           <ul>
 
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.bestLabel}}</a>
                             {% if each.children  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.bestLabel}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -78,11 +78,11 @@
                         <li><a href="entities-tree-properties.html">rdf:Property</a>
 
                           <ul>
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.bestLabel}}</a>
 
                             {% if each.children  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.bestLabel}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -154,7 +154,7 @@
                     <div class="panel-body">
 
                     {% if each.ancestors %}
-                            {% for s in each.ancestors %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.qname}}</a></li>{% endfor %}
+                            {% for s in each.ancestors %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.bestLabel}}</a></li>{% endfor %}
                     {% else %}
                         <li>owl:Thing</li>
                     {% endif %}
@@ -176,7 +176,7 @@
                   </div>
                   <div class="panel-body">
 
-                      {% for s in each.children %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.qname}}</a></li>{% endfor %}
+                      {% for s in each.children %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.bestLabel}}</a></li>{% endfor %}
 
 
                   </div>
@@ -202,11 +202,11 @@
                      {% if each.domains %}
                          {% for s in each.domains %}
                          {% if s.ext_model %}
-                              <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.qname|default:s}}</a>
+                              <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.bestLabel|default:s}}</a>
                            {% elif s.is_Bnode  %}
                               <a>Blank node</a> (see implementation)
                            {% else  %}
-                              <a href="{{s.slug}}.html" title="{{s.uri}}">{{s.qname|default:s}}</a>
+                              <a href="{{s.slug}}.html" title="{{s.uri}}">{{s.bestLabel|default:s}}</a>
                            {% endif %}
                            {% if not forloop.last %}, {% endif %}
                          {% endfor %}
@@ -216,18 +216,18 @@
                    </td>
 
                     <td>
-                      {{each.qname}}
+                      {{each.bestLabel}}
                     </td>
 
                     <td>
                       {% if each.ranges %}
                           {% for s in each.ranges %}
                           {% if s.ext_model %}
-                               <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.qname|default:s}}</a>
+                               <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.bestLabel|default:s}}</a>
                              {% elif s.is_Bnode  %}
                                 <a>Blank node</a> (see implementation)
                             {% else  %}
-                               <a href="{{s.slug}}.html" title="{{s.uri}}">{{s.qname|default:s}}</a>
+                               <a href="{{s.slug}}.html" title="{{s.uri}}">{{s.bestLabel|default:s}}</a>
                             {% endif %}
                             {% if not forloop.last %}, {% endif %}
                           {% endfor %}
