@@ -34,9 +34,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Update package management
-      run: pip install --upgrade pip setuptools
-    - name: Install dependent packages
-      run: pip install click colorama rdflib requests
+      run: pip install --upgrade pip setuptools wheel
+    - name: Install package and dependencies
+      run: pip install .
     - name: Install test packages
       run: pip install nose
     - name: Run tests
