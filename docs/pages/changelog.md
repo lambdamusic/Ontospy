@@ -148,8 +148,7 @@ ontospy.Ontospy
 -   publish v1.7.4
 -   publish new ontospy viz outputs
     -   take a selection of outputs from ontospy viz (only good ontologies)
-    -   put online eg on my webfaction
-        -   http://www.michelepasin.org/support/ontospy-examples/index.html
+    -   put online 
 
 ## February 5, 2017
 
@@ -374,7 +373,7 @@ improved notably support for python 3
 -   added standard way to add/test viz - eg >python -m ontospy.viz.viz_html
 -   simplified way VISUALIZATIONS_LIST are managed - just import, give unique name and add
 -   simplified way test_run for viz is accedded
-    -   func = locals()["run"] # main func dynamically  run_test_viz(func)
+    -   func = locals()["run"] # main func dynamically run_test_viz(func)
 -   viz_d3packhierarchy: - basic working model for viz_d3packhierarchy
 
 ## June 19, 2016

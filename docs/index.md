@@ -27,7 +27,7 @@ Calling the `ontospy` command from a terminal window launches a utility for scan
 
 For example, if you pass a valid graph URI:
 
-```
+```bash
 $ ontospy scan http://purl.org/spar/frbr
 ```
 
@@ -50,7 +50,7 @@ Once you have a package manager installed, simply install Ontospy from the Pytho
 
 If you want less library dependencies (eg because you want to include Ontospy in another project and don't care about html documentation), you can simply install the core library only:
 
-```
+```bash
 $ pip install ontospy
 ```
 
@@ -62,7 +62,7 @@ The 'shell' or interactive command line interface requires the [readline](https:
 
 This module is optionally installed with Ontospy like this:
 
-```
+```bash
 $ pip install ontospy[SHELL]
 ```
 
@@ -70,7 +70,7 @@ $ pip install ontospy[SHELL]
 
 If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you should install the FULL version of the library like this:
 
-```
+```bash
 $ pip install ontospy[FULL]
 ```
 
@@ -81,7 +81,7 @@ The full version includes more files (eg html templates) and it has a larger foo
 
 If you’re upgrading from an older version, make sure you use the -U flag:
 
-```
+```bash
 $ pip install ontospy -U
 ```
 
@@ -91,151 +91,155 @@ If used as a Python package, the basic workflow is the following: load a graph b
 
 Let's take a look at the [Friend Of A Friend](http://semanticweb.org/wiki/FOAF) vocabulary.
 
-    In [1]: import ontospy
 
-    In [2]: ontospy.__version__
-    Out[2]: '1.9.8'
+```python
+In [1]: import ontospy
 
-    In [3]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/", verbose=True)
-    Reading: <http://xmlns.com/foaf/0.1/>
-    .. trying rdf serialization: <xml>
-    ..... success!
-    ----------
-    Loaded 631 triples.
-    ----------
-    RDF sources loaded successfully: 1 of 1.
-    ..... 'http://xmlns.com/foaf/0.1/'
-    ----------
-    Scanning entities...
-    ----------
-    Ontologies.........: 1
-    Classes............: 15
-    Properties.........: 67
-    ..annotation.......: 7
-    ..datatype.........: 26
-    ..object...........: 34
-    Concepts (SKOS)....: 0
-    Shapes (SHACL).....: 0
-    ----------
+In [2]: ontospy.__version__
+Out[2]: '1.9.8'
 
-    In [4]: model.all_classes
-    Out[4]:
-    [<Class *http://xmlns.com/foaf/0.1/Agent*>,
-    <Class *http://xmlns.com/foaf/0.1/Document*>,
-    <Class *http://xmlns.com/foaf/0.1/Group*>,
-    <Class *http://xmlns.com/foaf/0.1/Image*>,
-    <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-    <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-    <Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
-    <Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
-    <Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
-    <Class *http://xmlns.com/foaf/0.1/Organization*>,
-    <Class *http://xmlns.com/foaf/0.1/Person*>,
-    <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
-    <Class *http://xmlns.com/foaf/0.1/Project*>,
-    <Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-    <Class *http://www.w3.org/2004/02/skos/core#Concept*>]
+In [3]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/", verbose=True)
+Reading: <http://xmlns.com/foaf/0.1/>
+.. trying rdf serialization: <xml>
+..... success!
+----------
+Loaded 631 triples.
+----------
+RDF sources loaded successfully: 1 of 1.
+..... 'http://xmlns.com/foaf/0.1/'
+----------
+Scanning entities...
+----------
+Ontologies.........: 1
+Classes............: 15
+Properties.........: 67
+..annotation.......: 7
+..datatype.........: 26
+..object...........: 34
+Concepts (SKOS)....: 0
+Shapes (SHACL).....: 0
+----------
 
-    In [5]: model.all_properties_object
-    Out[5]:
-    [<Property *http://xmlns.com/foaf/0.1/account*>,
-    <Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
-    <Property *http://xmlns.com/foaf/0.1/based_near*>,
-    <Property *http://xmlns.com/foaf/0.1/currentProject*>,
-    <Property *http://xmlns.com/foaf/0.1/depiction*>,
-    <Property *http://xmlns.com/foaf/0.1/depicts*>,
-    <Property *http://xmlns.com/foaf/0.1/focus*>,
-    <Property *http://xmlns.com/foaf/0.1/fundedBy*>,
-    <Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
-    <Property *http://xmlns.com/foaf/0.1/homepage*>,
-    <Property *http://xmlns.com/foaf/0.1/img*>,
-    <Property *http://xmlns.com/foaf/0.1/interest*>,
-    <Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
-    <Property *http://xmlns.com/foaf/0.1/knows*>,
-    <Property *http://xmlns.com/foaf/0.1/logo*>,
-    <Property *http://xmlns.com/foaf/0.1/made*>,
-    <Property *http://xmlns.com/foaf/0.1/maker*>,
-    <Property *http://xmlns.com/foaf/0.1/mbox*>,
-    <Property *http://xmlns.com/foaf/0.1/member*>,
-    <Property *http://xmlns.com/foaf/0.1/openid*>,
-    <Property *http://xmlns.com/foaf/0.1/page*>,
-    <Property *http://xmlns.com/foaf/0.1/pastProject*>,
-    <Property *http://xmlns.com/foaf/0.1/phone*>,
-    <Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
-    <Property *http://xmlns.com/foaf/0.1/publications*>,
-    <Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
-    <Property *http://xmlns.com/foaf/0.1/theme*>,
-    <Property *http://xmlns.com/foaf/0.1/thumbnail*>,
-    <Property *http://xmlns.com/foaf/0.1/tipjar*>,
-    <Property *http://xmlns.com/foaf/0.1/topic*>,
-    <Property *http://xmlns.com/foaf/0.1/topic_interest*>,
-    <Property *http://xmlns.com/foaf/0.1/weblog*>,
-    <Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
-    <Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>]
+In [4]: model.all_classes
+Out[4]:
+[<Class *http://xmlns.com/foaf/0.1/Agent*>,
+<Class *http://xmlns.com/foaf/0.1/Document*>,
+<Class *http://xmlns.com/foaf/0.1/Group*>,
+<Class *http://xmlns.com/foaf/0.1/Image*>,
+<Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+<Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+<Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
+<Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
+<Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
+<Class *http://xmlns.com/foaf/0.1/Organization*>,
+<Class *http://xmlns.com/foaf/0.1/Person*>,
+<Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
+<Class *http://xmlns.com/foaf/0.1/Project*>,
+<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+<Class *http://www.w3.org/2004/02/skos/core#Concept*>]
 
-    In [6]: model.printClassTree()
-    foaf:Agent
-    ----foaf:Group
-    ----foaf:Organization
-    ----foaf:Person
-    foaf:Document
-    ----foaf:Image
-    ----foaf:PersonalProfileDocument
-    foaf:LabelProperty
-    foaf:OnlineAccount
-    ----foaf:OnlineChatAccount
-    ----foaf:OnlineEcommerceAccount
-    ----foaf:OnlineGamingAccount
-    foaf:Project
-    http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
-    ----foaf:Person
-    skos:Concept
+In [5]: model.all_properties_object
+Out[5]:
+[<Property *http://xmlns.com/foaf/0.1/account*>,
+<Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
+<Property *http://xmlns.com/foaf/0.1/based_near*>,
+<Property *http://xmlns.com/foaf/0.1/currentProject*>,
+<Property *http://xmlns.com/foaf/0.1/depiction*>,
+<Property *http://xmlns.com/foaf/0.1/depicts*>,
+<Property *http://xmlns.com/foaf/0.1/focus*>,
+<Property *http://xmlns.com/foaf/0.1/fundedBy*>,
+<Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
+<Property *http://xmlns.com/foaf/0.1/homepage*>,
+<Property *http://xmlns.com/foaf/0.1/img*>,
+<Property *http://xmlns.com/foaf/0.1/interest*>,
+<Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
+<Property *http://xmlns.com/foaf/0.1/knows*>,
+<Property *http://xmlns.com/foaf/0.1/logo*>,
+<Property *http://xmlns.com/foaf/0.1/made*>,
+<Property *http://xmlns.com/foaf/0.1/maker*>,
+<Property *http://xmlns.com/foaf/0.1/mbox*>,
+<Property *http://xmlns.com/foaf/0.1/member*>,
+<Property *http://xmlns.com/foaf/0.1/openid*>,
+<Property *http://xmlns.com/foaf/0.1/page*>,
+<Property *http://xmlns.com/foaf/0.1/pastProject*>,
+<Property *http://xmlns.com/foaf/0.1/phone*>,
+<Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
+<Property *http://xmlns.com/foaf/0.1/publications*>,
+<Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
+<Property *http://xmlns.com/foaf/0.1/theme*>,
+<Property *http://xmlns.com/foaf/0.1/thumbnail*>,
+<Property *http://xmlns.com/foaf/0.1/tipjar*>,
+<Property *http://xmlns.com/foaf/0.1/topic*>,
+<Property *http://xmlns.com/foaf/0.1/topic_interest*>,
+<Property *http://xmlns.com/foaf/0.1/weblog*>,
+<Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
+<Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>]
 
-    In [7]: model.toplayer_classes
-    Out[7]:
-    [<Class *http://xmlns.com/foaf/0.1/Agent*>,
-    <Class *http://xmlns.com/foaf/0.1/Document*>,
-    <Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-    <Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-    <Class *http://xmlns.com/foaf/0.1/Project*>,
-    <Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-    <Class *http://www.w3.org/2004/02/skos/core#Concept*>]
+In [6]: model.printClassTree()
+foaf:Agent
+----foaf:Group
+----foaf:Organization
+----foaf:Person
+foaf:Document
+----foaf:Image
+----foaf:PersonalProfileDocument
+foaf:LabelProperty
+foaf:OnlineAccount
+----foaf:OnlineChatAccount
+----foaf:OnlineEcommerceAccount
+----foaf:OnlineGamingAccount
+foaf:Project
+http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
+----foaf:Person
+skos:Concept
 
-    In [8]: model.get_class('document')
-    Out[8]:
-    [<Class *http://xmlns.com/foaf/0.1/Document*>,
-    <Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
+In [7]: model.toplayer_classes
+Out[7]:
+[<Class *http://xmlns.com/foaf/0.1/Agent*>,
+<Class *http://xmlns.com/foaf/0.1/Document*>,
+<Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
+<Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
+<Class *http://xmlns.com/foaf/0.1/Project*>,
+<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
+<Class *http://www.w3.org/2004/02/skos/core#Concept*>]
 
-    In [9]: c1 = _[1]
+In [8]: model.get_class('document')
+Out[8]:
+[<Class *http://xmlns.com/foaf/0.1/Document*>,
+<Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
 
-    In [10]: print(c1.rdf_source())
-    @prefix dc: <http://purl.org/dc/elements/1.1/> .
-    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-    @prefix owl: <http://www.w3.org/2002/07/owl#> .
-    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-    @prefix sh: <http://www.w3.org/ns/shacl#> .
-    @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-    @prefix vann: <http://purl.org/vocab/vann/> .
-    @prefix void: <http://rdfs.org/ns/void#> .
-    @prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
-    @prefix wot: <http://xmlns.com/wot/0.1/> .
-    @prefix xml: <http://www.w3.org/XML/1998/namespace> .
-    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+In [9]: c1 = _[1]
 
-    foaf:PersonalProfileDocument a rdfs:Class,
-            owl:Class ;
-        rdfs:label "PersonalProfileDocument" ;
-        rdfs:comment "A personal profile RDF document." ;
-        rdfs:subClassOf foaf:Document ;
-        vs:term_status "testing" .
+In [10]: print(c1.rdf_source())
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix wot: <http://xmlns.com/wot/0.1/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+foaf:PersonalProfileDocument a rdfs:Class,
+        owl:Class ;
+    rdfs:label "PersonalProfileDocument" ;
+    rdfs:comment "A personal profile RDF document." ;
+    rdfs:subClassOf foaf:Document ;
+    vs:term_status "testing" .
 
 
-    In [11]: c1.parents()
-    Out[11]: [<Class *http://xmlns.com/foaf/0.1/Document*>]
+In [11]: c1.parents()
+Out[11]: [<Class *http://xmlns.com/foaf/0.1/Document*>]
 
-    In [12]: c1.children()
-    Out[12]: []
+In [12]: c1.children()
+Out[12]: []
+```
+
 
 ## Is Ontospy for Me?
 
@@ -256,10 +260,10 @@ One can then manually customize these outputs by editing the source html files.
 
 For example:
 
--   [Schema.org](http://www.michelepasin.org/support/ontospy-examples/schema_org_topbraidttl/index.html) documentation
--   [FOAF](http://www.michelepasin.org/support/ontospy-examples/foafrdf/index.html) documentation
+-   [Schema.org](https://lambdamusic.github.io/ontospy-examples//schema_org_topbraidttl/index.html) documentation
+-   [FOAF](https://lambdamusic.github.io/ontospy-examples//foafrdf/index.html) documentation
 
-That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](http://www.michelepasin.org/support/ontospy-examples/index.html).
+That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](https://lambdamusic.github.io/ontospy-examples//index.html).
 
 > Note: this functionality relies on a module called _ontodocs_, which used to be a separate library. As of version 1.9.8 this module has been incorporated in Ontospy, but can be installed on-demand.
 
@@ -267,13 +271,13 @@ That's the kind of documentation Ontospy can generate out-of-the-box. For even m
 
 By default the libraries needed by this feature (Django and Pygments) are not installed, so you have to add them like this:
 
-```
+```bash
 $ pip install ontospy[FULL] -U
 ```
 
 This feature is normally used from the command line:
 
-```
+```bash
 $ ontospy gendocs
 
 Ontospy v1.9.8
@@ -302,7 +306,7 @@ In a nutshell, all visualizations inherit from a [VizFactory](https://github.com
 
 This is how you would invoke a visualization from a script:
 
-```
+```python
 import ontospy
 from ontospy.ontodocs.viz.viz_html_single import *
 
