@@ -45,3 +45,5 @@ venv
 .idea
 .vsdocs
 .vscode
+
+README_PRIVATE.md
