@@ -23,13 +23,13 @@ The same functionalities are accessible also via a command line application (`on
 
 ## Generating ontology documentation
 
-Ontospy can be used to generate HTML documentation for an ontology pretty easily. E.g. see the [Schema.org](https://lambdamusic.github.io/ontospy-examples//schema_org_topbraidttl/index.html) ontology, or [FOAF](https://lambdamusic.github.io/ontospy-examples//foafrdf/index.html) ontology.
+Ontospy can be used to generate HTML documentation for an ontology pretty easily. E.g. see the [Schema.org](https://lambdamusic.github.io/ontospy-examples/schema_org_topbraidttl/index.html) ontology, or [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) ontology.
 
 This functionality relies on a module called _ontodocs_, which used to be maintained as a separate library but is now distributed with ontospy as an add-on:
 
 -   `pip install ontospy[HTML]`
 
-For more examples of the kind of documentation that can be generated out-of-the-box, [take a look at this page](https://lambdamusic.github.io/ontospy-examples//index.html).
+For more examples of the kind of documentation that can be generated out-of-the-box, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
 
 ## Status
 

@@ -260,10 +260,10 @@ One can then manually customize these outputs by editing the source html files.
 
 For example:
 
--   [Schema.org](https://lambdamusic.github.io/ontospy-examples//schema_org_topbraidttl/index.html) documentation
--   [FOAF](https://lambdamusic.github.io/ontospy-examples//foafrdf/index.html) documentation
+-   [Schema.org](https://lambdamusic.github.io/ontospy-examples/schema_org_topbraidttl/index.html) documentation
+-   [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) documentation
 
-That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](https://lambdamusic.github.io/ontospy-examples//index.html).
+That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
 
 > Note: this functionality relies on a module called _ontodocs_, which used to be a separate library. As of version 1.9.8 this module has been incorporated in Ontospy, but can be installed on-demand.
 
