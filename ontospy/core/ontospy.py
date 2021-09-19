@@ -65,10 +65,39 @@ class Ontospy(object):
                  hide_implicit_preds=True,
                  sparql_endpoint=None,
                  credentials=None,
-                 build_all=True):
+                 build_all=True,
+                 entity_display_title="qname",
+                 ):
+        """Load the graph in memory, then setup all necessary attributes.
+
+        Parameters
+        ----------
+        uri_or_path : [type], optional
+            [description], by default None
+        data : [type], optional
+            [description], by default None
+        file_obj : [type], optional
+            [description], by default None
+        rdf_format : str, optional
+            [description], by default ""
+        verbose : bool, optional
+            [description], by default False
+        hide_base_schemas : bool, optional
+            [description], by default True
+        hide_implicit_types : bool, optional
+            [description], by default True
+        hide_implicit_preds : bool, optional
+            [description], by default True
+        sparql_endpoint : [type], optional
+            [description], by default None
+        credentials : [type], optional
+            [description], by default None
+        build_all : bool, optional
+            [description], by default True
+        entity_display_title : str, optional
+            How to display entities by default. Two options accepted: "qname" (default) or "label" for rdfs:label. 
         """
-        Load the graph in memory, then setup all necessary attributes.
-        """
+        
         super(Ontospy, self).__init__()
 
         self.rdflib_graph = None
@@ -76,6 +105,7 @@ class Ontospy(object):
         self.credentials = None  # tuple: auth credentials for endpoint if needed
         self.sources = None
         self.sparqlHelper = None
+        self.entity_display_title = entity_display_title
         self.namespaces = []
         # entities buckets start with 'all_'
         self.all_ontologies = []
@@ -95,18 +125,17 @@ class Ontospy(object):
 
         # finally:
         if uri_or_path or data or file_obj:
-            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose,
-                          hide_base_schemas, hide_implicit_types,
-                          hide_implicit_preds)
+            self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose)
             if build_all:
                 self.build_all(
                     verbose=verbose,
                     hide_base_schemas=hide_base_schemas,
                     hide_implicit_types=hide_implicit_types,
-                    hide_implicit_preds=hide_implicit_preds)
+                    hide_implicit_preds=hide_implicit_preds,
+                    entity_display_title=entity_display_title
+                    )
         elif sparql_endpoint:  # by default entities are not extracted
-            self.load_sparql(sparql_endpoint, verbose, hide_base_schemas,
-                             hide_implicit_types, hide_implicit_preds, credentials)
+            self.load_sparql(sparql_endpoint, verbose, credentials)
         else:
             pass
 
@@ -129,10 +158,7 @@ class Ontospy(object):
                  data=None,
                  file_obj=None,
                  rdf_format="",
-                 verbose=False,
-                 hide_base_schemas=True,
-                 hide_implicit_types=True,
-                 hide_implicit_preds=True):
+                 verbose=False):
         """Load an RDF source into an ontospy/rdflib graph"""
         loader = RDFLoader(verbose=verbose)
         loader.load(uri_or_path, data, file_obj, rdf_format)
@@ -144,9 +170,7 @@ class Ontospy(object):
     def load_sparql(self,
                     sparql_endpoint,
                     verbose=False,
-                    hide_base_schemas=True,
-                    hide_implicit_types=True,
-                    hide_implicit_preds=True, credentials=None):
+                    credentials=None):
         """
         Set up a SPARQLStore backend as a virtual ontospy graph
 
@@ -186,7 +210,9 @@ class Ontospy(object):
                   verbose=False,
                   hide_base_schemas=True,
                   hide_implicit_types=True,
-                  hide_implicit_preds=True):
+                  hide_implicit_preds=True,
+                  entity_display_title='qname',
+                  ):
         """
         Extract all ontology entities from an RDF graph and construct Python representations of them.
         """
@@ -254,7 +280,7 @@ class Ontospy(object):
                         checkDC_ID = [x for x in self.rdflib_graph.objects(
                             candidate[0], rdflib.namespace.DC.identifier)]
                         if checkDC_ID:
-                            out += [Ontology(checkDC_ID[0], namespaces=self.namespaces), ]
+                            out += [Ontology(checkDC_ID[0], namespaces=self.namespaces, entity_display_title=self.entity_display_title), ]
                         else:
                             vannprop = rdflib.URIRef(
                                 "http://purl.org/vocab/vann/preferredNamespaceUri")
@@ -268,12 +294,15 @@ class Ontospy(object):
                                 if checkDC_prefix:
                                     out += [Ontology(checkDC_ID[0],
                                                      namespaces=self.namespaces,
-                                                     prefPrefix=checkDC_prefix[0])]
+                                                     prefPrefix=checkDC_prefix[0],
+                                                     entity_display_title=self.entity_display_title,
+                                                     )
+                                                     ]
                                 else:
-                                    out += [Ontology(checkDC_ID[0], namespaces=self.namespaces)]
+                                    out += [Ontology(checkDC_ID[0], namespaces=self.namespaces, entity_display_title=self.entity_display_title)]
 
                 else:
-                    out += [Ontology(candidate[0], namespaces=self.namespaces)]
+                    out += [Ontology(candidate[0], namespaces=self.namespaces, entity_display_title=self.entity_display_title)]
 
         else:
             pass
@@ -318,7 +347,7 @@ class Ontospy(object):
             test_existing_cl = self.get_class(uri=_uri)
             if not test_existing_cl:
                 # create it
-                ontoclass = OntoClass(_uri, _type, self.namespaces)
+                ontoclass = OntoClass(_uri, _type, self.namespaces, entity_display_title=self.entity_display_title)
                 self.all_classes += [ontoclass]
             else:
                 # if OWL.Class over RDFS.Class - update it
@@ -389,7 +418,7 @@ class Ontospy(object):
             test_existing_prop = self.get_property(uri=candidate[0])
             if not test_existing_prop:
                 # create it
-                self.all_properties += [OntoProperty(candidate[0], candidate[1], self.namespaces)]
+                self.all_properties += [OntoProperty(candidate[0], candidate[1], self.namespaces, entity_display_title=self.entity_display_title)]
             else:
                 # update it
                 if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
@@ -458,7 +487,7 @@ class Ontospy(object):
             test_existing_cl = self.get_skos(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces)]
+                self.all_skos_concepts += [OntoSKOSConcept(candidate[0], None, self.namespaces, entity_display_title=self.entity_display_title)]
             else:
                 pass
         # print("concepts created")
@@ -520,7 +549,7 @@ class Ontospy(object):
             test_existing_cl = self.get_any_entity(uri=candidate[0])
             if not test_existing_cl:
                 # create it
-                self.all_shapes += [OntoShape(candidate[0], None, self.namespaces)]
+                self.all_shapes += [OntoShape(candidate[0], None, self.namespaces, entity_display_title=self.entity_display_title)]
             else:
                 pass
 
@@ -575,7 +604,10 @@ class Ontospy(object):
             pass
         qres = self.sparqlHelper.entityTriples(uri)
         if qres:
-            entity = ontospyClass(rdflib.URIRef(uri), None, self.namespaces)
+            entity = ontospyClass(rdflib.URIRef(uri), 
+                            None, 
+                            self.namespaces, 
+                            entity_display_title=self.entity_display_title)
             entity.triples = qres
             entity._buildGraph()  # force construction of mini graph
             # try to add class info
@@ -614,7 +646,7 @@ class Ontospy(object):
                     aClass.domain_of += [aProp]
                 else:
                     # edge case: it's not an OntoClass instance
-                    aProp.domains += [OntoClass(x, None, self.namespaces, ext_model=True)]
+                    aProp.domains += [OntoClass(x, None, self.namespaces, ext_model=True, entity_display_title=self.entity_display_title)]
 
         for x in ranges:
             if isBlankNode(x):
@@ -628,7 +660,7 @@ class Ontospy(object):
                     # eg a DataType property has xsd:STRING
                     # here we're storing an ontospy entities but not adding it to
                     # the main index
-                    aProp.ranges += [OntoClass(x, None, self.namespaces, ext_model=True)]
+                    aProp.ranges += [OntoClass(x, None, self.namespaces, ext_model=True, entity_display_title=self.entity_display_title)]
 
     def __computeTopLayer(self):
         """
