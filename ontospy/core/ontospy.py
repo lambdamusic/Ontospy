@@ -618,16 +618,16 @@ class Ontospy(object):
 
 	def build_entity_from_uri(self, uri, ontospyClass=None):
 		"""
-		Extract RDF statements having a URI as subject, then instantiate the RDF_Entity Python object so that it can be queried further.
+		Extract RDF statements having a URI as subject, then instantiate the RdfEntity Python object so that it can be queried further.
 
-		Passing <ontospyClass> allows to instantiate a user-defined RDF_Entity subclass.
+		Passing <ontospyClass> allows to instantiate a user-defined RdfEntity subclass.
 
 		NOTE: the entity is not attached to any index. In future version we may create an index for these (individuals?) keeping into account that any existing model entity could be (re)created this way.
 		"""
 		if not ontospyClass:
-			ontospyClass = RDF_Entity
-		elif not issubclass(ontospyClass, RDF_Entity):
-			click.secho("Error: <%s> is not a subclass of ontospy.RDF_Entity" % str(ontospyClass))
+			ontospyClass = RdfEntity
+		elif not issubclass(ontospyClass, RdfEntity):
+			click.secho("Error: <%s> is not a subclass of ontospy.RdfEntity" % str(ontospyClass))
 			return None
 		else:
 			pass
@@ -669,7 +669,7 @@ class Ontospy(object):
 
 		for x in domains:
 			if isBlankNode(x):
-				aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
+				aProp.domains += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
 			else:
 				aClass = self.get_class(uri=str(x))
 				if aClass:
@@ -685,7 +685,7 @@ class Ontospy(object):
 
 		for x in ranges:
 			if isBlankNode(x):
-				aProp.domains += [RDF_Entity(x, None, self.namespaces, is_Bnode=True)]
+				aProp.domains += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
 			else:
 				aClass = self.get_class(uri=str(x))
 				if aClass:

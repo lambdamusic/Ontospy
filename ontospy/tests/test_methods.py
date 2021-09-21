@@ -23,10 +23,10 @@ print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
 
 
-class SampleCustomEntity(ontospy.RDF_Entity):
+class SampleCustomEntity(ontospy.RdfEntity):
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, entity_display_title="qname"):
-        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model, entity_display_title)
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname"):
+        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model, pref_title)
 
     def __repr__(self):
         return "<SampleCustomEntity *%s*>" % ( self.uri)
@@ -49,7 +49,7 @@ class TestMethods(unittest.TestCase):
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	DATA_FOLDER = dir_path + "/rdf/"
 	f = DATA_FOLDER + "pizza.ttl"
-	o = Ontospy(f, verbose=True, entity_display_title="label")
+	o = Ontospy(f, verbose=True, pref_entities_title="label")
 
 	printDebug("\n*****\nTest: loading with local file... > %s\n*****" % str(f), "important")
 
@@ -63,9 +63,9 @@ class TestMethods(unittest.TestCase):
 			print("URI: ", c.uri)
 			print("RDFTYPE: ", c.rdftype)
 			print("BEST LABEL: ", c.bestLabel())
-			print("TITLE DISPLAY: ", c.display_title)
+			print("TITLE: ", c.title)
 			print("===")
-			
+
 		printDebug("Test completed succesfully.\n", "green")
 
 
@@ -111,7 +111,7 @@ class TestMethods(unittest.TestCase):
 		print("URI: ", e)
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
-		print("TITLE DISPLAY: ", e.display_title)
+		print("TITLE: ", e.title)
 		print("RDF SOURCE: ")
 		print(e.rdf_source())
 		printDebug("Test completed succesfully.\n", "green")
@@ -127,7 +127,7 @@ class TestMethods(unittest.TestCase):
 		print("URI: ", e)
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
-		print("TITLE DISPLAY: ", e.display_title)
+		print("TITLE: ", e.title)
 		print("OWL DISJOINT WITH: ")
 		print("\n".join([x for x in e.disjointWith()]))
 		printDebug("Test completed succesfully.\n", "green")

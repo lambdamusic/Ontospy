@@ -13,7 +13,7 @@ from . import *
 from .utils import *
 
 
-class RDF_Entity(object):
+class RdfEntity(object):
     """
     Pythonic representation of an RDF resource - normally not instantiated but used for
     inheritance purposes
@@ -30,7 +30,7 @@ class RDF_Entity(object):
     _ids = count(0)
 
     def __repr__(self):
-        return "<Ontospy: RDF_Entity object for uri *%s*>" % (self.uri)
+        return "<Ontospy: RdfEntity object for uri *%s*>" % (self.uri)
 
     def __init__(self,
                  uri,
@@ -58,8 +58,8 @@ class RDF_Entity(object):
         self.is_Bnode = is_Bnode
         self._pref_title = pref_title
         self._pref_language = pref_language
-        print("RDF_Entity (received)", pref_title)
-        print("RDF_Entity (set)", self._pref_title)
+        print("RdfEntity (received)", pref_title)
+        print("RdfEntity (set)", self._pref_title)
         self.slug = None
         self.rdftype = rdftype
         self.triples = None
@@ -116,7 +116,7 @@ class RDF_Entity(object):
             for terzetto in self.triples:
                 self.rdflib_graph.add(terzetto)
 
-    # methods added to RDF_Entity even though they apply only to some subs
+    # methods added to RdfEntity even though they apply only to some subs
 
     def ancestors(self, cl=None, noduplicates=True):
         """ returns all ancestors in the taxonomy """
@@ -248,7 +248,7 @@ class RDF_Entity(object):
 
 
 
-class Ontology(RDF_Entity):
+class Ontology(RdfEntity):
     """
     Pythonic representation of an OWL ontology
     """
@@ -301,7 +301,7 @@ class Ontology(RDF_Entity):
         printDebug("Properties..: %d" % len(self.all_properties))
 
 
-class OntoClass(RDF_Entity):
+class OntoClass(RdfEntity):
     """
     Python representation of a generic class within an ontology.
     Includes methods for representing and querying RDFS/OWL classes
@@ -346,7 +346,7 @@ class OntoClass(RDF_Entity):
             if self.sparqlHelper:
                 qres = self.sparqlHelper.getClassInstances(self.uri)
                 for uri in [x[0] for x in qres]:
-                    instance = RDF_Entity(uri, self.uri, self.namespaces)
+                    instance = RdfEntity(uri, self.uri, self.namespaces)
                     instance.triples = self.sparqlHelper.entityTriples(
                         instance.uri)
                     instance._buildGraph()  # force construction of mini graph
@@ -383,7 +383,7 @@ class OntoClass(RDF_Entity):
         # self.printGenericTree()
 
 
-class OntoProperty(RDF_Entity):
+class OntoProperty(RdfEntity):
     """
     Python representation of a generic RDF/OWL property.
 
@@ -434,7 +434,7 @@ class OntoProperty(RDF_Entity):
         # self.printGenericTree()
 
 
-class OntoSKOSConcept(RDF_Entity):
+class OntoSKOSConcept(RdfEntity):
     """
     Python representation of a generic SKOS concept within an ontology.
     @todo: complete methods..
@@ -475,7 +475,7 @@ class OntoSKOSConcept(RDF_Entity):
         self.printGenericTree()
 
 
-class OntoShape(RDF_Entity):
+class OntoShape(RdfEntity):
     """
     Python representation of a SHACL shape.
 

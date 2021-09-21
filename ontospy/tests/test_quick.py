@@ -34,7 +34,7 @@ from ..core.utils import *
 print("-------------------\nOntospy ", VERSION, "\n-------------------")
 
 
-class MyRDFEntity(ontospy.RDF_Entity):
+class MyRDFEntity(ontospy.RdfEntity):
 	def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
 		super(MyRDFEntity, self).__init__(uri, rdftype, namespaces, ext_model)
 
