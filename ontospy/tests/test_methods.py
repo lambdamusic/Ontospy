@@ -25,8 +25,8 @@ print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
 class SampleCustomEntity(ontospy.RDF_Entity):
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
-        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model)
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, entity_display_title="qname"):
+        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model, entity_display_title)
 
     def __repr__(self):
         return "<SampleCustomEntity *%s*>" % ( self.uri)
@@ -49,9 +49,25 @@ class TestMethods(unittest.TestCase):
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	DATA_FOLDER = dir_path + "/rdf/"
 	f = DATA_FOLDER + "pizza.ttl"
-	o = Ontospy(f, verbose=True)
+	o = Ontospy(f, verbose=True, entity_display_title="label")
 
 	printDebug("\n*****\nTest: loading with local file... > %s\n*****" % str(f), "important")
+
+	def test0(self):
+		"""
+		Class methods
+		"""
+		printDebug("\n=================\nTEST 0: Checking the <class> displays", "green")
+
+		for c in self.o.all_classes:
+			print("URI: ", c.uri)
+			print("RDFTYPE: ", c.rdftype)
+			print("BEST LABEL: ", c.bestLabel())
+			print("TITLE DISPLAY: ", c.display_title)
+			print("===")
+			
+		printDebug("Test completed succesfully.\n", "green")
+
 
 	def test1(self):
 		"""
@@ -62,7 +78,7 @@ class TestMethods(unittest.TestCase):
 		for c in self.o.all_classes:
 			# c.describe()
 			if c.instances:
-				print("CLASS: " + c.uri)
+				print("CLASS: " + c.uri + " " + c.display_title)
 				print("INSTANCES: ")
 				for el in c.instances:
 					print(el.uri, el.qname)
@@ -79,7 +95,7 @@ class TestMethods(unittest.TestCase):
 
 		for c in self.o.all_classes[:3]:
 			print("CLASS: ")
-			print(c.uri, c.qname)
+			print(c.uri, c.qname, c.display_title)
 			print("RDF:TYPE VALUES: ")
 			print(c.getValuesForProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 
@@ -95,6 +111,7 @@ class TestMethods(unittest.TestCase):
 		print("URI: ", e)
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
+		print("TITLE DISPLAY: ", e.display_title)
 		print("RDF SOURCE: ")
 		print(e.rdf_source())
 		printDebug("Test completed succesfully.\n", "green")
@@ -110,6 +127,7 @@ class TestMethods(unittest.TestCase):
 		print("URI: ", e)
 		print("RDFTYPE: ", e.rdftype)
 		print("BEST LABEL: ", e.bestLabel())
+		print("TITLE DISPLAY: ", e.display_title)
 		print("OWL DISJOINT WITH: ")
 		print("\n".join([x for x in e.disjointWith()]))
 		printDebug("Test completed succesfully.\n", "green")
