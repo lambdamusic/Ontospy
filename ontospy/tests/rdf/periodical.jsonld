@@ -1,5 +1,5 @@
 {
-  "@context": "http://schema.org",
+  "@context": "http://schema.org/",
   "@graph": [
     {
         "@id": "#issue",
