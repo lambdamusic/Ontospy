@@ -36,7 +36,7 @@ print("-------------------\nOntospy ", VERSION, "\n-------------------")
 
 class MyRDFEntity(ontospy.RdfEntity):
 	def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
-		super(MyRDFEntity, self).__init__(uri, rdftype, namespaces, ext_model)
+		super().__init__(uri, rdftype, namespaces, ext_model)
 
 	def __repr__(self):
 		return "<MyRDFEntity *%s*>" % (self.uri)
@@ -60,8 +60,8 @@ class TestQuick(unittest.TestCase):
 
 		dir_path = os.path.dirname(os.path.realpath(__file__))
 		DATA_FOLDER = dir_path + "/rdf/"
-		f = DATA_FOLDER + "pizza.ttl"
-		o = Ontospy(f, verbose=True, pref_entities_title="qname", pref_language="de")
+		f = DATA_FOLDER + "multilingual.ttl"
+		o = Ontospy(f, verbose=True, pref_title="label", pref_lang="it")
 
 		for c in o.all_classes:
 			print("URI: ", c.uri)

@@ -26,7 +26,7 @@ class RDFLoader(object):
     Accepts: [single item or list]
     :: uri_or_path = a uri or local path
     :: data = a string containing rdf
-    :: file_obj = a python file objecy
+    :: file_obj = a python file object
 
     Returns: rdflib graph instance.
 
@@ -258,7 +258,7 @@ class RDFLoader(object):
             "----------\nFatal error parsing graph%s\n(using RDF serializations: %s)"
             % (uri, str(rdf_format_opts)), "red")
         printDebug(
-            "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>"
+            "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://rdfvalidator.mybluemix.net/>\n<https://json-ld.org/playground/>"
         )
 
         return

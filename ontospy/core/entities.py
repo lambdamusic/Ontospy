@@ -39,7 +39,7 @@ class RdfEntity(object):
                  ext_model=False,
                  is_Bnode=False,
                  pref_title="qname",
-                 pref_language="en",
+                 pref_lang="en",
                  ):
         """
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
@@ -57,9 +57,8 @@ class RdfEntity(object):
         self.ext_model = ext_model
         self.is_Bnode = is_Bnode
         self._pref_title = pref_title
-        self._pref_language = pref_language
-        print("RdfEntity (received)", pref_title)
-        print("RdfEntity (set)", self._pref_title)
+        self._pref_lang = pref_lang
+
         self.slug = None
         self.rdftype = rdftype
         self.triples = None
@@ -187,7 +186,7 @@ class RdfEntity(object):
         out = ""
 
         if not prefLanguage:
-            prefLanguage = self._pref_language
+            prefLanguage = self._pref_lang
 
         if test:
             out = firstStringInList(test, prefLanguage)
@@ -215,7 +214,7 @@ class RdfEntity(object):
         ]
 
         if not prefLanguage:
-            prefLanguage = self._pref_language
+            prefLanguage = self._pref_lang
 
         for pred in test_preds:
             test = self.getValuesForProperty(pred)
@@ -235,7 +234,6 @@ class RdfEntity(object):
         
         Defaults to 'qname'.
         """
-        print("in <title> attribute: ", self._pref_title)
 
         if self._pref_title == "qname":
             out = self.qname
@@ -263,12 +261,12 @@ class Ontology(RdfEntity):
                  pref_prefix="",
                  ext_model=False,
                  pref_title="qname",
-                 pref_language="en",
+                 pref_lang="en",
                  ):
         """
         Init ontology object. Load the graph in memory, then setup all necessary attributes.
         """
-        super(Ontology, self).__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_language=pref_language)
+        super().__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_lang=pref_lang)
         # self.uri = uri # rdflib.Uriref
         self.prefix = pref_prefix
         self.slug = "ontology-" + slugify(self.qname)
@@ -317,13 +315,12 @@ class OntoClass(RdfEntity):
     """
 
     def __init__(self, uri, rdftype=None, namespaces=None, 
-                ext_model=False, pref_title="qname", pref_language="en"):
+                ext_model=False, pref_title="qname", pref_lang="en"):
         """
         ...
         """
-        print("OntoClass (sender) =>", pref_title)
         super().__init__(uri, rdftype, namespaces, ext_model, 
-                pref_title=pref_title, pref_language=pref_language)
+                pref_title=pref_title, pref_lang=pref_lang)
         self.slug = "class-" + slugify(self.qname)
         self.domain_of = []
         self.range_of = []
@@ -396,11 +393,11 @@ class OntoProperty(RdfEntity):
     """
 
     def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, 
-            pref_title="qname", pref_language="en"):
+            pref_title="qname", pref_lang="en"):
         """
         ...
         """
-        super(OntoProperty, self).__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_language=pref_language)
+        super().__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_lang=pref_lang)
 
         self.slug = "prop-" + slugify(self.qname)
         self.rdftype = inferMainPropertyType(rdftype)
@@ -441,12 +438,12 @@ class OntoSKOSConcept(RdfEntity):
 
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname", pref_language="en"):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname", pref_lang="en"):
         """
         ...
         """
-        super(OntoSKOSConcept, self).__init__(uri, rdftype, namespaces,
-                                              ext_model, pref_title=pref_title, pref_language=pref_language)
+        super().__init__(uri, rdftype, namespaces,
+                                              ext_model, pref_title=pref_title, pref_lang=pref_lang)
         self.slug = "concept-" + slugify(self.qname)
         self.instance_of = []
         self.ontology = None
@@ -481,11 +478,11 @@ class OntoShape(RdfEntity):
 
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname", pref_language="en"):
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname", pref_lang="en"):
         """
         ...
         """
-        super(OntoShape, self).__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_language=pref_language)
+        super().__init__(uri, rdftype, namespaces, ext_model, pref_title=pref_title, pref_lang=pref_lang)
         self.slug = "shape-" + slugify(self.qname)
         self.ontology = None
         self.targetClasses = []

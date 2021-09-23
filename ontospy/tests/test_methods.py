@@ -23,10 +23,11 @@ print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
 
 
+
 class SampleCustomEntity(ontospy.RdfEntity):
 
-    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname"):
-        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model, pref_title)
+    def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False, pref_title="qname", pref_lang="en"):
+        super(SampleCustomEntity, self).__init__(uri, rdftype, namespaces, ext_model, pref_title, pref_lang)
 
     def __repr__(self):
         return "<SampleCustomEntity *%s*>" % ( self.uri)
@@ -44,14 +45,19 @@ class SampleCustomEntity(ontospy.RdfEntity):
 
 class TestMethods(unittest.TestCase):
 
-	# updated 2018-05-08
+	# load sample ontologies
 
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 	DATA_FOLDER = dir_path + "/rdf/"
+	
 	f = DATA_FOLDER + "pizza.ttl"
-	o = Ontospy(f, verbose=True, pref_entities_title="label")
+	printDebug("\n*****\n ..loading local ontology > %s\n*****" % str(f), "important")
+	o = Ontospy(f, verbose=True, pref_title="label")
+	
+	f = DATA_FOLDER + "multilingual.ttl"
+	printDebug("\n*****\n ..loading local ontology > %s\n*****" % str(f), "important")
+	o2 = Ontospy(f, verbose=True, pref_title="qname", pref_lang="en")
 
-	printDebug("\n*****\nTest: loading with local file... > %s\n*****" % str(f), "important")
 
 	def test0(self):
 		"""
@@ -78,7 +84,7 @@ class TestMethods(unittest.TestCase):
 		for c in self.o.all_classes:
 			# c.describe()
 			if c.instances:
-				print("CLASS: " + c.uri + " " + c.display_title)
+				print("CLASS: " + c.uri + " " + c.title)
 				print("INSTANCES: ")
 				for el in c.instances:
 					print(el.uri, el.qname)
@@ -95,7 +101,7 @@ class TestMethods(unittest.TestCase):
 
 		for c in self.o.all_classes[:3]:
 			print("CLASS: ")
-			print(c.uri, c.qname, c.display_title)
+			print(c.uri, c.qname, c.title)
 			print("RDF:TYPE VALUES: ")
 			print(c.getValuesForProperty("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 
@@ -131,9 +137,48 @@ class TestMethods(unittest.TestCase):
 		print("OWL DISJOINT WITH: ")
 		print("\n".join([x for x in e.disjointWith()]))
 		printDebug("Test completed succesfully.\n", "green")
-	
+
+
+
+	def test5(self):
+		"""
+		Pref label and pref language parameters
+		"""
+
+		printDebug("\n=================\nTEST 5-1: pref_title=qname / pref_lang=en", "green")
+		for c in self.o2.all_classes:
+			print("URI: ", c.uri)
+			print("RDFTYPE: ", c.rdftype)
+			print("BEST LABEL: ", c.bestLabel())
+			print("TITLE: ", c.title)
+			print("===")
+
+		printDebug("\n=================\nTEST 5-2: pref_title=label / pref_lang=it", "green")
+		for c in self.o2.all_classes:
+			print("URI: ", c.uri)
+			print("RDFTYPE: ", c.rdftype)
+			print("BEST LABEL: ", c.bestLabel())
+			print("TITLE: ", c.title)
+			print("===")
+
+		printDebug("\n=================\nTEST 5-3: pref_title=label / pref_lang=es", "green")
+		for c in self.o2.all_classes:
+			print("URI: ", c.uri)
+			print("RDFTYPE: ", c.rdftype)
+			print("BEST LABEL: ", c.bestLabel())
+			print("TITLE: ", c.title)
+			print("===")
+
+		printDebug("Test completed succesfully.\n", "green")
+
 	
 	print("Success.\n")
+
+
+
+
+
+
 
 
 

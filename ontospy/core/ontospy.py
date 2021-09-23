@@ -56,8 +56,8 @@ class Ontospy(object):
 				 sparql_endpoint=None,
 				 credentials=None,
 				 build_all=True,
-				 pref_entities_title="qname",
-				 pref_language="en",
+				 pref_title="qname",
+				 pref_lang="en",
 				 ):
 		"""Load the graph in memory, then setup all necessary attributes.
 
@@ -85,9 +85,9 @@ class Ontospy(object):
 			[description], by default None
 		build_all : bool, optional
 			[description], by default True
-		pref_entities_title : str, optional
+		pref_title : str, optional
 			How to display entities by default. Two options accepted: "qname" (default) or "label" for rdfs:label. 
-		pref_language : str, optional
+		pref_lang : str, optional
 			Default: 'en'
 		"""
 		
@@ -98,8 +98,8 @@ class Ontospy(object):
 		self.credentials = None  # tuple: auth credentials for endpoint if needed
 		self.sources = None
 		self.sparqlHelper = None
-		self.pref_title = pref_entities_title
-		self.pref_language = pref_language
+		self.pref_title = pref_title
+		self.pref_lang = pref_lang
 		self.namespaces = []
 		# entities buckets start with 'all_'
 		self.all_ontologies = []
@@ -120,7 +120,7 @@ class Ontospy(object):
 									self.namespaces,
 									False, 
 									self.pref_title, 
-									self.pref_language)
+									self.pref_lang)
 
 		# finally:
 		if uri_or_path or data or file_obj:
@@ -296,21 +296,21 @@ class Ontospy(object):
 													 namespaces=self.namespaces,
 													 pref_prefix=checkDC_prefix[0],
 													 pref_title=self.pref_title,
-													 pref_language=self.pref_language,
+													 pref_lang=self.pref_lang,
 													 )
 													 ]
 								else:
 									out += [Ontology(checkDC_ID[0], 
 											namespaces=self.namespaces, 
 											pref_title=self.pref_title,
-											pref_language=self.pref_language,
+											pref_lang=self.pref_lang,
 											)]
 
 				else:
 					out += [Ontology(candidate[0], 
 								namespaces=self.namespaces, 
 								pref_title=self.pref_title,
-								pref_language=self.pref_language,
+								pref_lang=self.pref_lang,
 								)]
 
 		else:
@@ -360,7 +360,7 @@ class Ontospy(object):
 									 self.namespaces, 
 									 False,
 									 self.pref_title, 
-									 self.pref_language)
+									 self.pref_lang)
 				self.all_classes += [ontoclass]
 			else:
 				# if OWL.Class over RDFS.Class - update it
@@ -435,7 +435,7 @@ class Ontospy(object):
 											self.namespaces, 
 											False,
 											self.pref_title,
-											self.pref_language,
+											self.pref_lang,
 											)]
 			else:
 				# update it
@@ -509,7 +509,7 @@ class Ontospy(object):
 											self.namespaces, 
 											None, 
 											self.pref_title, 
-											self.pref_language,)
+											self.pref_lang,)
 											]
 			else:
 				pass
@@ -576,7 +576,7 @@ class Ontospy(object):
 									self.namespaces, 
 									None, 
 									self.pref_title, 
-									self.pref_language,)
+									self.pref_lang,)
 									]
 			else:
 				pass
@@ -638,7 +638,7 @@ class Ontospy(object):
 							self.namespaces, 
 							None, 
 							self.pref_title, 
-							self.pref_language,)
+							self.pref_lang,)
 			entity.triples = qres
 			entity._buildGraph()  # force construction of mini graph
 			# try to add class info
@@ -681,7 +681,7 @@ class Ontospy(object):
 										self.namespaces, 
 										True,  # ext_model arg
 										self.pref_title, 
-										self.pref_language,)]
+										self.pref_lang,)]
 
 		for x in ranges:
 			if isBlankNode(x):
@@ -699,7 +699,7 @@ class Ontospy(object):
 									self.namespaces, 
 									True, 
 									self.pref_title,
-									self.pref_language,)]
+									self.pref_lang,)]
 
 	def __computeTopLayer(self):
 		"""
