@@ -636,6 +636,8 @@ def action_visualize(args,
                      title="",
                      viztype="",
                      theme="",
+                     preflabel="",
+                     preflang="",
                      verbose=False):
     """
     export model into another format eg html, d3 etc...
@@ -663,9 +665,9 @@ def action_visualize(args,
     # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
     # get ontospy graph
     printDebug("Loading graph...", dim=True)
-    g = Ontospy(ontouri, verbose=verbose)
+    g = Ontospy(ontouri, verbose=verbose, pref_title=preflabel, pref_lang=preflang)
 
-    # put in home folder by default: <ontouri>/<viztype>/files..
+    # put viz in home folder by default: <ontouri>/<viztype>/files..
     if not path:
         from os.path import expanduser
         home = expanduser("~")

@@ -296,7 +296,7 @@
 
 	{% if classes %}
 		<fieldset> <legend>Classes ({{classes|length}})</legend>
-			{% for each in classes  %}<span><a href="#{{each.qname}}">{{each.qname}}</a></span>
+			{% for each in classes  %}<span><a href="#{{each.qname}}">{{each.title}}</a></span>
 			{% if not forloop.last %}|{% endif %}
 			{% endfor %}
 		</fieldset>
@@ -305,7 +305,7 @@
 	{% if objproperties %}
 
 	<fieldset> <legend>Object Properties ({{objproperties|length}})</legend>
-		&nbsp;{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+		&nbsp;{% for each in objproperties  %}<a href="#{{each.qname}}">{{each.title}}</a>
 		{% if not forloop.last %}|{% endif %}  {% endfor %}
 	</fieldset>
 
@@ -313,7 +313,7 @@
 
 	{% if dataproperties %}
 	<fieldset> <legend>Datatype Properties ({{dataproperties|length}})</legend>
-		&nbsp;{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+		&nbsp;{% for each in dataproperties  %}<a href="#{{each.qname}}">{{each.title}}</a>
 		{% if not forloop.last %}|{% endif %}  {% endfor %}
 	</fieldset>
 	{% endif %}
@@ -321,7 +321,7 @@
 	{% if annotationproperties %}
 
 		<fieldset> <legend>Annotation Properties ({{annotationproperties|length}})</legend>
-			&nbsp;{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+			&nbsp;{% for each in annotationproperties  %}<a href="#{{each.qname}}">{{each.title}}</a>
 			{% if not forloop.last %}|{% endif %}  {% endfor %}
 		</fieldset>
 
@@ -330,7 +330,7 @@
 	{% if skosConcepts %}
 
 		<fieldset> <legend>SKOS Concepts ({{skosConcepts|length}})</legend>
-			&nbsp;{% for each in skosConcepts  %}<a href="#{{each.qname}}">{{each.qname}}</a>
+			&nbsp;{% for each in skosConcepts  %}<a href="#{{each.qname}}">{{each.title}}</a>
 			{% if not forloop.last %}|{% endif %}  {% endfor %}
 		</fieldset>
 
@@ -355,7 +355,7 @@
 
 
 
-				<h3 class="entity-section">Class: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+				<h3 class="entity-section">Class: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.title}}</a>
 					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
 				</h3>
 				<hr>
@@ -365,15 +365,15 @@
                 <div class="tree">
                     <ul>
                         {% if each.parents %}
-                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
+                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.title}}</a>
 
                             <ul>
 
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+                              <li><a style="font-weight: bold;">{{each.title}}</a>
 
                               {% if each.children  %}
                                   <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.title}}</a></li>{% endfor %}
                                   </ul>
                               {% endif %}
                                 </li>
@@ -388,11 +388,11 @@
                             <li href="#"><a>owl:Thing</a>
 
                             <ul>
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+                              <li><a style="font-weight: bold;">{{each.title}}</a>
 
                               {% if each.children  %}
                                   <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.title}}</a></li>{% endfor %}
                                   </ul>
                               {% endif %}
                                 </li>
@@ -409,7 +409,7 @@
 
                 {% if not each.children  %}
                 <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                    <small>NOTE</small> {{each.title}} is a leaf node.</p>
                 {% endif %}
 
 				<p class="section-desc"><b>Description</b>
@@ -420,7 +420,7 @@
                 {% if each.ancestors %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
                         <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% else %}
                     <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
@@ -431,14 +431,14 @@
 				{% if each.domain_of %}
 					<p class="section-desc"><b>Property Domain of:</b>
                         <br>
-                        {% for s in each.domain_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.domain_of %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
 				{% if each.range_of %}
 					<p class="section-desc"><b>Property Range of:</b>
                         <br>
-                        {% for s in each.range_of %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.range_of %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
@@ -468,7 +468,7 @@
 
 			<div class="entity-div">
 
-				<h3 class="entity-section">Object Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+				<h3 class="entity-section">Object Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.title}}</a>
 					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
 				</h3>
 				<hr>
@@ -486,7 +486,7 @@
                 {% if each.ancestors %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
                         <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% else %}
 
@@ -497,24 +497,24 @@
 				{% if each.children %}
 					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
                         <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
 				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.domains %}
 					<p class="section-desc"><b>Class Domain for:</b>
                         <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.ranges %}
 					<p class="section-desc"><b>Class Range for:</b>
                         <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 
@@ -546,14 +546,14 @@
 
 			<div class="entity-div">
 
-				<h3 class="entity-section">Datatype Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+				<h3 class="entity-section">Datatype Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.title}}</a>
 					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
 				</h3>
 				<hr>
 
                 {% if not each.children  %}
                 <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                    <small>NOTE</small> {{each.title}} is a leaf node.</p>
                 {% endif %}
 
 				<p class="section-desc"><b>Description</b>
@@ -564,7 +564,7 @@
                 {% if each.ancestors %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
                         <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% else %}
 
@@ -575,24 +575,24 @@
 				{% if each.children %}
 					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
                         <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
 				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.domains %}
 					<p class="section-desc"><b>Class Domain for:</b>
                         <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.ranges %}
 					<p class="section-desc"><b>Class Range for:</b>
                         <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 
@@ -624,14 +624,14 @@
 
 			<div class="entity-div">
 
-				<h3 class="entity-section">Annotation Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+				<h3 class="entity-section">Annotation Property: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.title}}</a>
 					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
 				</h3>
 				<hr>
 
                 {% if not each.children  %}
                 <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                    <small>NOTE</small> {{each.title}} is a leaf node.</p>
                 {% endif %}
 
 				<p class="section-desc"><b>Description</b>
@@ -642,7 +642,7 @@
                 {% if each.ancestors %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors|length }})</small>:</b>
                         <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% else %}
 
@@ -653,24 +653,24 @@
 				{% if each.children %}
 					<p class="section-desc"><b>Has sub-property <small>(direct)</small>:</b>
                         <br />
-                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.children %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
 				{% if 0 and each.descendants and each.descendants|length > each.children|length %}
-					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+					<p class="section-desc"><b>Has Sub Property <small>(all)   </small>:</b> {% for s in each.descendants %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.domains %}
 					<p class="section-desc"><b>Class Domain for:</b>
                         <br>
-                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.domains %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 				{% if each.ranges %}
 					<p class="section-desc"><b>Class Range for:</b>
                         <br>
-                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+                        {% for s in each.ranges %}<a href="#{{s.qname|default:each.qname}}">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 				{% endif %}
 
 
@@ -701,7 +701,7 @@
 
 			<div class="entity-div">
 
-				<h3 class="entity-section">Concept: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.qname}}</a>
+				<h3 class="entity-section">Concept: <a name="{{each.qname}}" href="#{{each.qname}}">{{each.title}}</a>
 					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
 				</h3>
 				<hr>
@@ -709,15 +709,15 @@
                 <div class="tree">
                     <ul>
                         {% if each.parents %}
-                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.qname}}</a>
+                            {% for s in each.parents %}<li> <a href="#{{s.qname}}">{{s.title}}</a>
 
                             <ul>
 
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+                              <li><a style="font-weight: bold;">{{each.title}}</a>
 
                               {% if each.children  %}
                                   <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.title}}</a></li>{% endfor %}
                                   </ul>
                               {% endif %}
                                 </li>
@@ -732,11 +732,11 @@
                             <li href="#"><a>skos:Concept</a>
 
                             <ul>
-                              <li><a style="font-weight: bold;">{{each.qname}}</a>
+                              <li><a style="font-weight: bold;">{{each.title}}</a>
 
                               {% if each.children  %}
                                   <ul>
-                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.qname}}</a></li>{% endfor %}
+                                    {% for s in each.children %}<li><a href="#{{s.qname}}">{{s.title}}</a></li>{% endfor %}
                                   </ul>
                               {% endif %}
                                 </li>
@@ -752,7 +752,7 @@
 
                 {% if not each.children  %}
                 <p class="section-desc">
-                    <small>NOTE</small> {{each.qname}} is a leaf node.</p>
+                    <small>NOTE</small> {{each.title}} is a leaf node.</p>
                 {% endif %}
 
 				<p class="section-desc"><b>Description</b>
@@ -763,7 +763,7 @@
                 {% if each.ancestors %}
 					<p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors|length }})</small>:</b>
                         <br />
-                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.ancestors %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 
