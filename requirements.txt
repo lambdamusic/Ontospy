@@ -8,3 +8,5 @@ colorama>=0.3.7 # note: on windows click requires colorama too http://click.poco
 pyparsing>=2.1.10
 keepalive>=0.5
 # readline==6.2.4.1  # optional, for shell autocomplete
+# django>=1.10.3  # optional: for gendocs
+# pygments==2.1.3 # optional: for gendocs
