@@ -334,7 +334,7 @@
                 label: 'Top Layer' // for legend
             }],
             labels: [
-                {% for class in topclasses %}"{{class.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
+                {% for class in topclasses %}"{{class.title|safe}}"{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             ]
         };
@@ -375,7 +375,7 @@
                 label: 'Top Layer' // for legend
             }],
             labels: [
-                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.bestLabel|safe}}"{% if not forloop.last %}, {% endif %}
+                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.title|safe}}"{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             ]
         };

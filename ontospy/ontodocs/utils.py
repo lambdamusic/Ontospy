@@ -206,7 +206,7 @@ def formatHTML_EntityTreeTable(treedict, element=0):
         else:
             stringa += """<tr>
 							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
-						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.qname, 50))
+						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.title, 50))
 
         if treedict.get(x, None):
             stringa += """ <tr>

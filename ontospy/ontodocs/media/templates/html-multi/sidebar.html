@@ -14,7 +14,7 @@
 
             {# simulated second level #}
           {% for each in  ontospy_graph.all_classes%}
-              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %} href="{{each.slug}}.html">{{each.qname}}</a></li>
+              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %} href="{{each.slug}}.html">{{each.title}}</a></li>
           {% endfor %}
         {% endif %}
 
@@ -24,7 +24,7 @@
 
             {# simulated second level #}
           {% for each in  ontospy_graph.all_properties %}
-              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.title}}</a></li>
           {% endfor %}
 
         {% endif %}
@@ -35,7 +35,7 @@
 
               {# simulated second level #}
             {% for each in  ontospy_graph.all_skos_concepts %}
-                <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.qname}}</a></li>
+                <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% ifequal thispage each.qname %}class="active"{% endifequal %}  href="{{each.slug}}.html">{{each.title}}</a></li>
             {% endfor %}
 
         {% endif %}

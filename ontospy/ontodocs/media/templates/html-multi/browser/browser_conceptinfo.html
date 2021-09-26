@@ -40,7 +40,7 @@
 
          <h1>
 {#                Concept: #}
-             {{each.qname}}
+             {{each.title}}
              {% if not each.children  %}
                  <small class="label label-info label-xs ">leaf node</small>
                {% endif %}
@@ -61,14 +61,14 @@
 
                         <li>
 
-                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a>
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
 
                           <ul>
 
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
                             {% if each.children  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -83,11 +83,11 @@
                         <li><a href="entities-tree-properties.html">skos:Concept</a>
 
                           <ul>
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.qname}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
 
                             {% if each.children  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.qname}}</a></li>{% endfor %}
+                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -143,7 +143,7 @@
              </div>
              <div class="panel-body">
 
-                 {{each.bestDescription|default:"--"}}
+                 {{each.bestDescription|linebreaks|default:"--"}}
              </div>
            </div>
             </div></div>
@@ -161,7 +161,7 @@
             <div class="panel-body">
 
             {% if each.ancestors %}
-                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.qname}}</a></li>{% endfor %}
+                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.title}}</a></li>{% endfor %}
             {% else %}
                 <li>owl:Thing</li>
             {% endif %}
