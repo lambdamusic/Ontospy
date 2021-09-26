@@ -12,12 +12,12 @@
 #### Tree
 {% if each.parents %}
 {% for s in each.parents %}
-* [{{s.qname}}]({{s.slug}}.md)
+* [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
@@ -26,7 +26,7 @@
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
@@ -40,13 +40,13 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|default:"--"}}
+{{each.bestDescription|linebreaks|default:"--"}}
 
 
 {% if each.ancestors %}
 #### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
-- [{{s.qname}}]({{s.slug}}.md)
+- [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
 #### Inherits from:

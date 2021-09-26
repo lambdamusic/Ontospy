@@ -12,12 +12,12 @@
 #### Tree
 {% if each.parents %}
 {% for s in each.parents %}
-* [{{s.qname}}]({{s.slug}}.md)
+* [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
@@ -26,7 +26,7 @@
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
@@ -40,13 +40,13 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|default:"--"}}
+{{each.bestDescription|linebreaks|default:"--"}}
 
 
 {% if each.ancestors %}
 #### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
-- [{{s.qname}}]({{s.slug}}.md)
+- [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
 #### Inherits from:
@@ -78,14 +78,14 @@ owl:Thing
         
         <tr style="background: lightcyan;text-align: left;">
             <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
-            From <a title="{{k.qname}}" href="{{k.slug}}.md" class="rdfclass">{{k.qname}}</a></span>
+            From <a title="{{k.qname}}" href="{{k.slug}}.md" class="rdfclass">{{k.title}}</a></span>
             </th>
         </tr>       
 
             {% for prop in v  %}
             <tr>
                 <td class="firsttd">
-                    <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.md">{{prop.qname}}</a>         
+                    <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.md">{{prop.title}}</a>         
                 </td>
                 <td class="thirdtd">
                     <span>{{prop.bestDescription}}</span>
@@ -94,7 +94,7 @@ owl:Thing
                     {% if  prop.ranges %}
                     {% for range in prop.ranges  %}
 
-                        <a title="{{range.qname}}" href="{{range.slug}}.md" class="rdfclass">{{range.qname}}</a>
+                        <a title="{{range.qname}}" href="{{range.slug}}.md" class="rdfclass">{{range.title}}</a>
 
                     {% endfor %}
                     {% else %}

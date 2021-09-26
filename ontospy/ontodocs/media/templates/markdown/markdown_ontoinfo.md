@@ -51,7 +51,7 @@ Prefix   | URI      |
 #### Classes ({{ontospy_graph.all_classes|length}})
 
 {% for each in ontospy_graph.all_classes %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}
@@ -61,7 +61,7 @@ Prefix   | URI      |
 #### SKOS Concepts ({{ontospy_graph.all_skos_concepts|length}})
 
 {% for each in ontograph.all_skos_concepts  %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}
@@ -71,7 +71,7 @@ Prefix   | URI      |
 #### Object Properties ({{ontospy_graph.all_properties_object|length}})
 
 {% for each in ontospy_graph.all_properties_object %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}
@@ -81,7 +81,7 @@ Prefix   | URI      |
 #### Datatype Properties ({{ontospy_graph.all_properties_datatype|length}})
 
 {% for each in ontospy_graph.all_properties_datatype %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}
@@ -91,7 +91,7 @@ Prefix   | URI      |
 #### Annotation Properties ({{ontograph.all_properties_annotation|length}})
 
 {% for each in ontospy_graph.all_properties_annotation  %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}
@@ -102,7 +102,7 @@ Prefix   | URI      |
 #### Properties ({{ontospy_graph.all_properties|length}})
 
 {% for each in ontospy_graph.all_properties  %}
-- [{{each.qname}}]({{each.slug}}.md "Open")
+- [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
 {% endif %}

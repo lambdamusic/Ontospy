@@ -12,12 +12,12 @@
 #### Tree
 {% if each.parents %}
 {% for s in each.parents %}
-* [{{s.qname}}]({{s.slug}}.md)
+* [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md)
+        * [{{s.title}}]({{s.slug}}.md)
 {% endfor %}        
 {% endif %}
 
@@ -26,7 +26,7 @@
     * {{each.qname}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md)
+        * [{{s.title}}]({{s.slug}}.md)
 {% endfor %}        
 {% endif %}
 
@@ -40,12 +40,12 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|default:"--"}}
+{{each.bestDescription|linebreaks|default:"--"}}
 
 {% if each.ancestors %}
 #### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
-- [{{s.qname}}]({{s.slug}}.md)
+- [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
 #### Inherits from:
@@ -56,8 +56,8 @@ owl:Thing
 #### Usage
 {% if each.domains %}
 {% for s in each.domains %}
-[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}
-{% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.qname}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.qname}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
+[{{s.title}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}
+{% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.title}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
 
 #### Implementation
 ```
