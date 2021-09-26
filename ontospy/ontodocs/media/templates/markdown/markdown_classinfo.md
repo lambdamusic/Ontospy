@@ -6,7 +6,7 @@
     
 {% with main_entity as each  %}
 
-## Class {{each.qname}}
+## Class {{each.title}}
 
 
 #### Tree
@@ -14,7 +14,7 @@
 {% for s in each.parents %}
 * [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
         * [{{s.title}}]({{s.slug}}.md) 
@@ -23,7 +23,7 @@
 
 {% else %}
 * owl:Thing
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
         * [{{s.title}}]({{s.slug}}.md) 
@@ -63,7 +63,7 @@ owl:Thing
 
 
 {% if each.domain_of_inferred %}
-#### Instances of {{each.qname}} can have the following properties:
+#### Instances of {{each.title}} can have the following properties:
 
 <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover ">
 

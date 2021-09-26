@@ -6,7 +6,7 @@
     
 {% with main_entity as each  %}
 
-# SKOS Concept {{each.qname}}
+# SKOS Concept {{each.title}}
 
 
 #### Tree
@@ -14,7 +14,7 @@
 {% for s in each.parents %}
 * [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
         * [{{s.title}}]({{s.slug}}.md) 
@@ -23,7 +23,7 @@
 
 {% else %}
 * skos:Concept
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
         * [{{s.title}}]({{s.slug}}.md) 
