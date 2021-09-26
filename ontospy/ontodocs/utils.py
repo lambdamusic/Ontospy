@@ -36,7 +36,8 @@ def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
         d = {}
         # print "*" * level, x.label
         d['qname'] = x.qname
-        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        # d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['name'] = x.title
         d['objid'] = x.id
         if x.children() and level < MAX_DEPTH:
             d['size'] = len(x.children()) + 5  # fake size
@@ -93,7 +94,8 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
         d = {}
         # print "*" * level, x.label
         d['qname'] = x.qname
-        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        # d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['name'] = x.title
         d['objid'] = x.id
         if x.children() and level < MAX_DEPTH:
             duplicate_row = {}

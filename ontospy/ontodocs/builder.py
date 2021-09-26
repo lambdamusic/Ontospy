@@ -177,28 +177,28 @@ def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
         from .viz.viz_markdown import MarkdownViz
         v = MarkdownViz(g, title)
 
-    elif this_viz['ID'] == "d3-tree":
-        from .viz.viz_d3tree import Dataviz
+    elif this_viz['ID'] == "d3-dendogram":
+        from .viz.viz_d3dendogram import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "d3-bubble-chart":
-        from .viz.viz_d3bubbleChart import Dataviz
+        from .viz.viz_d3bubble_chart import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "d3-pack-hierarchy":
-        from .viz.viz_d3packHierarchy import Dataviz
+        from .viz.viz_d3pack_hierarchy import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "d3-bar-hierarchy":
-        from .viz.viz_d3barHierarchy import Dataviz
+        from .viz.viz_d3bar_hierarchy import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "d3-partition-table":
-        from .viz.viz_d3partitionTable import Dataviz
+        from .viz.viz_d3partition_table import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "d3-rotating-cluster":
-        from .viz.viz_d3rotatingCluster import Dataviz
+        from .viz.viz_d3rotating_cluster import Dataviz
         v = Dataviz(g, title)
 
     elif this_viz['ID'] == "sigma-force-directed":

@@ -1,0 +1,27 @@
+
+    <script type="text/javascript">
+
+		var slider = $("#slider").slideReveal({
+			  trigger: $("#trigger"),
+			  push: false,
+			  overlay: true,
+			  width: '50%',
+			  speed: 700 ,
+			});
+
+		function showpanel(argument) {
+			console.log("#"+argument);
+			if (argument != "None") {
+				$("#slide_contents").empty();
+				$("#slide_contents").html($("#"+argument).html());
+				slider.slideReveal("show");
+			}
+		}
+
+
+
+
+
+    </script>
+
+

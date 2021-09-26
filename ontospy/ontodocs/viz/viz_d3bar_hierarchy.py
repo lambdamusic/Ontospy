@@ -9,13 +9,13 @@ from ..builder import *  # loads and sets up Django
 from ..viz_factory import VizFactory
 
 # ===========
-# D3 PARTITION TABLE
+# D3 Bar Hierarchy
 # ===========
 
 
 class Dataviz(VizFactory):
     """
-    D3 Partition table
+    D3 Bar HierarchyViz
 
     """
 
@@ -48,7 +48,7 @@ class Dataviz(VizFactory):
 
         # Ontology - MAIN PAGE
         contents = self._renderTemplate(
-            "d3/d3_partitionTable.html", extraContext=extra_context)
+            "d3/d3_bar_hierarchy.html", extraContext=extra_context)
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 

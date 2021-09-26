@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<title>Ontospy > {{docs_title}}</title>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+
+
+
+{% block custom_css %}
+
+
+    
+{% endblock custom_css %}
+
+
+
+
+
+
+<style type="text/css" media="screen">
+
+    /*slider CSS INCLUDED BY DEFAULT*/
+
+
+    .hidden {
+        display: none;
+    }
+
+    
+    .side-panel{
+        background-color: #E6E6E6;
+        padding: 10px;
+        /*word-wrap: break-word;*/
+        overflow: auto;
+    }
+
+    .side-panel-left{
+        box-shadow: -5px 0 15px -6px #585858 inset;
+    }
+
+    .side-panel-right{
+        box-shadow: 5px 0 15px -6px #585858 inset;
+    }
+
+    a.class {
+        color: darkred;
+    }
+    a.prop {
+        color: darkblue;
+    }
+
+    .turtlesource {
+        font-size: 12px;
+        overflow: auto;
+    }
+
+    dt {
+        color: darkslategrey;
+    }
+
+    .text-muted {
+        color: grey;
+    }
+
+    hr {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .credits {
+        color: gray;
+    }
+
+    a.greylink {
+        color: #666;
+        text-decoration: underline;
+    }
+
+    .section-title {
+        font-size: smaller;
+    }
+
+</style>
+
+
+
+
+
+</head>
+
+
+<body>
+
+	{# VISIBLE PAGE HTML #}
+
+	{# note: showpanel arg is the ID of the div that is showing.. #}
+
+	<h1 class="title"><a href="javascript:showpanel('ontoinfo');">{{docs_title}}</a></h1>
+
+	<hr>
+
+
+
+
+    {% block main_content %}
+
+
+    {% endblock main_content %}
+
+
+
+
+	<hr>
+    <small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://lambdamusic.github.io/Ontospy/" target="_blank">Ontospy</a> on {% now "jS F Y H:i" %} </small>
+
+
+
+	{# SLIDER AND HIDDEN TABS #}
+
+	{% include "d3tree_hiddendivs.html" %}
+
+
+	<div id='slider' class="side-panel side-panel-left">
+		<span class="text-muted">Press <kbd>ESC</kbd> to close</span>
+		<div id="slide_contents"></div>
+	</div>
+
+	{# <button id='trigger'>Trigger</button> #}
+
+
+    
+
+
+
+    {% block the_javascript %}
+
+
+    {% endblock the_javascript %}
+
+
+
+
+
+</body>
+</html>
