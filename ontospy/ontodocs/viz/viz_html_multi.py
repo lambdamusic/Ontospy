@@ -51,13 +51,6 @@ class KompleteViz(VizFactory):
         FILE_NAME = "statistics.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 
-        # VIZ LIST
-        if False:
-            contents = self._renderTemplate("html-multi/viz_list.html", extraContext={"theme": self.theme})
-            FILE_NAME = "visualizations.html"
-            self._save2File(contents, FILE_NAME, self.output_path)
-
-
         browser_output_path = self.output_path
 
         # ENTITIES A-Z

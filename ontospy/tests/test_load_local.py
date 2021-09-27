@@ -5,7 +5,7 @@ Unit test stub for ontosPy
 
 Run like this:
 
-:path/to/ontospyProject>python -m ontospy.tests.test_load_local
+$ python -m ontospy.tests.test_load_local
 
 """
 
@@ -16,6 +16,7 @@ from .. import *
 from .. core import *
 from .. core.utils import *
 
+from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
 
 
 # sanity check
@@ -24,20 +25,18 @@ print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
 class TestLoadOntologies(unittest.TestCase):
 
-	dir_path = os.path.dirname(os.path.realpath(__file__))
-	DATA_FOLDER = dir_path + "/rdf/"
 
 	def test1_load_locally(self):
 		"""
 		Check if the ontologies in /RDF folder load ok
 		"""
-		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % self.DATA_FOLDER)
+		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % TEST_RDF_FOLDER)
 
-		for f in os.listdir(self.DATA_FOLDER):
+		for f in os.listdir(TEST_RDF_FOLDER):
 			if not f.startswith('.'):
 				printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
 
-				o = Ontospy(self.DATA_FOLDER + f, verbose=True)
+				o = Ontospy(TEST_RDF_FOLDER + f, verbose=True)
 
 				print("CLASS TREE")
 				o.printClassTree()

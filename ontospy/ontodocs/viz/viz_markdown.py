@@ -16,7 +16,7 @@ from ..viz_factory import VizFactory
 
 class MarkdownViz(VizFactory):
     """
-    A simple markdown rendering in multi pages
+    A simple markdown rendering, using multiple pages
 
     """
 

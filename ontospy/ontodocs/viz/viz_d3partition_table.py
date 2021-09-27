@@ -8,15 +8,14 @@ from ..utils import *
 from ..builder import *  # loads and sets up Django
 from ..viz_factory import VizFactory
 
-# TEMPLATE: D3 PACK HIERARCHY
-# http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
-# https://github.com/d3/d3/wiki/Pack-Layout
-# http://bl.ocks.org/nilanjenator/4950148
+# ===========
+# D3 PARTITION TABLE
+# ===========
 
 
 class Dataviz(VizFactory):
     """
-    D3 PackHierarchyViz
+    D3 Partition table
 
     """
 
@@ -36,15 +35,10 @@ class Dataviz(VizFactory):
             0, 99, 1, self.ontospy_graph.toplayer_classes)
         c_total = len(self.ontospy_graph.all_classes)
 
-        if len(self.ontospy_graph.toplayer_classes) == 1:
-            # the first element can be the single top level
-            JSON_DATA_CLASSES = json.dumps(jsontree_classes[0])
-        else:
-            # hack to make sure that we have a default top level object
-            JSON_DATA_CLASSES = json.dumps({
-                'children': jsontree_classes,
-                'name': 'owl:Thing',
-            })
+        JSON_DATA_CLASSES = json.dumps({
+            'children': jsontree_classes,
+            'name': 'owl:Thing',
+        })
 
         extra_context = {
             "ontograph": self.ontospy_graph,
@@ -54,7 +48,7 @@ class Dataviz(VizFactory):
 
         # Ontology - MAIN PAGE
         contents = self._renderTemplate(
-            "d3/d3_packHierarchy.html", extraContext=extra_context)
+            "d3/d3_partition_table.html", extraContext=extra_context)
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 

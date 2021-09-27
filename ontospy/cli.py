@@ -198,6 +198,14 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
     'THEME: select bootstrap style (only for the html-multi-page visualization). Default: simplex (random=use a random theme).'
 )
 @click.option(
+    '--preflabel',
+    help='PREF-LABEL: default value to use for entity titles (qname|label - default=qname).')
+@click.option(
+    '--preflang',
+    help=
+    'PREF-LANGUAGE: default language for multilingual strings (default=en).'
+)
+@click.option(
     '--nobrowser',
     is_flag=True,
     help="NO-BROWSER: prevents opening the html output in the browser by default.")
@@ -218,6 +226,8 @@ def gendocs(ctx,
             type="",
             title="",
             theme="",
+            preflabel="",
+            preflang="",
             nobrowser=False,
             showthemes=False,
             showtypes=False):
@@ -256,6 +266,12 @@ def gendocs(ctx,
     if theme and theme == "random":
         theme = random_theme()
 
+    if preflabel and preflabel not in ["label", "qname"]:
+        click.secho(
+            "WARNING: the valid preflabel options are either 'qname' or 'label' (= rdfs:label) only. Using defaults.",
+            fg="red")
+        preflabel = "qname"
+
     if outputpath:
         if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
             click.secho(
@@ -283,6 +299,8 @@ def gendocs(ctx,
         title=title,
         viztype=type,
         theme=theme,
+        preflabel=preflabel,
+        preflang=preflang,
         verbose=verbose)
 
     if url and (not nobrowser):  # open browser

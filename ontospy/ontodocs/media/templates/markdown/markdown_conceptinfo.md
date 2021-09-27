@@ -6,27 +6,27 @@
     
 {% with main_entity as each  %}
 
-# SKOS Concept {{each.qname}}
+# SKOS Concept {{each.title}}
 
 
 #### Tree
 {% if each.parents %}
 {% for s in each.parents %}
-* [{{s.qname}}]({{s.slug}}.md)
+* [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
 {% else %}
 * skos:Concept
-    * {{each.qname}}
+    * {{each.title}}
 {% if each.children  %}
 {% for s in each.children %}
-        * [{{s.qname}}]({{s.slug}}.md) 
+        * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
@@ -40,13 +40,13 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|default:"--"}}
+{{each.bestDescription|linebreaks|default:"--"}}
 
 
 {% if each.ancestors %}
 #### Inherits from ({{ each.ancestors|length }})
 {% for s in each.ancestors %}
-- [{{s.qname}}]({{s.slug}}.md)
+- [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
 #### Inherits from:

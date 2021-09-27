@@ -96,7 +96,7 @@ class Dataviz(VizFactory):
 
         # Ontology - MAIN PAGE
         contents = self._renderTemplate(
-            "d3/d3tree.html", extraContext=extra_context)
+            "d3/d3_dendogram.html", extraContext=extra_context)
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 

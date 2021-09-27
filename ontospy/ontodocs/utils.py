@@ -36,7 +36,8 @@ def build_D3treeStandard(old, MAX_DEPTH, level=1, toplayer=None):
         d = {}
         # print "*" * level, x.label
         d['qname'] = x.qname
-        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        # d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['name'] = x.title
         d['objid'] = x.id
         if x.children() and level < MAX_DEPTH:
             d['size'] = len(x.children()) + 5  # fake size
@@ -93,7 +94,8 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
         d = {}
         # print "*" * level, x.label
         d['qname'] = x.qname
-        d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        # d['name'] = x.bestLabel(quotes=False).replace("_", " ")
+        d['name'] = x.title
         d['objid'] = x.id
         if x.children() and level < MAX_DEPTH:
             duplicate_row = {}
@@ -206,7 +208,7 @@ def formatHTML_EntityTreeTable(treedict, element=0):
         else:
             stringa += """<tr>
 							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
-						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.qname, 50))
+						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.title, 50))
 
         if treedict.get(x, None):
             stringa += """ <tr>

@@ -3,7 +3,16 @@
 {# hidden divs for d3tree viz - shown within slider #}
 
 <div class="hidden" id="ontoinfo">
-	<h2>Ontology: <a href="{{main_uri}}" target="_blank" class="class"  title="Try to open original URI">{{main_uri}}</a></h2>
+
+	
+	{% if main_uri %}
+		<h2>Ontology: <a href="{{main_uri|default:'--'}}" target="_blank" class="class"  title="Try to open original URI">{{main_uri}}</a></h2>
+	{% else %}
+		<h2>Ontology:</h2> 
+		<em>Not defined</em>
+	{% endif %}
+		
+
 
 	<hr class="margintop">
 
@@ -37,6 +46,20 @@
 
 	{% endif %}
 
+
+
+	{% if topclasses %}
+	<hr>
+	<b class="section-title">Top Classes</b>
+	
+	<p>
+	{% for s in topclasses %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}
+	</p>
+
+	{% endif %}
+
+
+
 </div>
 
 
@@ -48,15 +71,21 @@
 
 	
 	<h2 class="entity-section">Class: <a href="{{each.uri}}" class="class" target="_blank"
-                                          title="Try to open original URI">{{each.qname}}</a>
+                                          title="Try to open original URI">{{each.title}}</a>
 	</h2>
 	<hr>
 
+
+	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
     {% if each.bestLabel %}
-	<p><b class="section-title">Label: </b>{{each.bestLabel|capfirst}}</p>
+		<p><b class="section-title">Label: </b>
+			{{each.bestLabel|capfirst}}
+		</p>
     {% endif %}
     {% if each.bestDescription %}
-        <p><b class="section-title">Description: </b>{{each.bestDescription}}</p>
+        <p><b class="section-title">Description: </b>
+			{{each.bestDescription|linebreaks}}
+		</p>
     {% endif %}
 
 
@@ -67,27 +96,27 @@
 	
 	
 	{% if each.parents %}
-		<p><b class="section-title">Has Super Class (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Class (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
-		<p><b class="section-title">Has Super Class (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Class (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 
 	{% if each.children  %}
-		<p><b class="section-title">Has Sub Class (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Class (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.descendants and each.descendants|length > each.children|length %}
-		<p><b class="section-title">Has Sub Class (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Class (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 
 	{% if each.domain_of %}
-		<p><b class="section-title">In Domain Of:</b> {% for s in each.domain_of %}<a href="javascript:showpanel('{{s.id}}');"  class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">In Domain Of:</b> {% for s in each.domain_of %}<a href="javascript:showpanel('{{s.id}}');"  class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.range_of %}
-		<p><b class="section-title">In Range Of:</b> {% for s in each.range_of %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">In Range Of:</b> {% for s in each.range_of %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 
 	<hr>
@@ -112,15 +141,21 @@
 <div class="hidden" id="{{each.id}}">
 	
 	<h2 class="entity-section">Property: <a  href="{{each.uri}}" class="prop"  target="_blank"
-                                          title="Try to open original URI">{{each.qname}}</a>
+                                          title="Try to open original URI">{{each.title}}</a>
 	</h2>
 	<hr>
 
+
+	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
     {% if each.bestLabel %}
-	<p><b class="section-title">Label: </b>{{each.bestLabel|capfirst}}</p>
+		<p><b class="section-title">Label: </b>
+			{{each.bestLabel|capfirst}}
+		</p>
     {% endif %}
     {% if each.bestDescription %}
-        <p><b class="section-title">Description: </b>{{each.bestDescription}}</p>
+        <p><b class="section-title">Description: </b>
+			{{each.bestDescription|linebreaks}}
+		</p>
     {% endif %}
 
 
@@ -130,27 +165,27 @@
 
 
 	{% if each.parents %}
-		<p><b  class="section-title">Has Super Property (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b  class="section-title">Has Super Property (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
-		<p><b  class="section-title">Has Super Property (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b  class="section-title">Has Super Property (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.children %}
-		<p><b class="section-title">Has Sub Property (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Property (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.descendants and each.descendants|length > each.children|length %}
-		<p><b class="section-title">Has Sub Property (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Property (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.domains %}
-		<p><b class="section-title">Domain:</b> {% for s in each.domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Domain:</b> {% for s in each.domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.ranges %}
-		<p><b class="section-title">Range:</b> {% for s in each.ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Range:</b> {% for s in each.ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default:s}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	<hr>
@@ -176,15 +211,20 @@
 <div class="hidden" id="{{each.id}}">
 	
 	<h2 class="entity-section">Concept: <a href="{{each.uri}}" class="class"  target="_blank"
-                                          title="Try to open original URI">{{each.qname}}</a>
+                                          title="Try to open original URI">{{each.title}}</a>
 	</h2>
 	<hr>
 
+	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
     {% if each.bestLabel %}
-	<p><b class="section-title">Label: </b>{{each.bestLabel|capfirst}}</p>
+		<p><b class="section-title">Label: </b>
+			{{each.bestLabel|capfirst}}
+		</p>
     {% endif %}
     {% if each.bestDescription %}
-        <p><b class="section-title">Description: </b>{{each.bestDescription}}</p>
+        <p><b class="section-title">Description: </b>
+			{{each.bestDescription|linebreaks}}
+		</p>
     {% endif %}
 
 
@@ -193,19 +233,19 @@
 	{% endif %}
 	
 	{% if each.parents %}
-		<p><b class="section-title">Has Super Concept (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Concept (direct):</b> {% for s in each.parents %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.ancestors  and each.ancestors|length > each.parents|length %}
-		<p><b class="section-title">Has Super Concept (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Concept (all):</b> {% for s in each.ancestors %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.children %}
-		<p><b class="section-title">Has Sub Concept (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Concept (direct):</b> {% for s in each.children %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	{% if each.descendants and each.descendants|length > each.children|length %}
-		<p><b class="section-title">Has Sub Concept (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.qname}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Concept (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	

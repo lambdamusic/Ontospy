@@ -18,7 +18,7 @@ VISUALIZATIONS_LIST = {
                            "Description": "@todo",
                        },
                        {
-                           "ID": "d3-tree",
+                           "ID": "d3-dendogram",
                            "Title": "D3 Dendogram",
                            "Description": "@todo",
                        },

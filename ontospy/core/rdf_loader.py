@@ -20,13 +20,12 @@ from .utils import *
 
 
 class RDFLoader(object):
-    """
-    Utility to Load any RDF source into an RDFLIB graph instance.
+    """Utility to Load any RDF source into an RDFLIB graph instance.
 
     Accepts: [single item or list]
     :: uri_or_path = a uri or local path
     :: data = a string containing rdf
-    :: file_obj = a python file objecy
+    :: file_obj = a python file object
 
     Returns: rdflib graph instance.
 
@@ -112,12 +111,11 @@ class RDFLoader(object):
         return self.rdflib_graph
 
     def load_uri(self, uri):
-        """
-        Load a single resource into the graph for this object. 
+        """Load a single resource into the graph for this object. 
 
         Approach: try loading into a temporary graph first, if that succeeds merge it into the main graph. This allows to deal with the JSONLD loading issues which can solved only by using a  ConjunctiveGraph (https://github.com/RDFLib/rdflib/issues/436). Also it deals with the RDFA error message which seems to stick into a graph even if the parse operation fails. 
         
-        NOTE the final merge operation can be improved as graph-set operations involving blank nodes could case collisions (https://rdflib.readthedocs.io/en/stable/merging.html)  
+        TODO the final merge operation can be improved as graph-set operations involving blank nodes could case collisions (https://rdflib.readthedocs.io/en/stable/merging.html)  
 
         :param uri: single RDF source location
         :return: None (sets self.rdflib_graph and self.sources_valid)
@@ -258,7 +256,7 @@ class RDFLoader(object):
             "----------\nFatal error parsing graph%s\n(using RDF serializations: %s)"
             % (uri, str(rdf_format_opts)), "red")
         printDebug(
-            "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://www.ivan-herman.net/Misc/2008/owlrl/>"
+            "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://rdfvalidator.mybluemix.net/>\n<https://json-ld.org/playground/>"
         )
 
         return
