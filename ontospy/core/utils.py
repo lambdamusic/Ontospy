@@ -877,13 +877,13 @@ def slugify(value):
 
 
 def get_files_with_extensions(folder, extensions):
-    """walk dir and return .* files as a list
+    """walk dir and return .* files as a list. Hidden files are ignored.
     Note: directories are walked recursively"""
     out = []
     for root, dirs, files in os.walk(folder):
         for file in files:
             filename, file_extension = os.path.splitext(file)
-            if file_extension.replace(".", "") in extensions:
+            if not filename.startswith('.') and file_extension.replace(".", "") in extensions:
                 out += [os.path.join(root, file)]
                 # break
 

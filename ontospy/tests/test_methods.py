@@ -18,6 +18,11 @@ from ..core import *
 from ..core.utils import *
 
 
+
+from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
+
+
+
 # sanity check
 print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 
@@ -47,14 +52,11 @@ class TestMethods(unittest.TestCase):
 
 	# load sample ontologies
 
-	dir_path = os.path.dirname(os.path.realpath(__file__))
-	DATA_FOLDER = dir_path + "/rdf/"
-	
-	f = DATA_FOLDER + "pizza.ttl"
+	f = TEST_RDF_FOLDER + "pizza.ttl"
 	printDebug("\n*****\n ..loading local ontology > %s\n*****" % str(f), "important")
 	o = Ontospy(f, verbose=True, pref_title="label")
 	
-	f = DATA_FOLDER + "multilingual.ttl"
+	f = TEST_RDF_FOLDER + "multilingual.ttl"
 	printDebug("\n*****\n ..loading local ontology > %s\n*****" % str(f), "important")
 	o2 = Ontospy(f, verbose=True, pref_title="qname", pref_lang="en")
 

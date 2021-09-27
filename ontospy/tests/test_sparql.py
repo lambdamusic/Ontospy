@@ -17,7 +17,6 @@ from ..core import *
 from ..core.utils import *
 
 
-
 # sanity check
 print("-------------------\nOntospy ",  VERSION, "\n-------------------")
 

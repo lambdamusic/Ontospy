@@ -1,4 +1,4 @@
-{
+[{
   "@context": "http://schema.org/",
   "@graph": [
     {
@@ -36,4 +36,4 @@
         "author": "Smiraglia, Richard P."
     }
   ]
-}
+}]

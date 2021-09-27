@@ -1,0 +1,171 @@
+[
+    {
+      "@context": "https://springernature.github.io/scigraph/jsonld/sgcontext.json", 
+      "about": [
+        {
+          "id": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/1199", 
+          "inDefinedTermSet": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/", 
+          "name": "Other Medical and Health Sciences", 
+          "type": "DefinedTerm"
+        }, 
+        {
+          "id": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/11", 
+          "inDefinedTermSet": "http://purl.org/au-research/vocabulary/anzsrc-for/2008/", 
+          "name": "Medical and Health Sciences", 
+          "type": "DefinedTerm"
+        }
+      ], 
+      "author": [
+        {
+          "affiliation": {
+            "name": [
+              "MBA Datamonitor plc, Charles House, 108\u2013110 Finchley Road, NW3 5JJ, London, UK"
+            ], 
+            "type": "Organization"
+          }, 
+          "familyName": "Belsey", 
+          "givenName": "Mark", 
+          "id": "sg:person.07674367221.06", 
+          "sameAs": [
+            "https://app.dimensions.ai/discover/publication?and_facet_researcher=ur.07674367221.06"
+          ], 
+          "type": "Person"
+        }, 
+        {
+          "affiliation": {
+            "name": [
+              "MBA Datamonitor plc, Charles House, 108\u2013110 Finchley Road, NW3 5JJ, London, UK"
+            ], 
+            "type": "Organization"
+          }, 
+          "familyName": "Evans", 
+          "givenName": "David", 
+          "id": "sg:person.012622670623.47", 
+          "sameAs": [
+            "https://app.dimensions.ai/discover/publication?and_facet_researcher=ur.012622670623.47"
+          ], 
+          "type": "Person"
+        }, 
+        {
+          "affiliation": {
+            "name": [
+              "MBA Datamonitor plc, Charles House, 108\u2013110 Finchley Road, NW3 5JJ, London, UK"
+            ], 
+            "type": "Organization"
+          }, 
+          "familyName": "Pavlou", 
+          "givenName": "Alex", 
+          "id": "sg:person.010471747621.06", 
+          "sameAs": [
+            "https://app.dimensions.ai/discover/publication?and_facet_researcher=ur.010471747621.06"
+          ], 
+          "type": "Person"
+        }, 
+        {
+          "affiliation": {
+            "name": [
+              "MBA Datamonitor plc, Charles House, 108\u2013110 Finchley Road, NW3 5JJ, London, UK"
+            ], 
+            "type": "Organization"
+          }, 
+          "familyName": "Savopoulos", 
+          "givenName": "John", 
+          "id": "sg:person.01175104551.77", 
+          "sameAs": [
+            "https://app.dimensions.ai/discover/publication?and_facet_researcher=ur.01175104551.77"
+          ], 
+          "type": "Person"
+        }
+      ], 
+      "citation": [
+        {
+          "id": "https://doi.org/10.1016/s0140-6736(04)16934-1", 
+          "sameAs": [
+            "https://app.dimensions.ai/details/publication/pub.1011166483"
+          ], 
+          "type": "CreativeWork"
+        }, 
+        {
+          "id": "https://doi.org/10.1016/j.virusres.2004.02.006", 
+          "sameAs": [
+            "https://app.dimensions.ai/details/publication/pub.1015699065"
+          ], 
+          "type": "CreativeWork"
+        }, 
+        {
+          "id": "https://doi.org/10.1016/j.jviromet.2004.03.011", 
+          "sameAs": [
+            "https://app.dimensions.ai/details/publication/pub.1017215790"
+          ], 
+          "type": "CreativeWork"
+        }
+      ], 
+      "datePublished": "2006-01", 
+      "datePublishedReg": "2006-01-01", 
+      "description": "Following flu vaccine manufacturing and supply issues in the USA and the global threat of an avian flu pandemic, the flu market is attracting considerable interest. This market was worth approximately US$1.1bn in 2004, and it is expected to grow to US$3.1bn by 2010: a compound annual growth rate of 17.1 per cent. To capitalise on this explosive growth rate, flu vaccine manufacturers should position their products towards combating the avian flu pandemic threat. However, there are a number of challenges associated with producing avian flu vaccines using egg-based manufacture systems: currently the dominant vaccine production technique. In the current paper, Datamonitor's infectious disease analysis team argues the case for the potential transformation of the flu market by governmental initiatives, and specifically on the role of these initiatives in driving cell culture flu manufacture as part of pandemic preparedness plans.", 
+      "genre": "research_article", 
+      "id": "sg:pub.10.1057/palgrave.jcb.3040160", 
+      "inLanguage": [
+        "en"
+      ], 
+      "isAccessibleForFree": false, 
+      "isPartOf": [
+        {
+          "id": "sg:journal.1020999", 
+          "issn": [
+            "1462-8732", 
+            "1478-565X"
+          ], 
+          "name": "Journal of Commercial Biotechnology", 
+          "type": "Periodical"
+        }, 
+        {
+          "issueNumber": "2", 
+          "type": "PublicationIssue"
+        }, 
+        {
+          "type": "PublicationVolume", 
+          "volumeNumber": "12"
+        }
+      ], 
+      "name": "Growth drivers and resistors of the influenza market: The importance of cell culture flu", 
+      "pagination": "150-155", 
+      "productId": [
+        {
+          "name": "readcube_id", 
+          "type": "PropertyValue", 
+          "value": [
+            "a005dd24aba8e6af14ce8998a6c8c57b1c155ebbdae3208e274ee78870fa4ccc"
+          ]
+        }, 
+        {
+          "name": "doi", 
+          "type": "PropertyValue", 
+          "value": [
+            "10.1057/palgrave.jcb.3040160"
+          ]
+        }, 
+        {
+          "name": "dimensions_id", 
+          "type": "PropertyValue", 
+          "value": [
+            "pub.1033592356"
+          ]
+        }
+      ], 
+      "sameAs": [
+        "https://doi.org/10.1057/palgrave.jcb.3040160", 
+        "https://app.dimensions.ai/details/publication/pub.1033592356"
+      ], 
+      "sdDataset": "articles", 
+      "sdDatePublished": "2019-04-11T00:13", 
+      "sdLicense": "https://scigraph.springernature.com/explorer/license/", 
+      "sdPublisher": {
+        "name": "Springer Nature - SN SciGraph project", 
+        "type": "Organization"
+      }, 
+      "sdSource": "s3://com-uberresearch-data-dimensions-target-20181106-alternative/cleanup/v134/2549eaecd7973599484d7c17b260dba0a4ecb94b/merge/v9/a6c9fde33151104705d4d7ff012ea9563521a3ce/jats-lookup/v90/0000000001_0000000264/records_8695_00000500.jsonl", 
+      "type": "ScholarlyArticle", 
+      "url": "http://link.springer.com/10.1057/palgrave.jcb.3040160"
+    }
+  ]

@@ -7,7 +7,7 @@ Test Quick: use this file to quickly run scripts/tests which will then be integr
 
 Running it:
 
-./run-quick-test.sh
+.tools/run-quick-test.sh
 
 TIP
 
@@ -30,23 +30,14 @@ from .. import *
 from ..core import *
 from ..core.utils import *
 
+
+from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
+
+
 # sanity check
 print("-------------------\nOntospy ", VERSION, "\n-------------------")
 
 
-class MyRDFEntity(ontospy.RdfEntity):
-	def __init__(self, uri, rdftype=None, namespaces=None, ext_model=False):
-		super().__init__(uri, rdftype, namespaces, ext_model)
-
-	def __repr__(self):
-		return "<MyRDFEntity *%s*>" % (self.uri)
-
-	def disjointWith(self):
-		"""
-		Example: pull out disjoint with statements
-		"""
-		pred = "http://www.w3.org/2002/07/owl#disjointWith"
-		return self.getValuesForProperty(pred)
 
 
 class TestQuick(unittest.TestCase):
@@ -58,17 +49,9 @@ class TestQuick(unittest.TestCase):
 		"""
 		print("=================\n*** QUICK TEST 1 ***\n=================\n")
 
-		dir_path = os.path.dirname(os.path.realpath(__file__))
-		DATA_FOLDER = dir_path + "/rdf/"
-		f = DATA_FOLDER + "multilingual.ttl"
-		o = Ontospy(f, verbose=True, pref_title="label", pref_lang="it")
+		f = TEST_RDF_FOLDER + "periodical.jsonld"
 
-		for c in o.all_classes:
-			print("URI: ", c.uri)
-			print("RDFTYPE: ", c.rdftype)
-			print("BEST LABEL: ", c.bestLabel())
-			print("TITLE: ", c.title)
-			print("===")
+		o = Ontospy(f, verbose=True, rdf_format="json-ld")
 			
 
 
