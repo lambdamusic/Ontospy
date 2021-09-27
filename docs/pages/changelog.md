@@ -2,6 +2,17 @@
 
 Summary of changes.
 
+
+## September, 2021: v 1.9.9
+
+- add `pref_title` and `pref_language` options to ontospy
+- update CLI to accept these parameters for documentation generation 
+    * eg `ontospy gendocs -l --preflabel label` 
+- improve all viz templates to use user provided titles 
+- add `|linebreaks` to bestDescription method for better rendering
+- various code improvements for tests
+
+
 ## July, 2019: v1.9.8.3
 
 -  `gendocs` option: `no browser` prevents opening html viz in browser 
