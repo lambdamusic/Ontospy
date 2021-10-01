@@ -194,7 +194,6 @@ def action_listlocal(all_details=True):
 
 def _print2cols_ontologies():
     ontologies = get_localontologies()
-    ONTOSPY_LOCAL_MODELS = get_home_location()
 
     if ontologies:
         printDebug("------------", "tip")

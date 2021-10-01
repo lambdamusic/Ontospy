@@ -102,7 +102,7 @@ def get_localontologies(pattern=""):
                 else:
                     if pattern in f:
                         res += [f]
-    return res
+    return sorted(res)
 
 
 def get_random_ontology(TOP_RANGE=10, pattern=""):
