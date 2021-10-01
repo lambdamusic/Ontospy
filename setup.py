@@ -75,7 +75,7 @@ setup(
     name='ontospy',
     version=VERSIONSTRING,
     description=
-    'Query, inspect and visualize knowledge models encoded as RDF/OWL ontologies.',
+    'Query, inspect and visualize knowledge models encoded as RDF&OWL ontologies.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/lambdamusic/ontospy',
@@ -129,7 +129,8 @@ setup(
     entry_points={
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
-            'ontospy=ontospy.cli:main_cli'
+            'ontospy=ontospy.cli:main_cli',
+            'quicktest_ontospy=ontospy.tests.quick:main'
         ],
     },
 )

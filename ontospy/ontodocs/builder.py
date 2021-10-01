@@ -77,20 +77,19 @@ try:
 
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
-    click.secho("Visualizations configuration file not found.", fg="red")
+    printDebug("Visualizations configuration file not found.", fg="red")
     raise
 
 
 def show_types():
     for n, t in enumerate(VISUALIZATIONS_LIST):
-        printDebug("%d. %s" % (n + 1, t['Title']), "green")
-    printDebug("Note: select a viz type by using its numerical index.",
+        printInfo("%d. %s" % (n + 1, t['Title']), "green")
+    printInfo("Note: select a viz type by using its numerical index.",
                "comment")
-
 
 def show_themes():
     for t in BOOTSWATCH_THEMES:
-        printDebug(t, "green")
+        printInfo(t, "green")
 
 
 def random_theme():

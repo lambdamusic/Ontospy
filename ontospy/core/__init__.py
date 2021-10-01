@@ -37,9 +37,6 @@ from .utils import printDebug
 GLOBAL_DISABLE_CACHE = False
 
 # ===========
-# ===========
-
-# ===========
 #
 # STATIC VARIABLES AND PATHS
 #
@@ -74,6 +71,8 @@ BOOTSTRAP_ONTOLOGIES = [
 
 # sample endpoints
 BOOTSTRAP_ENDPOINTS = [
-    "http://dbpedia.org/sparql", "http://data.semanticweb.org/sparql",
-    "http://linkedgeodata.org/sparql", "http://sparql.data.southampton.ac.uk/"
+    "http://dbpedia.org/sparql", 
+    "http://data.semanticweb.org/sparql",
+    "http://linkedgeodata.org/sparql", 
+    "http://sparql.data.southampton.ac.uk/"
 ]

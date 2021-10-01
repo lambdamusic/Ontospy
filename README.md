@@ -37,6 +37,15 @@ For more examples of the kind of documentation that can be generated out-of-the-
 
 I have little time to spend on this project these days, so I'm mainly focusing on bug fixes and maintenance. Happy to review PRs if you want to add more functionalities! 
 
+## Development
+
+```
+# git clone the repo first
+$ mkvirtualenv ontospy
+$ pip install -r requirements.txt
+$ pip install -e .
+```
+
 ## Documentation
 
 http://lambdamusic.github.io/Ontospy/

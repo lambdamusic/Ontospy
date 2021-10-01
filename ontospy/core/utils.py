@@ -105,17 +105,38 @@ def remove_duplicates(seq, idfun=None):
     return result
 
 
-def printDebug(text, mystyle="", **kwargs):
-    """
-    util for printing in colors using click.secho()
+def printDebug(text, mystyle="", err=True, **kwargs):
+    """Wrapper around click.secho() for printing in colors with various defaults.
 
     :kwargs = you can do printDebug("s", bold=True)
 
-    2018-12-06: by default print to standard error (err=True)
+    2018-12-06: by default print to standard error stderr (err=True)
+    https://click.palletsprojects.com/en/5.x/api/#click.echo
+    This means that the output is ok with `less` and when piped to other commands (or files)
 
     Styling output:
     <http://click.pocoo.org/5/api/#click.style>
     Styles a text with ANSI styles and returns the new string. By default the styling is self contained which means that at the end of the string a reset code is issued. This can be prevented by passing reset=False.
+
+    This works also with inner click styles eg
+
+    ```python
+    uri, title = "http://example.com", "My ontology"
+    printDebug(click.style("[%d]" % 1, fg='blue') +
+               click.style(uri + " ==> ", fg='black') +
+               click.style(title, fg='red'))
+    ```
+
+    Or even with Colorama
+
+    ```
+    from colorama import Fore, Style
+
+    printDebug(Fore.BLUE + Style.BRIGHT + "[%d]" % 1 + 
+            Style.RESET_ALL + uri + " ==> " + Fore.RED + title + 
+            Style.RESET_ALL)
+    ```
+
 
     Examples:
 
@@ -149,47 +170,30 @@ def printDebug(text, mystyle="", **kwargs):
     """
 
     if mystyle == "comment":
-        click.secho(text, dim=True, err=True)
+        click.secho(text, dim=True, err=err)
     elif mystyle == "important":
-        click.secho(text, bold=True, err=True)
+        click.secho(text, bold=True, err=err)
     elif mystyle == "normal":
-        click.secho(text, reset=True, err=True)
+        click.secho(text, reset=True, err=err)
     elif mystyle == "red" or mystyle == "error":
-        click.secho(text, fg='red', err=True)
+        click.secho(text, fg='red', err=err)
     elif mystyle == "green":
-        click.secho(text, fg='green', err=True)
+        click.secho(text, fg='green', err=err)
     else:
-        click.secho(text, **kwargs)
+        click.secho(text, err=err, **kwargs)
 
 
-def printComment(text, mystyle="comment", **kwargs):
+
+
+def printInfo(text, mystyle="", **kwargs):
+    """Wrapper around printDebug for printing ALWAYS to stdout
+    This means that the output can be grepped etc..
+    NOTE this output will be picked up by pipes etc..
+
+    Fixes https://github.com/lambdamusic/Ontospy/issues/76
     """
-    wrapper around click.secho()
-    .. same as printDebug, but just one option
-    [for backward compatibility]
-    """
+    printDebug(text, mystyle, False, **kwargs)
 
-    click.secho(text, fg='green', **kwargs)
-
-
-def OLD_printDebug(s, style=None):
-    """
-    util for printing in colors to sys.stderr stream
-    """
-    if style == "comment":
-        s = Style.DIM + s + Style.RESET_ALL
-    elif style == "important":
-        s = Style.BRIGHT + s + Style.RESET_ALL
-    elif style == "normal":
-        s = Style.RESET_ALL + s + Style.RESET_ALL
-    elif style == "red":
-        s = Fore.RED + s + Style.RESET_ALL
-    elif style == "green":
-        s = Fore.GREEN + s + Style.RESET_ALL
-    try:
-        print(s, file=sys.stderr)
-    except:
-        pass
 
 
 def pprint2columns(llist, max_length=60):

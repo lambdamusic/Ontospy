@@ -71,7 +71,7 @@ def action_analyze(sources,
     Load up a model into ontospy and analyze it
     """
     for x in sources:
-        click.secho("Parsing %s..." % str(x), fg='white')
+        printDebug("Parsing %s..." % str(x), fg='white')
 
     if extra:
         hide_base_schemas = False
@@ -85,7 +85,7 @@ def action_analyze(sources,
     if raw:
         o = Ontospy(uri_or_path=sources, verbose=verbose, build_all=False)
         s = o.serialize()
-        print(s)
+        printInfo(s)
         return
     elif endpoint:
         g = Ontospy(
@@ -129,7 +129,7 @@ def action_serialize(source, out_fmt="turtle", verbose=False):
 
     o = Ontospy(uri_or_path=source, verbose=verbose, build_all=False)
     s = o.serialize(out_fmt)
-    print(s)
+    printInfo(s)
 
 
 def action_jsonld_playground(source_path, verbose=False):
@@ -216,7 +216,7 @@ def _print_table_ontologies():
     ONTOSPY_LOCAL_MODELS = get_home_location()
 
     if ontologies:
-        print("")
+        printDebug("")
         temp = []
         from collections import namedtuple
         Row = namedtuple('Row', ['N', 'Added', 'File'])
@@ -236,7 +236,7 @@ def _print_table_ontologies():
             # cached = str(os.path.exists(ONTOSPY_LOCAL_CACHE + "/" + file + ".pickle"))
             temp += [Row(_counter, last_modified_date, name)]
         pprinttable(temp)
-        print("")
+        printDebug("")
     return
 
 
@@ -255,7 +255,6 @@ def action_import(location, verbose=True):
         if location.startswith("www."):  #support for lazy people
             location = "http://%s" % str(location)
         if location.startswith("http"):
-            # print("here")
             headers = {'Accept': "application/rdf+xml"}
             try:
                 # Py2
@@ -287,7 +286,6 @@ def action_import(location, verbose=True):
                 shutil.copy(location, fullpath)
             else:
                 raise ValueError('The location specified is not a file.')
-        # print("Saved local copy")
     except:
         printDebug(
             "Error retrieving file. Please make sure <%s> is a valid location."
@@ -327,8 +325,7 @@ def action_import_folder(location):
         for file in onlyfiles:
             if not file.startswith("."):
                 filepath = os.path.join(location, file)
-                # print(Fore.RED + "\n---------\n" + filepath + "\n---------" + Style.RESET_ALL)
-                click.secho(
+                printDebug(
                     "\n---------\n" + filepath + "\n---------", fg='red')
                 return action_import(filepath)
     else:
@@ -403,10 +400,11 @@ def _import_LOV(
         for x in options:
             uri, title, ns = x['uri'], x['titles'][0]['value'], x['nsp']
             # print("%s ==> %s" % (d['titles'][0]['value'], d['uri']))
-            click.echo(
+            printDebug(
                 click.style("[%d]" % counter, fg='blue') +
                 click.style(uri + " ==> ", fg='black') +
-                click.style(title, fg='red'))
+                click.style(title, fg='red'), 
+                err=True)
 
             counter += 1
 
@@ -420,7 +418,7 @@ def _import_LOV(
                 try:
                     _id = int(var)
                     ontouri = options[_id - 1]['uri']
-                    print(Fore.RED + "\n---------\n" + ontouri +
+                    printDebug(Fore.RED + "\n---------\n" + ontouri +
                           "\n---------" + Style.RESET_ALL)
                     action_analyze([ontouri])
                     if click.confirm(
@@ -429,7 +427,7 @@ def _import_LOV(
                         action_import(ontouri)
                     return
                 except:
-                    print("Error retrieving file. Import failed.")
+                    printDebug("Error retrieving file. Import failed.")
                     continue
 
 
@@ -457,10 +455,10 @@ def _import_PREFIXCC(keyword=""):
 
     counter = 1
     for x in options:
-        print(Fore.BLUE + Style.BRIGHT + "[%d]" % counter,
-              Style.RESET_ALL + x[0] + " ==> ", Fore.RED + x[1],
+        printDebug(Fore.BLUE + Style.BRIGHT + "[%d]" % counter +
+              Style.RESET_ALL + x[0] + " ==> " + Fore.RED + x[1] + 
               Style.RESET_ALL)
-        # print(Fore.BLUE + x[0], " ==> ", x[1])
+        # printDebug(Fore.BLUE + x[0] + " ==> " + x[1])
         counter += 1
 
     while True:
@@ -472,7 +470,7 @@ def _import_PREFIXCC(keyword=""):
             try:
                 _id = int(var)
                 ontouri = options[_id - 1][1]
-                print(Fore.RED + "\n---------\n" + ontouri + "\n---------" +
+                printDebug(Fore.RED + "\n---------\n" + ontouri + "\n---------" +
                       Style.RESET_ALL)
                 action_analyze([ontouri])
                 if click.confirm(
@@ -480,7 +478,7 @@ def _import_PREFIXCC(keyword=""):
                     action_import(ontouri)
                 return
             except:
-                print("Error retrieving file. Import failed.")
+                printDebug("Error retrieving file. Import failed.")
                 continue
 
 
@@ -491,7 +489,7 @@ def action_bootstrap(verbose=False):
     count = 0
     for s in BOOTSTRAP_ONTOLOGIES:
         count += 1
-        print(count, "<%s>" % s)
+        printInfo(count, "<%s>" % s)
 
     printDebug("--------------")
     printDebug("Note: this operation may take several minutes.")
@@ -563,30 +561,30 @@ def action_cache_reset():
     var = input(Style.BRIGHT + "=====\nProceed? (y/n) " + Style.RESET_ALL)
     if var == "y":
         repo_contents = get_localontologies()
-        print(Style.BRIGHT +
+        printInfo(Style.BRIGHT +
               "\n=====\n%d ontologies available in the local library\n=====" %
               len(repo_contents) + Style.RESET_ALL)
         for onto in repo_contents:
             fullpath = ONTOSPY_LOCAL_MODELS + "/" + onto
             try:
-                print(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
-                print("Loading graph...")
+                printInfo(Fore.RED + "\n=====\n" + onto + Style.RESET_ALL)
+                printInfo("Loading graph...")
                 g = Ontospy(fullpath)
-                print("Loaded ", fullpath)
+                printInfo("Loaded ", fullpath)
             except:
                 g = None
-                print(
+                printDebug(
                     "Error parsing file. Please make sure %s contains valid RDF."
                     % fullpath)
 
             if g:
-                print("Caching...")
+                printInfo("Caching...")
                 do_pickle_ontology(onto, g)
 
-        print(Style.BRIGHT + "===Completed===" + Style.RESET_ALL)
+        printDebug(Style.BRIGHT + "===Completed===" + Style.RESET_ALL)
 
     else:
-        print("Goodbye")
+        printDebug("Goodbye")
 
 
 def actions_delete():

@@ -107,12 +107,11 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     ctx.obj['VERBOSE'] = verbose
     ctx.obj['STIME'] = sTime
 
-    click.secho("Ontospy " + VERSION, fg='white')
-    # click.secho("------------", fg='white')
+    printDebug("Ontospy " + VERSION, "comment")
     if not verbose and ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
+        printDebug(ctx.get_help())
     # else:
-    #     click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+    #     printDebug('I am about to invoke %s' % ctx.invoked_subcommand)
 
 
 ##
@@ -156,7 +155,7 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
 
     else:
-        click.echo(ctx.get_help())
+        printDebug(ctx.get_help())
 
 
 ##
@@ -245,14 +244,14 @@ def gendocs(ctx,
         # check that we have the required dependencies
         import django
     except:
-        click.secho(
+        printDebug(
             "WARNING: this functionality requires the Django package and other extra dependecies.",
             fg="red")
-        click.secho("Install with `pip install ontospy[HTML] -U`")
+        printDebug("Install with `pip install ontospy[HTML] -U`")
         sys.exit(0)
 
     if not source and not showthemes and not showtypes and not lib:
-        click.echo(ctx.get_help())
+        printDebug(ctx.get_help())
         return
 
     if showthemes:
@@ -267,24 +266,24 @@ def gendocs(ctx,
         theme = random_theme()
 
     if preflabel and preflabel not in ["label", "qname"]:
-        click.secho(
+        printDebug(
             "WARNING: the valid preflabel options are either 'qname' or 'label' (= rdfs:label) only. Using defaults.",
             fg="red")
         preflabel = "qname"
 
     if outputpath:
         if not (os.path.exists(outputpath)) or not (os.path.isdir(outputpath)):
-            click.secho(
+            printDebug(
                 "WARNING: the -o option must include a valid directory path.",
                 fg="red")
             sys.exit(0)
 
     if source and len(source) > 1:
-        click.secho(
+        printDebug(
             'Note: currently only one argument can be passed', fg='red')
 
     if lib:
-        click.secho("Local library => '%s'" % get_home_location(), fg='white')
+        printDebug("Local library => '%s'" % get_home_location(), fg='white')
         ontouri = action_listlocal(all_details=False)
         if ontouri:
             source = [os.path.join(get_home_location(), ontouri)]
@@ -425,13 +424,13 @@ def lib(ctx,
             DONE_ACTION = True
             action_import(filepath[0], verbose)
         else:
-            click.secho(
+            printDebug(
                 "You provided no arguments - please specify what to save..",
                 fg='white')
         raise SystemExit(1)
 
     elif show:
-        click.secho("Local library => '%s'" % get_home_location(), fg='white')
+        printDebug("Local library => '%s'" % get_home_location(), fg='white')
         filename = action_listlocal(all_details=False)
 
         if filename:
@@ -442,7 +441,7 @@ def lib(ctx,
             shellPrintOverview(g, print_opts)
 
     else:
-        click.echo(ctx.get_help())
+        printDebug(ctx.get_help())
         return
 
     if DONE_ACTION:
@@ -492,10 +491,10 @@ def ser(ctx, source, output_format):
     output_format = output_format
     VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
-        click.echo(ctx.get_help())
+        printDebug(ctx.get_help())
     else:
         if output_format not in VALID_FORMATS:
-            click.secho(
+            printDebug(
                 "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
                 fg='red')
             return
@@ -545,7 +544,7 @@ def utils(
 
     if jsonld:
         if not filepath:
-            click.secho(
+            printDebug(
                 "What do you want to test? Please specify a valid JSONLD source.",
                 fg='red')
         else:
@@ -556,8 +555,8 @@ def utils(
         DONE_ACTION = True
         action_webimport()
     else:
-        click.secho("You haven't specified any utils command.")
-        click.echo(ctx.get_help())
+        printDebug("You haven't specified any utils command.")
+        printDebug(ctx.get_help())
 
     if DONE_ACTION:
         eTime = time.time()
