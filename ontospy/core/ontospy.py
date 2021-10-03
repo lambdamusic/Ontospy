@@ -15,7 +15,7 @@ import rdflib
 from .utils import *
 from .rdf_loader import RDFLoader
 from .entities import *
-from .sparqlHelper import SparqlHelper
+from .sparql_helper import SparqlHelper
 
 
 class Ontospy(object):
@@ -214,41 +214,41 @@ class Ontospy(object):
 		Extract all ontology entities from an RDF graph and construct Python representations of them.
 		"""
 		if verbose:
-			printDebug("Scanning entities...", "green")
-			printDebug("----------", "comment")
+			printInfo("Scanning entities...", "green")
+			printInfo("----------", "comment")
 
 		self.build_ontologies()
 		if verbose:
-			printDebug("Ontologies.........: %d" % len(self.all_ontologies), "comment")
+			printInfo("Ontologies.........: %d" % len(self.all_ontologies), "comment")
 
 		self.build_classes(hide_base_schemas, hide_implicit_types)
 		if verbose:
-			printDebug("Classes............: %d" % len(self.all_classes), "comment")
+			printInfo("Classes............: %d" % len(self.all_classes), "comment")
 
 		self.build_properties(hide_implicit_preds)
 		if verbose:
-			printDebug("Properties.........: %d" % len(self.all_properties), "comment")
+			printInfo("Properties.........: %d" % len(self.all_properties), "comment")
 		if verbose:
-			printDebug("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
+			printInfo("..annotation.......: %d" % len(self.all_properties_annotation), "comment")
 		if verbose:
-			printDebug("..datatype.........: %d" % len(self.all_properties_datatype), "comment")
+			printInfo("..datatype.........: %d" % len(self.all_properties_datatype), "comment")
 		if verbose:
-			printDebug("..object...........: %d" % len(self.all_properties_object), "comment")
+			printInfo("..object...........: %d" % len(self.all_properties_object), "comment")
 
 		self.build_skos_concepts()
 		if verbose:
-			printDebug("Concepts (SKOS)....: %d" % len(self.all_skos_concepts), "comment")
+			printInfo("Concepts (SKOS)....: %d" % len(self.all_skos_concepts), "comment")
 
 		self.build_shapes()
 		if verbose:
-			printDebug("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
+			printInfo("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
 
 		# self.__computeTopLayer()
 
 		self.__computeInferredProperties()
 
 		if verbose:
-			printDebug("----------", "comment")
+			printInfo("----------", "comment")
 
 	def build_ontologies(self, exclude_BNodes=False, return_string=False):
 		"""
@@ -315,7 +315,7 @@ class Ontospy(object):
 
 		else:
 			pass
-			# printDebug("No owl:Ontologies found")
+			# printInfo("No owl:Ontologies found")
 
 		# finally... add all annotations/triples
 		self.all_ontologies = out
@@ -343,7 +343,6 @@ class Ontospy(object):
 
 		qres = self.sparqlHelper.getAllClasses(hide_base_schemas,
 											   hide_implicit_types)
-		# print("rdflib query done")
 
 		for class_tuple in qres:
 
@@ -367,7 +366,6 @@ class Ontospy(object):
 				if _type == rdflib.OWL.Class:
 					test_existing_cl.rdftype = rdflib.OWL.Class
 
-		# print("classes created")
 
 		# add more data
 		for aClass in self.all_classes:
@@ -627,7 +625,7 @@ class Ontospy(object):
 		if not ontospyClass:
 			ontospyClass = RdfEntity
 		elif not issubclass(ontospyClass, RdfEntity):
-			click.secho("Error: <%s> is not a subclass of ontospy.RdfEntity" % str(ontospyClass))
+			printDebug("Error: <%s> is not a subclass of ontospy.RdfEntity" % str(ontospyClass))
 			return None
 		else:
 			pass
@@ -1133,11 +1131,11 @@ class Ontospy(object):
 		emerging with counting graph length on cached Graph objects..
 		"""
 		# @todo  investigate what's going on..
-		# click.secho(unicode(type(self.rdflib_graph)), fg="red")
+		# printDebug(unicode(type(self.rdflib_graph)), fg="red")
 		try:
 			return len(self.rdflib_graph)
 		except:
-			click.secho("Ontospy: error counting graph length..", fg="red")
+			printDebug("Ontospy: error counting graph length..", fg="red")
 			return 0
 
 

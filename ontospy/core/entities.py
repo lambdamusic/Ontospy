@@ -86,15 +86,15 @@ class RdfEntity(object):
             return None
 
     def printSerialize(self, format="turtle"):
-        printDebug("\n" + self.rdf_source(format))
+        printInfo("\n" + self.rdf_source(format))
 
     def printTriples(self):
         """ display triples """
-        printDebug(Fore.RED + self.uri + Style.RESET_ALL)
+        printInfo(Fore.RED + self.uri + Style.RESET_ALL)
         for x in self.triples:
-            printDebug(Fore.BLACK + "=> " + unicode(x[1]))
-            printDebug(Style.DIM + ".... " + unicode(x[2]) + Fore.RESET)
-        print("")
+            printInfo(Fore.BLACK + "=> " + unicode(x[1]))
+            printInfo(Style.DIM + ".... " + unicode(x[2]) + Fore.RESET)
+        printInfo("")
 
     def _build_qname(self, uri=None, namespaces=None):
         """ extracts a qualified name for a uri """
@@ -218,7 +218,7 @@ class RdfEntity(object):
 
         for pred in test_preds:
             test = self.getValuesForProperty(pred)
-            # printDebug(str(test), "red")
+            # printInfo(str(test), "red")
             if test:
                 if quotes:
                     return addQuotes(joinStringsInList(test, prefLanguage))
@@ -290,13 +290,13 @@ class Ontology(RdfEntity):
         """ shotcut to pull out useful info for interactive use """
         # self.printGenericTree()
         # self.printTriples()
-        printDebug(self.uri, "green")
+        printInfo(self.uri, "green")
         self.stats()
 
     def stats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("Classes.....: %d" % len(self.all_classes))
-        printDebug("Properties..: %d" % len(self.all_properties))
+        printInfo("Classes.....: %d" % len(self.all_classes))
+        printInfo("Properties..: %d" % len(self.all_properties))
 
 
 class OntoClass(RdfEntity):
@@ -359,15 +359,15 @@ class OntoClass(RdfEntity):
 
     def printStats(self):
         """ shortcut to pull out useful info for interactive use """
-        printDebug("----------------")
-        printDebug("Parents......: %d" % len(self.parents()))
-        printDebug("Children.....: %d" % len(self.children()))
-        printDebug("Ancestors....: %d" % len(self.ancestors()))
-        printDebug("Descendants..: %d" % len(self.descendants()))
-        printDebug("Domain of....: %d" % len(self.domain_of))
-        printDebug("Range of.....: %d" % len(self.range_of))
-        printDebug("Instances....: %d" % self.count())
-        printDebug("----------------")
+        printInfo("----------------")
+        printInfo("Parents......: %d" % len(self.parents()))
+        printInfo("Children.....: %d" % len(self.children()))
+        printInfo("Ancestors....: %d" % len(self.ancestors()))
+        printInfo("Descendants..: %d" % len(self.descendants()))
+        printInfo("Domain of....: %d" % len(self.domain_of))
+        printInfo("Range of.....: %d" % len(self.range_of))
+        printInfo("Instances....: %d" % self.count())
+        printInfo("----------------")
 
     def printGenericTree(self):
         printGenericTree(self)
@@ -375,7 +375,7 @@ class OntoClass(RdfEntity):
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
         # self.printTriples()
-        printDebug(self.uri, "green")
+        printInfo(self.uri, "green")
         self.printStats()
         # self.printGenericTree()
 
@@ -414,19 +414,19 @@ class OntoProperty(RdfEntity):
 
     def printStats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("----------------")
-        printDebug("Parents......: %d" % len(self.parents()))
-        printDebug("Children.....: %d" % len(self.children()))
-        printDebug("Ancestors....: %d" % len(self.ancestors()))
-        printDebug("Descendants..: %d" % len(self.descendants()))
-        printDebug("Has Domain...: %d" % len(self.domains))
-        printDebug("Has Range....: %d" % len(self.ranges))
-        printDebug("----------------")
+        printInfo("----------------")
+        printInfo("Parents......: %d" % len(self.parents()))
+        printInfo("Children.....: %d" % len(self.children()))
+        printInfo("Ancestors....: %d" % len(self.ancestors()))
+        printInfo("Descendants..: %d" % len(self.descendants()))
+        printInfo("Has Domain...: %d" % len(self.domains))
+        printInfo("Has Range....: %d" % len(self.ranges))
+        printInfo("----------------")
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
         # self.printTriples()
-        printDebug(self.uri, "green")
+        printInfo(self.uri, "green")
         self.printStats()
         # self.printGenericTree()
 
@@ -454,12 +454,12 @@ class OntoSKOSConcept(RdfEntity):
 
     def printStats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("----------------")
-        printDebug("Parents......: %d" % len(self.parents()))
-        printDebug("Children.....: %d" % len(self.children()))
-        printDebug("Ancestors....: %d" % len(self.ancestors()))
-        printDebug("Descendants..: %d" % len(self.descendants()))
-        printDebug("----------------")
+        printInfo("----------------")
+        printInfo("Parents......: %d" % len(self.parents()))
+        printInfo("Children.....: %d" % len(self.children()))
+        printInfo("Ancestors....: %d" % len(self.ancestors()))
+        printInfo("Descendants..: %d" % len(self.descendants()))
+        printInfo("----------------")
 
     def printGenericTree(self):
         printGenericTree(self)
@@ -467,7 +467,7 @@ class OntoSKOSConcept(RdfEntity):
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
         # self.printTriples()
-        printDebug(self.uri, "green")
+        printInfo(self.uri, "green")
         self.printStats()
         self.printGenericTree()
 
@@ -493,12 +493,12 @@ class OntoShape(RdfEntity):
 
     def printStats(self):
         """ shotcut to pull out useful info for interactive use """
-        printDebug("----------------")
-        printDebug("Parents......: %d" % len(self.parents()))
-        printDebug("Children.....: %d" % len(self.children()))
-        printDebug("Ancestors....: %d" % len(self.ancestors()))
-        printDebug("Descendants..: %d" % len(self.descendants()))
-        printDebug("----------------")
+        printInfo("----------------")
+        printInfo("Parents......: %d" % len(self.parents()))
+        printInfo("Children.....: %d" % len(self.children()))
+        printInfo("Ancestors....: %d" % len(self.ancestors()))
+        printInfo("Descendants..: %d" % len(self.descendants()))
+        printInfo("----------------")
 
     def describe(self):
         """ shotcut to pull out useful info for interactive use """

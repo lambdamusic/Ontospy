@@ -214,13 +214,13 @@ def pprint2columns(llist, max_length=60):
 
     if col_width > max_length:
         for el in llist:
-            print(el)
+            printInfo(el)
     else:
         column1 = llist[:int(len(llist) / 2)]
         column2 = llist[int(len(llist) / 2):]
         for c1, c2 in zip(column1, column2):
             space = " " * (col_width - len(c1))
-            print("%s%s%s" % (c1, space, c2))
+            printInfo("%s%s%s" % (c1, space, c2))
 
 
 def pprinttable(rows):
@@ -265,15 +265,15 @@ def pprinttable(rows):
         pattern = " | ".join(formats)
         hpattern = " | ".join(hformats)
         separator = "-+-".join(['-' * n for n in lens])
-        print(hpattern % tuple(headers))
-        print(separator)
+        printInfo(hpattern % tuple(headers))
+        printInfo(separator)
         for line in rows:
-            print(pattern % tuple(line))
+            printInfo(pattern % tuple(line))
     elif len(rows) == 1:
         row = rows[0]
         hwidth = len(max(row._fields, key=lambda x: len(x)))
         for i in range(len(row)):
-            print("%*s = %s" % (hwidth, row._fields[i], row[i]))
+            printInfo("%*s = %s" % (hwidth, row._fields[i], row[i]))
 
 
 def save_anonymous_gist(title, files):
@@ -299,7 +299,7 @@ def save_anonymous_gist(title, files):
     try:
         from github3 import create_gist
     except:
-        print("github3 library not found (pip install github3)")
+        printDebug("github3 library not found (pip install github3)")
         raise SystemExit(1)
 
     gist = create_gist(title, files)
@@ -395,23 +395,23 @@ def printBasicInfo(onto):
     """
     rdfGraph = onto.rdflib_graph
 
-    print("_" * 50, "\n")
-    print("TRIPLES = %s" % len(rdfGraph))
-    print("_" * 50)
-    print("\nNAMESPACES:\n")
+    printInfo("_" * 50, "\n")
+    printInfo("TRIPLES = %s" % len(rdfGraph))
+    printInfo("_" * 50)
+    printInfo("\nNAMESPACES:\n")
     for x in onto.ontologyNamespaces:
-        print("%s : %s" % (x[0], x[1]))
+        printInfo("%s : %s" % (x[0], x[1]))
 
-    print("_" * 50, "\n")
-    print("ONTOLOGY METADATA:\n")
+    printInfo("_" * 50, "\n")
+    printInfo("ONTOLOGY METADATA:\n")
     for x, y in onto.ontologyAnnotations():
-        print("%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces),
+        printInfo("%s: \n	 %s" % (uri2niceString(x, onto.ontologyNamespaces),
                               uri2niceString(y, onto.ontologyNamespaces)))
-    print("_" * 50, "\n")
+    printInfo("_" * 50, "\n")
 
-    print("CLASS TAXONOMY:\n")
+    printInfo("CLASS TAXONOMY:\n")
     onto.printClassTree()
-    print("_" * 50, "\n")
+    printInfo("_" * 50, "\n")
 
 
 def inferMainPropertyType(uriref):
@@ -611,7 +611,7 @@ def sort_uri_list_by_name(uri_list, bypassNamespace=False):
             return sorted(uri_list)
     except:
         # TODO: do more testing.. maybe use a unicode-safe method instead of __str__
-        print(
+        printDebug(
             "Error in <sort_uri_list_by_name>: possibly a UnicodeEncodeError")
         return uri_list
 
@@ -823,41 +823,41 @@ def shellPrintOverview(g, opts={'labels': False}):
     except:
         labels = False
 
-    print(Style.BRIGHT + "Namespaces\n-----------" + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "Namespaces\n-----------" + Style.RESET_ALL)
     if g.namespaces:
         for p, u in g.namespaces:
             row = Fore.GREEN + "%s" % p + Fore.BLACK + "  %s" % u + Fore.RESET
-            print(row)
+            printInfo(row)
     else:
         printDebug("None found", "comment")
 
-    print(Style.BRIGHT + "\nOntologies\n-----------" + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "\nOntologies\n-----------" + Style.RESET_ALL)
     if ontologies:
         for o in ontologies:
             o.printTriples()
     else:
         printDebug("None found", "comment")
 
-    print(Style.BRIGHT + "\nClasses\n" + "-" * 10 + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "\nClasses\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_classes:
         g.printClassTree(showids=False, labels=labels)
     else:
         printDebug("None found", "comment")
 
-    print(Style.BRIGHT + "\nProperties\n" + "-" * 10 + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "\nProperties\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_properties:
         g.printPropertyTree(showids=False, labels=labels)
     else:
         printDebug("None found", "comment")
 
-    print(Style.BRIGHT + "\nSKOS Concepts\n" + "-" * 10 + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "\nSKOS Concepts\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_skos_concepts:
 
         g.printSkosTree(showids=False, labels=labels)
     else:
         printDebug("None found", "comment")
 
-    print(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10 + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_shapes:
 
         for x in g.all_shapes:

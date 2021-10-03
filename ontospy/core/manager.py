@@ -52,10 +52,10 @@ def get_or_create_home_repo(reset=False):
         raise SystemExit(1)
 
     if dosetup:
-        print(Fore.GREEN + "Setup successfull: local library created at <%s>" %
+        printDebug(Fore.GREEN + "Setup successfull: local library created at <%s>" %
               LIBRARY_HOME + Style.RESET_ALL)
     # else:
-    # print(Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL)
+    # printDebug(Style.DIM + "Local library: <%s>" % LIBRARY_HOME + Style.RESET_ALL)
 
     return True
 
@@ -112,7 +112,7 @@ def get_random_ontology(TOP_RANGE=10, pattern=""):
         ontouri = choices[random.randint(0, TOP_RANGE)]  # [0]
     except:
         ontouri = choices[0]
-    print("Testing with URI: %s" % ontouri)
+    printDebug("Testing with URI: %s" % ontouri)
     g = get_pickled_ontology(ontouri)
     if not g:
         g = do_pickle_ontology(ontouri)
@@ -131,7 +131,7 @@ def get_pickled_ontology(filename):
         try:
             return cPickle.load(open(pickledfile, "rb"))
         except:
-            print(Style.DIM +
+            printDebug(Style.DIM +
                   "** WARNING: Cache is out of date ** ...recreating it... " +
                   Style.RESET_ALL)
             return None
@@ -185,10 +185,10 @@ def do_pickle_ontology(filename, g=None):
             cPickle.dump(g, open(pickledpath, "wb"))
             printDebug(".. cached <%s>" % filename, "green")
         except Exception as e:
-            print(Style.DIM + "\n.. Failed caching <%s>" % filename +
+            printDebug(Style.DIM + "\n.. Failed caching <%s>" % filename +
                   Style.RESET_ALL)
-            print(str(e) + "\n")
-            print(
+            printDebug(str(e) + "\n")
+            printDebug(
                 Style.DIM +
                 "... attempting to increase the recursion limit from %d to %d" %
                 (sys.getrecursionlimit(), sys.getrecursionlimit() * 10) +
@@ -202,6 +202,6 @@ def do_pickle_ontology(filename, g=None):
                 printDebug(
                     "\n... Failed caching <%s>... Aborting caching operation..."
                     % filename, "error")
-                print(str(e) + "\n")
+                printDebug(str(e) + "\n")
             sys.setrecursionlimit(int(sys.getrecursionlimit() / 10))
     return g

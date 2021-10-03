@@ -59,9 +59,9 @@ class RDFLoader(object):
 
     def _debugGraph(self):
         """internal util to print out contents of graph"""
-        print("Len of graph: ", len(self.rdflib_graph))
+        printDebug("Len of graph: ", len(self.rdflib_graph))
         for x, y, z in self.rdflib_graph:
-            print(x, y, z)
+            printDebug(x, y, z)
 
     def load(self, uri_or_path=None, data=None, file_obj=None, rdf_format=""):
 
