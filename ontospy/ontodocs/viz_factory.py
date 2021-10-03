@@ -17,7 +17,6 @@ except NameError:
 # django loading requires different steps based on version
 # https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
 import django
-import click
 
 # http://stackoverflow.com/questions/1714027/version-number-comparison
 from distutils.version import StrictVersion
@@ -42,7 +41,7 @@ try:
     from .CONFIG import VISUALIZATIONS_LIST
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
-    click.secho("Visualizations configuration file not found.", fg="red")
+    printDebug("Visualizations configuration file not found.", fg="red")
     raise
 
 
