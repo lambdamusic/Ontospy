@@ -167,17 +167,17 @@ class Shell(cmd.Cmd):
                    'DEFAULT': Style.DIM,
                    }
         try:
-            print(styles1[style] + ms + Style.RESET_ALL)
+            printInfo(styles1[style] + ms + Style.RESET_ALL)
         except:
-            print(styles1['DEFAULT'] + ms + Style.RESET_ALL)
+            printInfo(styles1['DEFAULT'] + ms + Style.RESET_ALL)
 
     def _printM(self, messages):
         """print a list of strings - for the mom used only by stats printout"""
         if len(messages) == 2:
-            print(Style.BRIGHT + messages[0] + Style.RESET_ALL +
+            printInfo(Style.BRIGHT + messages[0] + Style.RESET_ALL +
                   Fore.BLUE + messages[1] + Style.RESET_ALL)
         else:
-            print("Not implemented")
+            printInfo("Not implemented")
 
     def _joinedQnames(self, _list):
         """util for returning a string joinin names of entities *used only in info command*"""
@@ -246,13 +246,13 @@ class Shell(cmd.Cmd):
             obj = self.currentEntity['object']
             label = obj.bestLabel() or NOTFOUND
             description = obj.bestDescription() or NOTFOUND
-            print(Style.BRIGHT + "OBJECT TYPE: " + Style.RESET_ALL +
+            printInfo(Style.BRIGHT + "OBJECT TYPE: " + Style.RESET_ALL +
                   Fore.BLACK + uri2niceString(obj.rdftype) + Style.RESET_ALL)
-            print(Style.BRIGHT + "URI        : " + Style.RESET_ALL +
+            printInfo(Style.BRIGHT + "URI        : " + Style.RESET_ALL +
                   Fore.GREEN + "<" + unicode(obj.uri) + ">" + Style.RESET_ALL)
-            print(Style.BRIGHT + "TITLE      : " + Style.RESET_ALL +
+            printInfo(Style.BRIGHT + "TITLE      : " + Style.RESET_ALL +
                   Fore.BLACK + label + Style.RESET_ALL)
-            print(Style.BRIGHT + "DESCRIPTION: " + Style.RESET_ALL +
+            printInfo(Style.BRIGHT + "DESCRIPTION: " + Style.RESET_ALL +
                   Fore.BLACK + description + Style.RESET_ALL)
 
         else:
@@ -261,22 +261,22 @@ class Shell(cmd.Cmd):
             self._print("----------------", "TIP")
             self._printStats(self.current['graph'])
             for obj in self.current['graph'].all_ontologies:
-                print(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL +
+                printInfo(Style.BRIGHT + "Ontology URI: " + Style.RESET_ALL +
                       Fore.RED + "<%s>" % str(obj.uri) + Style.RESET_ALL)
                 # self._print("==> Ontology URI: <%s>" % str(obj.uri), "IMPORTANT")
                 # self._print("----------------", "TIP")
                 label = obj.bestLabel() or NOTFOUND
                 description = obj.bestDescription() or NOTFOUND
-                print(Style.BRIGHT + "Title       : " + Style.RESET_ALL +
+                printInfo(Style.BRIGHT + "Title       : " + Style.RESET_ALL +
                       Fore.BLACK + label + Style.RESET_ALL)
-                print(Style.BRIGHT + "Description : " + Style.RESET_ALL +
+                printInfo(Style.BRIGHT + "Description : " + Style.RESET_ALL +
                       Fore.BLACK + description + Style.RESET_ALL)
         self._print("----------------", "TIP")
         # self._print("----------------", "TIP")
 
     def _printTaxonomy(self, hrlinetop=True):
         """
-        print(a local taxonomy for the object)
+        print a local taxonomy for the object
         """
         if not self.currentEntity:  # ==> ontology level
             return
@@ -305,7 +305,7 @@ class Shell(cmd.Cmd):
 
     def _printClassDomain(self, hrlinetop=True, print_inferred=False):
         """
-        print(more informative stats about the object)
+        print more informative stats about the object
         2016-06-14: added inferred option
         """
         if not self.currentEntity:  # ==> ontology level
@@ -323,7 +323,7 @@ class Shell(cmd.Cmd):
                 else:
                     ranges = "owl:Thing"
                     # print( Style.RESET_ALL + " => " + Fore.MAGENTA +
-                print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                printInfo(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                       i.qname + Style.RESET_ALL + " => " + Style.DIM + ranges +
                       Style.RESET_ALL)
 
@@ -342,7 +342,7 @@ class Shell(cmd.Cmd):
                             else:
                                 ranges = "owl:Thing"
                                 # print(Style.RESET_ALL + " => " + Fore.MAGENTA +
-                            print(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                            printInfo(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                                   i.qname + Style.RESET_ALL + " => " + Style.DIM +
                                   ranges + Style.RESET_ALL)
 
@@ -368,7 +368,7 @@ class Shell(cmd.Cmd):
                                         for y in i.domains])
                 else:
                     domains = "owl:Thing"
-                print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname +
+                printInfo(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname +
                       Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
             # inferred stuff
@@ -385,7 +385,7 @@ class Shell(cmd.Cmd):
                                     [y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
                             else:
                                 domains = "owl:Thing"
-                            print(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                            printInfo(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA +
                                   i.qname + Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
             self._print("----------------")
@@ -592,7 +592,7 @@ class Shell(cmd.Cmd):
                 self._print_entity_intro(entity=self.currentEntity)
 
         else:
-            print("not found")
+            printInfo("not found")
 
     def _select_property(self, line):
         """try to match a property and load it"""
@@ -620,7 +620,7 @@ class Shell(cmd.Cmd):
             if self.currentEntity:
                 self._print_entity_intro(entity=self.currentEntity)
         else:
-            print("not found")
+            printInfo("not found")
 
     def _select_concept(self, line):
         """try to match a class and load it"""
@@ -647,7 +647,7 @@ class Shell(cmd.Cmd):
                 self._print_entity_intro(entity=self.currentEntity)
 
         else:
-            print("not found")
+            printInfo("not found")
 
     def _delete_file(self, line=""):
         """	Delete an ontology
@@ -701,7 +701,7 @@ class Shell(cmd.Cmd):
             choice = self._selectFromList(out, line)
             if choice:
                 fullpath = self.LOCAL_MODELS + "/" + choice
-                print(fullpath)
+                printDebug(fullpath)
                 if os.path.isfile(fullpath):
 
                     self._print("--------------")
@@ -1076,7 +1076,7 @@ class Shell(cmd.Cmd):
     def do_next(self, line):
         """Jump to the next entities (ontology, class or property) depending on context"""
         if not self.current:
-            print("Please select an ontology first. E.g. use the 'ls ontologies' or 'get ontology <name>' commands.")
+            printInfo("Please select an ontology first. E.g. use the 'ls ontologies' or 'get ontology <name>' commands.")
         elif self.currentEntity:
             g = self.current['graph']
             if self.currentEntity['type'] == 'class':
@@ -1089,7 +1089,7 @@ class Shell(cmd.Cmd):
                 nextentity = g.nextConcept(self.currentEntity['object'].uri)
                 self._select_concept(str(nextentity.uri))
             else:
-                print("Not implemented")
+                printInfo("Not implemented")
         else:
             if len(self.all_ontologies) > 1:
                 nextonto = self._next_ontology()
@@ -1115,8 +1115,8 @@ class Shell(cmd.Cmd):
         """Inspiring quotes for the working ontologist"""
         _quote = random.choice(QUOTES)
         # print(_quote['source'])
-        print(Style.DIM + unicode(_quote['text']))
-        print(Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL)
+        printInfo(Style.DIM + unicode(_quote['text']))
+        printInfo(Style.BRIGHT + unicode(_quote['source']) + Style.RESET_ALL)
 
     # 2016-02-12: method taken from https://github.com/xlcnd/isbntools/blob/master/isbntools/bin/repl.py
     # 2016-04-25: hidden
@@ -1138,10 +1138,10 @@ class Shell(cmd.Cmd):
             out = fo.read().decode("utf-8")
             err = fe.read().decode("utf-8")
         if out:
-            print(out)
+            printInfo(out)
             return
         if err:
-            print(err.replace('isbn_', ''))
+            printInfo(err.replace('isbn_', ''))
 
     # HELP METHODS
     # --------
@@ -1319,10 +1319,10 @@ class Shell(cmd.Cmd):
 def main():
     """ standalone line script """
 
-    print("Ontospy " + VERSION)
+    printInfo("Ontospy " + VERSION)
 
     Shell()._clear_screen()
-    print(Style.BRIGHT + "** Ontospy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
+    printInfo(Style.BRIGHT + "** Ontospy Interactive Ontology Browser " + VERSION + " **" + Style.RESET_ALL)
     # manager.get_or_create_home_repo()
     Shell().cmdloop()
     raise SystemExit(1)
