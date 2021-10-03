@@ -35,7 +35,7 @@
 
     #container {
         /*max-width: 400px;*/
-        height: 600px;
+        height: 800px;
         margin: auto;
     }
 
@@ -55,11 +55,22 @@
 
     <div id="container"></div>
 
+    <p>Double click on a node to see its properties.</p>
+
+
+
 
 
 {% endblock main_content %}
 
 
+
+
+{% block extra_footer %}
+
+Visualization developed with <a class="greylink" href="https://github.com/jacomyal/sigma.js">sigma.js</a>.
+
+{% endblock extra_footer %}
 
 
 
@@ -104,8 +115,10 @@
         },
         settings: {
             doubleClickEnabled: false,
-            minNodeSize: 1,
+            minNodeSize: 5,
             maxNodeSize: 30,
+            labelSize: "proportional",
+            labelThreshold: 10,
             enableEdgeHovering: true,
             edgeHoverColor: 'edge',
             defaultEdgeHoverColor: '#000',
@@ -118,6 +131,13 @@
 
     s.refresh();
     s.startForceAtlas2();
+
+    // show info on click
+	s.bind('doubleClickNode', function(e) {
+        var nodeId = e.data.node.id;
+		console.log(nodeId);
+		showpanel(nodeId); 
+	});
 
 
     </script>
