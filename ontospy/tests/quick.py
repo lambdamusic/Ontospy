@@ -58,6 +58,16 @@ def main(test_number):
               Style.RESET_ALL)
 
 
+	if test_number == 3:
+
+		print("=================\n*** QUICK TEST 1 ***\n=================\n")
+
+		f = TEST_RDF_FOLDER + "pizza.ttl"
+
+		o = Ontospy(f, verbose=True, rdf_format="ttl", hide_implicit_types=False, hide_base_schemas=False, hide_implicit_preds=False)
+		print(f)			
+
+
 
 
 

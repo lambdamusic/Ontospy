@@ -53,6 +53,7 @@ class Ontospy(object):
 				 hide_base_schemas=True,
 				 hide_implicit_types=True,
 				 hide_implicit_preds=True,
+				 hide_individuals=True,
 				 sparql_endpoint=None,
 				 credentials=None,
 				 build_all=True,
@@ -79,6 +80,8 @@ class Ontospy(object):
 			[description], by default True
 		hide_implicit_preds : bool, optional
 			[description], by default True
+		hide_individuals: bool, opt
+			Extract class instances or not, by default True
 		sparql_endpoint : [type], optional
 			[description], by default None
 		credentials : [type], optional
@@ -110,7 +113,7 @@ class Ontospy(object):
 		self.all_properties_datatype = []
 		self.all_skos_concepts = []
 		self.all_shapes = []
-		# self.all_individuals = []
+		self.all_individuals = []
 		self.toplayer_classes = []
 		self.toplayer_properties = []
 		self.toplayer_skos = []
@@ -131,6 +134,7 @@ class Ontospy(object):
 					hide_base_schemas=hide_base_schemas,
 					hide_implicit_types=hide_implicit_types,
 					hide_implicit_preds=hide_implicit_preds,
+					hide_individuals=hide_individuals,
 					)
 		elif sparql_endpoint:  # by default entities are not extracted
 			self.load_sparql(sparql_endpoint, verbose, credentials)
@@ -209,6 +213,7 @@ class Ontospy(object):
 				  hide_base_schemas=True,
 				  hide_implicit_types=True,
 				  hide_implicit_preds=True,
+				  hide_individuals=True,
 				  ):
 		"""
 		Extract all ontology entities from an RDF graph and construct Python representations of them.
@@ -242,6 +247,11 @@ class Ontospy(object):
 		self.build_shapes()
 		if verbose:
 			printInfo("Shapes (SHACL).....: %d" % len(self.all_shapes), "comment")
+
+		if not hide_individuals:
+			self.build_individuals()
+			if verbose:
+				printInfo("Individuals........: %d" % len(self.all_individuals), "comment")			
 
 		# self.__computeTopLayer()
 
@@ -614,6 +624,37 @@ class Ontospy(object):
 		self.toplayer_shapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
 
 
+	def build_individuals(self):
+		"""
+		By default, only add individuals of classes that have been previously extracted.
+		"""
+		self.all_individuals = []  
+
+		for c in self.all_classes:
+			c._instances = []
+			qres = self.sparqlHelper.getClassInstances(c.uri)
+            
+			for uri in [x[0] for x in qres]:
+
+				test_existing_indiv = self.get_individual(uri=uri)
+
+				if not test_existing_indiv:
+					instance = RdfEntity(uri, c.uri, c.namespaces)
+					instance.triples = self.sparqlHelper.entityTriples(
+						instance.uri)
+					instance._buildGraph()  # force construction of mini graph
+				else:
+					instance = test_existing_indiv
+				
+				c._instances += [instance]
+
+				if not test_existing_indiv:
+					self.all_individuals += [instance]
+
+		# sort alphabetically
+		self.all_individuals = sorted(self.all_individuals, key=lambda x: x.qname)
+
+
 	def build_entity_from_uri(self, uri, ontospyClass=None):
 		"""
 		Extract RDF statements having a URI as subject, then instantiate the RdfEntity Python object so that it can be queried further.
@@ -869,6 +910,44 @@ class Ontospy(object):
 				if uri and x.uri.lower() == uri.lower():
 					return x
 			return None
+
+	def get_individual(self, id=None, uri=None, match=None):
+		"""
+		get the saved-individual with given ID or via other methods...
+
+		Note: analogous to getClass method
+		"""
+
+		if not id and not uri and not match:
+			return None
+
+		if type(id) == type("string"):
+			uri = id
+			id = None
+			if not is_http(uri):
+				match = uri
+				uri = None
+		if match:
+			if type(match) != type("string"):
+				return []
+			res = []
+			if ":" in match:  # qname
+				for x in self.all_individuals:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in self.all_individuals:
+					if match.lower() in x.uri.lower():
+						res += [x]
+			return res
+		else:
+			for x in self.all_individuals:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			return None
+
 
 	def get_skos(self, id=None, uri=None, match=None):
 		"""
