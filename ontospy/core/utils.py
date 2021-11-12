@@ -496,7 +496,7 @@ def printGenericTree(element,
     else:
         bestLabel = ""
 
-    printDebug("%s%s%s%s" % (_id_, "-" * 4 * level, element.qname, bestLabel))
+    printInfo("%s%s%s%s" % (_id_, "-" * 4 * level, element.qname, bestLabel))
 
     # recursion
     for sub in element.children():
@@ -822,6 +822,10 @@ def shellPrintOverview(g, opts={'labels': False}):
         labels = opts['labels']
     except:
         labels = False
+    try:
+        individuals = opts['individuals']
+    except:
+        individuals = False
 
     printInfo(Style.BRIGHT + "Namespaces\n-----------" + Style.RESET_ALL)
     if g.namespaces:
@@ -829,42 +833,53 @@ def shellPrintOverview(g, opts={'labels': False}):
             row = Fore.GREEN + "%s" % p + Fore.BLACK + "  %s" % u + Fore.RESET
             printInfo(row)
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
 
     printInfo(Style.BRIGHT + "\nOntologies\n-----------" + Style.RESET_ALL)
     if ontologies:
         for o in ontologies:
             o.printTriples()
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
 
     printInfo(Style.BRIGHT + "\nClasses\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_classes:
         g.printClassTree(showids=False, labels=labels)
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
 
     printInfo(Style.BRIGHT + "\nProperties\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_properties:
         g.printPropertyTree(showids=False, labels=labels)
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
 
     printInfo(Style.BRIGHT + "\nSKOS Concepts\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_skos_concepts:
 
         g.printSkosTree(showids=False, labels=labels)
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
 
     printInfo(Style.BRIGHT + "\nSHACL Shapes\n" + "-" * 10 + Style.RESET_ALL)
     if g.all_shapes:
 
         for x in g.all_shapes:
-            printDebug("%s" % (x.qname))
+            printInfo("%s" % (x.qname))
             # printDebug("%s" % (x.bestLabel()), "comment")
     else:
-        printDebug("None found", "comment")
+        printInfo("None found", "comment")
+    
+    if individuals:
+        printInfo(Style.BRIGHT + "\nIndividuals\n" + "-" * 10 + Style.RESET_ALL)
+        if g.all_individuals:
+
+            for x in g.all_individuals:
+                printInfo("%s" % (x.qname))
+                # printDebug("%s" % (x.bestLabel()), "comment")
+        else:
+            printInfo("None found", "comment")
+
 
 
 def slugify(value):
