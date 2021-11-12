@@ -188,7 +188,7 @@ class VizFactory(object):
             "annotationproperties":
             self.ontospy_graph.all_properties_annotation,
             "skosConcepts": self.ontospy_graph.all_skos_concepts,
-            "instances": []
+            "individuals": self.ontospy_graph.all_individuals,
         }
 
         return context_data
