@@ -129,6 +129,13 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
 )
 @click.option(
+    '--individuals',
+    '-i',
+    is_flag=True,
+    help=
+    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts only instances of explicitly declared classes. Use with -x option to get all possible instances.'
+)
+@click.option(
     '--raw',
     '-r',
     is_flag=True,
@@ -139,7 +146,7 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     is_flag=True,
     help='ENDPOINT: the url passed is a sparql endpoint (beta).')
 @click.pass_context
-def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
+def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=False):
     """SCAN: get ontology data from RDF source and print out a report.
     """
     verbose = ctx.obj['VERBOSE']
@@ -147,9 +154,10 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
     print_opts = {
         'labels': verbose,
         'extra': extra,
+        'individuals': individuals,
     }
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose, extra, raw)
+        action_analyze(sources, endpoint, print_opts, verbose, extra, raw, individuals)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -182,6 +190,13 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False):
     is_flag=True,
     help=
     'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
+    '--individuals',
+    '-i',
+    is_flag=True,
+    help=
+    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts only instances of explicitly declared classes. Use with -x option to get all possible instances.'
 )
 @click.option(
     '--type',
@@ -222,6 +237,7 @@ def gendocs(ctx,
             source=None,
             outputpath="",
             extra=False,
+            individuals=False,
             type="",
             title="",
             theme="",
@@ -234,9 +250,6 @@ def gendocs(ctx,
     """
     verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
-    print_opts = {
-        'labels': verbose,
-    }
 
     from .ontodocs.builder import show_themes, random_theme, show_types
 
@@ -300,7 +313,10 @@ def gendocs(ctx,
         theme=theme,
         preflabel=preflabel,
         preflang=preflang,
+        extra= extra,
+        individuals= individuals,
         verbose=verbose)
+
 
     if url and (not nobrowser):  # open browser
         import webbrowser
@@ -330,6 +346,13 @@ def gendocs(ctx,
     is_flag=True,
     help=
     'EXTRA-DATA: extract implicit types and predicates using basic inference rules. Note: by default ontospy extracts only classes/properties which are explictly declared.'
+)
+@click.option(
+    '--individuals',
+    '-i',
+    is_flag=True,
+    help=
+    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts only instances of explicitly declared classes. Use with -x option to get all possible instances.'
 )
 @click.option(
     '--bootstrap',
@@ -364,6 +387,7 @@ def gendocs(ctx,
 def lib(ctx,
         filepath=None,
         extra=False,
+        individuals=False,
         bootstrap=False,
         cache=False,
         reveal=False,
@@ -377,6 +401,8 @@ def lib(ctx,
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
+        'extra': extra,
+        'individuals': individuals,
     }
     DONE_ACTION = False
 

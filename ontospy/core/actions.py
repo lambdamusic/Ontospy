@@ -66,12 +66,15 @@ def action_analyze(sources,
                    print_opts=False,
                    verbose=False,
                    extra=False,
-                   raw=False):
+                   raw=False,
+                   individuals=False):
     """
     Load up a model into ontospy and analyze it
     """
+    printDebug("Parsing ...", fg='white')
     for x in sources:
-        printDebug("Parsing %s..." % str(x), fg='white')
+        printInfo("# %s" % str(x), fg='white')
+    printInfo("")
 
     if extra:
         hide_base_schemas = False
@@ -81,6 +84,11 @@ def action_analyze(sources,
         hide_base_schemas = True
         hide_implicit_types = True
         hide_implicit_preds = True
+
+    if individuals:
+        hide_individuals = False
+    else:
+        hide_individuals = True
 
     if raw:
         o = Ontospy(uri_or_path=sources, verbose=verbose, build_all=False)
@@ -93,20 +101,26 @@ def action_analyze(sources,
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
             hide_implicit_types=hide_implicit_types,
-            hide_implicit_preds=hide_implicit_preds)
+            hide_implicit_preds=hide_implicit_preds,
+            hide_individuals=hide_individuals)
         printDebug("Extracting classes info")
         g.build_classes()
         printDebug("..done")
         printDebug("Extracting properties info")
         g.build_properties()
         printDebug("..done")
+        if not hide_individuals:
+            printDebug("Extracting individuals info (WARNING - on Sparql endpoints this could lead to very long performance times")
+            g.build_individuals()
+            printDebug("..done")
     else:
         g = Ontospy(
             uri_or_path=sources,
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
             hide_implicit_types=hide_implicit_types,
-            hide_implicit_preds=hide_implicit_preds)
+            hide_implicit_preds=hide_implicit_preds,
+            hide_individuals=hide_individuals)
 
     shellPrintOverview(g, print_opts)
 
@@ -635,6 +649,8 @@ def action_visualize(args,
                      theme="",
                      preflabel="",
                      preflang="",
+                     extra= False,
+                     individuals= False,
                      verbose=False):
     """
     export model into another format eg html, d3 etc...
@@ -650,6 +666,20 @@ def action_visualize(args,
         ontouri = args[0]
         islocal = False
 
+    if extra:
+        hide_base_schemas = False
+        hide_implicit_types = False
+        hide_implicit_preds = False
+    else:
+        hide_base_schemas = True
+        hide_implicit_types = True
+        hide_implicit_preds = True
+
+    if individuals:
+        hide_individuals = False
+    else:
+        hide_individuals = True
+
     # select a visualization
     if viztype:
         viztype = select_visualization(viztype)
@@ -662,7 +692,16 @@ def action_visualize(args,
     # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
     # get ontospy graph
     printDebug("Loading graph...", dim=True)
-    g = Ontospy(ontouri, verbose=verbose, pref_title=preflabel, pref_lang=preflang)
+
+    g = Ontospy(
+        ontouri, 
+        verbose=verbose, 
+        pref_title=preflabel, 
+        pref_lang=preflang,
+        hide_base_schemas=hide_base_schemas,
+        hide_implicit_types=hide_implicit_types,
+        hide_implicit_preds=hide_implicit_preds,
+        hide_individuals=hide_individuals)
 
     # put viz in home folder by default: <ontouri>/<viztype>/files..
     if not path:

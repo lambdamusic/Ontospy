@@ -647,6 +647,7 @@ class Ontospy(object):
 					instance = test_existing_indiv
 				
 				c._instances += [instance]
+				instance._instance_of += [c]
 
 				if not test_existing_indiv:
 					self.all_individuals += [instance]

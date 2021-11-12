@@ -64,8 +64,10 @@ def main(test_number):
 
 		f = TEST_RDF_FOLDER + "pizza.ttl"
 
-		o = Ontospy(f, verbose=True, rdf_format="ttl", hide_implicit_types=False, hide_base_schemas=False, hide_implicit_preds=False)
-		print(f)			
+		o = Ontospy(f, verbose=True, rdf_format="ttl", hide_implicit_types=False, hide_base_schemas=True, hide_implicit_preds=False, hide_individuals=False)
+		print(f)
+		for x in o.all_individuals:
+			print(x.qname, [z.uri for z in x.instance_of()])			
 
 
 
