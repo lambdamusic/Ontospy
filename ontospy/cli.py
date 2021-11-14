@@ -46,6 +46,17 @@ from .core.utils import *
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
+
+def validate_format_string(s):
+    if s not in VALID_FORMATS:
+        printDebug(
+            "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
+            fg='red')
+        return False
+    return True
+
+
 ##################
 #
 #  COMMAND LINE MAIN METHODS
@@ -145,8 +156,13 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     '-e',
     is_flag=True,
     help='ENDPOINT: the url passed is a sparql endpoint (beta).')
+@click.option(
+    '-f',
+    '--format',
+    default='',
+    help='RDF-FORMAT: the serialization format of the input file (default=inferred)')
 @click.pass_context
-def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=False):
+def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=False, format=False):
     """SCAN: get ontology data from RDF source and print out a report.
     """
     verbose = ctx.obj['VERBOSE']
@@ -156,8 +172,11 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
         'extra': extra,
         'individuals': individuals,
     }
+
+    if format and not validate_format_string(format):
+        return
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose, extra, raw, individuals)
+        action_analyze(sources, endpoint, print_opts, verbose, extra, raw, individuals, format)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -514,15 +533,10 @@ def ser(ctx, source, output_format):
     print_opts = {
         'labels': verbose,
     }
-    output_format = output_format
-    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
         printDebug(ctx.get_help())
     else:
-        if output_format not in VALID_FORMATS:
-            printDebug(
-                "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
-                fg='red')
+        if not validate_format_string(output_format):
             return
         else:
             action_serialize(source, output_format, verbose)
