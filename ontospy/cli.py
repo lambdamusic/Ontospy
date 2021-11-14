@@ -133,7 +133,7 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     '-i',
     is_flag=True,
     help=
-    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts only instances of explicitly declared classes. Use with -x option to get all possible instances.'
+    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts direct instances of explicitly declared classes. Use with -x option to get all possible instances.'
 )
 @click.option(
     '--raw',
