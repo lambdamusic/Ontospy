@@ -3,6 +3,14 @@
 Summary of changes.
 
 
+## November, 2021: v 1.9.9.2
+
+- Add ability to extract individuals (instances) 
+  - `-i` option from command line
+  - `hide_individuals=False` parameter in `Ontospy`
+- All gendocs visualizations updated so to handle instances
+- Improve handling of multi-ontology graphs: ontologies list ordered alphabetically by default
+
 ## September, 2021: v 1.9.9
 
 - add `pref_title` and `pref_language` options to ontospy
