@@ -334,6 +334,10 @@ class Ontospy(object):
 			onto.triples = self.sparqlHelper.entityTriples(onto.uri)
 			onto._buildGraph()  # force construction of mini graph
 
+		# sort alphabetically
+		self.all_ontologies = sorted(self.all_ontologies, key=lambda x: x.uri)
+
+
 	#
 	#  RDFS:class vs OWL:class cf. http://www.w3.org/TR/owl-ref/ section 3.1
 	#

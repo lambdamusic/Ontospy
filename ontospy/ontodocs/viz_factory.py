@@ -70,11 +70,18 @@ class VizFactory(object):
         self.basic_context_data = self._build_basic_context()
 
     def infer_best_title(self):
-        """Selects something usable as a title for an ontospy graph"""
+        """Selects something usable as a title for an ontospy graph. 
+        If we have more than one ontology definition, use a generic title."""
         if self.ontospy_graph.all_ontologies:
-            return self.ontospy_graph.all_ontologies[0].uri
+            if len(self.ontospy_graph.all_ontologies) > 1:
+                return f"RDF knowledge graph ({len(self.ontospy_graph.all_ontologies)} ontologies)"
+            else:
+                return self.ontospy_graph.all_ontologies[0].uri
         elif self.ontospy_graph.sources:
-            return self.ontospy_graph.sources[0]
+            if len(self.ontospy_graph.sources) > 1:
+                return f"RDF knowledge graph {len(self.ontospy_graph.sources)} sources"
+            else:
+                return self.ontospy_graph.sources[0]
         else:
             return "Untitled"
 
