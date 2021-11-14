@@ -10,6 +10,8 @@ Summary of changes.
   - `hide_individuals=False` parameter in `Ontospy`
 - All gendocs visualizations updated so to handle instances
 - Improve handling of multi-ontology graphs: ontologies list ordered alphabetically by default
+- Add `format` parameter to `scan` command
+- Fix for `--verbose` option 
 
 ## September, 2021: v 1.9.9
 
