@@ -103,6 +103,7 @@ class Ontospy(object):
 		self.sparqlHelper = None
 		self.pref_title = pref_title
 		self.pref_lang = pref_lang
+		self.hide_individuals = hide_individuals
 		self.namespaces = []
 		# entities buckets start with 'all_'
 		self.all_ontologies = []
@@ -1146,7 +1147,7 @@ class Ontospy(object):
 
 	def ontologyShapeTree(self):
 		"""
-		Returns a dict representing the ontology tree
+		Returns a dict representing the shapes tree
 		Top level = {0:[top properties]}
 		Multi inheritance is represented explicitly
 		"""
@@ -1156,6 +1157,20 @@ class Ontospy(object):
 			for element in self.all_shapes:
 				if element.children():
 					treedict[element] = element.children()
+			return treedict
+		return treedict
+
+
+	def ontologyIndividualsTree(self):
+		"""
+		Returns a dict representing the individuals
+		Top level = {0:[all individuals]}
+		NOTE individuals have no inherent hierarchy, this method was added 
+		so to be more consistent with the similar methods for classes etc..
+		"""
+		treedict = {}
+		if self.all_individuals:
+			treedict[0] = self.all_individuals
 			return treedict
 		return treedict
 
@@ -1200,7 +1215,8 @@ class Ontospy(object):
 		out += [("Datatype Properties", len(self.all_properties_datatype))]
 		out += [("Skos Concepts", len(self.all_skos_concepts))]
 		out += [("Data Shapes", len(self.all_shapes))]
-		# out += [("Individuals", len(self.individuals))] @TODO
+		if not self.hide_individuals:
+			out += [("Individuals", len(self.all_individuals))]
 		out += [("Data Sources", len(self.sources))]
 		return out
 

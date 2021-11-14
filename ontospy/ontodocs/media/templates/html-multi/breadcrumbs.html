@@ -104,10 +104,25 @@
 {% endif %}
 
 
+
+{% if thispage == "individuals" %}
+<ol class="breadcrumb">
+  <li>
+    <a href="index.html">Home</a>
+  </li>
+  <li>
+        <a href="entities-az.html">Entities</a>
+    </li>
+    <li class="active">
+          Individuals
+      </li>
+</ol>
+{% endif %}
+
+
+
+
 {# SPECIFIC ENTITY INFO #}
-
-
-
 
 
 {% if thispage == "classinfo" %}
@@ -190,6 +205,28 @@
     </li>
     <li>
           <a href="entities-tree-shapes.html">Shapes</a>
+    </li>
+      <li class="active">
+            {{each.title}}
+        </li>
+  </ol>
+
+{% endif %}
+
+
+
+{% if thispage == "individualinfo" %}
+
+
+  <ol class="breadcrumb">
+    <li>
+      <a href="index.html">Home</a>
+    </li>
+    <li>
+          <a href="entities-az.html">Entities</a>
+    </li>
+    <li>
+          <a href="entities-tree-individuals.html">Individuals</a>
     </li>
       <li class="active">
             {{each.title}}

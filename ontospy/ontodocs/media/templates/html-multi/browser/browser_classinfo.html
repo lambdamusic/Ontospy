@@ -188,6 +188,23 @@
           {% endif %}
 
 
+          {% if each.instances%}
+          <div class="row"><div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Instances ({{each.instances|length}})</h3>
+              </div>
+                <div class="panel-body">
+
+
+                  {% for s in each.instances%}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.title}}</a></li>{% endfor %}
+
+
+                </div>
+            </div>
+         </div></div>
+         {% endif %}
+
 
          {% if each.domain_of_inferred %}
            <div class="row"><div class="col-md-12">

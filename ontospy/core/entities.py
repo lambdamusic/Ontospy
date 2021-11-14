@@ -59,7 +59,6 @@ class RdfEntity(object):
         self._pref_title = pref_title
         self._pref_lang = pref_lang
 
-        self.slug = None
         self.rdftype = rdftype
         self.triples = None
         self.rdflib_graph = rdflib.Graph()
@@ -68,6 +67,9 @@ class RdfEntity(object):
 
         self.qname = self._build_qname()
         self.rdftype_qname = self._build_qname(rdftype)
+
+        # PS default slug gets overridden later for typed entities
+        self.slug = "entity-" + slugify(self.qname)
 
         self._children = []
         self._parents = []
