@@ -60,7 +60,7 @@ owl:Thing
 {% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.title}}]({{s.slug}}.md){% if not forloop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
 
 #### Implementation
-```
+```rdf
 {{each.rdf_source|safe}}
 ```
 

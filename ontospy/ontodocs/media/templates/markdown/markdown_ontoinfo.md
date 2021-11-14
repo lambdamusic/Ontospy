@@ -109,5 +109,14 @@ Prefix   | URI      |
 {% endif %}
 
 
+{% if ontospy_graph.all_individuals %}
+#### Individuals ({{ontospy_graph.all_individuals|length}})
+
+{% for each in ontograph.all_individuals  %}
+- [{{each.title}}]({{each.slug}}.md "Open")
+{% endfor %}
+
+{% endif %}
+
 
 {% endblock main_column %}

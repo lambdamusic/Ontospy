@@ -41,7 +41,7 @@ class MarkdownViz(VizFactory):
 
         if self.ontospy_graph.all_classes:
 
-            # BROWSER PAGES - CLASSES ======
+        # BROWSER PAGES - CLASSES ======
             for entity in self.ontospy_graph.all_classes:
                 extra_context = {
                     "main_entity": entity,
@@ -56,7 +56,7 @@ class MarkdownViz(VizFactory):
 
         if self.ontospy_graph.all_properties:
 
-            # BROWSER PAGES - PROPERTIES ======
+        # BROWSER PAGES - PROPERTIES ======
             for entity in self.ontospy_graph.all_properties:
                 extra_context = {
                     "main_entity": entity,
@@ -71,7 +71,7 @@ class MarkdownViz(VizFactory):
 
         if self.ontospy_graph.all_skos_concepts:
 
-            # BROWSER PAGES - CONCEPTS ======
+        # BROWSER PAGES - CONCEPTS ======
             for entity in self.ontospy_graph.all_skos_concepts:
                 extra_context = {
                     "main_entity": entity,
@@ -80,6 +80,21 @@ class MarkdownViz(VizFactory):
                 }
                 contents = self._renderTemplate(
                     "markdown/markdown_conceptinfo.md",
+                    extraContext=extra_context)
+                FILE_NAME = entity.slug + ".ms"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
+        if self.ontospy_graph.all_individuals:
+
+        # BROWSER PAGES - INDIVIDUALS ======
+            for entity in self.ontospy_graph.all_individuals:
+                extra_context = {
+                    "main_entity": entity,
+                    "main_entity_type": "individual",
+                    "ontograph": self.ontospy_graph
+                }
+                contents = self._renderTemplate(
+                    "markdown/markdown_individualinfo.md",
                     extraContext=extra_context)
                 FILE_NAME = entity.slug + ".ms"
                 self._save2File(contents, FILE_NAME, browser_output_path)

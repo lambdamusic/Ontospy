@@ -55,7 +55,7 @@ skos:Concept
 
 
 #### Implementation
-```
+```rdf
 {{each.rdf_source|safe}}
 ```
 
