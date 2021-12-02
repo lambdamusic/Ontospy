@@ -16,6 +16,7 @@ from .utils import *
 from .rdf_loader import RDFLoader
 from .entities import *
 from .sparql_helper import SparqlHelper
+from .shacl_helper import build_shacl_constraints
 
 
 class Ontospy(object):
@@ -583,7 +584,7 @@ class Ontospy(object):
 		for candidate in qres:
 
 			test_existing_cl = self.get_any_entity(uri=candidate[0])
-			if not test_existing_cl:
+			if test_existing_cl:
 				# create it
 				self.all_shapes += [OntoShape(candidate[0], None, 
 									self.namespaces, 
@@ -627,6 +628,11 @@ class Ontospy(object):
 			if not c.parents():
 				exit += [c]
 		self.toplayer_shapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+
+		# compute SHACL property constraints once classes and shapes have been built
+		shacl_constraints = build_shacl_constraints(self)
+		for onto_class in self.all_classes:
+			onto_class.shacl_constraints = shacl_constraints.get(onto_class, [])
 
 
 	def build_individuals(self):
