@@ -2,223 +2,193 @@
 
 
 {% block navbar %}
-
-    {% include "navbar.html" %}
-
+  {% include "navbar.html" %}
 {% endblock navbar %}
 
 
 
 
 {% block sidebar %}
-
-    {% with thispage=main_entity.qname %}
-        {% include "sidebar.html" %}
-    {% endwith %}
-
+  {% with thispage=main_entity.qname %}
+    {% include "sidebar.html" %}
+  {% endwith %}
 {% endblock sidebar %}
 
 
-
 {% block bodycontent %}
-
-
-
-
 {% ifequal main_entity_type "shape"  %}
+  {% with main_entity as each  %}    {# each is a OntoShape object #}
 
-        {% with main_entity as each  %}
+    {# path to this shape #}
+    {% with thispage="shapeinfo" %}
+      {% include "breadcrumbs.html" %}
+    {% endwith %}
 
+    {# name of this shape, with "leaf node" if it has no children #}
+    <h1>
+        {{each.title}}
+        {% if not each.children  %}
+          <small class="label label-info label-xs">leaf node</small>
+        {% endif %}
+    </h1>
+    
+    <hr>  {# horizontal rule #}
 
-
-
-        {% with thispage="shapeinfo" %}
-            {% include "breadcrumbs.html" %}
-        {% endwith %}
-
-
-
-
-
-            <h1>
-{#                Class: #}
-                {{each.title}}
-                {% if not each.children  %}
-                    <small class="label label-info label-xs">leaf node</small>
-                  {% endif %}
-
-            </h1>
-            <hr>
-
-
-
-            <div class="tree-container">
-            <div class="tree">
+    {# Tree diagram #}
+    <div class="tree-container">
+      <div class="tree">
+        <ul>
+          {% if each.parents %}
+            {% for s in each.parents %}
+              <li>
+              <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
                 <ul>
-                    {% if each.parents %}
-
-                        {% for s in each.parents %}
-
-                        <li>
-
-                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
-
-                          <ul>
-
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
-                            {% if each.children  %}
-                                <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
-                                </ul>
-                            {% endif %}
-                              </li>
-
-                          </ul>
-
-                          </li>
-                        {% endfor %}
-
-                    {% else %}
-
-                        <li><a href="entities-tree-classes.html">sh:Shape</a>
-
-                          <ul>
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
-
-                            {% if each.children  %}
-                                <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
-                                </ul>
-                            {% endif %}
-                              </li>
-
-                          </ul>
-
-                        </li>
-                    {% endif %}
-
+                  <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+                  {% if each.children  %}
+                    <ul>
+                      {% for s in each.children %}
+                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                  </li>
                 </ul>
-            </div>
-            </div>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li><a href="entities-tree-classes.html">sh:Shape</a>
+              <ul>
+                <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+                  {% if each.children  %}
+                    <ul>
+                      {% for s in each.children %}
+                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </li>
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
 
 
 
-
-           <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">URI</h3>
-            </div>
-            <div class="panel-body">
-
-                <code>{{each.uri}}</code>
-            </div>
+    {# URI panel #}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">URI</h3>
           </div>
-           </div></div>
-
-           {% if  each.bestLabel %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Label</h3>
-            </div>
-            <div class="panel-body">
-
-                {{each.bestLabel}}
-            </div>
+          <div class="panel-body">
+            <code>{{each.uri}}</code>
           </div>
-           </div></div>
-           {% endif %}
+        </div>
+      </div>
+    </div>
 
 
+    {# Label panel #}
+    {% if  each.bestLabel %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Label</h3>
+          </div>
+          <div class="panel-body">
+            {{each.bestLabel}}
+          </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
 
-           {% if  each.bestDescription %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
+
+    {# Description panel #}
+    {% if  each.bestDescription %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Description</h3>
             </div>
             <div class="panel-body">
-
-                {{each.bestDescription|linebreaks|default:"--"}}
+              {{each.bestDescription|linebreaks|default:"--"}}
             </div>
           </div>
-           </div></div>
-           {% endif %}
+        </div>
+      </div>
+    {% endif %}
 
 
-
-
-           {% if each.ancestors %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
+    {# Superclasses panel #}
+    {% if each.ancestors %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Superclasses ({{each.ancestors|length}})</h3>
             </div>
             <div class="panel-body">
-
-            {% if each.ancestors %}
-                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.title}}</a></li>{% endfor %}
-            {% else %}
+              {% if each.ancestors %}
+                {% for s in each.ancestors %}
+                  <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
+                {% endfor %}
+              {% else %}
                 <li>owl:Thing</li>
-            {% endif %}
-
+              {% endif %}
             </div>
           </div>
-           </div></div>
-           {% endif %}
+        </div>
+      </div>
+    {% endif %}
 
 
-           {% if each.targetClasses %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
+    {# Target classes panel #}
+    {% if each.targetClasses %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Target Classes ({{each.targetClasses|length}})</h3>
             </div>
             <div class="panel-body">
-
-              {% for s in each.targetClasses %}<li><a href="{{s.slug}}.html">{{s.title}}</a></li>{% endfor %}
-
-
+              {% for s in each.targetClasses %}
+                <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
+                {% endfor %}
             </div>
           </div>
-           </div></div>
-           {% endif %}
+        </div>
+      </div>
+    {% endif %}
 
 
 
-
-           <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Implementation</h3>
-            </div>
-            <div class="panel-body implementation-panel">
-
-                {% if pygments_code %}
-
-                    {{pygments_code|safe}}
-
-                {% else %}
-                     <div class="implementation">
-                        <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
-                    </div>
-                {% endif %}
-            </div>
+    {# Implementation panel #}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Implementation</h3>
           </div>
-           </div></div>
+          <div class="panel-body implementation-panel">
+            {% if pygments_code %}
+              {{pygments_code|safe}}
+            {% else %}
+              <div class="implementation">
+                <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
 
 
-
-
-
-        {% endwith %}
-
-
-
+  {% endwith %}
 {% endifequal %}
-
-
-
-
 {% endblock bodycontent %}
