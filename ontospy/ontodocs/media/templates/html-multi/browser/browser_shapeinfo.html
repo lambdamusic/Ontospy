@@ -1,3 +1,9 @@
+{# NOTICE #}
+{# This software was produced for the U.S. Government under contract FA8702-22-C-0001, #}
+{# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV (DEC 2007) #}
+{# ©2021 The MITRE Corporation. All Rights Reserved. #}
+
+
 {% extends "base.html" %}
 
 
@@ -167,6 +173,84 @@
     {% endif %}
 
 
+    {# Usage panel - the main panel #}
+    {% comment %}
+    The OntoShape object may have zero, one or more target classes, which are OntoClass objects.
+    In practice, all our OntoShapes have exactly one target class, and we
+       use this class's shacl properties to populate this panel
+
+    If the OntoShape has no target classes, we skip this panel.
+    If the OntoShape has multiple target classes, we use the first one and ignore the rest.
+    {% endcomment %}
+    {% if each.targetClasses %}       {# each is an OntoShape which may have target classes #}
+      {% with each.targetClasses.0 as targetClass %}   {# targetClass is an OntoClass object for the first target class #}
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Shape Properties</h3>
+              </div>
+              <div class="panel-body" style="overflow: auto;">
+                <p>Instances of {{targetClass.qname}} can have the following properties:</p>
+              </div>
+              <table class="table table-bordered" style="overflow: auto;">
+                <tr class="table-classproperties">   {# Table header row #}
+                    <th><p style="text-align:center;">PROPERTY</p></th>
+                    <th><p style="text-align:center;">MIN COUNT</p></th>
+                    <th><p style="text-align:center;">MAX COUNT</p></th>
+                    <th><p style="text-align:center;">TYPE</p></th>
+                </tr>
+                {% for constraint in targetClass.shacl_constraints  %}   {# constraint is a Constraint object #}
+                  <tr>
+                    {% if constraint.header %} {# THIS ROW CONTAINS ONLY THE HEADER #}
+                      <td colspan="5">
+                        <small class="label label-info label-xs">{{constraint.header}}</small>
+                      </td>
+                        
+                    {% else %}   {# THIS ROW CONTAINS ALL THE COLUMNS #}
+                      <td>   {# PROPERTY #}
+                        {% with constraint.property_obj.onto_property as prop  %}
+                          <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
+                        {% endwith %}
+                      </td>
+ 
+                      <td>     {# MIN COUNT #}
+                        {{constraint.sh_minCount|join:", "|default:"0"}}
+                      </td>
+ 
+                      <td>     {# MAX COUNT #}
+                        {{constraint.sh_maxCount|join:", "|default:"*"}}
+                      </td>
+                        
+                      <td>     {# LOCAL TYPE #}
+                        {% for value in constraint.sh_datatype %}
+                          {% if value.onto_class %}
+                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                          {% else %}
+                            <i>{{value.qname}}</i>
+                          {% endif %} 
+                            <br>
+                        {% endfor %}
+                        {% for value in constraint.sh_class %}
+                          {% if value.onto_class %}
+                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                          {% else %}
+                            <i>{{value.qname}}</i>
+                          {% endif %} 
+                          <br>
+                        {% endfor %}
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+
+              </table>
+            </div>
+          </div>
+        </div>
+      {% endwith %}
+    {% endif %}
+    
 
     {# Implementation panel #}
     <div class="row">
