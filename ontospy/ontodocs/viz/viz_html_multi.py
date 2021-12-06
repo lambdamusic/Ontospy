@@ -15,6 +15,26 @@ from ..viz_factory import VizFactory
 
 
 
+def is_class_defined_as_shacl_node_shape(entity) -> bool:
+    """This function identifies all OWL Classes that define themselves as SHACL Node Shapes."""
+    is_matching_uri = False
+    is_NodeShape = False
+    is_Class = False
+
+    # check if the shape uri matches the class uri
+    for triple in entity.rdflib_graph.triples((entity.uri, SH.targetClass, entity.uri)): is_matching_uri = True
+    if is_matching_uri == False:
+        return False
+
+    # check if the entity is a NodeShape
+    for triple in entity.rdflib_graph.triples((entity.uri, RDF.type, SH.NodeShape)): is_NodeShape = True
+    if is_NodeShape == False:
+        return False
+
+    # check if the entity is a Class
+    for triple in entity.rdflib_graph.triples((entity.uri, RDF.type, OWL.Class)): is_Class = True
+
+    return (is_matching_uri and is_NodeShape and is_Class)
 
 
 class KompleteViz(VizFactory):

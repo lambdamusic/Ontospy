@@ -13,7 +13,7 @@ from colorama import Fore, Style
 
 import rdflib
 from rdflib import RDFS, RDF, BNode
-from rdflib.namespace import OWL, DC
+from rdflib.namespace import OWL, DC, SH
 DEFAULT_LANGUAGE = "en"
 
 import sys, os, subprocess, random, platform
