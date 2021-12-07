@@ -46,6 +46,17 @@ from .core.utils import *
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
+
+def validate_format_string(s):
+    if s not in VALID_FORMATS:
+        printDebug(
+            "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
+            fg='red')
+        return False
+    return True
+
+
 ##################
 #
 #  COMMAND LINE MAIN METHODS
@@ -133,7 +144,7 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     '-i',
     is_flag=True,
     help=
-    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts only instances of explicitly declared classes. Use with -x option to get all possible instances.'
+    'INDIVIDUALS: extract class instances as well. Note: by default ontospy extracts direct instances of explicitly declared classes. Use with -x option to get all possible instances.'
 )
 @click.option(
     '--raw',
@@ -145,19 +156,29 @@ Ontospy allows to extract and visualise ontology information included in RDF dat
     '-e',
     is_flag=True,
     help='ENDPOINT: the url passed is a sparql endpoint (beta).')
+@click.option(
+    '-f',
+    '--format',
+    default='',
+    help='RDF-FORMAT: the serialization format of the input file (default=inferred)')
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
-def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=False):
+def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=False, verbose=False, format=False):
     """SCAN: get ontology data from RDF source and print out a report.
     """
-    verbose = ctx.obj['VERBOSE']
+    # verbose = ctx.obj['VERBOSE']  # TODO 2021-11-14 VERBOSE INHERITANCE BROKEN ?
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
         'extra': extra,
         'individuals': individuals,
     }
+
+    if format and not validate_format_string(format):
+        return
     if sources or (sources and endpoint):
-        action_analyze(sources, endpoint, print_opts, verbose, extra, raw, individuals)
+        action_analyze(sources, endpoint, print_opts, verbose, extra, raw, individuals, format)
         eTime = time.time()
         tTime = eTime - sTime
         printDebug("\n-----------\n" + "Time:	   %0.2fs" % tTime, "comment")
@@ -231,6 +252,8 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
     '--showthemes',
     is_flag=True,
     help='SHOW-THEMES: show the available css theme choices.')
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
 def gendocs(ctx,
             lib=False,
@@ -245,10 +268,11 @@ def gendocs(ctx,
             preflang="",
             nobrowser=False,
             showthemes=False,
-            showtypes=False):
+            showtypes=False,
+            verbose=False):
     """GENDOCS: generate documentation in html or markdown format.
     """
-    verbose = ctx.obj['VERBOSE']
+    # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
 
     from .ontodocs.builder import show_themes, random_theme, show_types
@@ -382,6 +406,8 @@ def gendocs(ctx,
     help=
     'SAVE: import a local or remote RDF file to the local library. If a local folder path is passed, all valid RDF files found in it get imported. If no argument is provided and there is an internet connection, it allows to scan online ontology repositories to find items of interests.'
 )
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.argument('filepath', nargs=-1)
 @click.pass_context
 def lib(ctx,
@@ -393,11 +419,12 @@ def lib(ctx,
         reveal=False,
         show=False,
         save=False,
-        directory=False):
+        directory=False,
+        verbose=False):
     """
     LIBRARY: work with a local library of RDF models.
     """
-    verbose = ctx.obj['VERBOSE']
+    # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
@@ -504,25 +531,21 @@ def shell(sources=None):
     '--output_format',
     default='turtle',
     help='OUTPUT-FORMAT: the serialization format (default=turtle)')
-# @click.argument('output_format', nargs=1)
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.pass_context
-def ser(ctx, source, output_format):
+def ser(ctx, source, output_format, verbose=False):
     """SERIALIZE: tranform an RDF graph to a format of choice.
     """
-    verbose = ctx.obj['VERBOSE']
+    # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,
     }
-    output_format = output_format
-    VALID_FORMATS = ['xml', 'n3', 'turtle', 'nt', 'pretty-xml', "json-ld"]
     if not source:
         printDebug(ctx.get_help())
     else:
-        if output_format not in VALID_FORMATS:
-            printDebug(
-                "Not a valid format - must be one of: 'xml', 'n3', 'turtle', 'nt', 'pretty-xml', 'json-ld'.",
-                fg='red')
+        if not validate_format_string(output_format):
             return
         else:
             action_serialize(source, output_format, verbose)
@@ -551,6 +574,8 @@ def ser(ctx, source, output_format):
     is_flag=True,
     help='DISCOVER: find ontologies in online repositories like LOV or Prefix.cc'
 )
+@click.option(
+    '--verbose', '-v', is_flag=True, help='VERBOSE: print out debug messages.')
 @click.argument('filepath', nargs=-1)
 @click.pass_context
 def utils(
@@ -558,10 +583,11 @@ def utils(
         filepath=None,
         jsonld=False,
         discover=False,
+        verbose=False,
 ):
     """UTILS: miscellaneous bits and pieces.
     """
-    verbose = ctx.obj['VERBOSE']
+    # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
     print_opts = {
         'labels': verbose,

@@ -1,0 +1,329 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.purl.com/net/artofmaking.owl#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://www.purl.com/net/artofmaking.owl">
+  <owl:Ontology rdf:about="">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Ontology for the domain of Sculpture, developed in the context of the Art of Making project.
+http://www.artofmaking.ac.uk/ 
+The project originally looked at classic sculpture in Rome, but the ontology covers the domain of sculpture more generally.</rdfs:comment>
+    <owl:versionInfo>0.1 </owl:versionInfo>
+    <rdfs:seeAlso>http://www.michelepasin.org/artifacts/software/artofmaking</rdfs:seeAlso>
+    <dc:creator>Michele Pasin</dc:creator>
+  </owl:Ontology>
+  <owl:Class rdf:ID="glass">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Material"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Pneumatic_Tools">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Stone_Carving_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Mold_Making_Casting_Tool">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Encaustics_Tool">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Texturing_Tools">
+    <rdfs:subClassOf rdf:resource="#Encaustics_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="metals">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Material"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#Material">
+    <rdfs:comment>Raw materials are obviously transformed into a sculpture</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Wood_Carving_Tool">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="positioning">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Work_Process"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Image">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Document"/>
+    </rdfs:subClassOf>
+    <rdfs:comment>interesting for us as long as it depicts a sculpture
+We'll add here some standard image metadata</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Hammers_and_Picks">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Stone_Carving_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="shaping">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Work_Process"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Hellenistic">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Tradition"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="casting">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Method"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Scrapers">
+    <rdfs:subClassOf rdf:resource="#Encaustics_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Method">
+    <rdfs:comment>Involves using some tools</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Flat_Chisels">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Stone_Carving_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#Work_Process">
+    <rdfs:comment>Involves the use of certain tools, and can follow a method</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="firing">
+    <rdfs:subClassOf rdf:resource="#Method"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Gouges">
+    <rdfs:subClassOf rdf:resource="#Wood_Carving_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="molding">
+    <rdfs:subClassOf rdf:resource="#Method"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Clay_Modeling_Tool">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Frosting_Tools">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Stone_Carving_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Relief">
+    <rdfs:comment>- the sculpture is still attached to a background; types are bas-relief, alto-relievo, and sunken-relief</rdfs:comment>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Sculpture_object"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Plaster_Rasp">
+    <rdfs:subClassOf rdf:resource="#Mold_Making_Casting_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Skews">
+    <rdfs:subClassOf rdf:resource="#Wood_Carving_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Free-standing">
+    <rdfs:comment>sculpture, sculpture that is surrounded on all sides, except the base, by space. It is also known as sculpture "in the round", and is meant to be viewed from any angle.</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Sculpture_object"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Ceramic_Trimming_Tools">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Ceramics_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Digital_Image">
+    <rdfs:subClassOf rdf:resource="#Image"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Wire_End_Tools">
+    <rdfs:subClassOf rdf:resource="#Clay_Modeling_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Roman">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Tradition"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Fine_Riffler-Rasps">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Rasps"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Bust">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Statue"/>
+    </rdfs:subClassOf>
+    <owl:disjointWith>
+      <owl:Class rdf:ID="Equestrian_statue"/>
+    </owl:disjointWith>
+    <rdfs:comment>- representation of a person from the chest up</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Small_Riffler-Rasps">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Rasps"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Modernism">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Tradition"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:ID="Chisels">
+    <rdfs:subClassOf rdf:resource="#Wood_Carving_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="quarrying">
+    <rdfs:subClassOf rdf:resource="#Work_Process"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Plaster_Carving_Chisel">
+    <rdfs:subClassOf rdf:resource="#Mold_Making_Casting_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Actor"/>
+  <owl:Class rdf:ID="welding">
+    <rdfs:subClassOf rdf:resource="#Method"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Tooth_Chisels">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Stone_Carving_Tool"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#Equestrian_statue">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Statue"/>
+    </rdfs:subClassOf>
+    <rdfs:comment>typically showing a significant person on horseback</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Modern_Classicism">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Tradition"/>
+    </rdfs:subClassOf>
+  </owl:Class>
+  <owl:Class rdf:about="#Rasps">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="transport">
+    <rdfs:subClassOf rdf:resource="#Work_Process"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Tradition">
+    <rdfs:comment>Traditions influence methods and work processes.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="Text">
+    <rdfs:subClassOf rdf:resource="#Document"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Stacked_art">
+    <rdfs:comment>a form of sculpture formed by assembling objects and 'stacking' them</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Sculpture_object"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Stone_Carving_Tool">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Place"/>
+  <owl:Class rdf:ID="stone">
+    <rdfs:subClassOf rdf:resource="#Material"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Ceramics_Tool">
+    <rdfs:subClassOf rdf:resource="#Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Classical_period">
+    <rdfs:subClassOf rdf:resource="#Tradition"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Fountain">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Kinetic_sculpture"/>
+    </rdfs:subClassOf>
+    <rdfs:comment>the sculpture is designed with moving water</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="wood">
+    <rdfs:subClassOf rdf:resource="#Material"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Ceramic_Loop_Tools">
+    <rdfs:subClassOf rdf:resource="#Ceramics_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Carbide_Tipped_Tools">
+    <rdfs:subClassOf rdf:resource="#Stone_Carving_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Mannerist">
+    <rdfs:subClassOf rdf:resource="#Tradition"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Spatulas">
+    <rdfs:subClassOf rdf:resource="#Encaustics_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Statue">
+    <rdfs:comment>representationalist sculpture depicting a specific entity, usually a person, event, animal or object</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Sculpture_object"/>
+  </owl:Class>
+  <owl:Class rdf:about="#Kinetic_sculpture">
+    <rdfs:comment>- involves aspects of physical motion</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="#Sculpture_object"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Interview">
+    <rdfs:subClassOf rdf:resource="#Document"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Large_Steel_Rasps">
+    <rdfs:subClassOf rdf:resource="#Rasps"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Neo-Classical">
+    <rdfs:subClassOf rdf:resource="#Tradition"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Point_Chisels">
+    <rdfs:subClassOf rdf:resource="#Stone_Carving_Tool"/>
+  </owl:Class>
+  <owl:Class rdf:ID="Slide">
+    <rdfs:subClassOf rdf:resource="#Image"/>
+  </owl:Class>
+  <owl:Class rdf:ID="carving">
+    <rdfs:subClassOf rdf:resource="#Method"/>
+  </owl:Class>
+  <rdf:Property rdf:ID="typical_of_process">
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >dsfsdfsdf</dc:creator>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >typical of process</rdfs:label>
+    <rdfs:domain rdf:resource="#Method"/>
+    <rdfs:range rdf:resource="#Work_Process"/>
+  </rdf:Property>
+  <rdf:Property rdf:ID="part_of_process">
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >dsfsdfsdf</dc:creator>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >part of process</rdfs:label>
+    <rdfs:domain rdf:resource="#Work_Process"/>
+    <rdfs:range rdf:resource="#Work_Process"/>
+  </rdf:Property>
+  <owl:AllDisjointClasses>
+    <owl:members rdf:parseType="Collection">
+      <owl:Class rdf:about="#carving"/>
+      <owl:Class rdf:about="#casting"/>
+      <owl:Class rdf:about="#firing"/>
+      <owl:Class rdf:about="#molding"/>
+      <owl:Class rdf:about="#welding"/>
+    </owl:members>
+  </owl:AllDisjointClasses>
+  <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+  <owl:AllDisjointClasses>
+    <owl:members rdf:parseType="Collection">
+      <owl:Class rdf:about="#glass"/>
+      <owl:Class rdf:about="#metals"/>
+      <owl:Class rdf:about="#stone"/>
+      <owl:Class rdf:about="#wood"/>
+    </owl:members>
+  </owl:AllDisjointClasses>
+  <owl:AllDisjointClasses>
+    <owl:members rdf:parseType="Collection">
+      <owl:Class rdf:about="#positioning"/>
+      <owl:Class rdf:about="#quarrying"/>
+      <owl:Class rdf:about="#shaping"/>
+      <owl:Class rdf:about="#transport"/>
+    </owl:members>
+  </owl:AllDisjointClasses>
+  <owl:AllDisjointClasses>
+    <owl:members rdf:parseType="Collection">
+      <owl:Class rdf:about="#Free-standing"/>
+      <owl:Class rdf:about="#Kinetic_sculpture"/>
+      <owl:Class rdf:about="#Relief"/>
+      <owl:Class rdf:about="#Stacked_art"/>
+      <owl:Class rdf:about="#Statue"/>
+    </owl:members>
+  </owl:AllDisjointClasses>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:efrbroo="http://erlangen-crm.org/efrbroo/"
+    xmlns="http://www.purl.org/net/hucit#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base="http://www.purl.org/net/hucit">
+  <owl:Ontology rdf:about="">
+    <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >0.9.1</owl:versionInfo>
+    <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >2013-05-02</dc:date>
+    <dc:creator rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Matteo Romanello and Michele Pasin</dc:creator>
+    <dc:description xml:lang="en">HuCit is a light-weight ontology aimed at modelling citations with a particular focus on the Humanities</dc:description>
+    <dc:title xml:lang="en">HuCit, the HUmanities CITation Ontology</dc:title>
+    <owl:imports rdf:resource="http://erlangen-crm.org/efrbroo/"/>
+  </owl:Ontology>
+  <owl:Class rdf:ID="CanonicalTextStructure">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Canonical Text Structure</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="TextStructure"/>
+    </rdfs:subClassOf>
+    <rdfs:comment xml:lang="en">A TextStructure that becomes the canonical way to refer to a certain text. 
+For example, the canonical structure to refer to Homer's Iliad consists of books that, in turn, consist of poetic lines.
+References to such canonical structure are usually given in the paratext of print editions of ancient texts.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="http://www.w3.org/2002/07/owl#Thing"/>
+  <owl:Class rdf:ID="TextElement">
+    <rdfs:label xml:lang="en">Text Element</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="ConceptualObject"/>
+    </rdfs:subClassOf>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The elements (e.g. chapter, title, page) a textual structure is composed of. 
+
+When encoding a text, for instance using TEI, the elements of a textual structured can be captured by using the relevant mark-up elements (such as &lt;p&gt; for a paragraph, &lt;div&gt; for a book or a chapter, etc.). 
+
+The CTS Protocol defines a system of URNs to identify such text elements. (explain)</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="CanonicalCitation">
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Citation"/>
+    </rdfs:subClassOf>
+    <rdfs:label xml:lang="en">Canonical Citation</rdfs:label>
+    <rdfs:comment xml:lang="en">Canonical citations are references to ancient texts, usually  expressed by abbreviations and referring to "logical" rather than "physical" units of texts. 
+
+A citation to the first line of the Iliad, for instance does not refer to the very page of a specific critical edition of the text, but to the first line of the first book of the work (e.g. Hom. Il. 1.1).
+
+Some examples of canonical citations:
+* Arist. Poetics 1451a35-b6 and 1459a17-29
+* Hom. Il. 1.1
+* A. Cicero, DND 1.41
+
+In Hucit a citation is essentially a pointer and not a direct reference to a text. What the citation is pointing to is an element (TextElement) of an abstract structure of the text (TextStructure). If the citation is canonical–as not all citations are necessarily canonical–the citation is pointing to an element of a CanonicalTextStructure.</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="#TextStructure">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Text Structure</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#ConceptualObject"/>
+    </rdfs:subClassOf>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >The structure of a text: here it is represented as an abstract notion, but in reality it is determined by both logical and physical characteristics of a text.
+
+Text often, if not always, have multiple structures, such as for instance a logical structure made of books / chapters / paragraphs, and a physical structure made of pages / columns / lines and so on. These structures do overlap with each other: e.g. a page may contain a chapter or part of it, a paragraph may be split over several lines, etc.
+
+The composition of a textual structure can be represented by using the properties has_texual_component and part_of_component. The latter, in particular, is a recursive property and fits well the purpose of textual structures with a varying number of levels (down to the potentially deeply nested ones).</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:about="#Citation">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Citation</rdfs:label>
+    <rdfs:subClassOf>
+      <owl:Class rdf:ID="Expression"/>
+    </rdfs:subClassOf>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >TBD</rdfs:comment>
+  </owl:Class>
+  <owl:Class rdf:ID="SelfContainedExpression">
+    <rdfs:subClassOf>
+      <owl:Class rdf:about="#Expression"/>
+    </rdfs:subClassOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Self Contained Expression</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="#ConceptualObject">
+    <rdfs:comment xml:lang="en">Needs to be aligned to CIDOC-CRM</rdfs:comment>
+    <rdfs:subClassOf rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfs:label xml:lang="en">Conceptual Object</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="Work">
+    <rdfs:comment rdf:datatype="http://www.w3.org/2000/01/rdf-schema#Literal"
+    >A subclass of F1.Work as defined in FRBRoo</rdfs:comment>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >Work</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:about="#Expression">
+    <owl:equivalentClass rdf:resource="http://erlangen-crm.org/efrbroo/F2_Expression"/>
+    <rdfs:subClassOf rdf:resource="#ConceptualObject"/>
+    <rdfs:label xml:lang="en">Expression</rdfs:label>
+  </owl:Class>
+  <owl:Class rdf:ID="CitationStyle">
+    <rdfs:comment xml:lang="en">Two strings containing the same citation (e.g. a citation to Homer's Iliad, book 1, line 1) may differ for their surface appearance. We use CitationStyle to be able to distinguish two citations </rdfs:comment>
+    <rdfs:label xml:lang="en">Citation Style</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#ConceptualObject"/>
+  </owl:Class>
+  <owl:ObjectProperty rdf:ID="precedes">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:ID="follows"/>
+    </owl:inverseOf>
+    <rdfs:range rdf:resource="#TextElement"/>
+    <rdfs:domain rdf:resource="#TextElement"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="has_canonical_structure">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:ID="is_canonical_structure_of"/>
+    </owl:inverseOf>
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >has canonical structure</rdfs:label>
+    <rdfs:range rdf:resource="#CanonicalTextStructure"/>
+    <rdfs:domain rdf:resource="#Work"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="has_form">
+    <rdfs:range rdf:resource="#CitationStyle"/>
+    <rdfs:domain rdf:resource="#Citation"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="element_part_of">
+    <rdfs:domain rdf:resource="#TextElement"/>
+    <rdfs:range rdf:resource="#TextStructure"/>
+    <owl:inverseOf>
+      <owl:FunctionalProperty rdf:ID="has_element"/>
+    </owl:inverseOf>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="is_identified_by">
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:ID="resolves_to"/>
+    </owl:inverseOf>
+    <rdfs:range rdf:resource="#TextElement"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+  <owl:ObjectProperty rdf:about="#resolves_to">
+    <rdfs:domain rdf:resource="#TextElement"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#is_canonical_structure_of">
+    <rdfs:label rdf:datatype="http://www.w3.org/2001/XMLSchema#string"
+    >is canonical structure of</rdfs:label>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#follows">
+    <owl:inverseOf rdf:resource="#precedes"/>
+    <rdfs:range rdf:resource="#TextElement"/>
+    <rdfs:domain rdf:resource="#TextElement"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:ID="is_part_of">
+    <rdfs:range rdf:resource="#TextElement"/>
+    <owl:inverseOf>
+      <owl:ObjectProperty rdf:ID="has_part"/>
+    </owl:inverseOf>
+    <rdfs:domain rdf:resource="#TextElement"/>
+  </owl:ObjectProperty>
+  <owl:ObjectProperty rdf:about="#has_part">
+    <rdfs:domain rdf:resource="#TextElement"/>
+    <rdfs:range rdf:resource="#TextElement"/>
+  </owl:ObjectProperty>
+  <owl:FunctionalProperty rdf:ID="is_structure_of">
+    <owl:inverseOf>
+      <owl:FunctionalProperty rdf:ID="has_structure"/>
+    </owl:inverseOf>
+    <rdfs:range rdf:resource="#SelfContainedExpression"/>
+    <rdfs:domain rdf:resource="#TextStructure"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="#has_element">
+    <rdfs:range rdf:resource="#TextElement"/>
+    <rdfs:domain rdf:resource="#TextStructure"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:ID="has_content">
+    <rdfs:range rdf:resource="#ConceptualObject"/>
+    <rdfs:domain rdf:resource="#Citation"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:FunctionalProperty rdf:about="#has_structure">
+    <owl:inverseOf rdf:resource="#is_structure_of"/>
+    <rdfs:domain rdf:resource="#SelfContainedExpression"/>
+    <rdfs:range rdf:resource="#TextStructure"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+  </owl:FunctionalProperty>
+  <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#label"/>
+  <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#comment"/>
+  <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+  <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+  <owl:AnnotationProperty rdf:about="http://www.w3.org/2002/07/owl#versionInfo"/>
+  <owl:AnnotationProperty rdf:about="http://www.w3.org/2002/07/owl#deprecated"/>
+</rdf:RDF>
+
+<!-- Created with TopBraid -->

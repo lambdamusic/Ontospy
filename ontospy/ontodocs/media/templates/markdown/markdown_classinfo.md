@@ -54,9 +54,16 @@ owl:Thing
 {% endif %}
 
 
+{% if each.instances %}
+#### Has instances ({{ each.instances|length }})
+{% for s in each.instances %}
+- [{{s.title}}]({{s.slug}}.md)
+{% endfor %}
+{% endif %}
+
 
 #### Implementation
-```
+```rdf
 {{each.rdf_source|safe}}
 ```
 

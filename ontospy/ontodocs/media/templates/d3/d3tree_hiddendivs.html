@@ -90,7 +90,7 @@
 
 
 
-	{% if each.parents or each.children or each.domain_of or each.range_of  %}
+	{% if each.parents or each.children or each.domain_of or each.range_of or each.instances %}
 		<hr>
 	{% endif %}
 	
@@ -109,6 +109,10 @@
 	
 	{% if each.descendants and each.descendants|length > each.children|length %}
 		<p><b class="section-title">Has Sub Class (all):</b> {% for s in each.descendants %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+
+	{% if each.instances %}
+		<p><b class="section-title">Has Instances (direct):</b> {% for s in each.instances %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 
 	{% if each.domain_of %}
@@ -257,5 +261,53 @@
 	
 {% endfor %}
 
+
+
+
+
+
+
+
+
+{# INDIVIDUALS SECTION #}
+
+
+{% for each in individuals  %}
+
+<div class="hidden" id="{{each.id}}">
+	
+	<h2 class="entity-section">Individual: <a href="{{each.uri}}" class="class"  target="_blank"
+                                          title="Try to open original URI">{{each.title}}</a>
+	</h2>
+	<hr>
+
+	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
+    {% if each.bestLabel %}
+		<p><b class="section-title">Label: </b>
+			{{each.bestLabel|capfirst}}
+		</p>
+    {% endif %}
+    {% if each.bestDescription %}
+        <p><b class="section-title">Description: </b>
+			{{each.bestDescription|linebreaks}}
+		</p>
+    {% endif %}
+
+
+	{% if each.instance_of %}
+		<hr>
+	{% endif %}
+	
+	{% if each.instance_of %}
+		<p><b class="section-title">Is Direct Instance Of:</b> {% for s in each.instance_of %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not forloop.last %}|{% endif %} {% endfor %}</p>
+	{% endif %}
+	
+	<hr>
+	<b class="section-title">Implementation:</b>
+	<pre class="turtlesource">{{each.rdf_source|escape}}</pre>
+
+</div>
+	
+{% endfor %}
 
 

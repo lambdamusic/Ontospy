@@ -67,7 +67,8 @@ def action_analyze(sources,
                    verbose=False,
                    extra=False,
                    raw=False,
-                   individuals=False):
+                   individuals=False,
+                   format=""):
     """
     Load up a model into ontospy and analyze it
     """
@@ -91,12 +92,17 @@ def action_analyze(sources,
         hide_individuals = True
 
     if raw:
-        o = Ontospy(uri_or_path=sources, verbose=verbose, build_all=False)
+        o = Ontospy(
+            uri_or_path=sources, 
+            verbose=verbose, 
+            rdf_format=format, 
+            build_all=False)
         s = o.serialize()
         printInfo(s)
         return
     elif endpoint:
         g = Ontospy(
+            rdf_format=format, 
             sparql_endpoint=sources[0],
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
@@ -116,13 +122,15 @@ def action_analyze(sources,
     else:
         g = Ontospy(
             uri_or_path=sources,
+            rdf_format=format, 
             verbose=verbose,
             hide_base_schemas=hide_base_schemas,
             hide_implicit_types=hide_implicit_types,
             hide_implicit_preds=hide_implicit_preds,
             hide_individuals=hide_individuals)
 
-    shellPrintOverview(g, print_opts)
+    if len(g.rdflib_graph):
+        shellPrintOverview(g, print_opts)
 
 
 def action_reveal_library():

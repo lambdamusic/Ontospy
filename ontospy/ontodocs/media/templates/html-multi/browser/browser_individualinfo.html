@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+
+{% block navbar %}
+
+    {% include "navbar.html" %}
+
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+
+    {% with thispage=main_entity.qname %}
+        {% include "sidebar.html" %}
+    {% endwith %}
+
+{% endblock sidebar %}
+
+
+
+{% block bodycontent %}
+
+
+
+
+{% ifequal main_entity_type "individual"  %}
+
+        {% with main_entity as each  %}
+
+
+
+
+        {% with thispage="individualinfo" %}
+            {% include "breadcrumbs.html" %}
+        {% endwith %}
+
+
+
+
+
+            <h1>
+                {{each.title}}
+
+            </h1>
+            <hr>
+
+
+
+            <div class="tree-container">
+            <div class="tree">
+                <ul>
+                    {% if each.instance_of %}
+
+                        {% for s in each.instance_of %}
+
+                        <li>
+
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
+
+                          <ul>
+
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+
+                          </ul>
+
+                          </li>
+                        {% endfor %}
+
+                    {% else %}
+
+                        <li><a href="entities-tree-classes.html">owl:Thing</a>
+
+                          <ul>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+
+                            </li>
+
+                          </ul>
+
+                        </li>
+                    {% endif %}
+
+                </ul>
+            </div>
+            </div>
+
+
+
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">URI</h3>
+            </div>
+            <div class="panel-body">
+
+                <code>{{each.uri}}</code>
+            </div>
+          </div>
+           </div></div>
+
+           {% if  each.bestLabel %}
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Label</h3>
+            </div>
+            <div class="panel-body">
+
+                {{each.bestLabel}}
+            </div>
+          </div>
+           </div></div>
+           {% endif %}
+
+
+
+           {% if  each.bestDescription %}
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Description</h3>
+            </div>
+            <div class="panel-body">
+
+                {{each.bestDescription|linebreaks|default:"--"}}
+            </div>
+          </div>
+           </div></div>
+           {% endif %}
+
+
+
+
+           {% if each.instance_of %}
+            <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Is instance of  ({{each.instance_of|length}})</h3>
+            </div>
+            <div class="panel-body">
+
+            {% if each.instance_of %}
+                    {% for s in each.instance_of %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.title}}</a></li>{% endfor %}
+            {% else %}
+                <li>owl:Thing</li>
+            {% endif %}
+
+            </div>
+          </div>
+           </div></div>
+           {% endif %}
+
+
+
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Implementation</h3>
+            </div>
+            <div class="panel-body implementation-panel">
+
+                {% if pygments_code %}
+
+                    {{pygments_code|safe}}
+
+                {% else %}
+                     <div class="implementation">
+                        <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
+                    </div>
+                {% endif %}
+            </div>
+          </div>
+           </div></div>
+
+
+
+
+
+        {% endwith %}
+
+
+
+{% endifequal %}
+
+
+
+
+{% endblock bodycontent %}

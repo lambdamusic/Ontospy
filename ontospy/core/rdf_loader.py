@@ -169,8 +169,9 @@ class RDFLoader(object):
             if self.verbose:
                 printDebug(".. trying rdf serialization: <%s>" % f)
             try:
-                if f == 'json-ld':
-                    self._fix_default_graph_for_jsonld()
+                # TODO ??
+                # if f == 'json-ld':
+                #     self._fix_default_graph_for_jsonld()
                 self.rdflib_graph.parse(data=data, format=f)
                 if self.verbose: printDebug("..... success!")
                 success = True
@@ -253,7 +254,7 @@ class RDFLoader(object):
         if uri:
             uri = " <%s>" % str(uri)
         printDebug(
-            "----------\nFatal error parsing graph%s\n(using RDF serializations: %s)"
+            "----------\nFatal error parsing graph%s\n(tried RDF serializations: %s)"
             % (uri, str(rdf_format_opts)), "red")
         printDebug(
             "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://rdfvalidator.mybluemix.net/>\n<https://json-ld.org/playground/>"

@@ -32,6 +32,9 @@
         {% if ontospy_graph.all_shapes%}
         <li {% ifequal thispage "shapes" %}class="active"{% endifequal %}><a href="entities-tree-shapes.html">Shapes</a></li>
         {% endif %}
+        {% if ontospy_graph.all_individuals%}
+        <li {% ifequal thispage "individuals" %}class="active"{% endifequal %}><a href="entities-tree-individuals.html">Individuals</a></li>
+        {% endif %}
         <li {% ifequal thispage "statistics" %}class="active"{% endifequal %} ><a href="statistics.html">Statistics</a></li>
 
 
