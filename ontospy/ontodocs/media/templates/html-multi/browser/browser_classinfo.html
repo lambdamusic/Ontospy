@@ -171,6 +171,7 @@
       </div>
     {% endif %}
 
+
     {# Instances panel #}
     {% if each.instances%}
     <div class="row"><div class="col-md-12">
@@ -187,6 +188,7 @@
       </div>
     </div>
    {% endif %}
+
 
     {# Usage panel #}
     {% if each.domain_of_inferred %}
@@ -239,6 +241,107 @@
                     {% endfor %}
                   {% endif %}
                 {% endfor %}
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Property Shapes #}
+    {% if each.shacl_constraints %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Property Shapes</h3>
+            </div>
+            <div class="panel-body" style="overflow: auto;">
+              <p>By the associated SHACL property shapes, instances of {{each.title}} can have the following properties:</p>
+            </div>
+            <table class="table table-bordered" style="overflow: auto;">
+              <tr class="table-classproperties">
+                <th><p style="text-align:center;">PROPERTY</p></th>
+                <th><p style="text-align:center;">PROPERTY TYPE</p></th>
+                <th><p style="text-align:center;">DESCRIPTION</p></th>
+                <th><p style="text-align:center;">MIN COUNT</p></th>
+                <th><p style="text-align:center;">MAX COUNT</p></th>
+                <th><p style="text-align:center;">LOCAL RANGE<br><i>(type range for property on this class)</i></p></th>
+                <th><p style="text-align:center;">GLOBAL RANGE<br><i>(type range for property globally)</i></p></th>
+              </tr>
+              {% for constraint in each.shacl_constraints  %}
+                <tr>
+                  {# LABEL ROW -- for constraint.headers, display the label #}
+                  {% if constraint.header %}
+                    <td colspan="8">
+                      <small class="label label-info label-xs">{{constraint.header}}</small>
+                    </td>
+
+
+                  {# DATA ROW -- for non-headers, display the data in columns #}
+                  {% else %}
+                    <td>    {# PROPERTY #}
+                      {% with constraint.property_obj.onto_property as prop  %}
+                        <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
+                      {% endwith %}
+                    </td>
+
+                    <td>    {# TYPE (owl:DatatypeProperty or owl:ObjectProperty #}
+                      {{constraint.rdftype_qname|join:"<br>"|default:"--"}}
+                    </td>
+
+                    <td>     {# DESCRIPTION #}
+                      {{constraint.rdfs_comment|join:"<br>"}}
+                      <br>
+                      {{constraint.sh_description|join:"<br>"}}
+                    </td>
+
+                    <td>     {# MIN COUNT #}
+                      {{constraint.sh_minCount|join:", "|default:"0"}}
+                    </td>
+
+                    <td>     {# MAX COUNT #}
+                      {{constraint.sh_maxCount|join:", "|default:"*"}}
+                    </td>
+
+                    <td>     {# LOCAL TYPE (type defined for property on this classe) #}
+                      {% for value in constraint.sh_datatype %}
+                        {% if value.onto_class %}
+                          <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                        {% else %}
+                          <i>{{value.qname}}</i>
+                        {% endif %} 
+                          <br>
+                      {% endfor %}
+                      {% for value in constraint.sh_class %}
+                        {% if value.onto_class %}
+                          <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                        {% else %}
+                          <i>{{value.qname}}</i>
+                        {% endif %} 
+                        <br>
+                      {% endfor %}
+                    </td>
+
+                    <td>    {# GLOBAL RANGE (type range for property globally) #}
+                      {% with constraint.rdfs_range as values %}
+                        {% if values %}
+                          {% for value in values %}
+                            {% if value.onto_class %}
+                              <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                            {% else %}
+                              <i>{{value.qname}}</i>
+                            {% endif %} 
+                            <br>
+                          {% endfor %}                                     
+                        {% else %}
+                          <i>owl:Thing</i>
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                  {% endif %}
+                </tr>
               {% endfor %}
             </table>
           </div>
