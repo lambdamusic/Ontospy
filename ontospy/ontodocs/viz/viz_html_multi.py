@@ -82,6 +82,7 @@ class KompleteViz(VizFactory):
 
 
         if self.ontospy_graph.all_classes:
+
             # CLASSES = ENTITIES TREE
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "classes",
@@ -89,7 +90,9 @@ class KompleteViz(VizFactory):
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-classes.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
+
             # BROWSER PAGES - CLASSES ======
+
             for entity in self.ontospy_graph.all_classes:
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "class",
@@ -164,6 +167,15 @@ class KompleteViz(VizFactory):
             # BROWSER PAGES - SHAPES ======
 
             for entity in self.ontospy_graph.all_shapes:
+
+                # Check entities if they are SHACL NodeShapes and OWL Classes
+                if is_class_defined_as_shacl_node_shape(entity):
+                    # locate the class, and replace the parents/children for the tree-diagram
+                    for c in self.ontospy_graph.all_classes:
+                        if c.uri == entity.uri:
+                            entity.parents = c.parents
+                            entity.children = c.children
+
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "shape",
                                 "theme": self.theme,

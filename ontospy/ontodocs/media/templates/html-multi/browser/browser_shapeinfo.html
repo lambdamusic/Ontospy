@@ -47,13 +47,13 @@
           {% if each.parents %}
             {% for s in each.parents %}
               <li>
-              <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
+              <a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
                 <ul>
                   <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
                   {% if each.children  %}
                     <ul>
                       {% for s in each.children %}
-                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                        <li><a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
                       {% endfor %}
                     </ul>
                   {% endif %}
@@ -68,7 +68,7 @@
                   {% if each.children  %}
                     <ul>
                       {% for s in each.children %}
-                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                        <li><a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
                       {% endfor %}
                     </ul>
                   {% endif %}

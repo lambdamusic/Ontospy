@@ -23,11 +23,11 @@ from distutils.version import StrictVersion
 
 if StrictVersion(django.get_version()) > StrictVersion('1.7'):
     from django.conf import settings
-    from django.template import Context, Template
+    from django.template import Context, Template, Library
 
 else:
     from django.conf import settings
-    from django.template import Context, Template
+    from django.template import Context, Template, Library
 
 import zipfile
 import os, sys
@@ -44,6 +44,12 @@ except:  # Mother of all exceptions
     printDebug("Visualizations configuration file not found.", fg="red")
     raise
 
+register = Library()
+
+@register.filter()
+def slugify(value):
+    """A filter for django templates to call that returns a slugified value."""
+    return utils.slugify(value)
 
 class VizFactory(object):
     """
