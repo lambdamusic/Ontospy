@@ -2,6 +2,9 @@
 
 Summary of changes.
 
+## December, 2021: v 1.9.9.3
+
+- Fix bug: https://github.com/lambdamusic/Ontospy/issues/105
 
 ## November, 2021: v 1.9.9.2
 

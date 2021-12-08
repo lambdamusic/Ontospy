@@ -8,7 +8,7 @@
 #  note: 1.8 major update with ontodocs split
 ##################
 
-__version__ = "1.9.9.2"  # Pypi latest: https://pypi.org/project/ontospy/
+__version__ = "1.9.9.3"  # Pypi latest: https://pypi.org/project/ontospy/
 
 __copyright__ = "CopyRight (C) 2015-2021 by Michele Pasin"
 __license__ = "GNU"
