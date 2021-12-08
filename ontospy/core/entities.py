@@ -344,23 +344,9 @@ class OntoClass(RdfEntity):
 
     @property
     def instances(self):  # = all instances
+        if not self._instances:
+            return []
         return self._instances
-        # if self._instances == False:
-        #     # calculate and set
-        #     self._instances = []
-        #     if self.sparqlHelper:
-        #         qres = self.sparqlHelper.getClassInstances(self.uri)
-        #         for uri in [x[0] for x in qres]:
-        #             instance = RdfEntity(uri, self.uri, self.namespaces)
-        #             instance.triples = self.sparqlHelper.entityTriples(
-        #                 instance.uri)
-        #             instance._buildGraph()  # force construction of mini graph
-        #             self._instances += [instance]
-
-        #     return self._instances
-        # else:
-        #     # it's been calc already, hence return
-        #     return self._instances
 
     def count(self):
         return len(self.instances)
