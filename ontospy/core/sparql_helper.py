@@ -172,6 +172,28 @@ class SparqlHelper(object):
                  """ % (aURI))
         return list(qres)
 
+    def getPropsApplicableByShapes(self):
+        """
+            Find all properties that should not be "top-level" because they 
+            apply to some class via some SHACL PropertyShape.
+        """
+
+        qres = self.rdflib_graph.query("""SELECT ?nProperty
+                WHERE {
+                {
+                    ?nClass a rdfs:Class .
+                } UNION {
+                    ?nClass a owl:Class .
+                }
+
+                ?nNodeShape
+                    sh:property/sh:path ?nProperty ;
+                    sh:targetClass ?nClass ;
+                    .
+                }
+            """)
+        return list(qres)
+
     # ..................
     # SKOS
     # ..................
