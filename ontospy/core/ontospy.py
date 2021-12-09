@@ -812,7 +812,8 @@ class Ontospy(object):
 
 			# add properties from Owl:Thing ie the inference layer
 
-			topLevelProps = [p for p in self.all_properties if p.domains == []]
+			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
+			topLevelProps = [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 
