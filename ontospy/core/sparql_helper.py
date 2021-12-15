@@ -212,6 +212,8 @@ class SparqlHelper(object):
                         union
                         { ?x a sh:PropertyShape }
                     } """)
+        # printDebug(list(qres))
+        # sys.exit(0)
         return list(qres)
 
     # ..................
