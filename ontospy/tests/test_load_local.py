@@ -11,16 +11,18 @@ $ python -m ontospy.tests.test_load_local
 
 from __future__ import print_function
 
-import unittest, os, sys
+import unittest, os
+import time
+
 from .. import *
 from .. core import *
 from .. core.utils import *
 
-from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
+from .context import TEST_RDF_FOLDER
 
 
 # sanity check
-print("-------------------\nOntospy ",  VERSION, "\n-------------------")
+printDebug(f"-------------------\nOntospy {VERSION}\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):
@@ -30,11 +32,17 @@ class TestLoadOntologies(unittest.TestCase):
 		"""
 		Check if the ontologies in /RDF folder load ok
 		"""
-		print("=================\nTEST 1: Loading ontologies from <%s> folder and printing detailed entities descriptions.\n=================" % TEST_RDF_FOLDER)
+
+		printDebug(f"""\n=================\n
+		\nTEST 1: Loading all ontologies in => {TEST_RDF_FOLDER} 
+		\nFor each model detailed entities descriptions are printed out.
+		\n\n=================""", bg="blue", fg="white")
+
+		time.sleep(3)
 
 		for f in os.listdir(TEST_RDF_FOLDER):
 			if not f.startswith('.'):
-				printDebug("\n*****\nTest: loading local file... > %s\n*****" % str(f), "important")
+				printDebug("\n*****\nTest: loading file... > %s\n*****" % str(f), bg="green")
 
 				o = Ontospy(TEST_RDF_FOLDER + f, verbose=True)
 
@@ -42,14 +50,14 @@ class TestLoadOntologies(unittest.TestCase):
 				o.printClassTree()
 				print("----------")
 
-				for c in o.all_classes:
-					c.describe()
+				# for c in o.all_classes:
+				# 	c.describe()
 
-				for p in o.all_properties:
-					p.describe()
+				# for p in o.all_properties:
+				# 	p.describe()
 
-				for s in o.all_skos_concepts:
-					s.describe()
+				# for s in o.all_skos_concepts:
+				# 	s.describe()
 
 
 				print("Success.\n")

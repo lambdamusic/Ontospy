@@ -7,51 +7,43 @@
 clear
 
 echo "=================="
-echo "** [1/6] **"
-echo "CALLING [test_load_local] in 2 seconds..."
+echo "** [1/5] **"
+echo "CALLING [test_load_local] ..."
 echo "=================="
-sleep 2
 python -m ontospy.tests.test_load_local
+sleep 2
 
 echo ""
 echo "=================="
-echo "** [2/6] **"
-echo "CALLING [test_methods] in 2 seconds..."
+echo "** [2/5] **"
+echo "CALLING [test_methods] ..."
 echo "=================="
-sleep 2
 python -m ontospy.tests.test_methods
+sleep 2
 
 echo ""
 echo "=================="
-echo "** [3/6] **"
-echo "CALLING [test_load_remote] in 2 seconds..."
+echo "** [3/5] **"
+echo "CALLING [test_load_remote] ..."
 echo "=================="
-sleep 2
 python -m ontospy.tests.test_load_remote
+sleep 2
 
 echo ""
 echo "=================="
-echo "** [4/6] **"
-echo "CALLING [test_sparql] in 2 seconds..."
+echo "** [4/5] **"
+echo "CALLING [test_sparql] ..."
 echo "=================="
-sleep 2
 python -m ontospy.tests.test_sparql
+sleep 2
 
 echo ""
 echo "=================="
-echo "** [5/6] **"
-echo "CALLING [test_shapes] in 2 seconds..."
+echo "** [5/5] **"
+echo "CALLING [test_shapes]..."
 echo "=================="
-sleep 2
 python -m ontospy.tests.test_shapes
-
-echo ""
-echo "=================="
-echo "** [6/6] **"
-echo "CALLING [test_shaped_properties] in 2 seconds..."
-echo "=================="
 sleep 2
-python -m ontospy.tests.test_shaped_properties
 
 echo ""
 echo "=================="

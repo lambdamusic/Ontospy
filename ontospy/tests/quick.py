@@ -9,13 +9,12 @@ Test Quick: use this file to quickly run scripts/tests which will then be integr
 
 import click 
 
-import unittest, os, sys
 from .. import *
 from ..core import *
 from ..core.utils import *
 
 
-from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
+from .context import TEST_RDF_FOLDER
 
 
 # sanity check

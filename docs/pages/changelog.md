@@ -2,6 +2,18 @@
 
 Summary of changes.
 
+
+## December, 2021: v 1.9.9.4
+
+- Remove deprecated `Ontospy.__computeTopLayer`
+- Refactor `Ontospy.get_class` and related methods so to have less duplicated code
+  - Added `Ontospy.get_shapes`
+- Refactor `Ontospy.nextClass` and related methods so to have less duplicated code
+- Refactor `Ontospy.ontologyClassTree` and related methods so to have less duplicated code
+- Improve `Ontospy.get_shapes` so that it enforces URI uniqueness only among shapes URIs. This sets the ground for [pull-107](https://github.com/lambdamusic/Ontospy/pull/107).  
+- Refactor tests code and clean up tests rdf folder
+  - Add `uco_monolithic.ttl` and `scigraph` for shapes tests
+
 ## December, 2021: v 1.9.9.3
 
 - Fix bug: https://github.com/lambdamusic/Ontospy/issues/105
