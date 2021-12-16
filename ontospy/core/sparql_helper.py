@@ -178,6 +178,12 @@ class SparqlHelper(object):
             apply to some class via some SHACL PropertyShape.
         """
 
+        # This query finds classes by explicit class statement, and
+        # infers the class being a SHACL Shape from the domain of
+        # sh:property.  From SHACL specification section 2.1.3.3,
+        # "Implicit Class Targets", a reflective sh:targetClass is
+        # implied.
+        # https://www.w3.org/TR/shacl/#implicit-targetClass
         qres = self.rdflib_graph.query("""SELECT ?nProperty
                 WHERE {
                         {
@@ -185,10 +191,7 @@ class SparqlHelper(object):
                             UNION
                             { ?nClass a owl:Class . }
                         }
-                        ?nNodeShape
-                            sh:property/sh:path ?nProperty ;
-                            sh:targetClass ?nClass ;
-                            .
+                        ?nClass sh:property/sh:path ?nProperty .
                 }
                 """)
         return list(qres)
