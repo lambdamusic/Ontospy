@@ -174,7 +174,7 @@ class SparqlHelper(object):
 
     def getPropsApplicableByShapes(self):
         """
-            Find all properties that should not be "top-level" because they 
+            Find all properties that should not be "top-level" because they
             apply to some class via some SHACL PropertyShape.
         """
 
