@@ -180,18 +180,17 @@ class SparqlHelper(object):
 
         qres = self.rdflib_graph.query("""SELECT ?nProperty
                 WHERE {
-                {
-                    ?nClass a rdfs:Class .
-                } UNION {
-                    ?nClass a owl:Class .
+                        {
+                            { ?nClass a rdfs:Class . }
+                            UNION
+                            { ?nClass a owl:Class . }
+                        }
+                        ?nNodeShape
+                            sh:property/sh:path ?nProperty ;
+                            sh:targetClass ?nClass ;
+                            .
                 }
-
-                ?nNodeShape
-                    sh:property/sh:path ?nProperty ;
-                    sh:targetClass ?nClass ;
-                    .
-                }
-            """)
+                """)
         return list(qres)
 
     # ..................
