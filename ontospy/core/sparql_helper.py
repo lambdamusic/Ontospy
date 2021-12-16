@@ -174,24 +174,26 @@ class SparqlHelper(object):
 
     def getPropsApplicableByShapes(self):
         """
-            Find all properties that should not be "top-level" because they 
+            Find all properties that should not be "top-level" because they
             apply to some class via some SHACL PropertyShape.
         """
 
+        # This query finds classes by explicit class statement, and
+        # infers the class being a SHACL Shape from the domain of
+        # sh:property.  From SHACL specification section 2.1.3.3,
+        # "Implicit Class Targets", a reflective sh:targetClass is
+        # implied.
+        # https://www.w3.org/TR/shacl/#implicit-targetClass
         qres = self.rdflib_graph.query("""SELECT ?nProperty
                 WHERE {
-                {
-                    ?nClass a rdfs:Class .
-                } UNION {
-                    ?nClass a owl:Class .
+                        {
+                            { ?nClass a rdfs:Class . }
+                            UNION
+                            { ?nClass a owl:Class . }
+                        }
+                        ?nClass sh:property/sh:path ?nProperty .
                 }
-
-                ?nNodeShape
-                    sh:property/sh:path ?nProperty ;
-                    sh:targetClass ?nClass ;
-                    .
-                }
-            """)
+                """)
         return list(qres)
 
     # ..................
