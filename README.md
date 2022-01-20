@@ -27,7 +27,7 @@ Ontospy can be used to generate HTML documentation for an ontology pretty easily
 
 This functionality relies on a module called _ontodocs_, which used to be maintained as a separate library but is now distributed with ontospy as an add-on:
 
--   `pip install ontospy[HTML]`
+-   `pip install ontospy[FULL]`
 
 For more examples of the kind of documentation that can be generated out-of-the-box, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
 

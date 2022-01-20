@@ -12,13 +12,15 @@ Run like this:
 from __future__ import print_function
 
 import unittest, os, sys
+import time
+
 from .. import *
 from ..core import *
 from ..core.utils import *
 
 
 # sanity check
-print("-------------------\nOntospy ",  VERSION, "\n-------------------")
+printDebug(f"-------------------\nOntospy {VERSION}\n-------------------")
 
 
 class TestLoadOntologies(unittest.TestCase):
@@ -29,20 +31,19 @@ class TestLoadOntologies(unittest.TestCase):
 		Check if the ontologies in BOOTSTRAP list load ok
 		"""
 		MAX = 1
-		print("=================\nTEST 2: Loading some sample online ontologies.\n=================")
+		ONTOS = [o for o in BOOTSTRAP_ONTOLOGIES[:MAX]]
 
-		# printDebug("--------------")
-		printDebug("The following ontologies will be loaded from the web:")
-		printDebug("--------------")
-		count = 0
-		for s in BOOTSTRAP_ONTOLOGIES[:MAX]:
-			count += 1
-			printDebug(str(count) + " <%s>" % s)
+		printDebug(f"""\n=================\n
+		\nTEST 2: Loading some sample online ontologies => 
+		\n {ONTOS} 
+		\nFor each model detailed entities descriptions are printed out.
+		\n\n=================""", bg="blue", fg="white")
 
+		time.sleep(3)
 
 		for f in BOOTSTRAP_ONTOLOGIES[:MAX]:
 
-			printDebug("\n*****\nTest: loading remote uri... > %s\n*****" % str(f), "important")
+			printDebug("\n*****\nTest: loading remote uri... > %s\n*****" % str(f), 	bg="green")
 
 			try:
 				o = Ontospy(f, verbose=True)
@@ -55,7 +56,6 @@ class TestLoadOntologies(unittest.TestCase):
 				printDebug("An error occured - are you sure this resource is online?")
 				pass
 
-			# self.assertEqual(type(o), ontospy.Ontology)
 
 			print("Success.\n")
 

@@ -577,14 +577,14 @@ class Ontospy(object):
 		Instatiate the Shape Python objects and relate it to existing classes,
 		if available.
 		"""
-		self.all_shapes = []  # @todo: keep adding?
+		self.all_shapes = [] 
 
 		qres = self.sparqlHelper.getShapes()
 
 		for candidate in qres:
 
-			test_existing_cl = self.get_any_entity(uri=candidate[0])
-			if test_existing_cl:
+			test_existing_cl = self.get_shapes(uri=candidate[0])
+			if not test_existing_cl:
 				# create it
 				self.all_shapes += [OntoShape(candidate[0], None, 
 									self.namespaces, 
@@ -612,7 +612,9 @@ class Ontospy(object):
 				if aclass:
 					aShape.targetClasses += [aclass]
 					aclass.all_shapes += [aShape]
-					for propertyUri in aShape.getValuesForProperty(shacl['path']): #add shaped properties of this class. later can be used for ontodocs
+
+					#add shaped properties of this class. later can be used for ontodocs
+					for propertyUri in aShape.getValuesForProperty(shacl['path']): 
 						propType = self.get_property(str(propertyUri))
 						if propType:
 							aclass.shapedProperties += [{'shape': aShape, 'property': propType}]
@@ -627,7 +629,7 @@ class Ontospy(object):
 		for c in self.all_shapes:
 			if not c.parents():
 				exit += [c]
-		self.toplayer_shapes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
+		self.toplayer_shapes = exit 
 
 		# compute SHACL property constraints once classes and shapes have been built
 		shacl_constraints = build_shacl_constraints(self)
@@ -752,31 +754,6 @@ class Ontospy(object):
 									self.pref_title,
 									self.pref_lang,)]
 
-	def __computeTopLayer(self):
-		"""
-		deprecated: now this is calculated when entities get extracted
-		"""
-
-		exit = []
-		for c in self.all_classes:
-			if not c.parents():
-				exit += [c]
-		self.toplayer_classes = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
-
-		# properties
-		exit = []
-		for c in self.all_properties:
-			if not c.parents():
-				exit += [c]
-		self.toplayer_properties = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
-
-		# skos
-		exit = []
-		for c in self.all_skos_concepts:
-			if not c.parents():
-				exit += [c]
-		self.toplayer_skos = exit  # sorted(exit, key=lambda x: x.id) # doesnt work
-
 	def __computeInferredProperties(self):
 		"""
 
@@ -837,9 +814,47 @@ class Ontospy(object):
 	# methods for retrieving objects
 	# ================
 
+	def _get_defined_entity(self, id=None, uri=None, match=None, candidates_list=None):
+		"""Inner method to help matching uris or strings to entities that have been added 
+		to Ontospy. 
+
+		candidates_list
+			A list of entities, eg self.all_classes, self.all_properties, self.all_skos_concepts
+		"""
+
+		if not id and not uri and not match:
+			return None
+
+		if type(id) == type("string"):
+			uri = id
+			id = None
+			if not is_http(uri):
+				match = uri
+				uri = None
+		if match:
+			if type(match) != type("string"):
+				return []
+			res = []
+			if ":" in match:  # qname
+				for x in candidates_list:
+					if match.lower() in x.qname.lower():
+						res += [x]
+			else:
+				for x in candidates_list:
+					if match.lower() in x.uri.lower():
+						res += [x]
+			return res
+		else:
+			for x in candidates_list:
+				if id and x.id == id:
+					return x
+				if uri and x.uri.lower() == uri.lower():
+					return x
+			return None
+
 	def get_class(self, id=None, uri=None, match=None):
 		"""
-		get the saved-class with given ID or via other methods...
+		Get the saved-class with given ID or via other methods...
 
 		Note: it tries to guess what is being passed..
 
@@ -857,289 +872,144 @@ class Ontospy(object):
 
 		"""
 
-		if not id and not uri and not match:
-			return None
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_classes)
 
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			if ":" in match:  # qname
-				for x in self.all_classes:
-					if match.lower() in x.qname.lower():
-						res += [x]
-			else:
-				for x in self.all_classes:
-					if match.lower() in x.uri.lower():
-						res += [x]
-			return res
-		else:
-			for x in self.all_classes:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
 
 	def get_property(self, id=None, uri=None, match=None):
+		"""Get the saved-property with given ID or via other methods...
 		"""
-		get the saved-class with given ID or via other methods...
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_properties)
 
-		Note: analogous to getClass method
-		"""
-
-		if not id and not uri and not match:
-			return None
-
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			if ":" in match:  # qname
-				for x in self.all_properties:
-					if match.lower() in x.qname.lower():
-						res += [x]
-			else:
-				for x in self.all_properties:
-					if match.lower() in x.uri.lower():
-						res += [x]
-			return res
-		else:
-			for x in self.all_properties:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
 
 	def get_individual(self, id=None, uri=None, match=None):
+		"""Get the saved-individual with given ID or via other methods...
 		"""
-		get the saved-individual with given ID or via other methods...
-
-		Note: analogous to getClass method
-		"""
-
-		if not id and not uri and not match:
-			return None
-
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			if ":" in match:  # qname
-				for x in self.all_individuals:
-					if match.lower() in x.qname.lower():
-						res += [x]
-			else:
-				for x in self.all_individuals:
-					if match.lower() in x.uri.lower():
-						res += [x]
-			return res
-		else:
-			for x in self.all_individuals:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_individuals)
 
 
 	def get_skos(self, id=None, uri=None, match=None):
+		"""Get the saved skos concept with given ID or via other methods...
 		"""
-		get the saved skos concept with given ID or via other methods...
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_skos_concepts)
 
-		Note: it tries to guess what is being passed as above
+	def get_shapes(self, id=None, uri=None, match=None):
+		"""Get the saved shacl shapes with given ID or via other methods...
 		"""
-
-		if not id and not uri and not match:
-			return None
-
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			if ":" in match:  # qname
-				for x in self.all_skos_concepts:
-					if match.lower() in x.qname.lower():
-						res += [x]
-			else:
-				for x in self.all_skos_concepts:
-					if match.lower() in x.uri.lower():
-						res += [x]
-			return res
-		else:
-			for x in self.all_skos_concepts:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
-
-	def get_any_entity(self, id=None, uri=None, match=None):
-		"""
-		get a generic entity with given ID or via other methods...
-		"""
-
-		if not id and not uri and not match:
-			return None
-
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			if ":" in match:  # qname
-				for x in self.all_classes:
-					if match.lower() in x.qname.lower():
-						res += [x]
-				for x in self.all_properties:
-					if match.lower() in x.qname.lower():
-						res += [x]
-			else:
-				for x in self.all_classes:
-					if match.lower() in x.uri.lower():
-						res += [x]
-				for x in self.all_properties:
-					if match.lower() in x.uri.lower():
-						res += [x]
-			return res
-		else:
-			for x in self.all_classes:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			for x in self.all_properties:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_shapes)
 
 	def get_ontology(self, id=None, uri=None, match=None):
+		"""Get the saved-ontology with given ID or via other methods...
 		"""
-		get the saved-ontology with given ID or via other methods...
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=self.all_ontologies)
+
+	def get_any_entity(self, id=None, uri=None, match=None):
+		"""Get any entity-type with given ID or via other methods...
 		"""
 
-		if not id and not uri and not match:
-			return None
+		all_entities = self.all_classes + self.all_properties + self.all_individuals + self.all_skos_concepts + self.all_shapes + self.all_ontologies
 
-		if type(id) == type("string"):
-			uri = id
-			id = None
-			if not is_http(uri):
-				match = uri
-				uri = None
-		if match:
-			if type(match) != type("string"):
-				return []
-			res = []
-			for x in self.all_ontologies:
-				if match.lower() in x.uri.lower():
-					res += [x]
-			return res
-		else:
-			for x in self.all_ontologies:
-				if id and x.id == id:
-					return x
-				if uri and x.uri.lower() == uri.lower():
-					return x
-			return None
+		return self._get_defined_entity(
+			id=id, 
+			uri=uri, 
+			match=match, 
+			candidates_list=all_entities)
+
+
+
+	# ===============
+	# methods for the CLI interface, so that the user can interact with the ontospy object
+	# ================
+
+	def _next_entity(self, uri, candidates_list):
+		"""Returns the next entity in the list it is contained in. If it's the last one, returns the first one."""
+		if uri == candidates_list[-1].uri:
+			return candidates_list[0]
+		flag = False
+		for x in candidates_list:
+			if flag == True:
+				return x
+			if x.uri == uri:
+				flag = True
+		return None
 
 	def nextClass(self, classuri):
-		"""Returns the next class in the list of classes. If it's the last one, returns the first one."""
-		if classuri == self.all_classes[-1].uri:
-			return self.all_classes[0]
-		flag = False
-		for x in self.all_classes:
-			if flag == True:
-				return x
-			if x.uri == classuri:
-				flag = True
-		return None
+		"""Returns the next class in the list of classes."""
+		return self._next_entity(classuri, self.all_classes)
 
 	def nextProperty(self, propuri):
-		"""Returns the next property in the list of properties. If it's the last one, returns the first one."""
-		if propuri == self.all_properties[-1].uri:
-			return self.all_properties[0]
-		flag = False
-		for x in self.all_properties:
-			if flag == True:
-				return x
-			if x.uri == propuri:
-				flag = True
-		return None
+		"""Returns the next property in the list of classes."""
+		return self._next_entity(propuri, self.all_properties)
 
 	def nextConcept(self, concepturi):
-		"""Returns the next skos concept in the list of concepts. If it's the last one, returns the first one."""
-		if concepturi == self.all_skos_concepts[-1].uri:
-			return self.all_skos_concepts[0]
-		flag = False
-		for x in self.all_skos_concepts:
-			if flag == True:
-				return x
-			if x.uri == concepturi:
-				flag = True
-		return None
+		"""Returns the next skos concept in the list of concepts."""
+		return self._next_entity(concepturi, self.all_skos_concepts)
+
+	def nextShapes(self, shapeuri):
+		"""Returns the next shape in the list of shapes."""
+		return self._next_entity(shapeuri, self.all_shapes)
+
+	def nextOntology(self, shapeuri):
+		"""Returns the next ontology in the list of ontologies."""
+		return self._next_entity(shapeuri, self.all_ontologies)
+
+
+	# ===============
+	# methods for building super/sub trees
+	# TODO factor out common patterns into a separate helper method
+	# ================
+
+
+	def _tree_helper(self, entities_list, toplayer):
+		"""Common helper method for building super/sub trees"""
+		treedict = {}
+		if entities_list:
+			treedict[0] = toplayer
+			for element in entities_list:
+				if element.children():
+					treedict[element] = element.children()
+			return treedict
+		return treedict
+
 
 	def ontologyClassTree(self):
 		"""
-		Returns a dict representing the ontology tree
+		Returns a dict representing the ontology class tree
 		Top level = {0:[top classes]}
 		Multi inheritance is represented explicitly
 		"""
-		treedict = {}
-		if self.all_classes:
-			treedict[0] = self.toplayer_classes
-			for element in self.all_classes:
-				if element.children():
-					treedict[element] = element.children()
-			return treedict
-		return treedict
+		return self._tree_helper(self.all_classes, self.toplayer_classes)
 
 	def ontologyPropTree(self):
 		"""
-		Returns a dict representing the ontology tree
+		Returns a dict representing the ontology properties tree
 		Top level = {0:[top properties]}
 		Multi inheritance is represented explicitly
 		"""
-		treedict = {}
-		if self.all_properties:
-			treedict[0] = self.toplayer_properties
-			for element in self.all_properties:
-				if element.children():
-					treedict[element] = element.children()
-			return treedict
-		return treedict
+		return self._tree_helper(self.all_properties, self.toplayer_properties)
 
 	def ontologyConceptTree(self):
 		"""
@@ -1147,29 +1017,15 @@ class Ontospy(object):
 		Top level = {0:[top concepts]}
 		Multi inheritance is represented explicitly
 		"""
-		treedict = {}
-		if self.all_skos_concepts:
-			treedict[0] = self.toplayer_skos
-			for element in self.all_skos_concepts:
-				if element.children():
-					treedict[element] = element.children()
-			return treedict
-		return treedict
+		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos_concepts)
 
 	def ontologyShapeTree(self):
 		"""
 		Returns a dict representing the shapes tree
-		Top level = {0:[top properties]}
+		Top level = {0:[top shapes]}
 		Multi inheritance is represented explicitly
 		"""
-		treedict = {}
-		if self.all_shapes:
-			treedict[0] = self.toplayer_shapes
-			for element in self.all_shapes:
-				if element.children():
-					treedict[element] = element.children()
-			return treedict
-		return treedict
+		return self._tree_helper(self.all_shapes, self.toplayer_shapes)
 
 
 	def ontologyIndividualsTree(self):
@@ -1200,7 +1056,6 @@ class Ontospy(object):
 		if isinstance(s, bytes):
 			s = s.decode('utf-8')
 		return s
-
 
 	def serialize(self, format="turtle"):
 		"for backward compatibility"
@@ -1295,6 +1150,24 @@ class Ontospy(object):
 
 		if not element:  # first time
 			for x in self.toplayer_skos:
+				printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
+
+		else:
+			printGenericTree(element, 0, showids, labels, showtype, TYPE_MARGIN)
+
+	def printShapesTree(self, element=None, showids=False, labels=False, showtype=False):
+		"""
+		Print nicely into stdout the SHACL shapes tree of an ontology
+
+		Note: indentation is made so that ids up to 3 digits fit in, plus a space.
+		[123]1--
+		[1]123--
+		[12]12--
+		"""
+		TYPE_MARGIN = 13  # length for skos:concept
+
+		if not element:  # first time
+			for x in self.toplayer_shapes:
 				printGenericTree(x, 0, showids, labels, showtype, TYPE_MARGIN)
 
 		else:

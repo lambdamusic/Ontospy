@@ -10,7 +10,7 @@ $ python -m ontospy.tests.test_methods
 """
 
 from __future__ import print_function
-import click 
+import time
 
 import unittest, os, sys
 from .. import *
@@ -19,12 +19,12 @@ from ..core.utils import *
 
 
 
-from .context import TEST_RDF_FOLDER, TEST_SHAPES_FOLDER
+from .context import TEST_RDF_FOLDER
 
 
 
 # sanity check
-print("-------------------\nOntospy ",  VERSION, "\n-------------------")
+printDebug(f"-------------------\nOntospy {VERSION}\n-------------------")
 
 
 
@@ -50,6 +50,14 @@ class SampleCustomEntity(ontospy.RdfEntity):
 
 class TestMethods(unittest.TestCase):
 
+
+	printDebug(f"""\n=================\n
+	\nTEST Methods: checking specific ontospy methods 
+	\n\n=================""", bg="blue", fg="white")
+
+	time.sleep(3)
+
+
 	# load sample ontologies
 
 	f = TEST_RDF_FOLDER + "pizza.ttl"
@@ -61,11 +69,13 @@ class TestMethods(unittest.TestCase):
 	o2 = Ontospy(f, verbose=True, pref_title="qname", pref_lang="en")
 
 
+
+
 	def test0(self):
 		"""
 		Class methods
 		"""
-		printDebug("\n=================\nTEST 0: Checking the <class> displays", "green")
+		printDebug("\n=================\nTEST 0: Checking the <class> displays", bg="green")
 
 		for c in self.o.all_classes:
 			print("URI: ", c.uri)
@@ -81,7 +91,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		Instances method
 		"""
-		printDebug("\n=================\nTEST 1: Checking the <instances> method", "green")
+		printDebug("\n=================\nTEST 1: Checking the <instances> method", bg="green")
 
 		for c in self.o.all_classes:
 			# c.describe()
@@ -99,7 +109,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		getValuesForProperty
 		"""
-		printDebug("\n=================\nTEST 2: Checking the <getValuesForProperty> method", "green")
+		printDebug("\n=================\nTEST 2: Checking the <getValuesForProperty> method", bg="green")
 
 		for c in self.o.all_classes[:3]:
 			print("CLASS: ")
@@ -113,7 +123,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		build_entity_from_uri
 		"""
-		printDebug("\n=================\nTEST 3: Checking the <build_entity_from_uri> method", "green")
+		printDebug("\n=================\nTEST 3: Checking the <build_entity_from_uri> method", bg="green")
 
 		e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#Germany")
 		print("URI: ", e)
@@ -129,7 +139,7 @@ class TestMethods(unittest.TestCase):
 		"""
 		build_entity_from_uri - SampleCustomEntity
 		"""
-		printDebug("\n=================\nTEST 4: Checking the <build_entity_from_uri> method using a SampleCustomEntity class ", "green")
+		printDebug("\n=================\nTEST 4: Checking the <build_entity_from_uri> method using a SampleCustomEntity class ", bg="green")
 
 		e = self.o.build_entity_from_uri("http://www.co-ode.org/ontologies/pizza/pizza.owl#FruttiDiMare", SampleCustomEntity)
 		print("URI: ", e)
@@ -147,7 +157,7 @@ class TestMethods(unittest.TestCase):
 		Pref label and pref language parameters
 		"""
 
-		printDebug("\n=================\nTEST 5-1: pref_title=qname / pref_lang=en", "green")
+		printDebug("\n=================\nTEST 5-1: pref_title=qname / pref_lang=en", bg="green")
 		for c in self.o2.all_classes:
 			print("URI: ", c.uri)
 			print("RDFTYPE: ", c.rdftype)
@@ -155,7 +165,7 @@ class TestMethods(unittest.TestCase):
 			print("TITLE: ", c.title)
 			print("===")
 
-		printDebug("\n=================\nTEST 5-2: pref_title=label / pref_lang=it", "green")
+		printDebug("\n=================\nTEST 5-2: pref_title=label / pref_lang=it", bg="green")
 		for c in self.o2.all_classes:
 			print("URI: ", c.uri)
 			print("RDFTYPE: ", c.rdftype)
@@ -163,7 +173,7 @@ class TestMethods(unittest.TestCase):
 			print("TITLE: ", c.title)
 			print("===")
 
-		printDebug("\n=================\nTEST 5-3: pref_title=label / pref_lang=es", "green")
+		printDebug("\n=================\nTEST 5-3: pref_title=label / pref_lang=es", bg="green")
 		for c in self.o2.all_classes:
 			print("URI: ", c.uri)
 			print("RDFTYPE: ", c.rdftype)
