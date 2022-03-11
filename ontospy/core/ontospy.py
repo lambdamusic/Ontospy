@@ -1010,7 +1010,7 @@ class Ontospy(object):
 		Top level = {0:[top concepts]}
 		Multi inheritance is represented explicitly
 		"""
-		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos_concepts)
+		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos)
 
 	def ontologyShapeTree(self):
 		"""
