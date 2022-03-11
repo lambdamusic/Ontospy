@@ -1,0 +1,259 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sg: <http://www.springernature.com/scigraph/ontologies/core/> .
+@prefix sgg: <http://www.springernature.com/scigraph/graphs/> .
+@prefix sgo: <http://www.springernature.com/scigraph/ontologies/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix shapes: <http://www.springernature.com/scigraph/shapes/> .
+
+# shape - Article
+
+shapes:Article
+    a sh:Shape ;
+    sh:targetClass sg:Article ;
+    rdfs:label "RDF shape for the sg:Article model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    # Identity
+    sh:property [
+        sh:path sg:scigraphId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:npgId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:ddsIdJournalBrand ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:doi ;
+        sh:datatype xsd:string ; sh:pattern "^10\\.\\d{4,5}\\/\\S+$" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:doiLink ;
+        sh:stem "http://dx.doi.org/" ;
+        sh:maxCount 1 ;
+    ] ;
+
+    # Label
+    sh:property [
+        sh:path sg:language ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path sg:title ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path sg:abstract ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path sg:titleTranslated ;
+        sh:datatype rdf:langString ;
+    ] ;
+    sh:property [
+        sh:path sg:abstractTranslated ;
+        sh:datatype rdf:langString ;
+    ] ;
+
+
+    # Contributor
+    sh:property [
+        sh:path sg:hasContribution ;
+        sh:stem "http://www.springernature.com/scigraph/things/contributions/" ;
+    ] ;
+
+    # Publisher
+    sh:property [
+        sh:path sg:publicationYear ;
+        sh:datatype xsd:gYear ; sh:pattern "^\\d{4}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:publicationYearMonth ;
+        sh:datatype xsd:gYearMonth ; sh:pattern "^\\d{4}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:publicationDate ;
+        sh:datatype xsd:date ; sh:pattern "^\\d{4}-\\d{2}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:coverYear ;
+        sh:datatype xsd:gYear ; sh:pattern "^\\d{4}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:coverYearMonth ;
+        sh:datatype xsd:gYearMonth ; sh:pattern "^\\d{4}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:coverDate ;
+        sh:datatype xsd:date ; sh:pattern "^\\d{4}-\\d{2}-\\d{2}$" ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:license ;
+        sh:stem "http://creativecommons.org/licenses/" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:webpage ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+    ] ;
+
+    # Description
+    sh:property [
+        sh:path sg:hasArticleType ;
+        sh:stem "http://www.springernature.com/scigraph/things/article-types/" ;
+    ] ;
+    sh:property [
+        sh:path sg:hasFieldOfResearchCode ;
+        sh:stem "http://purl.org/au-research/vocabulary/anzsrc-for/" ;
+    ] ;
+    sh:property [
+        sh:path sg:hasSubject ;
+        sh:stem "http://www.springernature.com/scigraph/things/subjects/" ;
+    ] ;
+
+    # Source
+    sh:property [
+        sh:path sg:hasJournalBrand ;
+        sh:stem "http://www.springernature.com/scigraph/things/journal-brands/" ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:hasJournal ;
+        sh:stem "http://www.springernature.com/scigraph/things/journals/" ;
+        sh:maxCount 2 ;
+    ] ;
+    sh:property [
+        sh:path sg:issnElectronic ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\d{4}-\\d{3}[\\dXx]$" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:issnPrint ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\d{4}-\\d{3}[\\dXx]$" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:volume ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:issue ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:pageStart ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:pageEnd ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:pages ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+    ] ;
+    .
+
+# shape - Contribution
+
+shapes:Contribution
+    a sh:Shape ;
+    sh:targetClass sg:Contribution ;
+    rdfs:label "RDF shape for the sg:Contribution model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    # Identity
+    sh:property [
+        sh:path sg:scigraphId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+
+    sh:property [
+        sh:path sg:publishedFamilyName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:publishedGivenName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:publishedName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:order ;
+        sh:datatype xsd:integer ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:isCorresponding ;
+        sh:datatype xsd:boolean ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:role ;
+        # sh:datatype xsd:string ;
+        sh:in ( "author" "editor" "principal investigator" ) ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:hasPerson ;
+        sh:stem "http://www.springernature.com/scigraph/things/persons/" ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:hasAffiliation ;
+        sh:nodeKind sh:IRI ;
+        sh:stem "http://www.springernature.com/scigraph/things/affiliations/" ;
+    ] ;
+    .
+
+# shape - Affiliation
+
+shapes:Affiliation
+    a sh:Shape ;
+    sh:targetClass sg:Affiliation ;
+    rdfs:label "RDF shape for the sg:Affiliation model" ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    # Identity
+    sh:property [
+        sh:path sg:scigraphId ;
+        sh:datatype xsd:string ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+
+    sh:property [
+        sh:path sg:publishedName ;
+        sh:datatype xsd:string ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:order ;
+        sh:datatype xsd:integer ; sh:minCount 1 ; sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path sg:hasOrganization ;
+        sh:nodeKind sh:IRI ; sh:maxCount 1 ;
+    ] ;
+    .
