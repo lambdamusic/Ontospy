@@ -12,6 +12,8 @@ In this file,
     OntoClass is the ontospy class ontospy.core.entities.OntoClass
 '''
 
+import typing
+
 from collections import defaultdict
 import rdflib
 from rdflib import SH, RDFS
@@ -20,6 +22,7 @@ from rdflib import SH, RDFS
     # RDF  = http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # RDFS = http://www.w3.org/2000/01/rdf-schema#
 
+import ontospy
 
 
 class NodeShape:
@@ -183,10 +186,10 @@ class Constraint:
 
 
 
-def build_shacl_constraints(ontospy):
+def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> typing.Dict[ontospy.core.entities.OntoClass, Constraint]:
     '''
     Arguments:
-        ontospy   An Ontospy object
+        ontology_object   An Ontospy Ontology object
 
     Return:  All SHACL Constraint Dictionary
         all_shacl_constraints is {onto_class:[Constraint]}
@@ -222,17 +225,17 @@ def build_shacl_constraints(ontospy):
     all_shacl_constraints = {}   # {onto_class:[Constraint]}
 
     # Compute {property_uri:OntoProperty}
-    all_properties = {onto_prop.uri:onto_prop for onto_prop in ontospy.all_properties}   # {property_uri:OntoProperty}
+    all_properties = {onto_prop.uri:onto_prop for onto_prop in ontology_object.all_properties}   # {property_uri:OntoProperty}
     Property.set_all_properties(all_properties)
-    Property.set_namespace_manager(ontospy.namespaces)
+    Property.set_namespace_manager(ontology_object.namespaces)
 
     # Compute {class_uri:OntoClass}
-    all_classes = {onto_class.uri:onto_class for onto_class in ontospy.all_classes}      # {class_uri:OntoClass}
+    all_classes = {onto_class.uri:onto_class for onto_class in ontology_object.all_classes}      # {class_uri:OntoClass}
     NodeShape.set_all_classes(all_classes)
-    NodeShape.set_namespace_manager(ontospy.namespaces)
+    NodeShape.set_namespace_manager(ontology_object.namespaces)
 
     # Do for each class in the ontology
-    for onto_class in ontospy.all_classes:
+    for onto_class in ontology_object.all_classes:
 
         # Start with an empty LIST of ordered Constraint objects for this onto_class
         constraints = []   # [Constraint]
@@ -272,8 +275,6 @@ def build_shacl_constraints(ontospy):
 
     # Return all the constraints
     return all_shacl_constraints
-
-
 def add_property_constraints_from_shape_triples(class_uri, property_constraints, shacl_triples):
     '''
     Arguments:
