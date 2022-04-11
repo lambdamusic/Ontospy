@@ -275,6 +275,8 @@ def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> 
 
     # Return all the constraints
     return all_shacl_constraints
+
+
 def add_property_constraints_from_shape_triples(class_uri, property_constraints, shacl_triples):
     '''
     Arguments:
