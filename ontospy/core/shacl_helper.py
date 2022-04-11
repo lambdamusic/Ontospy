@@ -301,7 +301,8 @@ def add_property_constraints_from_shape_triples(class_uri, property_constraints,
         raise Exception('Something is very wrong.  Class URI not in triples.')
 
     # Get property bnodes
-    bnodes = spo_dict[class_uri].get(SH['property'])
+    # FIXME: The 'bnodes' variable makes an incorrect assumption on the graph node in the object position of 'sh:property'.  A SHACL PropertyShape can be identified as a blank node or an IRI.  This class is being incorrectly filtered to only BNodes.
+    bnodes: typing.List[typing.Union[rdflib.URIRef, rdflib.BNode]] = spo_dict[class_uri].get(SH['property'], [])
     if not bnodes:
         return
 
