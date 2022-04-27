@@ -12,20 +12,41 @@ In this file,
     OntoClass is the ontospy class ontospy.core.entities.OntoClass
 '''
 
-import typing
+from typing import Any, DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
 from collections import defaultdict
 import rdflib
-from rdflib import SH, RDFS
+from rdflib import BNode, Graph, Literal, RDFS, SH, URIRef
+from rdflib.term import Node
     # SH   = http://www.w3.org/ns/shacl#
     # OWL  = http://www.w3.org/2002/07/owl#
     # RDF  = http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # RDFS = http://www.w3.org/2000/01/rdf-schema#
 
 import ontospy
+from ontospy.core.entities import OntoClass, OntoProperty, OntoShape, Ontology, RdfEntity
+
+# TODO - This type is defined in what is currently a prerelease state of RDFLib.  Import rdflib.IdentifiedNode once RDFLib's version is >6.1.1.
+IdentifiedNode = Union[BNode, URIRef]
+
+# all_classes is a module-level tracking of all of the SHACL classes known to the caller of build_shacl_constraints.
+# As a reminder, SHACL classes are explicitly noted as classes (e.g. RDF or OWL Class instances), or are inferred to be classes by appearing as a rdf:type Object.
+# https://www.w3.org/TR/shacl/#dfn-shacl-class
+# all_classes is indexed by the IRI of the class.  Note that this constrains OntoSpy to only representing classes that are not BNodes, which might or might not be an issue with anonymous classes defined as part of OWL Restrictions.
+all_classes: Dict[URIRef, OntoClass] = dict()
+
+# all_properties follows the same practice as all_classes.
+all_properties: Dict[URIRef, OntoProperty] = dict()
+
+namespace_manager = rdflib.namespace.NamespaceManager(Graph())
 
 
-class NodeShape:
+def set_namespace_manager(namespaces) -> None:
+    for (prefix, uri) in namespaces:
+        namespace_manager.bind(prefix, uri)
+
+
+class NodeShape(object):
     '''
     Container for a class uri and its corresponding OntoClass object.
     A NodeShape MUST have a uri and may or may not have an OntoClass
@@ -38,23 +59,11 @@ class NodeShape:
         self.qname           The qname (onto_class.qname if onto_class is not None)
     '''
     # Class constant
-    all_classes = {}
-    namespace_manager = None
 
-    def __init__(self, class_uri):
+    def __init__(self, class_uri: rdflib.URIRef) -> None:
         self.class_uri = class_uri
-        self.onto_class = self.all_classes.get(class_uri)  # May be None
-        self.qname = self.namespace_manager.qname(class_uri)
-
-    @classmethod
-    def set_all_classes(cls, all_classes):
-        cls.all_classes = all_classes
-
-    @classmethod
-    def set_namespace_manager(cls, namespaces):
-        cls.namespace_manager = rdflib.Graph().namespace_manager
-        for (prefix, uri) in namespaces:
-            cls.namespace_manager.bind(prefix, uri)
+        self.onto_class = all_classes.get(class_uri)  # May be None
+        self.qname = namespace_manager.qname(class_uri)
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -72,7 +81,7 @@ class NodeShape:
 
 
 
-class Property:
+class Property(object):
     '''
     Container for a property uri and its corresponding OntoProperty object.
     A Property MUST have a uri and may or may not have an OntoProperty
@@ -83,36 +92,15 @@ class Property:
         self.onto_property      The OntoProperty object with uri self.property_uri,
                                 or None if this property is not in the ontology
     '''
-    # Class constant
-    all_properties = {}
-    namespace_manager = None
-    namespace_lookup = {}
 
-    def __init__(self, property_uri):
-        if isinstance(property_uri, rdflib.term.Literal):
-            tokens = property_uri.value.split(':')
-            if len(tokens) == 2:
-                prefix, propname = tokens
-                namespace = self.namespace_lookup.get(prefix)
-                if namespace:
-                    property_uri = rdflib.term.URIRef(namespace + propname)
-        self.property_uri = property_uri   # may be a Literal instead of a URI
-        self.onto_property = self.all_properties.get(property_uri)  # May be None
+    def __init__(self, property_uri: rdflib.URIRef) -> None:
+        self.property_uri = property_uri
+        self.onto_property: Optional[OntoProperty] = all_properties.get(property_uri)
+        self.qname: str
         try:
-            self.qname = self.namespace_manager.qname(property_uri)
+            self.qname = namespace_manager.qname(property_uri)
         except:
             self.qname = str(property_uri)
-
-    @classmethod
-    def set_all_properties(cls, all_properties):
-        cls.all_properties = all_properties
-
-    @classmethod
-    def set_namespace_manager(cls, namespaces):
-        cls.namespace_manager = rdflib.Graph().namespace_manager
-        for (prefix, uri) in namespaces:
-            cls.namespace_manager.bind(prefix, uri)
-            cls.namespace_lookup[prefix] = str(uri)
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -130,7 +118,7 @@ class Property:
 
 
 
-class Constraint:
+class Constraint(object):
     '''
     Container for constraint attributes.
 
@@ -141,7 +129,7 @@ class Constraint:
     A Header Constraint is a Constraint object that contains only a header string
     If the header argument is specified, the property_obj is ignored and a Header Constraint is returned
     '''
-    def __init__(self, property_obj=None, header=None):
+    def __init__(self, property_obj=None, header=None) -> None:
         '''
         Create empty instance of this class.
 
@@ -154,28 +142,28 @@ class Constraint:
 
         self.property_obj = property_obj   # PROPERTY: Property object
         self.sh_path = property_obj.qname  # THIS PROPERTY, a Property object
-        self.sh_minCount = set()
-        self.sh_maxCount = set()
-        self.sh_datatype = set()
-        self.sh_class = set()
-        self.sh_description = set()
-        self.sh_minInclusive = set()
-        self.sh_maxInclusive = set()
-        self.sh_minExclusive = set()
-        self.sh_maxExclusive = set()
-        self.sh_minLength = set()
-        self.sh_maxLength = set()
-        self.sh_pattern = set()
-        self.sh_equals = set()              #  Property objects
-        self.sh_disjoint = set()            #  Property objects
-        self.sh_lessThan = set()            #  Property objects
-        self.sh_lessThanOrEquals = set()    #  Property objects
-        self.sh_not = set()
-        self.sh_hasValue = set()
-        self.sh_in = set()
-        self.rdftype_qname = set()       # "owl:ObjectProperty" and/or "owl:DatatypeProperty"
-        self.rdfs_range = set()
-        self.rdfs_comment = set()
+        self.sh_minCount: Set[str] = set()
+        self.sh_maxCount: Set[str] = set()
+        self.sh_datatype: Set[NodeShape] = set()
+        self.sh_class: Set[NodeShape] = set()
+        self.sh_description: Set[str] = set()
+        self.sh_minInclusive: Set[str] = set()
+        self.sh_maxInclusive: Set[str] = set()
+        self.sh_minExclusive: Set[str] = set()
+        self.sh_maxExclusive: Set[str] = set()
+        self.sh_minLength: Set[str] = set()
+        self.sh_maxLength: Set[str] = set()
+        self.sh_pattern: Set[str] = set()
+        self.sh_disjoint: Set[RdfEntity] = set()            #  Property objects
+        self.sh_equals: Set[OntoProperty] = set()              #  Property objects
+        self.sh_lessThan: Set[OntoProperty] = set()            #  Property objects
+        self.sh_lessThanOrEquals: Set[OntoProperty] = set()    #  Property objects
+        self.sh_not: Set[NodeShape] = set()
+        self.sh_hasValue: Set[Union[str, RdfEntity]] = set()
+        self.sh_in: Set[RdfEntity] = set()
+        self.rdftype_qname: Set[str] = set()       # "owl:ObjectProperty" exclusive-or "owl:DatatypeProperty"
+        self.rdfs_range: Set[NodeShape] = set()
+        self.rdfs_comment: Set[str] = set()
 
 
     def __str__(self):
@@ -186,7 +174,7 @@ class Constraint:
 
 
 
-def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> typing.Dict[ontospy.core.entities.OntoClass, Constraint]:
+def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[Constraint]]:
     '''
     Arguments:
         ontology_object   An Ontospy Ontology object
@@ -221,27 +209,31 @@ def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> 
         If there is no min_count, the displayed value for MIN is '0'.
         If there is no max_count, the displayed value for MAX is '*'
     '''
+
     # Start with empty results
-    all_shacl_constraints = {}   # {onto_class:[Constraint]}
+    all_shacl_constraints: Dict[OntoClass, List[Constraint]] = dict()
 
     # Compute {property_uri:OntoProperty}
-    all_properties = {onto_prop.uri:onto_prop for onto_prop in ontology_object.all_properties}   # {property_uri:OntoProperty}
-    Property.set_all_properties(all_properties)
-    Property.set_namespace_manager(ontology_object.namespaces)
+    for onto_prop in ontology_object.all_properties:
+        all_properties[onto_prop.uri] = onto_prop
 
-    # Compute {class_uri:OntoClass}
-    all_classes = {onto_class.uri:onto_class for onto_class in ontology_object.all_classes}      # {class_uri:OntoClass}
-    NodeShape.set_all_classes(all_classes)
-    NodeShape.set_namespace_manager(ontology_object.namespaces)
+    set_namespace_manager(ontology_object.namespaces)
+
+    # Populate the dictionary mapping class IRIs to OntoClass objects.
+    ontology_class: OntoClass
+    for ontology_class in ontology_object.all_classes:
+        all_classes[ontology_class.uri] = ontology_class
 
     # Do for each class in the ontology
+    onto_class: OntoClass
     for onto_class in ontology_object.all_classes:
 
         # Start with an empty LIST of ordered Constraint objects for this onto_class
-        constraints = []   # [Constraint]
+        constraints: List[Constraint] = []
 
         # Do for each class in the lineage (self, parents, grandparents, etc)
-        lineage_classes = get_lineage(onto_class)
+        lineage_classes: List[OntoClass] = get_lineage(onto_class)
+        lineage_class: OntoClass
         for lineage_class in lineage_classes:
 
             # If class has no shapes, skip
@@ -249,11 +241,14 @@ def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> 
                 continue
 
             # Start with empty dictionary of property constraints for this lineage class
-            property_constraints = {}  # {property_uri:Constraint}
+            # The key of this dictionary is a property IRI (that is, a rdflib.URIRef).
+            property_constraints: Dict[URIRef, Constraint] = dict()
 
             # Do for each shape in this class (multiple shapes may have constraints for the same property_uri)
-            for shape in {item['shape'] for item in lineage_class.shapedProperties}:
 
+            for shaped_property_dict in lineage_class.shapedProperties:
+                assert isinstance(shaped_property_dict["shape"], OntoShape)
+                shape: OntoShape = shaped_property_dict["shape"]
                 # Parse triples to get property constraints for this shape and add to property_constraints
                 add_property_constraints_from_shape_triples(lineage_class.uri, property_constraints, shape.triples)
 
@@ -270,19 +265,23 @@ def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> 
             # Add constraints to LIST of constraints in alphabetical order
             constraints.extend(sorted(property_constraints.values(), key=lambda v:v.property_obj.qname))
 
-        # Add cumulative constraints to all_shacle_constraints
+        # Add cumulative constraints to all_shacl_constraints
         all_shacl_constraints[onto_class] = constraints
 
     # Return all the constraints
     return all_shacl_constraints
 
 
-def add_property_constraints_from_shape_triples(class_uri, property_constraints, shacl_triples):
+def add_property_constraints_from_shape_triples(
+    class_uri: URIRef,
+    property_constraints: Dict[URIRef, Constraint],
+    shacl_triples: Optional[List[Tuple[IdentifiedNode, IdentifiedNode, Node]]]
+) -> None:
     '''
     Arguments:
         class_uri                 URI of current class
         property_constraints      {property_uri:Constraint}
-        shacl_triples             LIST of shacl triples [(s, p, o)]
+        shacl_triples             List of shacl triples [(s, p, o)] pertaining to sh:PropertyShapes attached to the current class.
 
     Action:
         Modify property_constraints by property_uris and their Constraint object derived from the shacl triples
@@ -291,70 +290,92 @@ def add_property_constraints_from_shape_triples(class_uri, property_constraints,
     if not shacl_triples:
         return
 
-    # Build spo_dict = {subj:{pred:{obj}}} from triples
-    spo_dict = defaultdict(lambda: defaultdict(set))
-    for subj, pred, obj in shacl_triples:
-        spo_dict[subj][pred].add(obj)
+    # Build temporary graph to get access to RDFLib iterators.
+    tmp_graph = Graph()
+    for shacl_triple in shacl_triples:
+        tmp_graph.add(shacl_triple)
 
-    # If spo_dict does not contain the class_uri, something is very wrong
-    if not class_uri in spo_dict:
-        raise Exception('Something is very wrong.  Class URI not in triples.')
-
-    # Get property bnodes
-    # FIXME: The 'bnodes' variable makes an incorrect assumption on the graph node in the object position of 'sh:property'.  A SHACL PropertyShape can be identified as a blank node or an IRI.  This class is being incorrectly filtered to only BNodes.
-    bnodes: typing.List[typing.Union[rdflib.URIRef, rdflib.BNode]] = spo_dict[class_uri].get(SH['property'], [])
-    if not bnodes:
-        return
-
-    # If spo_dict is missing does not contain one of the bnodes, something is very wrong
-    for bnode in bnodes:
-        if bnode not in spo_dict:
-            raise Exception('Something is very wrong.  Triples refer to BNode not in triples.')
-
-    # Traverse bnodes and add to property_constraints
-    # Do for each bnode
-    for bnode in bnodes:
-        po_dict = spo_dict[bnode]
-
-        # From sh:path, get property URI
-        property_uris = po_dict.get(SH['path'])
-        if not property_uris:
-            continue    # BNode has no shacl property
-        if len(property_uris) > 1:
-            raise Exception('Something is very wrong.  Multiple property_uris for a property bnode')
-        property_uri = list(property_uris)[0]
-
+    # From sh:path, get property URI when object of sh:path triple is a named concept.
+    # Once found, property_uri will be used to guarantee an entry for property_constraints.
+    for n_property_shape, pred, obj in shacl_triples:
+        if pred != SH["path"]:
+            continue
+        if not isinstance(obj, URIRef):
+            # (sh:path can be an RDF List of predicates to follow in-sequence.  Designing documentation for that is left as future work.)
+            continue
+        property_uri: URIRef = obj
+        
         # Find this property's Constraint object in property_constraints.
         # If it hasn't been defined yet, create one.
         if property_uri not in property_constraints:
             property_constraints[property_uri] = Constraint(property_obj=Property(property_uri))
-        constraint = property_constraints[property_uri]
+        constraint: Constraint = property_constraints[property_uri]
 
-        # Add shape attributes
-        constraint.sh_minCount.update({str(literal.value) for literal in po_dict.get(SH['minCount'], [])})  # Strings
-        constraint.sh_maxCount.update({str(literal.value) for literal in po_dict.get(SH['maxCount'], [])})  # Strings
-        constraint.sh_datatype.update({NodeShape(uri) for uri in po_dict.get(SH['datatype'], [])})   # NodeShape objects
-        constraint.sh_class.update({NodeShape(uri) for uri in po_dict.get(SH['class'], [])})         # NodeShape objects
-        constraint.sh_minInclusive.update({str(literal.value) for literal in po_dict.get(SH['minInclusive'], [])})  # Strings
-        constraint.sh_maxInclusive.update({str(literal.value) for literal in po_dict.get(SH['maxInclusive'], [])})  # Strings
-        constraint.sh_minExclusive.update({str(literal.value) for literal in po_dict.get(SH['minExclusive'], [])})  # Strings
-        constraint.sh_maxExclusive.update({str(literal.value) for literal in po_dict.get(SH['maxExclusive'], [])})  # Strings
-        constraint.sh_minLength.update({str(literal.value) for literal in po_dict.get(SH['minLength'], [])})  # Strings
-        constraint.sh_maxLength.update({str(literal.value) for literal in po_dict.get(SH['maxLength'], [])})  # Strings
-        constraint.sh_pattern.update({str(literal.value) for literal in po_dict.get(SH['pattern'], [])})  # Strings
-        constraint.sh_equals.update({Property(iri) for iri in po_dict.get(SH['equals'], [])})  # Property objects
-        constraint.sh_disjoint.update({Property(iri) for iri in po_dict.get(SH['disjoint'], [])})  # Property objects
-        constraint.sh_lessThan.update({Property(iri) for iri in po_dict.get(SH['lessThan'], [])})  # Property objects
-        constraint.sh_lessThanOrEquals.update({Property(iri) for iri in po_dict.get(SH['lessThanOrEquals'], [])})  # Property objects
-        constraint.sh_not.update({str(uri) for uri in po_dict.get(SH['not'], [])})  # String for Shape uris
-        constraint.sh_hasValue.update({str(value) for value in po_dict.get(SH['hasValue'], [])})  # String for some value
-        constraint.sh_in.update({str(value) for value in po_dict.get(SH['in'], [])})  # String for the head node of a Shacl list
-        constraint.sh_description.update({str(literal.value) for literal in po_dict.get(SH['description'], [])})  # String
+        # Convert values in graph to sets of values to consolidate and/or compare after looping through lineage (outside scope of this subroutine).
+
+        for triple in tmp_graph.triples((n_property_shape, SH["class"], None)):
+            constraint.sh_class.update({NodeShape(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["datatype"], None)):
+            constraint.sh_datatype.update({NodeShape(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["description"], None)):
+            constraint.sh_description.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["disjoint"], None)):
+            constraint.sh_disjoint.update({OntoProperty(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["equals"], None)):
+            constraint.sh_equals.update({OntoProperty(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["hasValue"], None)):
+            if isinstance(triple[2], Literal):
+                constraint.sh_hasValue.update({str(triple[2])})
+            else:
+                constraint.sh_hasValue.update({RdfEntity(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["in"], None)):
+            constraint.sh_in.update({RdfEntity(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["lessThan"], None)):
+            constraint.sh_lessThan.update({OntoProperty(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["lessThanOrEquals"], None)):
+            constraint.sh_lessThanOrEquals.update({OntoProperty(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["minCount"], None)):
+            constraint.sh_minCount.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["maxCount"], None)):
+            constraint.sh_maxCount.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["maxExclusive"], None)):
+            constraint.sh_maxExclusive.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["maxInclusive"], None)):
+            constraint.sh_maxInclusive.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["maxLength"], None)):
+            constraint.sh_maxLength.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["minExclusive"], None)):
+            constraint.sh_minExclusive.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["minInclusive"], None)):
+            constraint.sh_minInclusive.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["minLength"], None)):
+            constraint.sh_minLength.update({str(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["not"], None)):
+            constraint.sh_not.update({NodeShape(triple[2])})
+
+        for triple in tmp_graph.triples((n_property_shape, SH["pattern"], None)):
+            constraint.sh_pattern.update({str(triple[2])})
 
 
 
-
-def add_owl_property_constraints(property_constraints):
+def add_owl_property_constraints(property_constraints: Dict[URIRef, Constraint]) -> None:
     '''
     Arguments:
         property_constraints    {property_uri:Constraint}
@@ -367,32 +388,33 @@ def add_owl_property_constraints(property_constraints):
 
         # Get OntoProperty object.  If no such object, do nothing
         property_obj = Property(property_uri)
-        onto_property = property_obj.onto_property
-        if not property_obj.onto_property:
+        if property_obj.onto_property is None:
             return
+        onto_property = property_obj.onto_property
 
         # From OntoProperty.rdftype_qname, add property_type
         constraint.rdftype_qname.add(onto_property.rdftype_qname)   # "owl:DatatypeProperty" or "owl:ObjectProperty"
 
-        # Build spo_dict = {subj:{pred:{obj}}} from triples
-        spo_dict = defaultdict(lambda: defaultdict(set))
-        for subj, pred, obj in onto_property.triples:
-            spo_dict[subj][pred].add(obj)
-
-        # Get po_dict for this property
-        po_dict = spo_dict.get(property_uri)
-        if not po_dict:
+        if onto_property.triples is None:
             return
 
+        # Build temporary graph to get access to RDFLib iterators.
+        tmp_graph = Graph()
+        for rdfs_triple in onto_property.triples:
+            tmp_graph.add(rdfs_triple)
+
         # From rdfs:comment, add comments from owl constraint to Constraints
-        constraint.rdfs_comment.update({str(literal.value) for literal in po_dict.get(RDFS['comment'], [])})  # String
+        for triple in tmp_graph.triples((property_uri, RDFS["comment"], None)):
+            constraint.rdfs_comment.update({str(triple[2])})
 
         # From rdfs:range, add NodeShape object to Constraints (skip BNodes)
-        constraint.rdfs_range.update({NodeShape(class_uri) for class_uri in po_dict.get(RDFS['range'], []) if isinstance(class_uri, rdflib.term.URIRef)})
+        for triple in tmp_graph.triples((property_uri, RDFS["range"], None)):
+            if not isinstance(triple[2], URIRef):
+                continue
+            constraint.rdfs_range.update({NodeShape(triple[2])})
 
 
-
-def get_lineage(onto_class):
+def get_lineage(onto_class: OntoClass) -> List[OntoClass]:
     '''
     Arguments:
         onto_class    An ontoClass object
@@ -402,8 +424,12 @@ def get_lineage(onto_class):
         The first item in the returned list is always the input, onto_class
         Remaining items are ancestor classes in breadth-first search order
     '''
+    # Start with self
+    onto_classes: List[OntoClass] = [onto_class]
+
+    # Add ancestors
     # Inner class -- recursively add ancestors, one generation at a time (breadth-first)
-    def _add_ancestors(sibling_classes):
+    def _add_ancestors(sibling_classes: List[OntoClass]) -> None:
         '''
         Arguments:
             sibling_classes  LIST of ontoClass objects whose parents to add
@@ -412,9 +438,11 @@ def get_lineage(onto_class):
             onto_classes   Accumulating list of ancestor classes in breadth first order
         '''
         # Get next generation
-        parent_classes = []
+        parent_classes: List[OntoClass] = []
         for sibling_class in sibling_classes:
-            parent_classes.extend(sibling_class.parents())
+            for parent_class in sibling_class.parents():
+                assert isinstance(parent_class, OntoClass)
+                parent_classes.append(parent_class)
 
         # If no parents, done
         if not parent_classes:
@@ -428,14 +456,10 @@ def get_lineage(onto_class):
         _add_ancestors(parent_classes)
 
 
-    # Start with self
-    onto_classes = [onto_class]
-
-    # Add ancestors
-    _add_ancestors([onto_class])
+    _add_ancestors(onto_classes)
 
     # Remove duplicates while maintaining order
-    unique_onto_classes = []
+    unique_onto_classes: List[OntoClass] = []
     for onto_class in onto_classes:
         if onto_class not in unique_onto_classes:
             unique_onto_classes.append(onto_class)
