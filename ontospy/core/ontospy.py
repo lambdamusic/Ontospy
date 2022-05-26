@@ -16,6 +16,7 @@ from .utils import *
 from .rdf_loader import RDFLoader
 from .entities import *
 from .sparql_helper import SparqlHelper
+from .shacl_helper import build_shacl_constraints
 
 
 class Ontospy(object):
@@ -630,6 +631,11 @@ class Ontospy(object):
 				exit += [c]
 		self.toplayer_shapes = exit 
 
+		# compute SHACL property constraints once classes and shapes have been built
+		shacl_constraints = build_shacl_constraints(self)
+		for onto_class in self.all_classes:
+			onto_class.shacl_constraints = shacl_constraints.get(onto_class, [])
+
 
 	def build_individuals(self):
 		"""
@@ -783,7 +789,8 @@ class Ontospy(object):
 
 			# add properties from Owl:Thing ie the inference layer
 
-			topLevelProps = [p for p in self.all_properties if p.domains == []]
+			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
+			topLevelProps = [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 

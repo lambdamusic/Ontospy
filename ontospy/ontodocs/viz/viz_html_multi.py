@@ -15,6 +15,22 @@ from ..viz_factory import VizFactory
 
 
 
+def is_class_defined_as_shacl_node_shape(entity) -> bool:
+    """This function identifies all RDFS or OWL Classes that define themselves as SHACL Node Shapes."""
+    is_NodeShape = False
+    is_Class = False
+
+    # check if the entity is a NodeShape
+    for triple in entity.rdflib_graph.triples((entity.uri, RDF.type, SH.NodeShape)): is_NodeShape = True
+    if is_NodeShape == False:
+        return False
+
+    # check if the entity is a SHACL Class (i.e. an OWL Class or RDFS Class)
+    for triple in entity.rdflib_graph.triples((entity.uri, RDF.type, OWL.Class)): is_Class = True
+    if is_Class == False:
+        for triple in entity.rdflib_graph.triples((entity.uri, RDF.type, RDFS.Class)): is_Class = True
+
+    return (is_NodeShape and is_Class)
 
 
 class KompleteViz(VizFactory):
@@ -62,6 +78,7 @@ class KompleteViz(VizFactory):
 
 
         if self.ontospy_graph.all_classes:
+
             # CLASSES = ENTITIES TREE
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "classes",
@@ -69,7 +86,9 @@ class KompleteViz(VizFactory):
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-classes.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
+
             # BROWSER PAGES - CLASSES ======
+
             for entity in self.ontospy_graph.all_classes:
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "class",
@@ -144,6 +163,15 @@ class KompleteViz(VizFactory):
             # BROWSER PAGES - SHAPES ======
 
             for entity in self.ontospy_graph.all_shapes:
+
+                # Check entities if they are SHACL NodeShapes and OWL Classes
+                if is_class_defined_as_shacl_node_shape(entity):
+                    # locate the class, and replace the parents/children for the tree-diagram
+                    for c in self.ontospy_graph.all_classes:
+                        if c.uri == entity.uri:
+                            entity.parents = c.parents
+                            entity.children = c.children
+
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "shape",
                                 "theme": self.theme,
