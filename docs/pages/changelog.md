@@ -3,6 +3,14 @@
 Summary of changes.
 
 
+## May, 2022: v 2.0.0-alpha
+
+An alpha release of 2.0.0. More refactoring and code improvement is planned before the full 2.0.0 release!
+
+- Merged additional SHACL support branch [pull-107](https://github.com/lambdamusic/Ontospy/pull/107)
+- Fix error loading JSONLD graphs [issue-1416](https://github.com/lambdamusic/Ontospy/issues/102)
+- Replace lov.okfn.org [issue-110](https://github.com/lambdamusic/Ontospy/issues/110)
+
 ## December, 2021: v 1.9.9.4
 
 - Remove deprecated `Ontospy.__computeTopLayer`

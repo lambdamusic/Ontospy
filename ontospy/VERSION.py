@@ -3,14 +3,14 @@
 
 ##################
 #
-#  metadata
+#  Project metadata
 #
 #  note: 1.8 major update with ontodocs split
 ##################
 
-__version__ = "1.9.9.4"  # Pypi latest: https://pypi.org/project/ontospy/
+__version__ = "2.0.0-alpha"  # Pypi latest: https://pypi.org/project/ontospy/
 
-__copyright__ = "CopyRight (C) 2015-2021 by Michele Pasin"
+__copyright__ = "CopyRight (C) 2015-2022 by Michele Pasin"
 __license__ = "GNU"
 __author__ = "Michele Pasin"
 __author_email__ = "michele dot pasin at gmail dot com"
