@@ -356,7 +356,7 @@ def action_import_folder(location):
 
 def action_webimport(hrlinetop=False):
     """ select from the available online directories for import """
-    DIR_OPTIONS = {1: "http://lov.okfn.org", 2: "http://prefix.cc/popular/"}
+    DIR_OPTIONS = {1: "https://lov.linkeddata.es/", 2: "https://prefix.cc/popular/"}
     selection = None
     while True:
         if hrlinetop:
@@ -393,10 +393,11 @@ def action_webimport(hrlinetop=False):
 
 
 def _import_LOV(
-        baseuri="http://lov.okfn.org/dataset/lov/api/v2/vocabulary/list",
+        baseuri="https://lov.linkeddata.es/dataset/lov/api/v2/vocabulary/list",
         keyword=""):
     """
-    2016-03-02: import from json list
+    Import schemas URI from json list at https://lov.linkeddata.es
+    2022-05-26: updated URL https://github.com/lambdamusic/Ontospy/issues/110
     """
 
     printDebug("----------\nReading source... <%s>" % baseuri)
@@ -457,8 +458,9 @@ def _import_PREFIXCC(keyword=""):
     List models from web catalog (prefix.cc) and ask which one to import
     2015-10-10: originally part of main ontospy; now standalone only
     2016-06-19: eliminated dependency on extras.import_web
+    2022-05-26: added https URL
     """
-    SOURCE = "http://prefix.cc/popular/all.file.vann"
+    SOURCE = "https://prefix.cc/popular/all.file.vann"
     options = []
 
     printDebug("----------\nReading source...")
