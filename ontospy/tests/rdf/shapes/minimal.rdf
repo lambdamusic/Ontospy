@@ -1,0 +1,39 @@
+
+# minimal shapes example
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf:         <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:        <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:        <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann:        <http://purl.org/vocab/vann/> .
+@prefix xsd:         <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix schema: <http://schema.org/> .
+
+schema:Person
+  a rdfs:Class, sh:NodeShape ;
+  sh:property
+    [
+      sh:path schema:name ;
+      sh:minCount 1 ;
+      sh:maxCount 1 ;
+    ],
+    [
+      sh:path schema:age ;
+      sh:minCount 1 ;
+      sh:minInclusive 18 ;
+    ] ;
+.
+
+schema:name a rdf:Property ;
+  rdfs:label "Name" ;
+  rdfs:comment "The name of the person." ;
+  rdfs:domain schema:Person ;
+  rdfs:range xsd:string .
+
+
+schema:age a rdf:Property ;
+  rdfs:label "Age" ;
+  rdfs:comment "The age of the person." ;
+  rdfs:domain schema:Person ;
+  rdfs:range xsd:integer .
