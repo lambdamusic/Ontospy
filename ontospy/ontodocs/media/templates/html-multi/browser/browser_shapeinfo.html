@@ -22,7 +22,7 @@
 
 
 {% block bodycontent %}
-{% ifequal main_entity_type "shape"  %}
+{% if main_entity_type == "shape"  %}
   {% with main_entity as each  %}    {# each is a OntoShape object #}
 
     {# path to this shape #}
@@ -274,5 +274,5 @@
 
 
   {% endwith %}
-{% endifequal %}
+{% endif %}
 {% endblock bodycontent %}

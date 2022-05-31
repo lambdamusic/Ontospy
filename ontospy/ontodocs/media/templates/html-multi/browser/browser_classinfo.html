@@ -22,7 +22,7 @@
 
 
 {% block bodycontent %}
-{% ifequal main_entity_type "class"  %}
+{% if main_entity_type == "class"  %}
   {% with main_entity as each  %}    {# each is a OntoClass object #}
 
     {# path to this class #}
@@ -372,5 +372,5 @@
 
 
         {% endwith %}
-{% endifequal %}
+{% endif %}
 {% endblock bodycontent %}

@@ -2,7 +2,7 @@
 {% block main_column %}
 
 
-{% ifequal main_entity_type "individual"  %}
+{% if main_entity_type == "individual"  %}
     
 {% with main_entity as each  %}
 
@@ -33,7 +33,7 @@ owl:Thing
 ```
 
 {% endwith %}
-{% endifequal %}
+{% endif %}
 
 
 

@@ -2,7 +2,7 @@
 {% block main_column %}
 
 
-{% ifequal main_entity_type "concept"  %}
+{% if main_entity_type == "concept"  %}
     
 {% with main_entity as each  %}
 
@@ -60,7 +60,7 @@ skos:Concept
 ```
 
 {% endwith %}
-{% endifequal %}
+{% endif %}
 
 
 

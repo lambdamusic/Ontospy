@@ -23,7 +23,7 @@
 {% block bodycontent %}
 
 
-{% ifequal main_entity_type "property"  %}
+{% if main_entity_type == "property"  %}
 
         {% with main_entity as each  %}
 
@@ -269,7 +269,7 @@
 
 
 
-{% endifequal %}
+{% endif %}
 
 
 

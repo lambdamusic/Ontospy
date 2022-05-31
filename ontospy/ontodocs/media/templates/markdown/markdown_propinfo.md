@@ -2,7 +2,7 @@
 {% block main_column %}
 
 
-{% ifequal main_entity_type "property"  %}
+{% if main_entity_type == "property"  %}
 
 {% with main_entity as each  %}
 
@@ -66,7 +66,7 @@ owl:Thing
 
 
 {% endwith %}
-{% endifequal %}
+{% endif %}
 
 
 
