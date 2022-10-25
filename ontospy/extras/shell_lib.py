@@ -972,7 +972,7 @@ class Shell(cmd.Cmd):
 
         try:
             # from ..viz.builder import action_visualize
-            from ..ontodocs.builder import action_visualize
+            from ..gendocs.builder import action_visualize
         except:
             self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return

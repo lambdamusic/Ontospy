@@ -308,7 +308,7 @@ This is how you would invoke a visualization from a script:
 
 ```python
 import ontospy
-from ontospy.ontodocs.viz.viz_html_single import *
+from ontospy.gendocs.viz.viz_html_single import *
 
 g = ontospy.Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
 

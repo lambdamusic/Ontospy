@@ -8,17 +8,6 @@
 
 import click
 import os
-from shutil import copyfile
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
-# django loading requires different steps based on version
-# https://docs.djangoproject.com/en/dev/releases/1.7/#standalone-scripts
-import django
-# http://stackoverflow.com/questions/1714027/version-number-comparison
-from distutils.version import StrictVersion
 
 from ..core import actions as ontospy_actions
 from ..core import manager as ontospy_manager
@@ -30,51 +19,9 @@ _dirname, _filename = os.path.split(os.path.abspath(__file__))
 ONTODOCS_VIZ_TEMPLATES = _dirname + "/media/templates/"
 ONTODOCS_VIZ_STATIC = _dirname + "/media/static/"
 
-if StrictVersion(django.get_version()) > StrictVersion('1.7'):
-    from django.conf import settings
-    from django.template import Context, Template
-
-    settings.configure()
-    django.setup()
-    settings.TEMPLATES = [
-        {
-            'BACKEND':
-            'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                # insert your TEMPLATE_DIRS here
-                ONTODOCS_VIZ_TEMPLATES + "html-single",
-                ONTODOCS_VIZ_TEMPLATES + "html-multi",
-                ONTODOCS_VIZ_TEMPLATES + "markdown",
-                ONTODOCS_VIZ_TEMPLATES + "d3",
-                ONTODOCS_VIZ_TEMPLATES + "misc",
-            ],
-            'APP_DIRS':
-            True,
-            'OPTIONS': {
-                'context_processors': [
-                    # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-                    # list if you haven't customized them:
-                    'django.contrib.auth.context_processors.auth',
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.i18n',
-                    'django.template.context_processors.media',
-                    'django.template.context_processors.static',
-                    'django.template.context_processors.tz',
-                    'django.contrib.messages.context_processors.messages',
-                ],
-            },
-        },
-    ]
-
-else:
-    from django.conf import settings
-    from django.template import Context, Template
-
-    settings.configure()
 
 try:
     from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES, BOOTSWATCH_THEME_DEFAULT
-
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
     printDebug("Visualizations configuration file not found.", fg="red")

@@ -188,7 +188,7 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
 
 
 ##
-## GENDOCS COMMAND (wrapper around ontodocs)
+## GENDOCS COMMAND
 ##
 
 
@@ -275,7 +275,7 @@ def gendocs(ctx,
     # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
 
-    from .ontodocs.builder import show_themes, random_theme, show_types
+    from .gendocs.builder import show_themes, random_theme, show_types
 
     try:
         # check that we have the required dependencies
