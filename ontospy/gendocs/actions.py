@@ -6,13 +6,8 @@
 #
 #
 
-import click
 import os
-
-from ..core import actions as ontospy_actions
-from ..core import manager as ontospy_manager
 from ..core.utils import *
-
 from .. import *
 
 _dirname, _filename = os.path.split(os.path.abspath(__file__))
@@ -99,14 +94,9 @@ def select_visualization(n):
 # ===========
 
 
-def build_visualization(ontouri, g, viz_index, path=None, title="", theme=""):
+def build_visualization(g, viz_index, path=None, title="", theme=""):
     """
     2017-01-20: new verion, less clever but also simpler
-
-    :param g:
-    :param viz_index:
-    :param main_entity:
-    :return:
     """
 
     this_viz = VISUALIZATIONS_LIST[viz_index]

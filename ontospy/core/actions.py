@@ -638,7 +638,7 @@ def action_visualize(args,
     <fromshell> : the local name is being passed from ontospy shell
     """
 
-    from ..gendocs.builder import ask_visualization, select_visualization, VISUALIZATIONS_LIST, build_visualization
+    from ..gendocs.actions import ask_visualization, select_visualization, VISUALIZATIONS_LIST, build_visualization
 
     if fromshell:
         ontouri = args
@@ -696,6 +696,6 @@ def action_visualize(args,
 
     # url  = build_viz(ontouri, g, viztype, path)
     printDebug("Building visualization...", dim=True)
-    url = build_visualization(ontouri, g, viztype, path, title, theme)
+    url = build_visualization(g, viztype, path, title, theme)
 
     return url

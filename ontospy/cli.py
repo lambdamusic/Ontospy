@@ -257,7 +257,7 @@ def gendocs(ctx,
     # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
 
-    from .gendocs.builder import show_themes, random_theme, show_types
+    from .gendocs.actions import show_themes, random_theme, show_types
 
     if not source and not showthemes and not showtypes and not lib:
         printDebug(ctx.get_help())

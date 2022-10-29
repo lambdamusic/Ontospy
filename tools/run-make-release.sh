@@ -17,7 +17,8 @@ echo "..building"
 echo "=================="
 
 python setup.py sdist
-python setup.py bdist_wheel --universal
+# python setup.py bdist_wheel --universal // drop py2 support
+python setup.py bdist_wheel
 
 echo "=================="
 echo "Distribution built"

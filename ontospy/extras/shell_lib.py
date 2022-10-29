@@ -962,8 +962,8 @@ class Shell(cmd.Cmd):
         line = line.split()
 
         try:
-            # from ..viz.builder import action_visualize
-            from ..gendocs.builder import action_visualize
+            # from ..viz.actions import action_visualize
+            from ..gendocs.actions import action_visualize
         except:
             self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return

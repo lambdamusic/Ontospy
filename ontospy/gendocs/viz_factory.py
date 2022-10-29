@@ -5,7 +5,7 @@
 
 from .. import * # import main ontospy VERSION 
 from ..core.utils import *  
-from .builder import ONTODOCS_VIZ_TEMPLATES, ONTODOCS_VIZ_STATIC
+from .actions import ONTODOCS_VIZ_TEMPLATES, ONTODOCS_VIZ_STATIC
 from .utils import *
 from .jinja_env import *
 

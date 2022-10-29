@@ -19,7 +19,7 @@ from ...core import actions
 from ...core.manager import get_home_location
 
 from ..viz_html_multi import KompleteViz, KompleteVizMultiModel
-from ..builder import random_theme
+from ..actions import random_theme
 import webbrowser
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
