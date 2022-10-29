@@ -1,10 +1,10 @@
-{% extends "markdown_base.md" %}
+{% extends "markdown/markdown_base.md" %}
 {% block main_column %}
 
 
-{% ifequal main_entity_type "individual"  %}
+{% if main_entity_type == "individual"  %}
     
-{% with main_entity as each  %}
+{% set each =  main_entity  %}
 
 # Individual {{each.title}}
 
@@ -13,7 +13,7 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|linebreaks|default:"--"}}
+{{each.bestDescription()|linebreaks|default("--")}}
 
 
 {% if each.instance_of %}
@@ -29,11 +29,10 @@ owl:Thing
 
 #### Implementation
 ```rdf
-{{each.rdf_source|safe}}
+{{each.rdf_source()|safe}}
 ```
 
-{% endwith %}
-{% endifequal %}
+{% endif %}
 
 
 

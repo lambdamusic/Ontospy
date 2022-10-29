@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-{% with thispage="entities-az" %}
-{% include "navbar.html" %}
-{% endwith %}
+{% set thispage="entities-az" %}
+{% include "html-multi/navbar.html" %}
+
 
 {% endblock navbar %}
 
@@ -14,9 +14,9 @@
 
 {% block sidebar %}
 
-{% with thispage="entities-az" %}
-{% include "sidebar.html" %}
-{% endwith %}
+{% set thispage="entities-az" %}
+{% include "html-multi/sidebar.html" %}
+
 
 {% endblock sidebar %}
 
@@ -25,9 +25,9 @@
 {% block bodycontent %}
 
 
-{% with thispage="entities-az" %}
-{% include "breadcrumbs.html" %}
-{% endwith %}
+{% set thispage="entities-az" %}
+{% include "html-multi/breadcrumbs.html" %}
+
 
 
 
@@ -59,7 +59,7 @@
               {% for each in ontospy_graph.all_classes %}
               <dt><a href="{{each.slug}}.html">{{each.title}}</a></dt>
               <dd>
-                {# {{ each.bestDescription|default:"[no definition]" }}#}
+                {# {{ each.bestDescription()|default:"[no definition]" }}#}
               </dd>
 
               {% endfor %}
@@ -86,7 +86,7 @@
               {% for each in ontospy_graph.all_skos_concepts %}
               <dt><a href="{{each.slug}}.html">{{each.title}}</a></dt>
               <dd>
-                {# {{ each.bestDescription|default:"[no definition]" }}#}
+                {# {{ each.bestDescription()|default:"[no definition]" }}#}
               </dd>
 
               {% endfor %}
@@ -113,7 +113,7 @@
               {% for each in ontospy_graph.all_individuals %}
               <dt><a href="{{each.slug}}.html">{{each.title}}</a></dt>
               <dd>
-                {# {{ each.bestDescription|default:"[no definition]" }}#}
+                {# {{ each.bestDescription()|default:"[no definition]" }}#}
               </dd>
 
               {% endfor %}
@@ -148,7 +148,7 @@
               {% for each in ontospy_graph.all_properties %}
               <dt><a href="{{each.slug}}.html">{{each.title}}</a></dt>
               <dd>
-                {# {{ each.bestDescription|default:"[no definition]" }}#}
+                {# {{ each.bestDescription()|default:"[no definition]" }}#}
               </dd>
 
               {% endfor %}
@@ -177,7 +177,7 @@
               {% for each in ontospy_graph.all_shapes %}
               <dt><a href="{{each.slug}}.html">{{each.title}}</a></dt>
               <dd>
-                {# {{ each.bestDescription|default:"[no definition]" }}#}
+                {# {{ each.bestDescription()|default:"[no definition]" }}#}
               </dd>
 
               {% endfor %}

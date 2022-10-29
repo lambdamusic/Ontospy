@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-    {% include "navbar.html" %}
+    {% include "html-multi/navbar.html" %}
 
 {% endblock navbar %}
 
@@ -12,9 +12,9 @@
 
 {% block sidebar %}
 
-    {% with thispage=main_entity.qname %}
-        {% include "sidebar.html" %}
-    {% endwith %}
+    {% set thispage=main_entity.qname %}
+        {% include "html-multi/sidebar.html" %}
+    
 
 {% endblock sidebar %}
 
@@ -24,15 +24,15 @@
 
 
 
-{% ifequal main_entity_type "concept"  %}
+{% if main_entity_type == "concept"  %}
 
-        {% with main_entity as each  %}
+        {% set each = main_entity  %}
 
 
 
-        {% with thispage="conceptinfo" %}
-            {% include "breadcrumbs.html" %}
-        {% endwith %}
+        {% set thispage="conceptinfo" %}
+            {% include "html-multi/breadcrumbs.html" %}
+        
 
 
 
@@ -41,7 +41,7 @@
          <h1>
 {#                Concept: #}
              {{each.title}}
-             {% if not each.children  %}
+             {% if not each.children()  %}
                  <small class="label label-info label-xs ">leaf node</small>
                {% endif %}
 
@@ -55,20 +55,20 @@
             <div class="tree-container">
             <div class="tree">
                 <ul>
-                    {% if each.parents %}
+                    {% if each.parents() %}
 
-                        {% for s in each.parents %}
+                        {% for s in each.parents() %}
 
                         <li>
 
-                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a>
 
                           <ul>
 
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
-                            {% if each.children  %}
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
+                            {% if each.children()  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
+                                  {% for s in each.children() %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -83,11 +83,11 @@
                         <li><a href="entities-tree-properties.html">skos:Concept</a>
 
                           <ul>
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
 
-                            {% if each.children  %}
+                            {% if each.children()  %}
                                 <ul>
-                                  {% for s in each.children %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>{% endfor %}
+                                  {% for s in each.children() %}<li><a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>{% endfor %}
                                 </ul>
                             {% endif %}
                               </li>
@@ -118,7 +118,7 @@
 
 
 
-            {% if  each.bestLabel %}
+            {% if  each.bestLabel() %}
              <div class="row"><div class="col-md-12">
                <div class="panel panel-default">
              <div class="panel-heading">
@@ -126,7 +126,7 @@
              </div>
              <div class="panel-body">
 
-                 {{each.bestLabel}}
+                 {{each.bestLabel()}}
              </div>
            </div>
             </div></div>
@@ -135,7 +135,7 @@
 
 
 
-            {% if each.bestDescription %}
+            {% if each.bestDescription() %}
              <div class="row"><div class="col-md-12">
                <div class="panel panel-default">
              <div class="panel-heading">
@@ -143,7 +143,7 @@
              </div>
              <div class="panel-body">
 
-                 {{each.bestDescription|linebreaks|default:"--"}}
+                 {{each.bestDescription()|linebreaks|default("--")}}
              </div>
            </div>
             </div></div>
@@ -160,8 +160,8 @@
             </div>
             <div class="panel-body">
 
-            {% if each.ancestors %}
-                    {% for s in each.ancestors %}<li><a href="{{s.slug}}.html">{{s.title}}</a></li>{% endfor %}
+            {% if each.ancestors() %}
+                    {% for s in each.ancestors() %}<li><a href="{{s.slug}}.html">{{s.title}}</a></li>{% endfor %}
             {% else %}
                 <li>owl:Thing</li>
             {% endif %}
@@ -186,7 +186,7 @@
 
                {% else %}
                     <div class="implementation">
-                       <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
+                       <code style="background-color: white;">{{each.rdf_source()|linebreaks}}</code>
                    </div>
                {% endif %}
            </div>
@@ -198,11 +198,11 @@
 
 
 
-        {% endwith %}
+        
 
 
 
-{% endifequal %}
+{% endif %}
 
 
 

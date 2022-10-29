@@ -5,7 +5,7 @@ import os, sys
 import json
 
 from ..utils import *
-from ..builder import *  # loads and sets up Django
+from ..builder import *  
 from ..viz_factory import VizFactory
 
 # TEMPLATE: D3 PACK HIERARCHY

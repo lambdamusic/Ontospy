@@ -10,7 +10,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="{{STATIC_URL}}libs/img/favicon.ico">
+    <link rel="icon" href="{{STATIC_URL}}custom/favicon.ico">
 
 	{% block pagetitle %}
 		<title>Ontospy > {{docs_title}}</title>
@@ -183,7 +183,7 @@
 
 {% block navbar %}
 
-    {% include "navbar.html" %}
+    {% include "html-multi/navbar.html" %}
 
 
 {% endblock navbar %}
@@ -199,7 +199,7 @@
 
     {% block sidebar %}
 
-      {% include "sidebar.html" %}
+      {% include "html-multi/sidebar.html" %}
 
     {% endblock sidebar %}
 
@@ -233,7 +233,7 @@
   <footer class="footer">
     <div class="container">
     {% block footer %}
-      <p class="text-muted">Documentation automatically generated on {% now "jS F Y" %} with <a href="http://lambdamusic.github.io/Ontospy/">Ontospy</a> ({{gendocs_version}})</p>
+      <p class="text-muted">Documentation automatically generated on {% now 'utc', '%a, %d %b %Y %H:%M:%S' %} with <a href="http://lambdamusic.github.io/Ontospy/">Ontospy</a> ({{gendocs_version}})</p>
 
     {% endblock footer %}
     </div>

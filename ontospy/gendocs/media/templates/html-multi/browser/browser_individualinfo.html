@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-    {% include "navbar.html" %}
+    {% include "html-multi/navbar.html" %}
 
 {% endblock navbar %}
 
@@ -12,9 +12,9 @@
 
 {% block sidebar %}
 
-    {% with thispage=main_entity.qname %}
-        {% include "sidebar.html" %}
-    {% endwith %}
+    {% set thispage=main_entity.qname %}
+        {% include "html-multi/sidebar.html" %}
+    
 
 {% endblock sidebar %}
 
@@ -25,16 +25,16 @@
 
 
 
-{% ifequal main_entity_type "individual"  %}
+{% if main_entity_type == "individual"  %}
 
-        {% with main_entity as each  %}
-
-
+        {% set each = main_entity  %}
 
 
-        {% with thispage="individualinfo" %}
-            {% include "breadcrumbs.html" %}
-        {% endwith %}
+
+
+        {% set thispage="individualinfo" %}
+            {% include "html-multi/breadcrumbs.html" %}
+        
 
 
 
@@ -57,11 +57,11 @@
 
                         <li>
 
-                          <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
+                          <a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a>
 
                           <ul>
 
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
 
                           </ul>
 
@@ -73,7 +73,7 @@
                         <li><a href="entities-tree-classes.html">owl:Thing</a>
 
                           <ul>
-                            <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
+                            <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
 
                             </li>
 
@@ -101,7 +101,7 @@
           </div>
            </div></div>
 
-           {% if  each.bestLabel %}
+           {% if  each.bestLabel() %}
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
             <div class="panel-heading">
@@ -109,7 +109,7 @@
             </div>
             <div class="panel-body">
 
-                {{each.bestLabel}}
+                {{each.bestLabel()}}
             </div>
           </div>
            </div></div>
@@ -117,7 +117,7 @@
 
 
 
-           {% if  each.bestDescription %}
+           {% if  each.bestDescription() %}
             <div class="row"><div class="col-md-12">
               <div class="panel panel-default">
             <div class="panel-heading">
@@ -125,7 +125,7 @@
             </div>
             <div class="panel-body">
 
-                {{each.bestDescription|linebreaks|default:"--"}}
+                {{each.bestDescription()|linebreaks|default("--")}}
             </div>
           </div>
            </div></div>
@@ -169,7 +169,7 @@
 
                 {% else %}
                      <div class="implementation">
-                        <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
+                        <code style="background-color: white;">{{each.rdf_source()|linebreaks}}</code>
                     </div>
                 {% endif %}
             </div>
@@ -180,11 +180,11 @@
 
 
 
-        {% endwith %}
+        
 
 
 
-{% endifequal %}
+{% endif %}
 
 
 

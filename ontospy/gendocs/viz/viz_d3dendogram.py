@@ -10,7 +10,7 @@ import os, sys
 import json
 
 from ..utils import *
-from ..builder import *  # loads and sets up Django
+from ..builder import * 
 from ..viz_factory import VizFactory
 
 
@@ -89,6 +89,9 @@ class Dataviz(VizFactory):
             "TOTAL_CLASSES": c_total,
             "TOTAL_PROPERTIES": p_total,
             "TOTAL_CONCEPTS": s_total,
+            "TOTAL_CLASSES_TOPLAYER": len(self.ontospy_graph.toplayer_classes),
+            "TOTAL_PROPERTIES_TOPLAYER": len(self.ontospy_graph.toplayer_properties),
+            "TOTAL_CONCEPTS_TOPLAYER": len(self.ontospy_graph.toplayer_skos),
             'JSON_DATA_CLASSES': JSON_DATA_CLASSES,
             'JSON_DATA_PROPERTIES': JSON_DATA_PROPERTIES,
             'JSON_DATA_CONCEPTS': JSON_DATA_CONCEPTS,

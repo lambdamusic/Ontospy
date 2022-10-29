@@ -1,4 +1,4 @@
-{% extends "d3base.html" %}
+{% extends "d3/d3base.html" %}
 
 
 
@@ -213,7 +213,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 
 
-	{% include 'js_slidereveal.html' %}
+	{% include 'shared/js_slidereveal.html' %}
 
 
 
@@ -232,7 +232,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 	var json1 = {{JSON_DATA_CLASSES|safe}};
 
-	{% if classes_TOPLAYER > 40 %}
+	{% if TOTAL_CLASSES_TOPLAYER > 40 %}
 	var variable_height1 = 1200;
 	{% else %}
 	var variable_height1 = 800;
@@ -288,7 +288,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	var json2 = {{JSON_DATA_PROPERTIES|safe}};
 
 
-	{% if properties_TOPLAYER > 40 %}
+	{% if TOTAL_PROPERTIES_TOPLAYER > 40 %}
 	var variable_height2 = 1200;
 	{% else %}
 	var variable_height2 = 800;
@@ -336,7 +336,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	var json3 = {{JSON_DATA_CONCEPTS|safe}};
 
 
-	{% if skosConcepts_TOPLAYER > 40 %}
+	{% if TOTAL_CONCEPTS_TOPLAYER > 40 %}
 	var variable_height3 = 1200;
 	{% else %}
 	var variable_height3 = 800;

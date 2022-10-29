@@ -1,22 +1,22 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-    {% with thispage="statistics" %}
+    {% set thispage="statistics" %}
 
-    {% include "navbar.html" %}
+    {% include "html-multi/navbar.html" %}
 
-    {% endwith %}
+    
 
 {% endblock navbar %}
 
 
 {% block sidebar %}
 
-    {% with thispage="statistics" %}
-        {% include "sidebar.html" %}
-    {% endwith %}
+    {% set thispage="statistics" %}
+        {% include "html-multi/sidebar.html" %}
+    
 
 {% endblock sidebar %}
 
@@ -25,9 +25,9 @@
 
 
 
-    {% with thispage="statistics" %}
-        {% include "breadcrumbs.html" %}
-    {% endwith %}
+    {% set thispage="statistics" %}
+        {% include "html-multi/breadcrumbs.html" %}
+    
 
 
 
@@ -98,7 +98,7 @@
                    <div class="col-sm-3 col-md-3 ">
                        <p id="chartsLegend">
                            <span class="text-muted" style="text-transform: uppercase;">Triples</span>
-                           <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount}}</span>
+                           <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount()}}</span>
                        </p>
                    </div>
 
@@ -236,7 +236,7 @@
     labels: [
              {% for each in stats %}
                 {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources"  %}"{{each.0}}"
-                    {% if not forloop.last %} , {% endif %}
+                    {% if not loop.last %} , {% endif %}
                 {% endif %}
             {% endfor %}
     ],
@@ -268,7 +268,7 @@
             data: [
              {% for each in stats %}
                 {% if each.0 != "Triples" and each.0 != "Ontologies" and each.0 != "Data Sources" %}{{each.1}}
-                    {% if not forloop.last %} , {% endif %}
+                    {% if not loop.last %} , {% endif %}
                 {% endif %}
             {% endfor %}
                  ],
@@ -298,7 +298,7 @@
     var data2 = {
             datasets: [{
                 data: [
-                    {% for class in topclasses%}{{ class.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
+                    {% for class in topclasses %}{{ class.descendants()|length|add("1")}}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 ],
                 backgroundColor: [
@@ -338,7 +338,7 @@
                 label: 'Top Layer' // for legend
             }],
             labels: [
-                {% for class in topclasses %}"{{class.title|safe}}"{% if not forloop.last %}, {% endif %}
+                {% for class in topclasses %}"{{class.title|safe}}"{% if not loop.last %}, {% endif %}
                 {% endfor %}
             ]
         };
@@ -366,7 +366,7 @@
     var data2skos = {
             datasets: [{
                 data: [
-                    {% for concept in ontospy_graph.toplayer_skos %}{{ concept.descendants|length|add:"1"}}{% if not forloop.last %}, {% endif %}
+                    {% for concept in ontospy_graph.toplayer_skos %}{{ concept.descendants()|length|add("1")}}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 ],
                 backgroundColor: [
@@ -379,7 +379,7 @@
                 label: 'Top Layer' // for legend
             }],
             labels: [
-                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.title|safe}}"{% if not forloop.last %}, {% endif %}
+                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.title|safe}}"{% if not loop.last %}, {% endif %}
                 {% endfor %}
             ]
         };
@@ -425,7 +425,7 @@
                         'rgba(255, 159, 64, 1)'
                     ],
                     borderWidth: 1,
-                    data: [{{ontospy_graph.triplesCount}}],
+                    data: [{{ontospy_graph.triplesCount()}}],
                 }
             ]
         };

@@ -277,16 +277,6 @@ def gendocs(ctx,
 
     from .gendocs.builder import show_themes, random_theme, show_types
 
-    try:
-        # check that we have the required dependencies
-        import django
-    except:
-        printDebug(
-            "WARNING: this functionality requires the Django package and other extra dependecies.",
-            fg="red")
-        printDebug("Install with `pip install ontospy[HTML] -U`")
-        sys.exit(0)
-
     if not source and not showthemes and not showtypes and not lib:
         printDebug(ctx.get_help())
         return

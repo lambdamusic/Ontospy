@@ -1,22 +1,22 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-    {% with thispage="home" %}
+    {% set thispage="home" %}
 
-    {% include "navbar.html" %}
+    {% include "html-multi/navbar.html" %}
 
-    {% endwith %}
+    
 
 {% endblock navbar %}
 
 
 {% block sidebar %}
 
-    {% with thispage="home" %}
-        {% include "sidebar.html" %}
-    {% endwith %}
+    {% set thispage="home" %}
+        {% include "html-multi/sidebar.html" %}
+    
 
 {% endblock sidebar %}
 
@@ -24,9 +24,9 @@
 {% block bodycontent %}
 
 
-    {% with thispage="home" %}
-        {% include "breadcrumbs.html" %}
-    {% endwith %}
+    {% set thispage="home" %}
+        {% include "html-multi/breadcrumbs.html" %}
+    
 
 
 
@@ -71,16 +71,21 @@
                 <dt>URI</dt>
                 <dd><code>{{ ontology.uri }}</code></dd>
               </dl>
-                {% if ontology.annotations %}
+                {% if ontology.annotations() %}
                     <dl>
-                        {% for each in ontology.annotations %}
-                            {% ifchanged each.1 %}<dt>{{each.1}}</dt>{% endifchanged %}
-                            <dd>{{each.2}}</dd>
-                        {% endfor %}
+                      {% for each in ontology.annotations() %}
+                          {% if each.1 != variable_watcher  %}
+                                <dt>{{each.1}}</dt>
+                              {% set variable_watcher = each.1 %}
+                          {% else %}{% endif %}
+                    <dd>{{each.2|linebreaks}}</dd>
+                    {% endfor %}
                     </dl>
                 {% else %}
                     <i>No metadata available</i>
                 {% endif %}
+
+
             </div>
           </div>
            </div></div>
@@ -134,7 +139,7 @@
                  <dl class="-dl-horizontal" style="--margin-left: -100px;">
 
                  {% for x, y in namespaces  %}
-                     <dt><span class="label label-info">{{x|default:":"}}</span></dt>
+                     <dt><span class="label label-info">{{x|default(":")}}</span></dt>
                      <dd><a href="{{y}}" target="_blank">{{y}}</a></dd>
 
                  {% endfor %}

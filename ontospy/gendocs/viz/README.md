@@ -7,3 +7,4 @@
 ### Testing locally
 
 -   `python -m ontospy.gendocs.viz.viz_d3barHierarchy` picks a random ontology and runs the script
+-   `python -m ontospy.gendocs.viz.viz_html_single` 

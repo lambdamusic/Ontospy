@@ -1,22 +1,22 @@
-{% extends "markdown_base.md" %}
+{% extends "markdown/markdown_base.md" %}
 {% block main_column %}
 
 
-{% ifequal main_entity_type "class"  %}
+{% if main_entity_type == "class"  %}
     
-{% with main_entity as each  %}
+{% set each = main_entity   %}
 
 ## Class {{each.title}}
 
 
 #### Tree
-{% if each.parents %}
-{% for s in each.parents %}
+{% if each.parents() %}
+{% for s in each.parents() %}
 * [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
     * {{each.title}}
-{% if each.children  %}
-{% for s in each.children %}
+{% if each.children()  %}
+{% for s in each.children() %}
         * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
@@ -24,15 +24,15 @@
 {% else %}
 * owl:Thing
     * {{each.title}}
-{% if each.children  %}
-{% for s in each.children %}
+{% if each.children()  %}
+{% for s in each.children() %}
         * [{{s.title}}]({{s.slug}}.md) 
 {% endfor %}        
 {% endif %}
 
 {% endif %}
 
-{% if not each.children  %}
+{% if not each.children()  %}
 *NOTE* this is a leaf node.
 {% endif %}
 
@@ -40,12 +40,12 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription|linebreaks|default:"--"}}
+{{each.bestDescription()|linebreaks|default("--")}}
 
 
-{% if each.ancestors %}
-#### Inherits from ({{ each.ancestors|length }})
-{% for s in each.ancestors %}
+{% if each.ancestors() %}
+#### Inherits from ({{ each.ancestors()|length }})
+{% for s in each.ancestors() %}
 - [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}
@@ -64,7 +64,7 @@ owl:Thing
 
 #### Implementation
 ```rdf
-{{each.rdf_source|safe}}
+{{each.rdf_source()|safe}}
 ```
 
 
@@ -80,7 +80,7 @@ owl:Thing
 
     {% for group in each.domain_of_inferred  %}      
 
-        {% for k,v in group.items  %}
+        {% for k,v in group.items()  %}
             
         
         <tr style="background: lightcyan;text-align: left;">
@@ -122,8 +122,7 @@ owl:Thing
 
 
 
-{% endwith %}
-{% endifequal %}
+{% endif %}
 
 
 

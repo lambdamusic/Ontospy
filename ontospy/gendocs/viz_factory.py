@@ -7,8 +7,7 @@ from .. import * # import main ontospy VERSION
 from ..core.utils import *  
 from .builder import ONTODOCS_VIZ_TEMPLATES, ONTODOCS_VIZ_STATIC
 from .utils import *
-
-from jinja2 import Environment, PackageLoader, select_autoescape
+from .jinja_env import *
 
 import zipfile
 import os, sys
@@ -24,19 +23,6 @@ try:
 except:  # Mother of all exceptions
     printDebug("Visualizations configuration file not found.", fg="red")
     raise
-
-# set up jinja2
-env = Environment(
-    loader=PackageLoader('gendocs.media', 'templates'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
-
-
-def slugify(value):
-    """A filter for django templates to call that returns a slugified value."""
-    return utils.slugify(value)
-
-env.filters['slugify'] = slugify
 
 
 class VizFactory(object):
@@ -111,9 +97,9 @@ class VizFactory(object):
         :param extraContext: a dict that can be loaded on demand
         :return: the rendered template as a string
         """
-        atemplate = open(self.templates_root + template_name, "r")
-        t = Template(atemplate.read())
-        context = Context(self.basic_context_data)
+        # t = env.get_template(self.templates_root + template_name)  # FAILS
+        t = env.get_template(template_name)
+        context = self.basic_context_data
         if extraContext and type(extraContext) == dict:
             context.update(extraContext)
         contents = safe_str(t.render(context))
@@ -160,7 +146,7 @@ class VizFactory(object):
 
     def _build_basic_context(self):
         """
-        Return a standard dict used in django as a template context
+        Return a standard dict used as a template context
         """
         # printDebug(str(self.ontospy_graph.toplayer_classes))
         topclasses = self.ontospy_graph.toplayer_classes[:]

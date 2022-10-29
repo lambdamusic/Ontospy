@@ -1,14 +1,10 @@
 
+{% extends "d3/d3base.html" %}
 
 
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
 
-<title>{{ontology.uri}}</title>
 
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-
+{% block custom_css %}
 
 
 
@@ -39,34 +35,50 @@
 
     #container {
         /*max-width: 400px;*/
-        height: 600px;
+        height: 800px;
         margin: auto;
     }
 
 </style>
 
 
-</head>
-
-
-<body>
-
-	{# VISIBLE PAGE HTML #}
-
-	{# note: showpanel arg is the ID of the div that is showing.. #}
-
-	<h1 class="title">Ontology:&nbsp;<a href="javascript:showpanel('ontoinfo');">{{main_uri}}</a></h1>
-	<h3>{{ontology.bestDescription}}</h3>
-
-	<p><small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://lambdamusic.github.io/Ontospy/" target="_blank">Ontospy</a> on {% now "jS F Y H:i" %}</small></p>
+{% endblock custom_css %}
 
 
 
-	<hr>
+
+
+
+{% block main_content %}
 
 
 
     <div id="container"></div>
+
+    <p>Double click on a node to see its properties.</p>
+
+
+
+
+
+{% endblock main_content %}
+
+
+
+
+{% block extra_footer %}
+
+Visualization developed with <a class="greylink" href="https://github.com/jacomyal/sigma.js">sigma.js</a>.
+
+{% endblock extra_footer %}
+
+
+
+
+
+{% block the_javascript %}
+
+
 
     {# JAVASCRIPT #}
 
@@ -75,14 +87,12 @@
     <script type="text/javascript" src="{{STATIC_URL}}libs/sigma/plugins/sigma.parsers.json.min.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}libs/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
 
+    <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery.slidereveal.min.js"></script>
+    
+    
 
-
-
-	<hr>
-	<small class="credits">Documentation automatically generated with <a href="https://github.com/lambdamusic/Ontospy" target="_blank" class="greylink">Ontospy</a> on {% now "jS F Y H:i" %}</small>
-
-
-
+    {% include 'shared/js_slidereveal.html' %}
 
 
    <script>
@@ -105,12 +115,14 @@
         },
         settings: {
             doubleClickEnabled: false,
-            minNodeSize: 1,
+            minNodeSize: 5,
             maxNodeSize: 30,
+            labelSize: "proportional",
+            labelThreshold: 10,
             enableEdgeHovering: true,
             edgeHoverColor: 'edge',
             defaultEdgeHoverColor: '#000',
-            edgeHoverSizeRatio: 1,
+            edgeHoverSizeRatio: 5,
             edgeHoverExtremities: true
           }
     });
@@ -120,10 +132,19 @@
     s.refresh();
     s.startForceAtlas2();
 
+    // show info on click
+	s.bind('doubleClickNode', function(e) {
+        var nodeId = e.data.node.id;
+		console.log(nodeId);
+		showpanel(nodeId); 
+	});
+
 
     </script>
 
 
 
-</body>
-</html>
+{% endblock the_javascript %}
+
+
+

@@ -8,4 +8,4 @@ _Vocabulary: [{{docs_title}}](index.md)_
 
 ---
 
-_Documentation automatically generated on {% now "jS F Y" %} with [Ontospy](http://lambdamusic.github.io/Ontospy/ "Open") ({{gendocs_version}})_
+_Documentation automatically generated on {% now 'utc', '%a, %d %b %Y %H:%M:%S' %} with [Ontospy](http://lambdamusic.github.io/Ontospy/ "Open") ({{gendocs_version}})_

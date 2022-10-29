@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
 
-  {% with thispage=treetype %}
-      {% include "navbar.html" %}
-  {% endwith %}
+  {% set thispage=treetype %}
+      {% include "html-multi/navbar.html" %}
+  
 
 {% endblock navbar %}
 
@@ -14,9 +14,9 @@
 
 {% block sidebar %}
 
-    {% with thispage=treetype %}
-        {% include "sidebar.html" %}
-    {% endwith %}
+    {% set thispage=treetype %}
+        {% include "html-multi/sidebar.html" %}
+    
 
 {% endblock sidebar %}
 
@@ -26,9 +26,9 @@
 
 
 
-    {% with thispage=treetype %}
-        {% include "breadcrumbs.html" %}
-    {% endwith %}
+    {% set thispage=treetype %}
+        {% include "html-multi/breadcrumbs.html" %}
+    
 
 
 

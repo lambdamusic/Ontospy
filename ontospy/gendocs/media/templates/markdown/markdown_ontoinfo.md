@@ -1,4 +1,4 @@
-{% extends "markdown_base.md" %}
+{% extends "markdown/markdown_base.md" %}
 
 
 {% block main_column %}
@@ -11,11 +11,13 @@
 #### Metadata
 {% for ontology in ontologies %}
 **{{ontology.uri}}**
-{% if ontology.annotations %}
-{% for each in ontology.annotations %}
-{% ifchanged each.1 %}
+{% if ontology.annotations() %}
+{% for each in ontology.annotations() %}
+{% if each.1 != variable_watcher  %}
 * {{each.1}}
-{% endifchanged %}
+{% set variable_watcher = each.1 %}
+{% else %}
+{% endif %}
     * {{each.2}}
 {% endfor %}
 {% else %}
@@ -47,7 +49,7 @@ Prefix   | URI      |
 
 ## Entities  
 
-{% if ontospy_graph.all_classes%}
+{% if ontospy_graph.all_classes %}
 #### Classes ({{ontospy_graph.all_classes|length}})
 
 {% for each in ontospy_graph.all_classes %}
@@ -60,7 +62,7 @@ Prefix   | URI      |
 {% if ontospy_graph.all_skos_concepts %}
 #### SKOS Concepts ({{ontospy_graph.all_skos_concepts|length}})
 
-{% for each in ontograph.all_skos_concepts  %}
+{% for each in ontospy_graph.all_skos_concepts  %}
 - [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 
@@ -88,7 +90,7 @@ Prefix   | URI      |
 
 
 {% if ontospy_graph.all_properties_annotation %}
-#### Annotation Properties ({{ontograph.all_properties_annotation|length}})
+#### Annotation Properties ({{ontospy_graph.all_properties_annotation|length}})
 
 {% for each in ontospy_graph.all_properties_annotation  %}
 - [{{each.title}}]({{each.slug}}.md "Open")
@@ -112,7 +114,7 @@ Prefix   | URI      |
 {% if ontospy_graph.all_individuals %}
 #### Individuals ({{ontospy_graph.all_individuals|length}})
 
-{% for each in ontograph.all_individuals  %}
+{% for each in ontospy_graph.all_individuals  %}
 - [{{each.title}}]({{each.slug}}.md "Open")
 {% endfor %}
 

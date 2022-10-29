@@ -4,36 +4,36 @@
 {# ©2021 The MITRE Corporation. All Rights Reserved. #}
 
 
-{% extends "base.html" %}
+{% extends "html-multi/base.html" %}
 
 
 {% block navbar %}
-  {% include "navbar.html" %}
+  {% include "html-multi/navbar.html" %}
 {% endblock navbar %}
 
 
 
 
 {% block sidebar %}
-  {% with thispage=main_entity.qname %}
-    {% include "sidebar.html" %}
-  {% endwith %}
+  {% set thispage=main_entity.qname %}
+    {% include "html-multi/sidebar.html" %}
+  
 {% endblock sidebar %}
 
 
 {% block bodycontent %}
-{% ifequal main_entity_type "class"  %}
-  {% with main_entity as each  %}    {# each is a OntoClass object #}
+{% if main_entity_type == "class"  %}
+  {% set each = main_entity  %}    {# each is a OntoClass object #}
 
     {# path to this class #}
-    {% with thispage="classinfo" %}
-        {% include "breadcrumbs.html" %}
-    {% endwith %}
+    {% set thispage="classinfo" %}
+        {% include "html-multi/breadcrumbs.html" %}
+    
 
     {# name of this class, with "leaf node" if it has no children #}
     <h1>
       {{each.title}}
-      {% if not each.children  %}
+      {% if not each.children()  %}
         <small class="label label-info label-xs">leaf node</small>
       {% endif %}
     </h1>
@@ -44,16 +44,16 @@
     <div class="tree-container">
       <div class="tree">
         <ul>
-          {% if each.parents %}
-            {% for s in each.parents %}
+          {% if each.parents() %}
+            {% for s in each.parents() %}
               <li>
-                <a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a>
+                <a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a>
                   <ul>
-                    <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
-                    {% if each.children  %}
+                    <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
+                    {% if each.children()  %}
                       <ul>
-                      {% for s in each.children %}
-                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                      {% for s in each.children() %}
+                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>
                       {% endfor %}
                       </ul>
                     {% endif %}
@@ -64,11 +64,11 @@
           {% else %}
             <li><a href="entities-tree-classes.html">owl:Thing</a>
               <ul>
-                <li><a style="font-weight: bold;" title="'{{each.bestLabel}}'{% if each.bestDescription %} - {{each.bestDescription|truncatewords:20}}{% endif %}">{{each.title}}</a>
-                  {% if each.children  %}
+                <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
+                  {% if each.children()  %}
                     <ul>
-                      {% for s in each.children %}
-                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel}}'{% if s.bestDescription %} - {{s.bestDescription|truncatewords:20}}{% endif %}">{{s.title}}</a></li>
+                      {% for s in each.children() %}
+                        <li><a href="{{s.slug}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>
                       {% endfor %}
                     </ul>
                   {% endif %}
@@ -97,7 +97,7 @@
 
 
     {# Label panel #}
-    {% if  each.bestLabel %}
+    {% if  each.bestLabel() %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
@@ -105,7 +105,7 @@
             <h3 class="panel-title">Label</h3>
           </div>
           <div class="panel-body">
-            {{each.bestLabel}}
+            {{each.bestLabel()}}
           </div>
           </div>
         </div>
@@ -114,7 +114,7 @@
 
 
     {# Description panel #}
-    {% if  each.bestDescription %}
+    {% if  each.bestDescription() %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
@@ -122,7 +122,7 @@
               <h3 class="panel-title">Description</h3>
             </div>
             <div class="panel-body">
-              {{each.bestDescription|linebreaks|default:"--"}}
+              {{each.bestDescription()|linebreaks|default("--")}}
             </div>
           </div>
         </div>
@@ -131,16 +131,16 @@
 
 
     {# Superclasses panel #}
-    {% if each.ancestors %}
+    {% if each.ancestors() %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Superclasses ({{each.ancestors|length}})</h3>
+              <h3 class="panel-title">Superclasses ({{each.ancestors()|length}})</h3>
             </div>
             <div class="panel-body">
-              {% if each.ancestors %}
-                {% for s in each.ancestors %}
+              {% if each.ancestors() %}
+                {% for s in each.ancestors() %}
                   <li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.title}}</a></li>
                 {% endfor %}
               {% else %}
@@ -206,7 +206,7 @@
                 <th>PROPERTY</th><th>TYPE</th><th>DESCRIPTION</th><th>RANGE</th>
               </tr>
               {% for group in each.domain_of_inferred  %}
-                {% for k,v in group.items  %}
+                {% for k,v in group.items()  %}
                   {% if v %}
                       <tr class="table-inheritanceinfo">
                         <th colspan="4" class="treeinfo">
@@ -222,7 +222,7 @@
                           <i>{{prop.rdftype_qname}}<i>
                         </td>
                         <td class="thirdtd">
-                          <span>{{prop.bestDescription|default:"--"}}</span>
+                          <span>{{prop.bestDescription()|default("--")}}</span>
                         </td>
                         <td class="fourthtd">
                           {% if prop.ranges %}
@@ -282,27 +282,27 @@
                   {# DATA ROW -- for non-headers, display the data in columns #}
                   {% else %}
                     <td>    {# PROPERTY #}
-                      {% with constraint.property_obj.onto_property as prop  %}
+                      {% set prop = constraint.property_obj.onto_property %}
                         <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
-                      {% endwith %}
+                      
                     </td>
 
                     <td>    {# TYPE (owl:DatatypeProperty or owl:ObjectProperty #}
-                      {{constraint.rdftype_qname|join:"<br>"|default:"--"}}
+                      {{constraint.rdftype_qname|join("<br>")|default("--")}}
                     </td>
 
                     <td>     {# DESCRIPTION #}
-                      {{constraint.rdfs_comment|join:"<br>"}}
+                      {{constraint.rdfs_comment|join("<br>")}}
                       <br>
-                      {{constraint.sh_description|join:"<br>"}}
+                      {{constraint.sh_description|join("<br>")}}
                     </td>
 
                     <td>     {# MIN COUNT #}
-                      {{constraint.sh_minCount|join:", "|default:"0"}}
+                      {{constraint.sh_minCount|join(", ")|default("0")}}
                     </td>
 
                     <td>     {# MAX COUNT #}
-                      {{constraint.sh_maxCount|join:", "|default:"*"}}
+                      {{constraint.sh_maxCount|join(", ")|default("*")}}
                     </td>
 
                     <td>     {# LOCAL TYPE (type defined for property on this classe) #}
@@ -325,7 +325,7 @@
                     </td>
 
                     <td>    {# GLOBAL RANGE (type range for property globally) #}
-                      {% with constraint.rdfs_range as values %}
+                      {% set values = constraint.rdfs_range %}
                         {% if values %}
                           {% for value in values %}
                             {% if value.onto_class %}
@@ -338,7 +338,7 @@
                         {% else %}
                           <i>owl:Thing</i>
                         {% endif %}
-                      {% endwith %}
+                      
                     </td>
                   {% endif %}
                 </tr>
@@ -362,7 +362,7 @@
               {{pygments_code|safe}}
             {% else %}
               <div class="implementation">
-                <code style="background-color: white;">{{each.rdf_source|linebreaks}}</code>
+                <code style="background-color: white;">{{each.rdf_source()|linebreaks}}</code>
               </div>
             {% endif %}
           </div>
@@ -371,6 +371,6 @@
     </div>
 
 
-        {% endwith %}
-{% endifequal %}
+        
+{% endif %}
 {% endblock bodycontent %}
