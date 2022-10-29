@@ -6,13 +6,8 @@ Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reser
 
 """
 
-from __future__ import print_function
-import sys, os, time, optparse
-try:
-    import urllib2
-except ImportError:
-    import urllib.request as urllib2
-
+import os
+import urllib.request as urllib2
 import click
 import rdflib
 

@@ -10,7 +10,7 @@ from .utils import *
 from .jinja_env import *
 
 import zipfile
-import os, sys
+import os
 import shutil
 
 from pygments import highlight

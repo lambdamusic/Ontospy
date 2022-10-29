@@ -5,13 +5,19 @@ from markupsafe import Markup, escape
 from jinja2 import pass_eval_context
 from ontospy.core.utils import slugify
 
-
-# set up jinja2
+#
+# SET UP JINJA2
+#
 env = Environment(
     loader=PackageLoader('ontospy.gendocs.media', 'templates'),
     autoescape=select_autoescape(['html', 'xml']),
     extensions=['jinja2_time.TimeExtension']
 )
+
+
+#############################
+####### JINJA2 CUSTOM FILTERS
+###
 
 
 #

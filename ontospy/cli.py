@@ -10,27 +10,9 @@ All rights reserved.
 import sys
 import os
 import time
-import optparse
 import os.path
-import shutil
-import requests
-
-try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
-
-try:
-    import urllib2
-except ImportError:
-    import urllib as urllib2
-
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
-
+import pickle as cPickle
+import urllib as urllib2
 import click
 # http://click.pocoo.org/5/python3/
 click.disable_unicode_literals_warning = True

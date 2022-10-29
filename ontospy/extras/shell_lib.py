@@ -19,16 +19,7 @@ import cmd
 import random
 import shutil
 import platform
-try:
-    import urllib2
-except:
-    import urllib as urllib2
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
-
+import urllib as urllib2
 from pyfiglet import Figlet
 from colorama import Fore, Style
 
