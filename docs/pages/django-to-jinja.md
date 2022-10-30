@@ -6,6 +6,7 @@ This is to make Ontospy footprint more lightweight, as well as to simplify futur
 
 This page contains information of Django specific template filters, or constructs, that are not directly usable with Jinja and how they have been updated. 
 
+
 ## NOW
 
 Django's template tag `now` can be used in Jinja after installing the extension https://pypi.org/project/jinja2-time/. 
@@ -26,19 +27,22 @@ Django's template tag `ifchanged` does not exist in Jinja. So a custom logic for
 From 
 
 ```python
-"""{% for each in o.annotations %}
+{% raw %}
+{% for each in o.annotations %}
     {% ifchanged each.1 %}
         {% if not forloop.first %}</dl>{% endif %}
             <dt>{{each.1}}</dt>
     {% endifchanged %}
     <dd>{{each.2|linebreaks}}</dd>
-{% endfor %}"""
+{% endfor %}
+{% endraw %}
 ```
 
 To
 
 ```python
-"""{% for each in o.annotations() %}
+{% raw %}
+{% for each in o.annotations() %}
     {% if each.1 != variable_watcher  %}
         {% if not loop.first %}</dl>{% endif %}
             <dt>{{each.1}}</dt>
@@ -46,7 +50,8 @@ To
     {% else %}
     {% endif %}
     <dd>{{each.2|linebreaks}}</dd>
-{% endfor %}"""
+{% endfor %}
+{% endraw %}
 ```
 
 
@@ -55,22 +60,22 @@ To
 Django's template tag `ifchanged` has a slightly diffent syntax in [Jinja](https://jinja.palletsprojects.com/en/3.1.x/templates/#jinja-filters.default).
 
 From
-
+{% raw %}
 ```python
-"""{{s.qname|default:each.qname}}"""
+{{s.qname|default:each.qname}}
 ```
 To
 
 ```python
-"""{{s.qname|default(each.qname)}}"""
+{{s.qname|default(each.qname)}}
 ```
-
+{% endraw %}
 
 ## LINEBREAKS
 
 Django's template filter `linebreaks` does not exist in Jinja. It can be implemented as a custom filter (see this [thread on SO](https://stackoverflow.com/questions/4901483/how-to-apply-django-jinja2-template-filters-escape-and-linebreaks-correctly))
 
-
+{% raw %}
 ```python
 import re
 from markupsafe import Markup, escape
@@ -88,7 +93,7 @@ def linebreaks_filter(eval_ctx, value):
 
 env.filters['linebreaks'] = linebreaks_filter
 ```
-
+{% endraw %}
 
 ## METHOD CALLS
 
@@ -96,7 +101,7 @@ Django's templating language is 'relaxed' when it comes to resolving an object *
 
 With Jinja, *method* calls need to be followed by parentheses, like in Python.  See also https://stackoverflow.com/questions/59589889/difference-between-an-item-and-an-attribute-jinja-python
 
-
+{% raw %}
 From 
 ```python
 """{% for each in o.annotations %}"""
@@ -106,10 +111,12 @@ To
 ```python
 """{% for each in o.annotations() %}"""
 ```
+{% endraw %}
+
 PS this applies to `each.children()` , `each.parents()`, `each.rdf_source()` etc..
 
 
-
+{% raw %}
 ## IFEQUAL
 
 From
@@ -157,4 +164,4 @@ To
 comment
 #}"""
 ```
-
+{% endraw %}
