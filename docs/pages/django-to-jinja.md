@@ -10,8 +10,10 @@ This page contains information of Django specific template filters, or construct
 
 Django's template tag `now` can be used in Jinja after installing the extension https://pypi.org/project/jinja2-time/. 
 
+Then you can do
+
 ```python
-{% now 'utc', '%a, %d %b %Y %H:%M:%S' %}
+"{% now 'utc', '%a, %d %b %Y %H:%M:%S' %}"
 ```
 
 
@@ -22,19 +24,19 @@ Django's template tag `ifchanged` does not exist in Jinja. So a custom logic for
 From 
 
 ```python
-{% for each in o.annotations %}
+"""{% for each in o.annotations %}
     {% ifchanged each.1 %}
         {% if not forloop.first %}</dl>{% endif %}
             <dt>{{each.1}}</dt>
     {% endifchanged %}
     <dd>{{each.2|linebreaks}}</dd>
-{% endfor %}
+{% endfor %}"""
 ```
 
 To
 
 ```python
-{% for each in o.annotations() %}
+"""{% for each in o.annotations() %}
     {% if each.1 != variable_watcher  %}
         {% if not loop.first %}</dl>{% endif %}
             <dt>{{each.1}}</dt>
@@ -42,7 +44,7 @@ To
     {% else %}
     {% endif %}
     <dd>{{each.2|linebreaks}}</dd>
-{% endfor %}
+{% endfor %}"""
 ```
 
 
@@ -53,12 +55,12 @@ Django's template tag `ifchanged` has a slightly diffent syntax in [Jinja](https
 From
 
 ```python
-{{s.qname|default:each.qname}}
+"""{{s.qname|default:each.qname}}"""
 ```
 To
 
 ```python
-{{s.qname|default(each.qname)}}
+"""{{s.qname|default(each.qname)}}"""
 ```
 
 
@@ -95,12 +97,12 @@ With Jinja, *method* calls need to be followed by parentheses, like in Python.  
 
 From 
 ```python
-{% for each in o.annotations %}
+"""{% for each in o.annotations %}"""
 ```
 
 To 
 ```python
-{% for each in o.annotations() %}
+"""{% for each in o.annotations() %}"""
 ```
 PS this applies to `each.children()` , `each.parents()`, `each.rdf_source()` etc..
 
@@ -111,20 +113,20 @@ PS this applies to `each.children()` , `each.parents()`, `each.rdf_source()` etc
 From
 
 ```python
-{% ifequal objtype "class" %}
+"""{% ifequal objtype "class" #}"""
 ```
 
 To
 
 ```python
-{% if objtype == "class" %}
+"""{% if objtype == "class" #}"""
 ```
 
 ## WITH
 
 From 
 ```python
-{% with main_entity as each  %}
+"""{% with main_entity as each  #}"""
 ...
 {% endwith %}
 ```
@@ -132,7 +134,7 @@ From
 To 
 
 ```python
-{% set each = main_entity  %}
+"""{% set each = main_entity  #}"""
 # no need to close anything
 ```
 
@@ -143,14 +145,14 @@ See https://jinja.palletsprojects.com/en/3.1.x/templates/#comments
 From
 
 ```python
-{% comment %}
+"""{% comment %}
 ```
 
 To 
 
 ```python
-{# 
+"""{% 
 comment
-#}
+#}"""
 ```
 
