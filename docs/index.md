@@ -10,6 +10,7 @@
 - [Is Ontospy for Me?](#is-ontospy-for-me)
 - [Generating Ontology Documentation](#generating-ontology-documentation)
 - [Miscellaneous Tips](#miscellaneous-tips)
+- [Version 2 Upgrade](#upgrading-to-v-2.0)
 - [Quick Links](#quick-links)
 
 ## Welcome to Ontospy's Documentation!
