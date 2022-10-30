@@ -9,7 +9,7 @@ Python library and command-line interface for inspecting and visualizing RDF mod
 -   [Github](https://github.com/lambdamusic/ontospy)
 -   [Docs](http://lambdamusic.github.io/Ontospy/)
 -   [Changelog](http://lambdamusic.github.io/Ontospy/pages/changelog.html)
--   [YouTube Video](https://youtu.be/MkKrtVHi_Ks)
+-   [YouTube](https://youtu.be/MkKrtVHi_Ks)
 
 # Description
 
@@ -17,20 +17,18 @@ Ontospy is a lightweight Python library and command line tool for inspecting and
 
 The basic workflow is simple: load a graph by instantiating the `Ontospy` class with a file containing RDFS, OWL or SKOS definitions. You get back a object that lets you interrogate the ontology. That's all!
 
-The same functionalities are accessible also via a command line application (`ontospy`). This is an interactive environment (like a repl) that allows to load ontologies from a local repository, interrogate them and cache them so that they can be quickly reloaded for inspection later on.
+The same functionalities are accessible also via a command line application. This is an interactive environment (like a repl) that allows to load ontologies from a local repository, interrogate them and cache them so that they can be quickly reloaded for inspection later on.
 
 [![Downloads](https://pepy.tech/badge/ontospy)](https://pepy.tech/project/ontospy)
 
 
 ## Generating ontology documentation
 
-Ontospy can be used to generate HTML documentation for an ontology pretty easily. E.g. see the [Schema.org](https://lambdamusic.github.io/ontospy-examples/schema_org_topbraidttl/index.html) ontology, or [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) ontology.
+Ontospy can be used to generate HTML documentation for an ontology pretty much out-of-the-box. 
 
-This functionality relies on a module called _ontodocs_, which used to be maintained as a separate library but is now distributed with ontospy as an add-on:
+See the website [Examples of ontology documentation generated via Ontospy](https://lambdamusic.github.io/ontospy-examples/index.html), or jump straight to the sample [Schema.org](https://lambdamusic.github.io/ontospy-examples/schema_org_topbraidttl/index.html) or [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) documentation pages.
 
--   `pip install ontospy[FULL]`
-
-For more examples of the kind of documentation that can be generated out-of-the-box, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
+> From version 2.0, the documentation generation libraries are installed by default with Ontospy. Previously, third party dependencies (e.g. Django) had to be installed separately. 
 
 ## Status
 

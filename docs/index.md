@@ -16,8 +16,6 @@
 
 Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
 
-> Note: this documentation is still a work-in-progress
-
 ## In a Nutshell
 
 Ontospy can be used either as an interactive command line interface (a
@@ -37,6 +35,9 @@ Many other options are available, in particular Ontospy allows to load/save onto
 
 [![OntospyVideo](static/ontospyvideo_sm.jpg)](https://youtu.be/MkKrtVHi_Ks)
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/MkKrtVHi_Ks/0.jpg)](https://www.youtube.com/watch?v=MkKrtVHi_Ks)
+
+
 ## Installation
 
 Prerequisites:
@@ -46,17 +47,20 @@ Prerequisites:
 
 Once you have a package manager installed, simply install Ontospy from the Python Package Index. There are three library versions you can choose from.
 
-**Lightweight Version**
+**Standard Version**
 
-If you want less library dependencies (eg because you want to include Ontospy in another project and don't care about html documentation), you can simply install the core library only:
+If you want to use ontospy as a Python module, or to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you can install the standard version of the library like this:
 
 ```bash
 $ pip install ontospy
 ```
+The python library, its dependencies and all of its command-line executables will be installed. The only thing which is left out is the bash autocomplete external dependencies.
 
-The python library, its dependencies and all of its command-line executables will be installed. The only thing which is left out is the documentation-generation feature.
+NOTE: 
+As of Ontospy version 2.0, the documentation generation libraries are installed by default with Ontospy. Previously, third party dependencies (e.g. Django) had to be installed separately. 
 
-**Lightweight Version plus Shell**
+
+**Standard Version plus Shell**
 
 The 'shell' or interactive command line interface requires the [readline](https://pypi.org/project/readline/) module, a set of functions for use by applications that allow users to edit command lines as they are typed in.  
 
@@ -65,17 +69,6 @@ This module is optionally installed with Ontospy like this:
 ```bash
 $ pip install ontospy[SHELL]
 ```
-
-**Full Version**
-
-If you want to use ontospy to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you should install the FULL version of the library like this:
-
-```bash
-$ pip install ontospy[FULL]
-```
-
-The full version includes more files (eg html templates) and it has a larger footprint as it relies on Django and other libraries. 
-
 
 **Upgrading**
 
@@ -241,7 +234,7 @@ Out[12]: []
 ```
 
 
-## Is Ontospy for Me?
+## Is Ontospy for me?
 
 Here are some reasons why you should use it:
 
@@ -265,15 +258,8 @@ For example:
 
 That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
 
-> Note: this functionality relies on a module called _ontodocs_, which used to be a separate library. As of version 1.9.8 this module has been incorporated in Ontospy, but can be installed on-demand.
 
-**Installation**
-
-By default the libraries needed by this feature (Django and Pygments) are not installed, so you have to add them like this:
-
-```bash
-$ pip install ontospy[FULL] -U
-```
+**How to**
 
 This feature is normally used from the command line:
 
@@ -300,9 +286,9 @@ Options:
   -h, --help             Show this message and exit.
 ```
 
-This feature is not really meant to be used programmatically, but I'm sure there are a few constructs in there which can be reused.
+This feature is not really meant to be used via Python, but I'm sure there are a few constructs in the source code which can be reused.
 
-In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontospy/blob/master/ontospy/ontodocs/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
+In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontospy/blob/master/ontospy/gendocs/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
 
 This is how you would invoke a visualization from a script:
 
@@ -326,6 +312,16 @@ If you are using OSx El Capitan your installation line probably will look like t
 
 This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899) (more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan))
 
+
+## Upgrading to V 2.0
+
+Ontospy version 2 provides new SHACL support, as well as it changes some of its internal dependencies (primarily, it moves from Django to Jinja for the HTML documentation part). 
+
+For the majority of users this upgrade should cause any issues, but since various internals have changed  this release may be backward-incompatible for users that have created custom extensions building upon Ontospy's documentation generation code.
+
+-   Please have a look at the [Django to Jinja migration](pages/django-to-jinja.html) page for more information
+
+
 ## Quick Links
 
 -   Github: [https://github.com/lambdamusic/ontospy](https://github.com/lambdamusic/ontospy)
@@ -334,7 +330,7 @@ This is due to the new [System Integrity Protection](https://support.apple.com/e
 
 Also:
 
--   Video: [hhttps://youtu.be/MkKrtVHi_Ks](https://youtu.be/MkKrtVHi_Ks)
+-   Youtube: [hhttps://youtu.be/MkKrtVHi_Ks](https://youtu.be/MkKrtVHi_Ks)
 
 Issues or questions?
 

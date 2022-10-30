@@ -3,6 +3,17 @@
 Summary of changes.
 
 
+## Oct, 2022: v 2.0.0
+
+Full release of version 2. The main library API is the same, but various internals have changed hence this release may be backward-incompatible for users that have custom extensions using Ontospy's source. 
+
+- Remove all Django dependencies, replaced with [Jinja2](https://jinja.palletsprojects.com/en/3.1.x/intro/#installation)
+- Rename `ontodocs` module to `gendocs`
+- Drop support for python2 
+- Remove `setup.cfg` and universal build (only py3)
+- Refactor code / clean up 
+- Refactor `setup.py` 
+
 ## May, 2022: v 2.0.0-alpha
 
 An alpha release of 2.0.0. More refactoring and code improvement is planned before the full 2.0.0 release!

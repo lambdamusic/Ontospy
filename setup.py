@@ -66,7 +66,7 @@ PACKAGE_DATA_FOLDERS = get_package_folders(
     DATA_STATIC_FILES, PROJECT_ROOT) + get_package_folders(
         DATA_TEMPLATE_FILES, PROJECT_ROOT)
 
-if True:
+if False:
     print(PACKAGE_DATA_FOLDERS)
 
 
@@ -75,7 +75,7 @@ setup(
     name='ontospy',
     version=VERSIONSTRING,
     description=
-    'Query, inspect and visualize knowledge models encoded as RDF&OWL ontologies.',
+    'Query, inspect and visualize ontologies encoded via RDF and OWL.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/lambdamusic/ontospy',
@@ -108,7 +108,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    keywords='ontology semantic web linked data rdf owl',
+    keywords='ontology semantic web linked data rdf owl visualization documentation knowledge graph',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed. For an analysis of "install_requires" vs pip's
@@ -121,7 +121,6 @@ setup(
     # $ pip install -e .[dev,test]
     extras_require={
         'SHELL': ['readline'],
-        'FULL': ['Django==3.2.10', 'Pygments==2.1.3'],
     },
     package_data={
         'ontospy': PACKAGE_DATA_FOLDERS
@@ -130,7 +129,7 @@ setup(
         'console_scripts': [
             # 'ontospy-sketch=ontospy.extras.sketch:main',
             'ontospy=ontospy.cli:main_cli',
-            'quicktest_ontospy=ontospy.tests.quick:main'
+            'ontospy_quicktest=ontospy.tests.quick:main'
         ],
     },
 )
