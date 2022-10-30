@@ -1,29 +1,14 @@
 # !/usr/bin/env python
 #  -*- coding: UTF-8 -*-
 
-from __future__ import print_function
-
 from ..VERSION import __version__, VERSION
 
 import logging
 logging.basicConfig()
 
-try:
-    from ConfigParser import SafeConfigParser
-except ImportError:
-    from configparser import SafeConfigParser
-
+from configparser import SafeConfigParser
 import sys, os
-try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
-
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
+import pickle as cPickle
 
 from .ontospy import Ontospy
 from .utils import printDebug
@@ -61,7 +46,7 @@ BOOTSTRAP_ONTOLOGIES = [
     "http://purl.org/goodrelations/v1",
     "http://www.ontologydesignpatterns.org/ont/dul/DUL.owl",
     "http://www.ifomis.org/bfo/1.1",
-    #
+    #  DEPRECATED
     # "http://topbraid.org/schema/schema.ttl",
     # "http://www.cidoc-crm.org/rdfs/cidoc_crm_v6.0-draft-2015January.rdfs",
     # "http://purl.uniprot.org/core/",

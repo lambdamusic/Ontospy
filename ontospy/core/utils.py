@@ -7,17 +7,16 @@ Copyright (c) 2010-2015 __Michele Pasin__ <http://www.michelepasin.org>. All rig
 
 """
 
-from __future__ import print_function
-
 from colorama import Fore, Style
 
 import rdflib
 from rdflib import RDFS, RDF, BNode
 from rdflib.namespace import OWL, DC, SH
-DEFAULT_LANGUAGE = "en"
-
-import sys, os, subprocess, random, platform
-
+import sys
+import os
+import subprocess
+import random
+import platform
 import click
 
 # Fix Python 2.x.
@@ -25,6 +24,8 @@ try:
     UNICODE_EXISTS = bool(type(unicode))
 except NameError:
     unicode = lambda s: str(s)
+
+DEFAULT_LANGUAGE = "en"
 
 # ===========
 # generic python utils

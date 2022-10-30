@@ -7,9 +7,7 @@ ONTOSPY
 Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reserved.
 """
 
-from __future__ import print_function
 from itertools import chain
-
 import rdflib
 
 from .utils import *

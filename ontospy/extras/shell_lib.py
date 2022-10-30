@@ -19,16 +19,7 @@ import cmd
 import random
 import shutil
 import platform
-try:
-    import urllib2
-except:
-    import urllib as urllib2
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
-
+import urllib as urllib2
 from pyfiglet import Figlet
 from colorama import Fore, Style
 
@@ -971,8 +962,8 @@ class Shell(cmd.Cmd):
         line = line.split()
 
         try:
-            # from ..viz.builder import action_visualize
-            from ..ontodocs.builder import action_visualize
+            # from ..viz.actions import action_visualize
+            from ..gendocs.actions import action_visualize
         except:
             self._print("This command requires the ontodocs package: `pip install ontodocs`")
             return

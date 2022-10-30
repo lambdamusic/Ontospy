@@ -7,48 +7,19 @@ All rights reserved.
 
 """
 
-from __future__ import print_function
-
 from colorama import Fore, Style
 
-import sys
 import os, os.path
-import time
-import optparse
 import shutil
 import requests
 import platform
 import subprocess
-import rdflib
 import datetime
-
-try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
-
-try:
-    import urllib2
-except ImportError:
-    # print("python3")
-    import urllib.request
-    from urllib.request import urlopen
-
-try:
-    from urllib import quote  # Python 2.X
-except ImportError:
-    from urllib.parse import quote  # Python 3+
-
-try:
-    from ConfigParser import SafeConfigParser
-except ImportError:  # python3
-    from configparser import SafeConfigParser
-
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
+import pickle as cPickle
+import urllib.request
+from urllib.request import urlopen
+from urllib.parse import quote  # Python 3+
+from configparser import SafeConfigParser
 
 from . import *
 from .ontospy import Ontospy
@@ -667,7 +638,7 @@ def action_visualize(args,
     <fromshell> : the local name is being passed from ontospy shell
     """
 
-    from ..ontodocs.builder import ask_visualization, select_visualization, VISUALIZATIONS_LIST, build_visualization
+    from ..gendocs.actions import ask_visualization, select_visualization, VISUALIZATIONS_LIST, build_visualization
 
     if fromshell:
         ontouri = args
@@ -725,6 +696,6 @@ def action_visualize(args,
 
     # url  = build_viz(ontouri, g, viztype, path)
     printDebug("Building visualization...", dim=True)
-    url = build_visualization(ontouri, g, viztype, path, title, theme)
+    url = build_visualization(g, viztype, path, title, theme)
 
     return url

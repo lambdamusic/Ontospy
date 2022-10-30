@@ -10,27 +10,9 @@ All rights reserved.
 import sys
 import os
 import time
-import optparse
 import os.path
-import shutil
-import requests
-
-try:
-    import cPickle
-except ImportError:
-    import pickle as cPickle
-
-try:
-    import urllib2
-except ImportError:
-    import urllib as urllib2
-
-# Fix Python 2.x.
-try:
-    input = raw_input
-except NameError:
-    pass
-
+import pickle as cPickle
+import urllib as urllib2
 import click
 # http://click.pocoo.org/5/python3/
 click.disable_unicode_literals_warning = True
@@ -188,7 +170,7 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
 
 
 ##
-## GENDOCS COMMAND (wrapper around ontodocs)
+## GENDOCS COMMAND
 ##
 
 
@@ -275,17 +257,7 @@ def gendocs(ctx,
     # verbose = ctx.obj['VERBOSE']
     sTime = ctx.obj['STIME']
 
-    from .ontodocs.builder import show_themes, random_theme, show_types
-
-    try:
-        # check that we have the required dependencies
-        import django
-    except:
-        printDebug(
-            "WARNING: this functionality requires the Django package and other extra dependecies.",
-            fg="red")
-        printDebug("Install with `pip install ontospy[HTML] -U`")
-        sys.exit(0)
+    from .gendocs.actions import show_themes, random_theme, show_types
 
     if not source and not showthemes and not showtypes and not lib:
         printDebug(ctx.get_help())

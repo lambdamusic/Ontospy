@@ -1,0 +1,279 @@
+{# NOTICE #}
+{# This software was produced for the U.S. Government under contract FA8702-22-C-0001, #}
+{# and is subject to the Rights in Data-General Clause 52.227-14, Alt. IV (DEC 2007) #}
+{# ©2021 The MITRE Corporation. All Rights Reserved. #}
+
+
+{% extends "html-multi/base.html" %}
+
+
+{% block navbar %}
+  {% include "html-multi/navbar.html" %}
+{% endblock navbar %}
+
+
+
+
+{% block sidebar %}
+  {% set thispage=main_entity.qname %}
+    {% include "html-multi/sidebar.html" %}
+  
+{% endblock sidebar %}
+
+
+{% block bodycontent %}
+{% if main_entity_type == "shape"  %}
+  {% set each = main_entity  %}    {# each is a OntoShape object #}
+
+    {# path to this shape #}
+    {% set thispage="shapeinfo" %}
+      {% include "html-multi/breadcrumbs.html" %}
+    
+
+    {# name of this shape, with "leaf node" if it has no children #}
+    <h1>
+        {{each.title}}
+        {% if not each.children()  %}
+          <small class="label label-info label-xs">leaf node</small>
+        {% endif %}
+    </h1>
+    
+    <hr>  {# horizontal rule #}
+
+    {# Tree diagram #}
+    <div class="tree-container">
+      <div class="tree">
+        <ul>
+          {% if each.parents() %}
+            {% for s in each.parents() %}
+              <li>
+              <a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a>
+                <ul>
+                  <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
+                  {% if each.children()  %}
+                    <ul>
+                      {% for s in each.children() %}
+                        <li><a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                  </li>
+                </ul>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li><a href="entities-tree-classes.html">sh:Shape</a>
+              <ul>
+                <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
+                  {% if each.children()  %}
+                    <ul>
+                      {% for s in each.children() %}
+                        <li><a href="shape-{{s.qname|slugify}}.html" title="'{{s.bestLabel()}}'{% if s.bestDescription() %} - {{s.bestDescription()|truncatewords(20)}}{% endif %}">{{s.title}}</a></li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </li>
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+
+
+    {# URI panel #}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">URI</h3>
+          </div>
+          <div class="panel-body">
+            <code>{{each.uri}}</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    {# Label panel #}
+    {% if  each.bestLabel() %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Label</h3>
+          </div>
+          <div class="panel-body">
+            {{each.bestLabel()}}
+          </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Description panel #}
+    {% if  each.bestDescription() %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Description</h3>
+            </div>
+            <div class="panel-body">
+              {{each.bestDescription()|linebreaks|default("--")}}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Superclasses panel #}
+    {% if each.ancestors() %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Superclasses ({{each.ancestors()|length}})</h3>
+            </div>
+            <div class="panel-body">
+              {% if each.ancestors() %}
+                {% for s in each.ancestors() %}
+                  <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
+                {% endfor %}
+              {% else %}
+                <li>owl:Thing</li>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Target classes panel #}
+    {% if each.targetClasses %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Target Classes ({{each.targetClasses|length}})</h3>
+            </div>
+            <div class="panel-body">
+              {% for s in each.targetClasses %}
+                <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
+                {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Usage panel - the main panel #}
+    {# comment 
+    The OntoShape object may have zero, one or more target classes, which are OntoClass objects.
+    In practice, all our OntoShapes have exactly one target class, and we
+       use this class's shacl properties to populate this panel
+
+    If the OntoShape has no target classes, we skip this panel.
+    If the OntoShape has multiple target classes, we use the first one and ignore the rest.
+    #}
+    
+    {% if each.targetClasses %}       {# each is an OntoShape which may have target classes #}
+      {% set targetClass = each.targetClasses.0 %}   {# targetClass is an OntoClass object for the first target class #}
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Shape Properties</h3>
+              </div>
+              <div class="panel-body" style="overflow: auto;">
+                <p>Instances of {{targetClass.qname}} can have the following properties:</p>
+              </div>
+              <table class="table table-bordered" style="overflow: auto;">
+                <tr class="table-classproperties">   {# Table header row #}
+                    <th><p style="text-align:center;">PROPERTY</p></th>
+                    <th><p style="text-align:center;">MIN COUNT</p></th>
+                    <th><p style="text-align:center;">MAX COUNT</p></th>
+                    <th><p style="text-align:center;">TYPE</p></th>
+                </tr>
+                {% for constraint in targetClass.shacl_constraints  %}   {# constraint is a Constraint object #}
+                  <tr>
+                    {% if constraint.header %} {# THIS ROW CONTAINS ONLY THE HEADER #}
+                      <td colspan="5">
+                        <small class="label label-info label-xs">{{constraint.header}}</small>
+                      </td>
+                        
+                    {% else %}   {# THIS ROW CONTAINS ALL THE COLUMNS #}
+                      <td>   {# PROPERTY #}
+                        {% set prop = constraint.property_obj.onto_property  %}
+                          <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
+                        
+                      </td>
+ 
+                      <td>     {# MIN COUNT #}
+                        {{constraint.sh_minCount|join(", ")|default("0")}}
+                      </td>
+ 
+                      <td>     {# MAX COUNT #}
+                        {{constraint.sh_maxCount|join(", ")|default("*")}}
+                      </td>
+                        
+                      <td>     {# LOCAL TYPE #}
+                        {% for value in constraint.sh_datatype %}
+                          {% if value.onto_class %}
+                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                          {% else %}
+                            <i>{{value.qname}}</i>
+                          {% endif %} 
+                            <br>
+                        {% endfor %}
+                        {% for value in constraint.sh_class %}
+                          {% if value.onto_class %}
+                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
+                          {% else %}
+                            <i>{{value.qname}}</i>
+                          {% endif %} 
+                          <br>
+                        {% endfor %}
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+
+              </table>
+            </div>
+          </div>
+        </div>
+      
+    {% endif %}
+    
+
+    {# Implementation panel #}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Implementation</h3>
+          </div>
+          <div class="panel-body implementation-panel">
+            {% if pygments_code %}
+              {{pygments_code|safe}}
+            {% else %}
+              <div class="implementation">
+                <code style="background-color: white;">{{each.rdf_source()|linebreaks}}</code>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  
+{% endif %}
+{% endblock bodycontent %}

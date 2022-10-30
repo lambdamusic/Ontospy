@@ -1,0 +1,177 @@
+{% extends "html-multi/base.html" %}
+
+
+{% block navbar %}
+
+    {% set thispage="home" %}
+
+    {% include "html-multi/navbar.html" %}
+
+    
+
+{% endblock navbar %}
+
+
+{% block sidebar %}
+
+    {% set thispage="home" %}
+        {% include "html-multi/sidebar.html" %}
+    
+
+{% endblock sidebar %}
+
+
+{% block bodycontent %}
+
+
+    {% set thispage="home" %}
+        {% include "html-multi/breadcrumbs.html" %}
+    
+
+
+
+        <div class="page-header">
+
+            <h3>Home
+{#            <small><a href="#menu-toggle" class="btn btn-default btn-xs" id="menu-toggle">Toggle Menu</a></small>#}
+            </h3>
+
+        </div>
+
+{% if  0 %}
+        <div class="row">
+            <div class="container">
+            <div class="col-md-12">
+                {% include "onto_header.html" %}
+                <hr>
+            </div>
+            </div>
+
+        </div>
+{% endif %}
+
+
+      <div class="row">
+
+        {# first column #}
+        <div class="col-md-6">
+
+           {% if ontologies%}
+
+           {% for ontology in ontologies %}
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Ontology Metadata</h3>
+            </div>
+            <div class="panel-body">
+              {# <h5 class="well"><code>{{ ontology.uri }}</code></h5>#}
+              <dl>
+                <dt>URI</dt>
+                <dd><code>{{ ontology.uri }}</code></dd>
+              </dl>
+                {% if ontology.annotations() %}
+                    <dl>
+                      {% for each in ontology.annotations() %}
+                          {% if each.1 != variable_watcher  %}
+                                <dt>{{each.1}}</dt>
+                              {% set variable_watcher = each.1 %}
+                          {% else %}{% endif %}
+                    <dd>{{each.2|linebreaks}}</dd>
+                    {% endfor %}
+                    </dl>
+                {% else %}
+                    <i>No metadata available</i>
+                {% endif %}
+
+
+            </div>
+          </div>
+           </div></div>
+           {% endfor %}
+        {% endif %}
+
+
+           <div class="row"><div class="col-md-12">
+              <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Metrics</h3>
+            </div>
+            <div class="panel-body">
+                <dl>
+
+                 {% for each in stats %}
+
+                  {% if each.0 != "Data Sources" %}
+
+                      <dt>{{each.0}}</dt>
+                      <dd>{{each.1}}</dd>
+
+                  {% endif %}
+
+                    {% endfor %}
+
+                </dl>
+            </div>
+          </div>
+           </div></div>
+
+
+
+
+        </div>
+         {# END first column #}
+
+
+        {# second column #}
+        <div class="col-md-6">
+
+
+          {% if namespaces %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Namespaces</h3>
+              </div>
+              <div class="panel-body" style="overflow: auto;">
+                 <dl class="-dl-horizontal" style="--margin-left: -100px;">
+
+                 {% for x, y in namespaces  %}
+                     <dt><span class="label label-info">{{x|default(":")}}</span></dt>
+                     <dd><a href="{{y}}" target="_blank">{{y}}</a></dd>
+
+                 {% endfor %}
+
+                </dl>
+              </div>
+            </div>
+              </div>
+            </div>
+            {% endif %}
+        </div>
+         {# END second column #}
+
+      </div>
+
+
+
+
+    <div class="container margin50">
+
+
+    </div> <!-- /container -->
+
+
+  {% endblock bodycontent %}
+
+
+
+
+
+{% block extrajs %}
+
+
+
+{% endblock extrajs %}
