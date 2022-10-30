@@ -13,7 +13,9 @@ Django's template tag `now` can be used in Jinja after installing the extension 
 Then you can do
 
 ```python
-{{ "{% now 'utc', '%a, %d %b %Y %H:%M:%S' %}" }}
+{% raw %}
+{% now 'utc', '%a, %d %b %Y %H:%M:%S' %}
+{% endraw %}
 ```
 
 
