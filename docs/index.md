@@ -10,7 +10,7 @@
 - [Is Ontospy for Me?](#is-ontospy-for-me)
 - [Generating Ontology Documentation](#generating-ontology-documentation)
 - [Miscellaneous Tips](#miscellaneous-tips)
-- [Version 2 Upgrade](#upgrading-to-v-2.0)
+- [Version 2 Upgrade](#upgrading-to-v-20)
 - [Quick Links](#quick-links)
 
 ## Welcome to Ontospy's Documentation!
@@ -35,8 +35,6 @@ Ontospy will extract and print out any ontology-related information contained in
 Many other options are available, in particular Ontospy allows to load/save ontologies from/to a local repository so that they can be cached and quickly reloaded for inspection later on. All without leaving your terminal window!
 
 [![OntospyVideo](static/ontospyvideo_sm.jpg)](https://youtu.be/MkKrtVHi_Ks)
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/MkKrtVHi_Ks/0.jpg)](https://www.youtube.com/watch?v=MkKrtVHi_Ks)
 
 
 ## Installation
