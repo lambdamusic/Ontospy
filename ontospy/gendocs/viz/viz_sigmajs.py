@@ -40,11 +40,13 @@ class Dataviz(VizFactory):
 
         c_mydict = build_class_json(self.ontospy_graph.all_classes)
         JSON_DATA_CLASSES = json.dumps(c_mydict)
+        c_total = len(self.ontospy_graph.all_classes)
 
 
         extra_context = {
                         "ontograph": self.ontospy_graph,
                         'JSON_DATA_CLASSES' : JSON_DATA_CLASSES,
+                        "TOTAL_CLASSES": c_total,
                         }
 
         # Ontology - MAIN PAGE

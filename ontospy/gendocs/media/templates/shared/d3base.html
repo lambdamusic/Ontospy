@@ -8,21 +8,44 @@
 
 
 
-
-{% block custom_css %}
-
-
-    
-{% endblock custom_css %}
-
-
-
-
-
-
 <style type="text/css" media="screen">
 
-    /*slider CSS INCLUDED BY DEFAULT*/
+
+    /*STANDARD CSS */
+
+
+    body {
+        margin-left: 6em;
+        margin-right: 12em;
+        font-size: 14px;
+        font-family: "Helvetica Neue", Helvetica;
+    }
+
+    h1, h2, h3, h4, h5, h6 { text-align: left }
+
+    h1, h2, h3, h4, h5 { color: #000000;}
+    h2 { font: 140% sans-serif }
+    h3 { font: 120% sans-serif }
+    h4 { font: bold 100% sans-serif }
+    h5 { font: italic 100% sans-serif }
+    h6 { font: small-caps 100% sans-serif }
+
+    .margintop {
+        margin-top: 40px;
+    }
+
+
+    a:link, a:visited {
+        color: #666;
+        text-decoration: none;
+        }
+    
+    a:hover {
+    color: #000
+    }
+
+    
+    /*SLIDER CSS */
 
 
     .hidden {
@@ -87,6 +110,15 @@
 
 
 
+{% block custom_css %}
+
+
+    
+{% endblock custom_css %}
+
+
+
+
 
 
 </head>
@@ -126,7 +158,7 @@
 
 	{# SLIDER AND HIDDEN TABS #}
 
-	{% include "d3/d3tree_hiddendivs.html" %}
+	{% include "shared/d3tree_hiddendivs.html" %}
 
 
 	<div id='slider' class="side-panel side-panel-left">
