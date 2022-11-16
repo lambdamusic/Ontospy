@@ -228,19 +228,24 @@
 
 <body>
 
-
+	{% if ontologies%}
 	
-	{% if ontologies|length > 1 %}
-	<h1 class="title">{{docs_title}}</a></h1>
-	
-		{% for o in ontologies  %}
-			<h3><li>{{o.uri}}</li></h3>
-		{% endfor %}
+		{% if ontologies|length > 1 %}
+			<h1 class="title">{{docs_title}}</a></h1>
 			
+				{% for o in ontologies  %}
+					<h3><li>{{o.uri}}</li></h3>
+				{% endfor %}
+					
+		{% else %}
+			<h1 class="title"><a href="{{main_uri}}" target="_blank">{{docs_title}}</a></h1>
+			<h3>{{ontologies.0.bestDescription()|linebreaks}}</h3>
+		{% endif %}
+
 	{% else %}
-	<h1 class="title"><a href="{{main_uri}}" target="_blank">{{docs_title}}</a></h1>
-	<h3>{{ontologies.0.bestDescription()|linebreaks}}</h3>
+		<h1 class="title">{{docs_title}}</h1>
 	{% endif %}
+		
 		
 
 
