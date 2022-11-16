@@ -41,7 +41,7 @@ class VizFactory(object):
         self.output_path = None
         self.output_path_static = None
         home = os.path.expanduser("~")
-        self.output_path_DEFAULT = os.path.join(home, "ontospy-viz-test")
+        self.output_path_DEFAULT = os.path.join(home, "ontospy-viz")
         self.template_name = ""
         self.main_file_name = ""
         self.templates_root = ONTODOCS_VIZ_TEMPLATES
