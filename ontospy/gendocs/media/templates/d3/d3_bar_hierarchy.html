@@ -49,6 +49,7 @@
 			background: white;
 		}
 
+
 </style>
 
 {% endblock custom_css %}
@@ -61,25 +62,48 @@
 
 
 
+	<div class="row header">
+			
+			
+			
+				
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
 
-	{% if TOTAL_CLASSES %}
-		<div class="row">
-			<h3>Classes ({{TOTAL_CLASSES}})</h3>
+	</div>
 
-			<br /><br />
-			<div id="breadcrumbs">Branch: 
-				<li class="bde">Owl:Thing</li>
-			</div>
+
+	<div class="row">
 
 
 
-			<div class="col-md-12" id="graph_classes" style="margin-top: 10px;">
+		<br /><br />
+		<div id="breadcrumbs">Branch: 
+			<li class="bde">Owl:Thing</li>
+		</div>
 
-			</div>
+
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
-	{% endif %}
+
+
+	</div>
 
 
 
@@ -124,7 +148,7 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
 
 <script type="text/javascript">
 
-    var root = {{JSON_DATA_CLASSES|safe}} ;
+    var root = {{JSON_DATA_OBJECTS|safe}} ;
 
 	var m = [80, 160, 0, 260], // top right bottom left
 	    w = 1280 - m[1] - m[3], // width
@@ -142,7 +166,7 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
         .tickFormat(d3.format("d"))
 	    .orient("top");
 
-	var svg = d3.select("#graph_classes").append("svg:svg")
+	var svg = d3.select("#the_graph").append("svg:svg")
 	    .attr("width", w + m[1] + m[3])
 	    .attr("height", h + m[0] + m[2])
 	  .append("svg:g")

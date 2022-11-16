@@ -9,13 +9,6 @@
 
 <style type="text/css" media="screen">
 
- body {
-  background: url(texture-noise.png);
-{#  overflow: hidden;#}
-  margin: 10px;
-  font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica;
-}
 
 #chart, #header, #footer {
   position: absolute;
@@ -138,31 +131,53 @@ text {
 {% block main_content %}
 
 
+	<div class="row header">
+		
+		
+		
+			
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
 
-	{% if TOTAL_CLASSES %}
-		<div class="row">
-			<h3>Classes ({{TOTAL_CLASSES}})</h3>
-			<div class="col-md-12" id="graph_classes" style="margin-top: 10px;">
+	</div>
 
 
-			</div>
+	<div class="row">
+
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
-	{% endif %}
+
+
+	</div>
 
 
 
 
-	{% endblock main_content %}
+{% endblock main_content %}
 
 
 
-	{% block extra_footer %}
+{% block extra_footer %}
 
 	Visualization developed with <a class="greylink" href="https://github.com/d3/d3">d3.js</a>.
 	
-	{% endblock extra_footer %}
+{% endblock extra_footer %}
 	
 	
 
@@ -197,7 +212,7 @@ text {
 
 <script type="text/javascript">
 
-    var root = {{JSON_DATA_CLASSES|safe}} ;
+    var root = {{JSON_DATA_OBJECTS|safe}} ;
 
 	var w = window.innerWidth;
 	var h = window.innerHeight;
@@ -208,7 +223,7 @@ text {
 	var x = d3.scale.linear().range([0, w]),
 	    y = d3.scale.linear().range([0, h]);
 
-	var vis = d3.select("#graph_classes").append("div")
+	var vis = d3.select("#the_graph").append("div")
 	    .attr("class", "chart")
 	    .style("width", w + "px")
 	    .style("height", h + "px")

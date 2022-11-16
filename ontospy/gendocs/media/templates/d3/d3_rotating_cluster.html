@@ -9,67 +9,61 @@
 <style type="text/css" media="screen">
 
 
-path.arc {
-  cursor: move;
-  fill: #fff;
-}
+    path.arc {
+      cursor: move;
+      fill: #fff;
+    }
 
-.node circle {
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
+    .node circle {
+      fill: #fff;
+      stroke: steelblue;
+      stroke-width: 1.5px;
+    }
 
-.node {
-  font-size: 10px;
-  pointer-events: none;
-}
+    .node {
+      font-size: 10px;
+      pointer-events: none;
+    }
 
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-
-text {
-  font-size: 11px;
-  pointer-events: none;
-}
-
-text.parent {
-  fill: #1f77b4;
-}
-
-circle {
-  fill: #ccc;
-  stroke: #999;
-  pointer-events: all;
-}
-
-circle.parent {
-  fill: #1f77b4;
-  fill-opacity: .1;
-  stroke: steelblue;
-}
-
-circle.parent:hover {
-  stroke: #ff7f0e;
-  stroke-width: .5px;
-}
-
-{#note: June 20, 2016 removed to allow mousetips on all circles #}
-{#circle.child {#}
-{#  pointer-events: none;#}
-{# } #}
+    .link {
+      fill: none;
+      stroke: #ccc;
+      stroke-width: 1.5px;
+    }
 
 
-circle.child:hover {
-  stroke: #ff7f0e;
-  stroke-width: .5px;
-  fill: #eaeaea;
-  fill-opacity: .9;
-}
+    text {
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    text.parent {
+      fill: #1f77b4;
+    }
+
+    circle {
+      fill: #ccc;
+      stroke: #999;
+      pointer-events: all;
+    }
+
+    circle.parent {
+      fill: #1f77b4;
+      fill-opacity: .1;
+      stroke: steelblue;
+    }
+
+    circle.parent:hover {
+      stroke: #ff7f0e;
+      stroke-width: .5px;
+    }
+
+    circle.child:hover {
+      stroke: #ff7f0e;
+      stroke-width: .5px;
+      fill: #eaeaea;
+      fill-opacity: .9;
+    }
 
 
 
@@ -83,23 +77,51 @@ circle.child:hover {
 
 
 
-
-  {% block main_content %}
-
-
-	{% if TOTAL_CLASSES %}
-		<div class="row">
-			<h3>Classes ({{TOTAL_CLASSES}})</h3>
-			<div class="col-md-12" id="graph_classes" style="margin-top: 10px;">
+{% block main_content %}
 
 
-			</div>
+	<div class="row header">
+		
+		
+		
+			
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
+
+	</div>
+
+
+	<div class="row">
+
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
-	{% endif %}
 
-  {% endblock main_content %}
+
+	</div>
+
+
+
+
+{% endblock main_content %}
+
+
+
 
 
 
@@ -141,10 +163,10 @@ circle.child:hover {
 
 <script type="text/javascript">
 
-    var json = {{JSON_DATA_CLASSES|safe}} ;
+    var json = {{JSON_DATA_OBJECTS|safe}} ;
 
-    var w = 1400,
-	    h = 1100,
+    var w = 1600,
+	    h = 1200,
 	    rx = w / 4,
 	    ry = h / 4,
 	    m0,
@@ -157,7 +179,7 @@ circle.child:hover {
     var diagonal = d3.svg.diagonal.radial()
         .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
 
-    var svg = d3.select("#graph_classes").append("div")
+    var svg = d3.select("#the_graph").append("div")
         .style("width", w + "px")
         .style("height", w + "px");
 

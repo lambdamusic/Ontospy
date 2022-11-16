@@ -31,29 +31,111 @@ class Dataviz(VizFactory):
         OVERRIDING THIS METHOD from Factory
         """
 
-        jsontree_classes = build_D3treeStandard(
-            0, 99, 1, self.ontospy_graph.toplayer_classes)
         c_total = len(self.ontospy_graph.all_classes)
+        p_total = len(self.ontospy_graph.all_properties)
+        s_total = len(self.ontospy_graph.all_skos_concepts)
 
-        JSON_DATA_CLASSES = json.dumps({
-            'children': jsontree_classes,
-            'name': 'owl:Thing',
-        })
+        main_url = None
 
-        extra_context = {
-            "ontograph": self.ontospy_graph,
-            "TOTAL_CLASSES": c_total,
-            'JSON_DATA_CLASSES': JSON_DATA_CLASSES,
-        }
+        if c_total:
+            c_mylist = build_D3treeStandard(0, 99, 1,
+                                            self.ontospy_graph.toplayer_classes)
+            # hack to make sure that we have a default top level object
+            JSON_DATA_CLASSES = json.dumps({
+                'children': c_mylist,
+                'name': 'owl:Thing',
+                'id': "None"
+            })
 
-        # Ontology - MAIN PAGE
-        contents = self._renderTemplate(
-            "d3/d3_partition_table.html", extraContext=extra_context)
-        FILE_NAME = "index.html"
-        main_url = self._save2File(contents, FILE_NAME, self.output_path)
+            extra_context = {
+                "ontograph": self.ontospy_graph,
+                "thispage": "classes",
+                "TOTAL_CLASSES": c_total,
+                "TOTAL_PROPERTIES": p_total,
+                "TOTAL_CONCEPTS": s_total,
+                "TOTAL_OBJECTS": c_total,
+                "TOTAL_OBJECTS_TOPLAYER": len(self.ontospy_graph.toplayer_classes),
+                'JSON_DATA_OBJECTS': JSON_DATA_CLASSES,
+            }
+
+            # Classes - MAIN PAGE
+            contents = self._renderTemplate(
+                "d3/d3_partition_table.html", extraContext=extra_context)
+            
+            if not main_url: 
+                FILE_NAME = "index.html"
+                main_url = self._save2File(contents, FILE_NAME, self.output_path)
+            else:
+                FILE_NAME = "classes.html"
+                self._save2File(contents, FILE_NAME, self.output_path)
+            
+
+
+        if p_total:
+            p_mylist = build_D3treeStandard(0, 99, 1,
+                                            self.ontospy_graph.toplayer_properties)
+            JSON_DATA_PROPERTIES = json.dumps({
+                'children': p_mylist,
+                'name': 'Properties',
+                'id': "None"
+            })
+
+            extra_context = {
+                "ontograph": self.ontospy_graph,
+                "thispage": "properties",
+                "TOTAL_CLASSES": c_total,
+                "TOTAL_PROPERTIES": p_total,
+                "TOTAL_CONCEPTS": s_total,
+                "TOTAL_OBJECTS": p_total,
+                "TOTAL_OBJECTS_TOPLAYER": len(self.ontospy_graph.toplayer_properties),
+                'JSON_DATA_OBJECTS': JSON_DATA_PROPERTIES,
+            }
+
+            # Properties PAGE
+            contents = self._renderTemplate(
+                "d3/d3_partition_table.html", extraContext=extra_context)
+            
+            if not main_url: 
+                FILE_NAME = "index.html"
+                main_url = self._save2File(contents, FILE_NAME, self.output_path)
+            else:
+                FILE_NAME = "properties.html"
+                self._save2File(contents, FILE_NAME, self.output_path)
+            
+
+        if s_total:
+            s_mylist = build_D3treeStandard(0, 99, 1,
+                                            self.ontospy_graph.toplayer_skos)
+            JSON_DATA_CONCEPTS = json.dumps({
+                'children': s_mylist,
+                'name': 'Concepts',
+                'id': "None"
+            })
+
+            extra_context = {
+                "ontograph": self.ontospy_graph,
+                "thispage": "concepts",
+                "TOTAL_CLASSES": c_total,
+                "TOTAL_PROPERTIES": p_total,
+                "TOTAL_CONCEPTS": s_total,
+                "TOTAL_OBJECTS": s_total,
+                "TOTAL_OBJECTS_TOPLAYER": len(self.ontospy_graph.toplayer_skos),
+                'JSON_DATA_OBJECTS': JSON_DATA_CONCEPTS,
+            }
+
+            # Concepts PAGE
+            contents = self._renderTemplate(
+                "d3/d3_partition_table.html", extraContext=extra_context)
+
+            if not main_url: 
+                FILE_NAME = "index.html"
+                main_url = self._save2File(contents, FILE_NAME, self.output_path)
+            else:
+                FILE_NAME = "skos.html"
+                self._save2File(contents, FILE_NAME, self.output_path)
+
 
         return main_url
-
 
 # if called directly, for testing purposes pick a random ontology
 

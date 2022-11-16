@@ -36,11 +36,6 @@ circle.parent:hover {
   stroke-width: .5px;
 }
 
-{#note: June 20, 2016 removed to allow mousetips on all circles #}
-{#circle.child {#}
-{#  pointer-events: none;#}
-{# } #}
-
 
 circle.child:hover {
   stroke: #ff7f0e;
@@ -98,26 +93,50 @@ path.link {
 
 
 
+
 {% block main_content %}
 
 
+	<div class="row header">
+		
+		
+		
+			
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
+
+	</div>
 
 
-	{% if TOTAL_CLASSES %}
-		<div class="row">
-			<h3>Classes ({{TOTAL_CLASSES}})</h3>
-			<div class="col-md-12" id="graph_classes">
+	<div class="row">
 
-
-			</div>
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
-	{% endif %}
+
+
+	</div>
+
 
 
 
 {% endblock main_content %}
+
 
 
 
@@ -152,7 +171,7 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
 
 <script type="text/javascript">
 
-    var data = {{JSON_DATA_CLASSES|safe}};
+    var data = {{JSON_DATA_OBJECTS|safe}};
 
     var w = 1280,
         h = 800,
@@ -167,7 +186,7 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
         .size([r, r])
         .value(function(d) { return d.size; });
 
-    var vis = d3.select("#graph_classes").insert("svg:svg", "h2")
+    var vis = d3.select("#the_graph").insert("svg:svg", "h2")
         .attr("width", w)
         .attr("height", h)
         .append("svg:g")
@@ -187,7 +206,6 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
 	    .text("a simple tooltip");
 
 
-{#    d3.json("flare.json", function(data) {#}
     node = root = data;
 
     var nodes = pack.nodes(data);
@@ -230,7 +248,6 @@ Visualization developed with <a class="greylink" href="https://github.com/d3/d3"
 
       d3.select(window).on("click", function() { zoom(root); });
 
-{#    });#}
 
     function zoom(d, i) {
       var k = r / d.r / 2;
