@@ -5,79 +5,86 @@
 
 {% block custom_css %}
 
+	<style type="text/css" media="screen">
 
-<style type="text/css" media="screen">
+		/* rect {
+		fill: none;
+		pointer-events: all;
+		}*/
 
+		rect {
+			fill:black;
+			stroke:none;
+		}
 
+		line {
+			stroke: #000;
+			stroke-width: 1.5px;
+		}
 
-/* rect {
-fill: none;
-pointer-events: all;
-}*/
+		.string, .regexp {
+			color: #f39;
+		}
 
-rect {
-fill:black;
-stroke:none;
-}
-
-line {
-stroke: #000;
-stroke-width: 1.5px;
-}
-
-.string, .regexp {
-color: #f39;
-}
-
-
-/*extra css*/
-
-.node circle {
-cursor: pointer;
-fill: #fff;
-stroke: steelblue;
-stroke-width: 1.5px;
-}
-
-.node text {
-font-size: 11px;
-}
-
-path.link {
-fill: none;
-stroke: #ccc;
-stroke-width: 1.5px;
-}
+		a.active {
+			font-weight: bold;
+			color: black;
+		}
 
 
-.infoentity {
-	stroke: white;
-	stroke-width: 2.5px;
-	opacity: 0.7;
-	background: linen;
-	line-height: 0.7em;
-}
+		/*extra css*/
+
+		.node circle {
+		cursor: pointer;
+		fill: #fff;
+		stroke: steelblue;
+		stroke-width: 1.5px;
+		}
+
+		.node text {
+		font-size: 11px;
+		}
+
+		path.link {
+		fill: none;
+		stroke: #ccc;
+		stroke-width: 1.5px;
+		}
 
 
-.smalldesc {
-	font-size: 20px;
-	margin-top: 0px;
-	color: black;
-}
-
-kbd {
-	padding: 2px 4px;
-	font-size: 90%;
-	color: #fff;
-	background-color: #333;
-	border-radius: 3px;
-	box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
-	border-image-outset: 1;
-}
-    
+		.infoentity {
+			stroke: white;
+			stroke-width: 2.5px;
+			opacity: 0.7;
+			background: linen;
+			line-height: 0.7em;
+		}
 
 
-</style>
+		.smalldesc {
+			font-size: 20px;
+			margin-top: 0px;
+			color: black;
+		}
+
+		kbd {
+			padding: 2px 4px;
+			font-size: 90%;
+			color: #fff;
+			background-color: #333;
+			border-radius: 3px;
+			box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+			border-image-outset: 1;
+		}
+			
+
+		.header {
+			font-size: 15px;
+			margin-bottom: 30px;
+		}
+
+
+	</style>
 
 
 {% endblock custom_css %}
@@ -91,45 +98,40 @@ kbd {
 {% block main_content %}
 
 
+	<div class="row header">
+		
+		
+		
+			
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
 
-	{% if TOTAL_CLASSES %}
+	</div>
+
+
 	<div class="row">
-		<h3>Classes ({{TOTAL_CLASSES}})</h3>
-		<div class="col-md-12" id="graph_classes">
+
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
 
 
 	</div>
-	{% endif %}
-
-	{% if TOTAL_PROPERTIES %}
-	<div class="row">
-		<h3>Properties ({{TOTAL_PROPERTIES}})</h3>
-		<div class="col-md-12" id="graph_properties">
-
-
-		</div>
-
-
-	</div>
-	{% endif %}
-
-
-	{% if TOTAL_CONCEPTS %}
-
-	<div class="row">
-		<h3>Concepts ({{TOTAL_CONCEPTS}})</h3>
-		<div class="col-md-12" id="graph_concepts">
-
-
-		</div>
-
-
-	</div>
-
-	{% endif %}
 
 
 
@@ -195,14 +197,15 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type="text/javascript">
 
 //
-// CLASSES
+// LOGIC FOR ALL OBJECTS TYPES
 //
 
-{% if TOTAL_CLASSES %}
 
-	var json1 = {{JSON_DATA_CLASSES|safe}};
+{% if TOTAL_OBJECTS > 0 %}
 
-	var variable_height1 = {{ TOTAL_CLASSES_TOPLAYER|d3_dendogram_height }};
+	var json1 = {{JSON_DATA_OBJECTS|safe}};
+
+	var variable_height1 = {{ TOTAL_OBJECTS_TOPLAYER|d3_dendogram_height }};
 
 	var m = [20, 120, 100, 120],
 	    w = 2600 - m[1] - m[3],
@@ -216,7 +219,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	var diagonal1 = d3.svg.diagonal()
 	    .projection(function(d) { return [d.y, d.x]; });
 
-	var vis1 = d3.select("#graph_classes").append("svg:svg")
+	var vis1 = d3.select("#the_graph").append("svg:svg")
 	    .attr("width", w + m[1] + m[3])
 	    .attr("height", h + m[0] + m[2])
 	  	.append("svg:g")
@@ -227,7 +230,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	root_classes.y0 = 0;
 
 
-	{% if TOTAL_CLASSES > 200 %}
+	{% if TOTAL_OBJECTS > 200 %}
 
 		// Initialize the display to show no nodes:
 		root_classes.children.forEach(toggleAll);
@@ -243,106 +246,13 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 
 
-//
-// PROPERTIES
-//
-
-
-{% if TOTAL_PROPERTIES %}
-
-
-	var json2 = {{JSON_DATA_PROPERTIES|safe}};
-
-
-	var variable_height2 = {{ TOTAL_PROPERTIES_TOPLAYER|d3_dendogram_height }};
-
-	var m = [20, 120, 100, 120],
-	    w = 2600 - m[1] - m[3],
-	    h = variable_height2 - m[0] - m[2],
-	    i = 0,
-	    root_properties;
-
-	var tree2 = d3.layout.tree()
-	    .size([h, w]);
-
-	var diagonal2 = d3.svg.diagonal()
-	    .projection(function(d) { return [d.y, d.x]; });
-
-	var vis2 = d3.select("#graph_properties").append("svg:svg")
-	    .attr("width", w + m[1] + m[3])
-	    .attr("height", h + m[0] + m[2])
-	  	.append("svg:g")
-	    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-
-	root_properties = json2;
-	root_properties.x0 = h / 2;
-	root_properties.y0 = 0;
-
-	{% if TOTAL_PROPERTIES > 200 %}
-
-		// Initialize the display to show no nodes:
-		root_properties.children.forEach(toggleAll);
-	{% endif %}
-
-
-	update(vis2, tree2, diagonal2, root_properties, json2);
-
-{% endif %}
-
-
-
-
-
-{% if TOTAL_CONCEPTS %}
-
-	var json3 = {{JSON_DATA_CONCEPTS|safe}};
-
-	var variable_height3 = {{ TOTAL_CONCEPTS_TOPLAYER|d3_dendogram_height }};
-
-	var m = [20, 120, 100, 120],
-	    w = 2600 - m[1] - m[3],
-	    h = variable_height3 - m[0] - m[2],
-	    i = 0,
-	    root_concepts;
-
-	var tree3 = d3.layout.tree()
-	    .size([h, w]);
-
-	var diagonal3 = d3.svg.diagonal()
-	    .projection(function(d) { return [d.y, d.x]; });
-
-	var vis3 = d3.select("#graph_concepts").append("svg:svg")
-	    .attr("width", w + m[1] + m[3])
-	    .attr("height", h + m[0] + m[2])
-	    .append("svg:g")
-	    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-
-	root_concepts = json3;
-	root_concepts.x0 = h / 2;
-	root_concepts.y0 = 0;
-
-
-
-	{% if TOTAL_CONCEPTS > 200 %}
-		// Initialize the display to show no nodes:
-		root_concepts.children.forEach(toggleAll);
-	{% endif %}
-
-
-
-	update(vis3, tree3, diagonal3, root_concepts, json3);
-
-
-{% endif %}
-
-
 
 //
 //  SHARED FUNCTIONS
 //
 
 
-// mikele: added more args [vis, tree, diagonal, root] which originally were referenced as a Global var
+// added more args [vis, tree, diagonal, root] which originally were referenced as a Global var
 function update(vis, tree, diagonal, source, root) {
 
   var duration = d3.event && d3.event.altKey ? 5000 : 500;

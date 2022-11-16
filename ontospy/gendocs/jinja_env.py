@@ -40,13 +40,16 @@ _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @pass_eval_context
 def linebreaks_filter(eval_ctx, value):
     """A filter for legacy django templates."""
-    if not value:
-        return ""
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
-                      for p in _paragraph_re.split(escape(value)))
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
+    try:
+        if not value:
+            return ""
+        result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
+                        for p in _paragraph_re.split(escape(value)))
+        if eval_ctx.autoescape:
+            result = Markup(result)
+        return result
+    except:
+        return value
 
 env.filters['linebreaks'] = linebreaks_filter
 
