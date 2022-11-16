@@ -37,11 +37,6 @@
     stroke-width: .5px;
   }
 
-  {#note: June 20, 2016 removed to allow mousetips on all circles #}
-  {#circle.child {#}
-  {#  pointer-events: none;#}
-  {# } #}
-
 
   circle.child:hover {
     stroke: #ff7f0e;
@@ -58,27 +53,48 @@
 
 
 
+  {% block main_content %}
 
 
-{% block main_content %}
+	<div class="row header">
+		
+		
+		
+			
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_PROPERTIES %}
+			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		
+		{% if TOTAL_CONCEPTS %}
+			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+			
+			
+		
+
+	</div>
 
 
+	<div class="row">
 
-	{% if TOTAL_CLASSES %}
-		<div class="row">
-			<h3>Classes ({{TOTAL_CLASSES}})</h3>
-			<div class="col-md-12" id="graph_classes">
-
-
-			</div>
+		<!-- the graph -->
+		
+		<div class="col-md-12" id="the_graph">
 
 
 		</div>
-	{% endif %}
+
+
+	</div>
 
 
 
-  {% endblock main_content %}
+
+{% endblock main_content %}
 
 
 
@@ -124,7 +140,7 @@
 
 <script type="text/javascript">
 
-	var root = {{JSON_DATA_CLASSES|safe}} ;
+	var root = {{JSON_DATA_OBJECTS|safe}} ;
 
     var diameter = 960,
     format = d3.format(",d"),
@@ -135,7 +151,7 @@
         .size([diameter, diameter])
         .padding(1.5);
 
-    var svg = d3.select("#graph_classes").append("svg")
+    var svg = d3.select("#the_graph").append("svg")
         .attr("width", diameter)
         .attr("height", diameter)
         .attr("class", "bubble");
@@ -186,7 +202,6 @@
           .style("text-anchor", "middle")
           .style("pointer-events", "none")
           .text(function(d) { return d.className.substring(0, d.r / 3); });
-{#    });#}
 
     // Returns a flattened hierarchy containing all leaf nodes under the root.
     function classes(root) {

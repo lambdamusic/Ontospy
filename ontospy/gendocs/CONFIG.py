@@ -24,17 +24,17 @@ VISUALIZATIONS_LIST = {
                        },
                        {
                            "ID": "d3-bubble-chart",
-                           "Title": "D3 Bubble chart [alpha]",
+                           "Title": "D3 Bubble chart",
                            "Description": "@todo",
                        },
                        {
                            "ID": "d3-pack-hierarchy",
-                           "Title": "D3 Pack hierarchy [alpha]",
+                           "Title": "D3 Pack hierarchy",
                            "Description": "@todo",
                        },
                        {
                            "ID": "d3-bar-hierarchy",
-                           "Title": "D3 Bar hierarchy [alpha]",
+                           "Title": "D3 Bar hierarchy",
                            "Description": "@todo",
                        },
                        {
