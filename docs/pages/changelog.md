@@ -2,6 +2,11 @@
 
 Summary of changes.
 
+## Nov, 2022: v 2.1.0
+
+- D3 visualizations improvements
+    - Split pages for different object types
+    - Refactor code
 
 ## Oct, 2022: v 2.0.0
 

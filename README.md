@@ -26,7 +26,7 @@ The same functionalities are accessible also via a command line application. Thi
 
 Ontospy can be used to generate HTML documentation for an ontology pretty much out-of-the-box. 
 
-See the website [Examples of ontology documentation generated via Ontospy](https://lambdamusic.github.io/ontospy-examples/index.html), or jump straight to the sample [Schema.org](https://lambdamusic.github.io/ontospy-examples/schema_org_topbraidttl/index.html) or [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) documentation pages.
+See the website [Examples of ontology documentation generated via Ontospy](https://lambdamusic.github.io/ontospy-examples/index.html), or jump straight to the sample [CIDOC-CRM](https://lambdamusic.github.io/ontospy-examples/cidoccrm_ecrm-2022-11owlxml/index.html) or [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) documentation pages.
 
 > From version 2.0, the documentation generation libraries are installed by default with Ontospy. Previously, third party dependencies (e.g. Django) had to be installed separately. 
 
