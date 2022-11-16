@@ -99,3 +99,22 @@ def truncatewords_filter(data, l=20):
 
 env.filters['truncatewords'] = truncatewords_filter
 
+
+
+
+#
+# FILTER
+#
+
+
+def d3_dendogram_height_filter(tot_objects):
+    """A filter to generate dynamically the min height of a dendogram."""
+    n = 50 * tot_objects
+    if n < 800:
+        return 800
+    else:
+        return n
+
+
+env.filters['d3_dendogram_height'] = d3_dendogram_height_filter
+

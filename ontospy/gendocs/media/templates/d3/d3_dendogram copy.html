@@ -202,7 +202,11 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 	var json1 = {{JSON_DATA_CLASSES|safe}};
 
-	var variable_height1 = {{ TOTAL_CLASSES_TOPLAYER|d3_dendogram_height }};
+	{% if TOTAL_CLASSES_TOPLAYER > 40 %}
+	var variable_height1 = 1200;
+	{% else %}
+	var variable_height1 = 800;
+	{% endif %}
 
 	var m = [20, 120, 100, 120],
 	    w = 2600 - m[1] - m[3],
@@ -254,7 +258,11 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	var json2 = {{JSON_DATA_PROPERTIES|safe}};
 
 
-	var variable_height2 = {{ TOTAL_PROPERTIES_TOPLAYER|d3_dendogram_height }};
+	{% if TOTAL_PROPERTIES_TOPLAYER > 40 %}
+	var variable_height2 = 1200;
+	{% else %}
+	var variable_height2 = 800;
+	{% endif %}
 
 	var m = [20, 120, 100, 120],
 	    w = 2600 - m[1] - m[3],
@@ -297,7 +305,12 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
 	var json3 = {{JSON_DATA_CONCEPTS|safe}};
 
-	var variable_height3 = {{ TOTAL_CONCEPTS_TOPLAYER|d3_dendogram_height }};
+
+	{% if TOTAL_CONCEPTS_TOPLAYER > 40 %}
+	var variable_height3 = 1200;
+	{% else %}
+	var variable_height3 = 800;
+	{% endif %}
 
 	var m = [20, 120, 100, 120],
 	    w = 2600 - m[1] - m[3],
