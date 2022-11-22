@@ -47,6 +47,7 @@ class Ontospy(object):
 				 uri_or_path=None,
 				 data=None,
 				 file_obj=None,
+				 graph_obj=None,
 				 rdf_format="",
 				 verbose=False,
 				 hide_base_schemas=True,
@@ -68,6 +69,8 @@ class Ontospy(object):
 		data : [type], optional
 			[description], by default None
 		file_obj : [type], optional
+			[description], by default None
+		graph_obj : [type], optional
 			[description], by default None
 		rdf_format : str, optional
 			[description], by default ""
@@ -126,8 +129,8 @@ class Ontospy(object):
 									self.pref_lang)
 
 		# finally:
-		if uri_or_path or data or file_obj:
-			self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose)
+		if uri_or_path or data or file_obj or graph_obj:
+			self.load_rdf(uri_or_path, data, file_obj, graph_obj ,rdf_format, verbose)
 			if build_all:
 				self.build_all(
 					verbose=verbose,
@@ -159,13 +162,18 @@ class Ontospy(object):
 				 uri_or_path=None,
 				 data=None,
 				 file_obj=None,
+				 graph_obj=None,
 				 rdf_format="",
 				 verbose=False):
 		"""Load an RDF source into an ontospy/rdflib graph"""
-		loader = RDFLoader(verbose=verbose)
-		loader.load(uri_or_path, data, file_obj, rdf_format)
-		self.rdflib_graph = loader.rdflib_graph
-		self.sources = loader.sources_valid
+		if graph_obj:
+			self.rdflib_graph = graph_obj
+			self.sources = graph_obj.identifier
+		else:
+			loader = RDFLoader(verbose=verbose)
+			loader.load(uri_or_path, data, file_obj, rdf_format)
+			self.rdflib_graph = loader.rdflib_graph
+			self.sources = loader.sources_valid
 		self.sparqlHelper = SparqlHelper(self.rdflib_graph)
 		self.namespaces = sorted(self.rdflib_graph.namespaces())
 
