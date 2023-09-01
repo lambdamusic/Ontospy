@@ -25,7 +25,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version:
+        - 3.8
+        - 3.9
+        # - "3.11"  # TODO - Replace 3.9 reference with this line after nose issue settled.
 
     steps:
     - uses: actions/checkout@v2
