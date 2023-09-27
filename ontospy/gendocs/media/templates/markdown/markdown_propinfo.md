@@ -40,7 +40,7 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription()|linebreaks|default("--")}}
+{{each.bestDescription()|default("--")}}
 
 {% if each.ancestors() %}
 #### Inherits from ({{ each.ancestors()|length }})
