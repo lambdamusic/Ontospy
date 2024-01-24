@@ -73,14 +73,14 @@ owl:Thing
 #### Instances of {{each.title}} can have the following properties:
 
 {% for group in each.domain_of_inferred  %}      
-    {% for k,v in group.items()  -%}
+    {%- for k,v in group.items()  -%}
           
-From [{{k.title}}]({{k.slug}}.md):
+##### From [{{k.title}}]({{k.slug}}.md):
 
 | Property | Description | Expected Type |
 |----------|-------------|---------------|
 {% for prop in v -%}
-| [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription}} | 
+| [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription()}} | 
             {%- if  prop.ranges -%}
                 {%- for range in prop.ranges -%} 
 [{{range.title}}]({{range.slug}}.md)
