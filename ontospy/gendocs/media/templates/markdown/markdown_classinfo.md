@@ -73,49 +73,43 @@ owl:Thing
 #### Instances of {{each.title}} can have the following properties:
 
 <table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover ">
+<tr>
+   <th height="40">Property</th><th>Description</th><th>Expected Type</th>
+</tr>
 
-    <tr>
-        <th height="40">Property</th><th>Description</th><th>Expected Type</th>
-    </tr>
+{% for group in each.domain_of_inferred  %}      
+    {% for k,v in group.items()  %}
+          
+      
+<tr style="background: lightcyan;text-align: left;">
+   <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
+   From <a title="{{k.qname}}" href="{{k.slug}}.md" class="rdfclass">{{k.title}}</a></span>
+   </th>
+</tr>       
 
-    {% for group in each.domain_of_inferred  %}      
-
-        {% for k,v in group.items()  %}
-            
-        
-        <tr style="background: lightcyan;text-align: left;">
-            <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
-            From <a title="{{k.qname}}" href="{{k.slug}}.md" class="rdfclass">{{k.title}}</a></span>
-            </th>
-        </tr>       
-
-            {% for prop in v  %}
-            <tr>
-                <td class="firsttd">
-                    <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.md">{{prop.title}}</a>         
-                </td>
-                <td class="thirdtd">
-                    <span>{{prop.bestDescription}}</span>
-                </td>
-                <td class="secondtd">
-                    {% if  prop.ranges %}
-                    {% for range in prop.ranges  %}
-
-                        <a title="{{range.qname}}" href="{{range.slug}}.md" class="rdfclass">{{range.title}}</a>
-
-                    {% endfor %}
-                    {% else %}
-                        <i>owl:Thing</i>
-                    {% endif %}
-                </td>
-            </tr>
+          {% for prop in v  %}
+<tr>
+   <td class="firsttd">
+   <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.md">{{prop.title}}</a>         
+   </td>
+   <td class="thirdtd">
+   <span>{{prop.bestDescription}}</span>
+   </td>
+   <td class="secondtd">
+               {% if  prop.ranges %}
+                   {% for range in prop.ranges  %}
+   <a title="{{range.qname}}" href="{{range.slug}}.md" class="rdfclass">{{range.title}}</a>
+                   {% endfor %}
+               {% else %}
+  <i>owl:Thing</i>
+               {% endif %}
+   </td>
+</tr>
 
             {% endfor %}
 
-        {% endfor %}
-
-    {% endfor %}
-
+      {% endfor %}
+{% endfor %}
 </table>
 
 {% endif %}
