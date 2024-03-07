@@ -18,11 +18,11 @@ class HTMLVisualizer(VizFactory):
 
     """
 
-    def __init__(self, ontospy_graph, title=""):
+    def __init__(self, *args, **kwargs):
         """
         Init
         """
-        super(HTMLVisualizer, self).__init__(ontospy_graph, title)
+        super(HTMLVisualizer, self).__init__(*args, **kwargs)
         self.template_name = "html-single/html-single.html"
         self.main_file_name = "index.html"
 

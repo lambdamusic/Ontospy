@@ -60,7 +60,7 @@ def d3_dendogram_height_filter(tot_objects):
     else:
         return n
     
-def add_default_filters(env: Environment):
+def add_default_filters(env):
     env.filters['slugify'] = slugify_filter
     env.filters['linebreaks'] = linebreaks_filter
     env.filters['capfirst'] = capfirst_filter

@@ -39,11 +39,11 @@ class KompleteViz(VizFactory):
     """
 
 
-    def __init__(self, ontospy_graph, title="", theme=""):
+    def __init__(self, ontospy_graph, title="", theme="", *args, **kwargs):
         """
         Init
         """
-        super(KompleteViz, self).__init__(ontospy_graph, title)
+        super(KompleteViz, self).__init__(ontospy_graph, title, *args, **kwargs)
         self.static_files = [
                 "custom",
                 "libs/bootswatch3_2",

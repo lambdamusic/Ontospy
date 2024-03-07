@@ -19,11 +19,11 @@ class Dataviz(VizFactory):
 
     """
 
-    def __init__(self, ontospy_graph, title=""):
+    def __init__(self, *args, **kwargs):
         """
         Init
         """
-        super(Dataviz, self).__init__(ontospy_graph, title)
+        super(Dataviz, self).__init__(*args, **kwargs)
         self.static_files = ["libs/d3-v3", "libs/jquery"]
 
     def _buildTemplates(self):

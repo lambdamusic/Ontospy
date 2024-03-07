@@ -8,7 +8,6 @@ from ..core.utils import *
 from .actions import ONTODOCS_VIZ_STATIC
 from .utils import *
 from .jinja_env import get_default_env
-from jinja2 import Environment
 
 import zipfile
 import os
@@ -33,7 +32,7 @@ class VizFactory(object):
     Tip: subclass and override as needed.
     """
 
-    def __init__(self, ontospy_graph, title="", jinja2env: Environment = None):
+    def __init__(self, ontospy_graph, title="", jinja2env = None):
         self.title = ''
         self.ontospy_graph = ontospy_graph
         self.static_files = []
