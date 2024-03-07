@@ -5,37 +5,11 @@ from markupsafe import Markup, escape
 from jinja2 import pass_eval_context
 from ontospy.core.utils import slugify
 
-#
-# SET UP JINJA2
-#
-env = Environment(
-    loader=PackageLoader('ontospy.gendocs.media', 'templates'),
-    autoescape=select_autoescape(['html', 'xml']),
-    extensions=['jinja2_time.TimeExtension']
-)
-
-
-#############################
-####### JINJA2 CUSTOM FILTERS
-###
-
-
-#
-# FILTER
-#
+_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 def slugify_filter(value):
     """A filter for legacy django templates to call that returns a slugified value."""
     return slugify(value)  # from ontospy.core.utils
-
-env.filters['slugify'] = slugify_filter
-
-
-#
-# FILTER
-#
-
-_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 @pass_eval_context
 def linebreaks_filter(eval_ctx, value):
@@ -51,12 +25,6 @@ def linebreaks_filter(eval_ctx, value):
     except:
         return value
 
-env.filters['linebreaks'] = linebreaks_filter
-
-#
-# FILTER
-#
-
 
 def capfirst_filter(value):
     """A filter for legacy django templates to call that returns a capitalized value."""
@@ -65,14 +33,6 @@ def capfirst_filter(value):
     except:
         return value
 
-env.filters['capfirst'] = capfirst_filter
-
-
-
-#
-# FILTER
-#
-
 
 def add_filter(value, integer_n):
     """A filter for legacy django templates."""
@@ -80,14 +40,6 @@ def add_filter(value, integer_n):
         return value + integer_n
     except:
         return value
-
-env.filters['add'] = add_filter
-
-
-
-#
-# FILTER
-#
 
 
 def truncatewords_filter(data, l=20):
@@ -100,16 +52,6 @@ def truncatewords_filter(data, l=20):
         return data
 
 
-env.filters['truncatewords'] = truncatewords_filter
-
-
-
-
-#
-# FILTER
-#
-
-
 def d3_dendogram_height_filter(tot_objects):
     """A filter to generate dynamically the min height of a dendogram."""
     n = 50 * tot_objects
@@ -117,7 +59,27 @@ def d3_dendogram_height_filter(tot_objects):
         return 800
     else:
         return n
+    
+def add_default_filters(env: Environment):
+    env.filters['slugify'] = slugify_filter
+    env.filters['linebreaks'] = linebreaks_filter
+    env.filters['capfirst'] = capfirst_filter
+    env.filters['add'] = add_filter
+    env.filters['truncatewords'] = truncatewords_filter
+    env.filters['d3_dendogram_height'] = d3_dendogram_height_filter
 
+def get_default_env():
+    # Setup Jinja2
+    env = Environment(
+        loader=PackageLoader('ontospy.gendocs.media', 'templates'),
+        autoescape=select_autoescape(['html', 'xml']),
+        extensions=['jinja2_time.TimeExtension']
+    )
 
-env.filters['d3_dendogram_height'] = d3_dendogram_height_filter
+    # Add custom filters
+    add_default_filters(env)
 
+    return env
+
+# Create this global variable for backwards compatibility
+env = get_default_env()

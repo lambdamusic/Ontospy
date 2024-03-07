@@ -5,9 +5,10 @@
 
 from .. import * # import main ontospy VERSION 
 from ..core.utils import *  
-from .actions import ONTODOCS_VIZ_TEMPLATES, ONTODOCS_VIZ_STATIC
+from .actions import ONTODOCS_VIZ_STATIC
 from .utils import *
-from .jinja_env import *
+from .jinja_env import get_default_env
+from jinja2 import Environment
 
 import zipfile
 import os
@@ -32,7 +33,7 @@ class VizFactory(object):
     Tip: subclass and override as needed.
     """
 
-    def __init__(self, ontospy_graph, title=""):
+    def __init__(self, ontospy_graph, title="", jinja2env: Environment = None):
         self.title = ''
         self.ontospy_graph = ontospy_graph
         self.static_files = []
@@ -44,10 +45,10 @@ class VizFactory(object):
         self.output_path_DEFAULT = os.path.join(home, "ontospy-viz")
         self.template_name = ""
         self.main_file_name = ""
-        self.templates_root = ONTODOCS_VIZ_TEMPLATES
         self.static_root = ONTODOCS_VIZ_STATIC
         self.title = title or self.infer_best_title()
         self.basic_context_data = self._build_basic_context()
+        self.jinja2env = jinja2env or get_default_env()
 
     def infer_best_title(self):
         """Selects something usable as a title for an ontospy graph. 
@@ -97,8 +98,7 @@ class VizFactory(object):
         :param extraContext: a dict that can be loaded on demand
         :return: the rendered template as a string
         """
-        # t = env.get_template(self.templates_root + template_name)  # FAILS
-        t = env.get_template(template_name)
+        t = self.jinja2env.get_template(template_name)
         context = self.basic_context_data
         if extraContext and type(extraContext) == dict:
             context.update(extraContext)
