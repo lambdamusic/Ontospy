@@ -19,7 +19,7 @@ import pickle as cPickle
 import urllib.request
 from urllib.request import urlopen
 from urllib.parse import quote  # Python 3+
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 from . import *
 from .ontospy import Ontospy
@@ -521,7 +521,7 @@ def action_update_library_location(_location):
 
     if os.path.isdir(_location):
 
-        config = SafeConfigParser()
+        config = ConfigParser()
         config_filename = ONTOSPY_LOCAL + '/config.ini'
         config.read(config_filename)
         if not config.has_section('models'):

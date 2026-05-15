@@ -63,7 +63,7 @@ def get_home_location():
     """Gets the path of the local library folder
     :return - a string e.g. "/users/mac/ontospy"
     """
-    config = SafeConfigParser()
+    config = ConfigParser()
     config_filename = ONTOSPY_LOCAL + '/config.ini'
 
     if not os.path.exists(config_filename):
