@@ -50,3 +50,6 @@ venv
 README_PRIVATE.md
 notebooks/scratch.ipynb
 backlog
+
+# local-only tests, eg against private endpoints (see docs/pages/tests.md)
+ontospy/tests/local/
