@@ -436,7 +436,6 @@ class OntoSKOSConcept(RdfEntity):
         super().__init__(uri, rdftype, namespaces,
                                               ext_model, pref_title=pref_title, pref_lang=pref_lang)
         self.slug = "concept-" + slugify(self.qname)
-        self.instance_of = []
         self.ontology = None
         self.sparqlHelper = None  # the original graph the class derives from
 

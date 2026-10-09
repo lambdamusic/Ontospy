@@ -292,12 +292,12 @@
     {% endif %}
 
 
-	{% if each.instance_of %}
+	{% if each.instance_of() %}
 		<hr>
 	{% endif %}
 	
-	{% if each.instance_of %}
-		<p><b class="section-title">Is Direct Instance Of:</b> {% for s in each.instance_of %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+	{% if each.instance_of() %}
+		<p><b class="section-title">Is Direct Instance Of:</b> {% for s in each.instance_of() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	<hr>

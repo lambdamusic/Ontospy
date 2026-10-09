@@ -43,6 +43,7 @@ The local tests take about a minute, mostly spent loading the ontologies in `ont
 | `test_load_local.py` | Every ontology in `ontospy/tests/rdf` loads | No |
 | `test_methods.py` | Specific `Ontospy` methods, preferred titles and languages, custom entity classes | No |
 | `test_shapes.py` | SHACL shapes are extracted (SciGraph ontology) | No |
+| `test_gendocs.py` | Every documentation type builds for an ontology with individuals (`pizza.ttl`) | No |
 | `test_load_remote.py` | A sample online ontology loads | Yes |
 | `test_sparql.py` | Connecting to and querying the DBpedia SPARQL endpoint | Yes |
 
