@@ -11,7 +11,7 @@
 __version__ = "2.2"  # Pypi latest: https://pypi.org/project/ontospy/
 
 __copyright__ = "CopyRight (C) 2015-2026 by Michele Pasin"
-__license__ = "GNU"
+__license__ = "MIT"
 __author__ = "Michele Pasin"
 __author_email__ = "michele dot pasin at gmail dot com"
 
