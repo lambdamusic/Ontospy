@@ -8,7 +8,10 @@ Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reser
 """
 
 from itertools import chain
+import json
+import re
 import rdflib
+from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 from .utils import *
 from .rdf_loader import RDFLoader
@@ -16,6 +19,8 @@ from .entities import *
 from .sparql_helper import SparqlHelper
 from .shacl_helper import build_shacl_constraints
 
+# a PREFIX declaration in a sparql query, eg `PREFIX owl: <http://www.w3.org/2002/07/owl#>`
+PREFIX_DECLARATION = re.compile(r"PREFIX\s+([\w.-]*)\s*:\s*<([^>]*)>", re.IGNORECASE)
 
 class Ontospy(object):
 	"""
@@ -95,6 +100,7 @@ class Ontospy(object):
 		
 		super(Ontospy, self).__init__()
 
+		self.verbose = verbose
 		self.rdflib_graph = None
 		self.sparql_endpoint = None
 		self.credentials = None  # tuple: auth credentials for endpoint if needed
@@ -169,30 +175,32 @@ class Ontospy(object):
 		self.sparqlHelper = SparqlHelper(self.rdflib_graph)
 		self.namespaces = sorted(self.rdflib_graph.namespaces())
 
+
 	def load_sparql(self,
 					sparql_endpoint,
 					verbose=False,
 					credentials=None):
 		"""
-		Set up a SPARQLStore backend as a virtual ontospy graph
+		Set up an ontospy graph using a sparql endpoint. 
 
-		Note: we're using a 'SPARQLUpdateStore' backend instead of 'SPARQLStore' cause otherwise authentication fails (https://github.com/RDFLib/rdflib/issues/755)
+		Note this is using SPARQLStore backend as a virtual ontospy graph. 
+		See 
+		- https://github.com/RDFLib/rdflib/blob/main/examples/sparqlstore_example.py 
+		- https://rdflib.readthedocs.io/en/stable/apidocs/rdflib.plugins.stores.html#rdflib.plugins.stores.sparqlstore.SPARQLStore
 
-		@TODO this error seems to be fixed in upcoming rdflib versions
-		https://github.com/RDFLib/rdflib/pull/744
+		Note: results are requested as JSON. With rdflib's default Accept header (sparql-results+xml
+		or rdf+xml) some endpoints eg Virtuoso/DBpedia reply with rdf+xml, which rdflib then
+		fails to parse as query results ("Repeat node-elements inside property elements").
 
 		"""
 		try:
-			# graph = rdflib.Graph('SPARQLStore')
-			# graph = rdflib.ConjunctiveGraph('SPARQLStore')
-			graph = rdflib.ConjunctiveGraph('SPARQLUpdateStore')
-
 			if credentials and type(credentials) == tuple:
-				# https://github.com/RDFLib/rdflib/issues/343
-				graph.store.setCredentials(credentials[0], credentials[1])
-				# graph.store.setHTTPAuth('BASIC') # graph.store.setHTTPAuth('DIGEST')
+				store = SPARQLStore(sparql_endpoint, auth=credentials, returnFormat="json")
+			else:
+				store = SPARQLStore(sparql_endpoint, returnFormat="json")
 
-			graph.open(sparql_endpoint)
+			graph = rdflib.Graph(store)
+
 			self.rdflib_graph = graph
 			self.sparql_endpoint = sparql_endpoint
 			self.sources = [sparql_endpoint]
@@ -202,6 +210,13 @@ class Ontospy(object):
 			printDebug("Error trying to connect to Endpoint.")
 			raise
 		# don't extract entities by default..
+
+	def add_namespace(self, ns_prefix, ns_url):
+		"""Add a new namespace to the ontospy graph, replacing any existing binding for the same prefix
+
+		eg o.add_namespace("schema", "http://schema.org/")
+		"""
+		self.rdflib_graph.bind(ns_prefix, ns_url, override=True, replace=True)
 
 
 	# ------------
@@ -272,6 +287,9 @@ class Ontospy(object):
 
 		Hence there is some logic to deal with these edge cases.
 		"""
+		if self.verbose:
+			printDebug(".. building ontologies")
+
 		out = []
 
 		qres = self.sparqlHelper.getOntology()
@@ -1059,12 +1077,71 @@ class Ontospy(object):
 		"for backward compatibility"
 		return self.rdf_source(format)
 
-	def query(self, stringa):
-		"""SPARQL query / wrapper for rdflib sparql query method """
+
+
+	def _cleanup_ns_declarations(self, sparql_q):
+		"""Removes PREFIX declarations from a sparql query and adds them to the graph namespaces.
+
+		Only needed for SPARQL endpoint graphs: rdflib's SPARQLStore prepends all the graph namespaces
+		to the query it sends, so a prefix declared in the query too ends up declared twice, which
+		many endpoints reject. See
+		https://stackoverflow.com/questions/76677670/sparql-namespace-conflict-while-querying
+
+		Parameters
+		----------
+		sparql_q : string
+			A sparql query
+		"""
+		new_ns = PREFIX_DECLARATION.findall(sparql_q)
+		if not new_ns:
+			return sparql_q
+		for prefix, uri in new_ns:
+			self.add_namespace(prefix, uri)
+		if self.verbose:
+			printDebug(f"Note: query PREFIX declarations moved to graph namespaces: {new_ns}")
+		return PREFIX_DECLARATION.sub("", sparql_q)
+
+
+	def query(self, stringa, format="list"):
+		"""SPARQL query / wrapper for rdflib sparql query method
+
+		format: "list" (default) returns a list of result rows.
+		"csv", "json", "txt" and "xml" return the results serialized as a string.
+		"df" returns a pandas DataFrame of the bindings' values (requires pandas).
+
+		Note this is different from graph serializations, as query results are normally tabular data.
+		TODO handle DESCRIBE and CONSTRUCT queries better
+		"""
+		VALID_FORMATS = ["csv", "json", "txt", "xml", "list", "df"]
+		if format not in VALID_FORMATS:
+			printInfo(f"Error: format not in VALID_FORMATS: {VALID_FORMATS}\n using default 'list'", "important")
+			format = "list"
+
+		if self.sparql_endpoint:
+			stringa = self._cleanup_ns_declarations(stringa)
 		qres = self.rdflib_graph.query(stringa)
-		return list(qres)
+
+		if format == "list":
+			return list(qres)
+		elif format == "df":
+			try:
+				import pandas as pd
+			except ImportError:
+				printDebug("WARNING - This Beta feature requires pandas - `pip install pandas`")
+				raise
+			d = json.loads(qres.serialize(format="json"))
+			if "boolean" in d:  # ASK query
+				return pd.DataFrame([{"boolean": d["boolean"]}])
+			columns = d.get("head", {}).get("vars", [])
+			rows = [{k: v["value"] for k, v in row.items()}
+					for row in d.get("results", {}).get("bindings", [])]
+			return pd.DataFrame(rows, columns=columns)
+		else:
+			out = qres.serialize(format=format)
+			return out.decode("utf-8") if isinstance(out, bytes) else out
+
 	def sparql(self, stringa):
-		"SPARQL query / replacement for query"
+		"LEGACY -- SPARQL query / replacement for query"
 		return self.query(stringa)
 
 	def stats(self):

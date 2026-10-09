@@ -38,10 +38,11 @@ I have little time to spend on this project these days, so I'm mainly focusing o
 
 ## Development
 
+Requires **Python 3.11** — the package's own code (`ontospy/core/__init__.py`) imports `SafeConfigParser` from `configparser`, removed in Python 3.12.
+
 ```
 # git clone the repo first
-$ mkvirtualenv ontospy
-$ pip install -r requirements.txt
+$ mkvirtualenv -p /opt/homebrew/bin/python3.11 ontospy2
 $ pip install -e .
 ```
 

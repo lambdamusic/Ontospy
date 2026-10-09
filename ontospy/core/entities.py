@@ -59,7 +59,7 @@ class RdfEntity(object):
         self.rdftype = rdftype
         self.triples = None
         self.rdflib_graph = rdflib.Graph()
-        self.namespaces = namespaces
+        self.namespaces = namespaces or []
         self.all_shapes = []
 
         self.qname = self._build_qname()

@@ -46,4 +46,7 @@ venv
 .vsdocs
 .vscode
 
+# private files
 README_PRIVATE.md
+notebooks/scratch.ipynb
+backlog

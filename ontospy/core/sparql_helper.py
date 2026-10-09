@@ -249,15 +249,14 @@ class SparqlHelper(object):
         Note: if a triple object is a blank node (=a nested definition)
         we try to extract all relevant data recursively (does not work with
         sparql endpoins)
+
+        2024-09-12: replaced the CONSTRUCT query to generate minigraph with `triples` method. 
+        This is to avoid "rdflib.exceptions.ParserError: None:6:144: Repeat node-elements inside property elements" 
+        which is happening due to unexpected triplestore return formats. 
         """
 
-        aURI = aURI
-        qres = self.rdflib_graph.query("""CONSTRUCT {<%s> ?y ?z }
-                 WHERE {
-                     { <%s> ?y ?z }
-                 }
-                 """ % (aURI, aURI))
-        lres = list(qres)
+        uri = rdflib.URIRef(aURI)
+        lres = [x for x in self.rdflib_graph.triples((uri, None, None))]
 
         def recurse(triples_list):
             """ uses the rdflib <triples> method to pull out all blank nodes info"""
