@@ -14,5 +14,5 @@ pygments==2.7.4 # for gendocs
 
 # LIBRARIES FOR DEVELOPMENT
 # twine
-# nose
+# pytest
 # coverage
