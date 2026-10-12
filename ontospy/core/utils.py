@@ -516,8 +516,9 @@ def firstStringInList(literalEntities, prefLanguage="en"):
         match = literalEntities[0]
     elif len(literalEntities) > 1:
         for x in literalEntities:
-            if getattr(x, 'language') and getattr(x,
-                                                  'language') == prefLanguage:
+            # getattr default: values can be URIs, eg rdfs:comment <http://...> (#142)
+            lang = getattr(x, 'language', None)
+            if lang and lang == prefLanguage:
                 match = x
         if not match:  # don't bother about language
             match = literalEntities[0]
@@ -539,8 +540,9 @@ def joinStringsInList(literalEntities, prefLanguage="en"):
         return literalEntities[0]
     elif len(literalEntities) > 1:
         for x in literalEntities:
-            if getattr(x, 'language') and getattr(x,
-                                                  'language') == prefLanguage:
+            # getattr default: values can be URIs, eg rdfs:comment <http://...> (#142)
+            lang = getattr(x, 'language', None)
+            if lang and lang == prefLanguage:
                 match.append(x)
         if not match:  # don't bother about language
             for x in literalEntities:

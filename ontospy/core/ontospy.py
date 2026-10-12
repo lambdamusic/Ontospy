@@ -813,12 +813,25 @@ class Ontospy(object):
 
 		:return: attach a list of dicts to each class, detailing valid props up the subsumption tree
 		"""
-		exit = []
+		# the same for every class: compute once, not once per class (#142)
+		top_level = {rel: self._topLevelProperties(rel) for rel in ("domain_of", "range_of")}
 		for c in self.all_classes:
-			c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of")
-			c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of")
+			c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of", top_level["domain_of"])
+			c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of", top_level["range_of"])
 
-	def getInferredPropertiesForClass(self, aClass, rel="domain_of"):
+	def _topLevelProperties(self, rel="domain_of"):
+		"""
+		properties with no domain (or range) info, which apply to owl:Thing.
+		Properties that apply to a class via a SHACL PropertyShape are not top-level.
+		"""
+		if rel == "domain_of":
+			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
+			return [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
+		elif rel == "range_of":
+			return [p for p in self.all_properties if p.ranges == []]
+		return []
+
+	def getInferredPropertiesForClass(self, aClass, rel="domain_of", topLevelProps=None):
 		"""
 		returns all properties valid for a class (as they have it in their domain)
 		recursively ie traveling up the descendants tree
@@ -842,9 +855,8 @@ class Ontospy(object):
 					_list.append({x: x.domain_of})
 
 			# add properties from Owl:Thing ie the inference layer
-
-			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
-			topLevelProps = [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
+			if topLevelProps is None:
+				topLevelProps = self._topLevelProperties(rel)
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 
@@ -855,8 +867,8 @@ class Ontospy(object):
 					_list.append({x: x.range_of})
 
 			# add properties from Owl:Thing ie the inference layer
-
-			topLevelProps = [p for p in self.all_properties if p.ranges == []]
+			if topLevelProps is None:
+				topLevelProps = self._topLevelProperties(rel)
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 
