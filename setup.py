@@ -80,7 +80,9 @@ setup(
     url='https://github.com/lambdamusic/ontospy',
     author='Michele Pasin',
     author_email='michele.pasin@gmail.com',
-    license='MIT',
+    # SPDX license expression (needs setuptools >= 77, which `python -m build` uses);
+    # it replaces the deprecated 'License :: ...' classifier
+    license_expression='MIT',
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -93,9 +95,6 @@ setup(
         'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
-
-        # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: MIT License',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
