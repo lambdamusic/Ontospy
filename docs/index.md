@@ -305,6 +305,42 @@ v.preview() # => open in browser
 
 ```
 
+**Customising the templates**
+
+The documentation is rendered with [Jinja2](https://jinja.palletsprojects.com/) templates, which live in the package's [templates folder](https://github.com/lambdamusic/Ontospy/tree/master/ontospy/gendocs/media/templates). To change how the output looks, eg to add your own CSS, or to remove a section you don't need, you can override any of them with your own version:
+
+1. Copy the template you want to change into a folder of your own, keeping its path relative to the templates folder, eg `my-templates/html-multi/base.html`.
+2. Edit your copy.
+3. Pass a Jinja2 environment that looks in your folder first, and falls back to Ontospy's own templates for everything else:
+
+```python
+import ontospy
+from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader, select_autoescape
+from ontospy.gendocs.jinja_env import add_default_filters
+from ontospy.gendocs.viz.viz_html_multi import KompleteViz
+
+my_env = Environment(
+    loader=ChoiceLoader([
+        FileSystemLoader("my-templates"),                        # your versions first
+        PackageLoader("ontospy.gendocs.media", "templates"),     # then Ontospy's
+    ]),
+    autoescape=select_autoescape(["html", "xml"]),
+    extensions=["jinja2_time.TimeExtension"],
+)
+add_default_filters(my_env)   # the filters Ontospy's templates use
+
+g = ontospy.Ontospy("my-ontology.ttl")
+v = KompleteViz(g, title="My ontology", jinja2env=my_env)
+v.build("my-docs")
+```
+
+Every visualization type accepts the `jinja2env` parameter. For example, with the multi-page HTML (`KompleteViz`):
+
+-   to add your own stylesheet, override `html-multi/base.html` and add a `<link>` after the existing ones
+-   to change what a class page shows, eg remove its "Usage" section, override `html-multi/browser/browser_classinfo.html`
+
+Custom templates are only available from Python, not from the `ontospy gendocs` command.
+
 ## Miscellaneous Tips
 
 If you are using OSx El Capitan your installation line probably will look like this

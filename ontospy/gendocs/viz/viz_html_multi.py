@@ -229,11 +229,11 @@ class KompleteVizMultiModel(KompleteViz):
     """
 
 
-    def __init__(self, ontospy_graph, title="", theme="", static_url="", output_path_static=""):
+    def __init__(self, ontospy_graph, title="", theme="", static_url="", output_path_static="", **kwargs):
         """
         Init
         """
-        super(KompleteVizMultiModel, self).__init__(ontospy_graph, title, theme)
+        super(KompleteVizMultiModel, self).__init__(ontospy_graph, title, theme, **kwargs)
         self.static_files = ["custom", "libs"]
         self.theme = validate_theme(theme)
         self.static_url = static_url  # eg "../static"

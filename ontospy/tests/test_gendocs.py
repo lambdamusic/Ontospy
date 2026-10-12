@@ -20,6 +20,20 @@ from .context import TEST_RDF_FOLDER
 
 VIZ_TYPES = [(n, v["ID"]) for n, v in enumerate(VISUALIZATIONS_LIST["Visualizations"])]
 
+# viz ID => (module in ontospy.gendocs.viz, class), as in gendocs.actions.build_visualization
+VIZ_CLASSES = {
+	"html-simple": ("viz_html_single", "HTMLVisualizer"),
+	"html-complex": ("viz_html_multi", "KompleteViz"),
+	"markdown": ("viz_markdown", "MarkdownViz"),
+	"d3-dendogram": ("viz_d3dendogram", "Dataviz"),
+	"d3-bubble-chart": ("viz_d3bubble_chart", "Dataviz"),
+	"d3-pack-hierarchy": ("viz_d3pack_hierarchy", "Dataviz"),
+	"d3-bar-hierarchy": ("viz_d3bar_hierarchy", "Dataviz"),
+	"d3-partition-table": ("viz_d3partition_table", "Dataviz"),
+	"d3-rotating-cluster": ("viz_d3rotating_cluster", "Dataviz"),
+	"sigma-force-directed": ("viz_sigmajs", "Dataviz"),
+}
+
 
 @pytest.fixture(scope="module")
 def pizza():
@@ -86,6 +100,34 @@ def test_markdown_property_table_rows(tmp_path):
 	assert "First line. Second line." in page
 	assert "Either A \\| B" in page
 	assert "class-edgerange2.md), [" in page or "class-edgerange1.md), [" in page
+
+
+@pytest.mark.parametrize("viz_index,viz_id", VIZ_TYPES, ids=[v for _, v in VIZ_TYPES])
+def test_custom_jinja2env(pizza, viz_index, viz_id, tmp_path):
+	"""#138: every visualization uses the Jinja2 environment it's given, so users can
+	override templates; here every template is replaced with a marker"""
+	from jinja2 import Environment, FunctionLoader
+	from ..gendocs.jinja_env import add_default_filters
+
+	env = Environment(loader=FunctionLoader(lambda name: "CUSTOM TEMPLATE " + name))
+	add_default_filters(env)
+	viz_module, viz_class = VIZ_CLASSES[viz_id]
+	cls = getattr(__import__("ontospy.gendocs.viz." + viz_module, fromlist=[viz_class]), viz_class)
+	v = cls(pizza, "title", jinja2env=env)
+	assert v.jinja2env is env
+	v.build(str(tmp_path))
+	assert "CUSTOM TEMPLATE" in read_all_output(tmp_path)
+
+
+def test_custom_jinja2env_multimodel(pizza, tmp_path):
+	"""the multi-ontology html used by scripts/export_all.py takes a jinja2env too"""
+	from ..gendocs.jinja_env import get_default_env
+	from ..gendocs.viz.viz_html_multi import KompleteVizMultiModel
+
+	env = get_default_env()
+	v = KompleteVizMultiModel(pizza, jinja2env=env, static_url="../static/",
+		output_path_static=str(tmp_path / "static"))
+	assert v.jinja2env is env
 
 
 def test_individual_instance_of(pizza):
