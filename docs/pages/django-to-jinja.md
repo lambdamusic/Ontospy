@@ -117,20 +117,20 @@ PS this applies to `each.children()` , `each.parents()`, `each.rdf_source()` etc
 From
 
 ```python
-{% ifequal objtype "class" #}"""
+{% ifequal objtype "class" %}
 ```
 
 To
 
 ```python
-{% if objtype == "class" #}"""
+{% if objtype == "class" %}
 ```
 
 ## WITH
 
 From 
 ```python
-{% with main_entity as each  #}"""
+{% with main_entity as each  %}
 ...
 {% endwith %}
 ```
@@ -138,7 +138,7 @@ From
 To 
 
 ```python
-{% set each = main_entity  #}"""
+{% set each = main_entity  %}
 # no need to close anything
 ```
 
@@ -157,6 +157,5 @@ To
 ```python
 {% 
 comment
-#}"""
+%}
 ```
-{% endraw %}
