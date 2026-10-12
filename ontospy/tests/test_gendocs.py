@@ -154,3 +154,26 @@ def test_html_multi_non_redundant_tree(tmp_path, non_redundant, expected):
 	build_visualization(g, viz_index, path=str(tmp_path), non_redundant=non_redundant)
 	page = (tmp_path / "entities-tree-classes.html").read_text(encoding="utf-8")
 	assert page.count('class="treelinks" href="class-rredbeardedguy.html"') == expected
+
+
+CYCLE_TTL = """
+@prefix : <http://example.org/c#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+:Top a owl:Class .
+:A a owl:Class ; rdfs:subClassOf :Top, :B .
+:B a owl:Class ; rdfs:subClassOf :A .
+"""
+
+
+@pytest.mark.parametrize("viz_index,viz_id", VIZ_TYPES, ids=[v for _, v in VIZ_TYPES])
+def test_build_with_cycle(viz_index, viz_id, tmp_path):
+	"""#142: a subclass cycle below a top-level class (A > B > A) used to make the
+	html-complex tree pages recurse forever"""
+	g = Ontospy(data=CYCLE_TTL, rdf_format="turtle")
+	assert build_visualization(g, viz_index, path=str(tmp_path))
+	if viz_id == "html-complex":
+		page = (tmp_path / "entities-tree-classes.html").read_text(encoding="utf-8")
+		# Top > A > B > A: A is shown again under B, but not expanded a second time
+		assert page.count('class="treelinks" href="class-ca.html"') == 2
+		assert page.count('class="treelinks" href="class-cb.html"') == 1
