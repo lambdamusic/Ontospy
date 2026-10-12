@@ -89,8 +89,9 @@ owl:Thing
 {% for prop in v -%}
 {#- a table row must stay on one line: line breaks become spaces, and | is escaped -#}
 | [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription()|replace("\r\n", " ")|replace("\n", " ")|replace("|", "\\|")}} | 
-            {%- if  prop.ranges -%}
-                {%- for range in prop.ranges -%} 
+            {%- set ranges = prop.ranges or prop.ranges_inferred -%}
+            {%- if  ranges -%}
+                {%- for range in ranges -%} 
 [{{range.title}}]({{range.slug}}.md)
                 {%- if not loop.last %}, {% endif -%}
                 {%- endfor -%}

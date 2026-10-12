@@ -551,6 +551,8 @@ class Ontospy(object):
 		# sort alphabetically
 		self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
 
+		self.__buildInferredDomainRanges()
+
 		# computer top layer for properties
 		# print("calc toplayer")
 		exit = []
@@ -792,7 +794,7 @@ class Ontospy(object):
 
 		for x in ranges:
 			if isBlankNode(x):
-				aProp.domains += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
+				aProp.ranges += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
 			else:
 				aClass = self.get_class(uri=str(x))
 				if aClass:
@@ -807,6 +809,30 @@ class Ontospy(object):
 									True, 
 									self.pref_title,
 									self.pref_lang,)]
+
+	def __buildInferredDomainRanges(self):
+		"""
+		2026-10-12: properties with no rdfs:domain (or rdfs:range) of their own inherit
+		the ones of their superproperties, all the way up (#126). As in RDFS, all of them
+		apply. They are kept apart from the declared ones, in <domains_inferred> and
+		<ranges_inferred>; classes list these properties in <domain_of_via_superproperties>
+		and <range_of_via_superproperties>.
+		"""
+		for aProp in self.all_properties:
+			if not aProp.domains:
+				for superprop in aProp.ancestors():
+					for x in superprop.domains:
+						if x.uri not in [y.uri for y in aProp.domains_inferred]:
+							aProp.domains_inferred.append(x)
+							if hasattr(x, "domain_of_via_superproperties"):  # not a blank node
+								x.domain_of_via_superproperties.append(aProp)
+			if not aProp.ranges:
+				for superprop in aProp.ancestors():
+					for x in superprop.ranges:
+						if x.uri not in [y.uri for y in aProp.ranges_inferred]:
+							aProp.ranges_inferred.append(x)
+							if hasattr(x, "range_of_via_superproperties"):  # not a blank node
+								x.range_of_via_superproperties.append(aProp)
 
 	def __computeInferredProperties(self):
 		"""
@@ -826,9 +852,10 @@ class Ontospy(object):
 		"""
 		if rel == "domain_of":
 			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
-			return [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
+			return [p for p in self.all_properties if p.domains == [] and p.domains_inferred == []
+						and not p.uri in properties_applicable_by_shapes]
 		elif rel == "range_of":
-			return [p for p in self.all_properties if p.ranges == []]
+			return [p for p in self.all_properties if p.ranges == [] and p.ranges_inferred == []]
 		return []
 
 	def getInferredPropertiesForClass(self, aClass, rel="domain_of", topLevelProps=None):
@@ -849,10 +876,10 @@ class Ontospy(object):
 		_list = []
 
 		if rel == "domain_of":
-			_list.append({aClass: aClass.domain_of})
-			for x in aClass.ancestors():
-				if x.domain_of:
-					_list.append({x: x.domain_of})
+			for x in [aClass] + aClass.ancestors():
+				props = x.domain_of + x.domain_of_via_superproperties
+				if props or x is aClass:
+					_list.append({x: props})
 
 			# add properties from Owl:Thing ie the inference layer
 			if topLevelProps is None:
@@ -861,10 +888,10 @@ class Ontospy(object):
 				_list.append({self.OWLTHING: topLevelProps})
 
 		elif rel == "range_of":
-			_list.append({aClass: aClass.range_of})
-			for x in aClass.ancestors():
-				if x.domain_of:
-					_list.append({x: x.range_of})
+			for x in [aClass] + aClass.ancestors():
+				props = x.range_of + x.range_of_via_superproperties
+				if props or x is aClass:
+					_list.append({x: props})
 
 			# add properties from Owl:Thing ie the inference layer
 			if topLevelProps is None:

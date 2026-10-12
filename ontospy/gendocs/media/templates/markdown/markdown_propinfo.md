@@ -61,10 +61,13 @@ owl:Thing
 
 
 #### Usage
-{% if each.domains %}
-{% for s in each.domains %}
+{% set domains = each.domains or each.domains_inferred %}{% set ranges = each.ranges or each.ranges_inferred %}
+{% if domains %}
+{% for s in domains %}
 [{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}
-{% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
+{% endfor %}{% if not each.domains %} _(inferred)_{% endif %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if ranges %}{% for s in ranges %}[{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}{% endfor %}{% if not each.ranges %} _(inferred)_{% endif %}{% else %}owl:Thing{% endif %}
+
+{% if not each.domains and domains or not each.ranges and ranges %}_(inferred) = inherited from superproperties_{% endif %}
 
 #### Implementation
 ```rdf

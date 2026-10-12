@@ -324,6 +324,9 @@ class OntoClass(RdfEntity):
         self.range_of = []
         self.domain_of_inferred = []
         self.range_of_inferred = []
+        # properties whose domain/range is inherited from a superproperty (#126)
+        self.domain_of_via_superproperties = []
+        self.range_of_via_superproperties = []
         self.ontology = None
         self._instances = False  # calc on demand at runtime
         self.sparqlHelper = None  # the original graph the class derives from
@@ -389,6 +392,9 @@ class OntoProperty(RdfEntity):
 
         self.domains = []
         self.ranges = []
+        # inherited from superproperties, when there are no domains/ranges (#126)
+        self.domains_inferred = []
+        self.ranges_inferred = []
         self.ontology = None
 
     def __repr__(self):
