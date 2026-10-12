@@ -52,3 +52,6 @@ backlog
 
 # local-only tests, eg against private endpoints (see docs/pages/tests.md)
 ontospy/tests/local/
+
+# setuptools' sdist staging folder, eg ontospy-2.2/ (it can survive builds inside Dropbox)
+/ontospy-*/

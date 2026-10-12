@@ -19,7 +19,7 @@ echo "=================="
 echo "Starting..."
 echo "=================="
 
-rm -rf dist/ build/
+rm -rf dist/ build/ ontospy-*/
 
 echo "=================="
 echo "..building"
