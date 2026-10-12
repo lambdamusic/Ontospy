@@ -2,6 +2,25 @@
 
 Summary of changes.
 
+## Oct, 2026: v 2.4
+
+- Large and complex ontologies
+    - Fix `RecursionError` on large ontologies, eg [FOVT](http://purl.obolibrary.org/obo/fovt.owl), and on class or property hierarchies with cycles or deep multiple inheritance. FOVT (12k classes) now loads in about 2 minutes, and its documentation builds [issue-142](https://github.com/lambdamusic/Ontospy/issues/142)
+    - Faster loading: a SHACL query used to run once per class, it now runs once
+    - Fix descriptions and labels whose value is a URI rather than a string, which crashed the documentation
+- Properties
+    - Properties with no domain or range of their own inherit those of their superproperties; the documentation shows them as "inferred from superproperties" instead of `owl:Thing`, and class "Usage" tables list them under the right class [issue-126](https://github.com/lambdamusic/Ontospy/issues/126)
+    - Properties whose type is a subclass of a property type are recognised, eg in [Brick](https://brickschema.org/) `brick:tilt a brick:EntityProperty`, where `brick:EntityProperty rdfs:subClassOf owl:ObjectProperty` [issue-118](https://github.com/lambdamusic/Ontospy/issues/118)
+    - A property's main type no longer depends on which of its types sorts first: eg Pizza's `hasBase` showed as `owl:FunctionalProperty`, now `owl:ObjectProperty`. Property pages list all of a property's types [issue-53](https://github.com/lambdamusic/Ontospy/issues/53)
+    - Properties whose URIs differ only by case, eg FOAF's `givenname` and `givenName`, are no longer merged, and get a page each in the documentation
+    - Fix blank-node ranges being added to a property's domains
+- Documentation generation (`gendocs`)
+    - The output folder is no longer emptied before generating the documentation: files are overwritten when needed, and Ontospy warns about files it didn't write. The new `--emptyfolder` option (`empty_folder=True` in Python) clears the folder first [issue-60](https://github.com/lambdamusic/Ontospy/issues/60), [issue-62](https://github.com/lambdamusic/Ontospy/issues/62)
+    - Non-redundant trees for reasoned ontologies: with `--nonredundant`, a class isn't repeated under a parent when it's already under one of its subclasses. In Python, `ontologyClassTree(non_redundant=True)` and the other tree methods. Based on [pull-87](https://github.com/lambdamusic/Ontospy/pull/87) by Andrea Mignone
+    - Metadata values that are URLs are shown as links [issue-61](https://github.com/lambdamusic/Ontospy/issues/61), and entities have a "See also" section for `rdfs:seeAlso` [issue-65](https://github.com/lambdamusic/Ontospy/issues/65)
+    - Markdown: individual and concept pages are saved as `.md` again (they were `.ms` since 2022, so links to them were broken)
+- [Examples](https://lambdamusic.github.io/ontospy-examples/) regenerated with this version; the index page now shows each ontology's title, description and counts
+
 ## Oct, 2026: v 2.3
 
 - Namespace prefixes: the prefixes declared in an RDF file now win over rdflib's defaults. Since rdflib 7, an ontology declaring `schema:` for `http://schema.org/` was shown with `schema1:` names, because rdflib binds `schema` to `https://schema.org/` by default [issue-135](https://github.com/lambdamusic/Ontospy/issues/135)
