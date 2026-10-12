@@ -22,7 +22,7 @@
 {% endif %}
 
 {% else %}
-* rdf:Property
+* {{each.rdftype_qname|default("rdf:Property", true)}}
     * {{each.title}}
 {% if each.children()  %}
 {% for s in each.children() %}
@@ -39,8 +39,21 @@
 #### URI
 {{each.uri}}
 
+{% if each.rdftypes_qnames %}
+#### Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}
+
+{% for t in each.rdftypes_qnames %}`{{t}}`{% if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
+
 #### Description
 {{each.bestDescription()|default("--")}}
+
+{% if each.seeAlso() %}
+#### See also
+{% for x in each.seeAlso() %}
+* {% if x is url %}[{{x}}]({{x}}){% else %}{{x}}{% endif %}
+{% endfor %}
+{% endif %}
 
 {% if each.ancestors() %}
 #### Inherits from ({{ each.ancestors()|length }})
@@ -54,10 +67,13 @@ owl:Thing
 
 
 #### Usage
-{% if each.domains %}
-{% for s in each.domains %}
+{% set domains = each.domains or each.domains_inferred %}{% set ranges = each.ranges or each.ranges_inferred %}
+{% if domains %}
+{% for s in domains %}
 [{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}
-{% endfor %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if each.ranges %}{% for s in each.ranges %}[{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}{% endfor %}{% else %}owl:Thing{% endif %}
+{% endfor %}{% if not each.domains %} _(inferred)_{% endif %}{% else %}owl:Thing{% endif %}=&gt;&nbsp;_{{each.title}}_&nbsp;=&gt;&nbsp;{% if ranges %}{% for s in ranges %}[{{s.title}}]({{s.slug}}.md){% if not loop.last %} &amp;&amp; {% endif %}{% endfor %}{% if not each.ranges %} _(inferred)_{% endif %}{% else %}owl:Thing{% endif %}
+
+{% if not each.domains and domains or not each.ranges and ranges %}_(inferred) = inherited from superproperties_{% endif %}
 
 #### Implementation
 ```rdf

@@ -78,7 +78,7 @@
                                 <dt>{{each.1}}</dt>
                               {% set variable_watcher = each.1 %}
                           {% else %}{% endif %}
-                    <dd>{{each.2|linebreaks}}</dd>
+                    <dd>{% if each.2 is url %}<a href="{{each.2}}" target="_blank">{{each.2}}</a>{% else %}{{each.2|linebreaks}}{% endif %}</dd>
                     {% endfor %}
                     </dl>
                 {% else %}

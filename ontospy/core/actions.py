@@ -632,7 +632,9 @@ def action_visualize(args,
                      preflang="",
                      extra= False,
                      individuals= False,
-                     verbose=False):
+                     verbose=False,
+                     empty_folder=False,
+                     non_redundant=False):
     """
     export model into another format eg html, d3 etc...
     <fromshell> : the local name is being passed from ontospy shell
@@ -696,6 +698,7 @@ def action_visualize(args,
 
     # url  = build_viz(ontouri, g, viztype, path)
     printDebug("Building visualization...", dim=True)
-    url = build_visualization(g, viztype, path, title, theme)
+    url = build_visualization(g, viztype, path, title, theme, empty_folder=empty_folder,
+                              non_redundant=non_redundant)
 
     return url

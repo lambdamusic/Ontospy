@@ -162,6 +162,26 @@ class SparqlHelper(object):
         qres = self.rdflib_graph.query(query)
         return list(qres)
 
+    def getPropertiesTypedBySubclasses(self):
+        """ Properties whose type is a subclass of one of the main property types, eg in
+        Brick: `brick:tilt a brick:EntityProperty` with
+        `brick:EntityProperty rdfs:subClassOf owl:ObjectProperty` (#118).
+
+        Returns a list of (property, main property type) tuples, like getAllProperties.
+        Uses the graph API rather than a SPARQL property path: walking down from the
+        four main types is cheap, also on large graphs.
+        """
+        out = []
+        for main_type in [rdflib.RDF.Property, rdflib.OWL.ObjectProperty,
+                          rdflib.OWL.DatatypeProperty, rdflib.OWL.AnnotationProperty]:
+            for subtype in self.rdflib_graph.transitive_subjects(rdflib.RDFS.subClassOf, main_type):
+                if subtype == main_type or isinstance(subtype, rdflib.BNode):
+                    continue
+                for x in self.rdflib_graph.subjects(rdflib.RDF.type, subtype):
+                    if not isinstance(x, rdflib.BNode):
+                        out.append((x, main_type))
+        return sorted(set(out))
+
     def getPropDirectSupers(self, aURI):
         aURI = aURI
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x

@@ -75,7 +75,7 @@
 
                     {% else %}
 
-                        <li><a href="entities-tree-properties.html">rdf:Property</a>
+                        <li><a href="entities-tree-properties.html">{{each.rdftype_qname|default("rdf:Property", true)}}</a>
 
                           <ul>
                             <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
@@ -111,6 +111,19 @@
            </div>
             </div></div>
 
+            {% if each.rdftypes_qnames %}
+            <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}</h3>
+             </div>
+             <div class="panel-body">
+                 {% for t in each.rdftypes_qnames %}<code>{{t}}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+             </div>
+           </div>
+            </div></div>
+            {% endif %}
+
 
 
             {% if  each.bestLabel() %}
@@ -141,6 +154,9 @@
           </div>
            </div></div>
            {% endif %}
+
+    {# See also panel #}
+    {% include "shared/seealso_panel.html" %}
 
 
 
@@ -199,8 +215,9 @@
                </tr>
                <tr>
                    <td>
-                     {% if each.domains %}
-                         {% for s in each.domains %}
+                     {% set domains = each.domains or each.domains_inferred %}
+                     {% if domains %}
+                         {% for s in domains %}
                          {% if s.ext_model %}
                               <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.title|default(s)}}</a>
                            {% elif s.is_Bnode  %}
@@ -210,6 +227,7 @@
                            {% endif %}
                            {% if not loop.last %}, {% endif %}
                          {% endfor %}
+                         {% if not each.domains %}(inferred from superproperties){% endif %}
                      {% else %}
                          <a>owl:Thing</a> (inferred)
                      {% endif %}
@@ -220,8 +238,9 @@
                     </td>
 
                     <td>
-                      {% if each.ranges %}
-                          {% for s in each.ranges %}
+                      {% set ranges = each.ranges or each.ranges_inferred %}
+                      {% if ranges %}
+                          {% for s in ranges %}
                           {% if s.ext_model %}
                                <a href="{{s.uri}}" target="_blank" title="{{s.uri}}">{{s.title|default(s)}}</a>
                              {% elif s.is_Bnode  %}
@@ -231,6 +250,7 @@
                             {% endif %}
                             {% if not loop.last %}, {% endif %}
                           {% endfor %}
+                          {% if not each.ranges %}(inferred from superproperties){% endif %}
                       {% else %}
                           <a>owl:Thing</a> (inferred)
                       {% endif %}

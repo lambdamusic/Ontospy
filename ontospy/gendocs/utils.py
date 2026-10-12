@@ -155,7 +155,7 @@ def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
 ##################
 
 
-def formatHTML_EntityTreeTable(treedict, element=0):
+def formatHTML_EntityTreeTable(treedict, element=0, _branch=()):
     """ outputs an html tree representation based on the dictionary we get from the Inspector
 	object....
 
@@ -194,6 +194,9 @@ def formatHTML_EntityTreeTable(treedict, element=0):
 
 	Note: The top level owl:Thing never appears as a link.
 
+	Note: <_branch> holds <element> and the entities above it; an entity already on it is shown
+	but not expanded again, so cycles (eg A > B > A) don't recurse forever (#142).
+
 	"""
     # ontoFile = onto.ontologyMaskedLocation or onto.ontologyPhysicalLocation
     # if not treedict:
@@ -209,13 +212,13 @@ def formatHTML_EntityTreeTable(treedict, element=0):
 							<td class="tc" colspan=4><a title=\"%s\" class=\"treelinks\" href=\"%s.html\">%s</a></td>
 						  </tr>""" % (x.uri, x.slug, truncchar_inverse(x.title, 50))
 
-        if treedict.get(x, None):
+        if treedict.get(x, None) and x not in _branch:
             stringa += """ <tr>
 							<td class="space"></td>
 							<td class="bar"></td>
 							<td class="space"></td>
 							<td>%s</td>
-							</tr>""" % formatHTML_EntityTreeTable(treedict, x)
+							</tr>""" % formatHTML_EntityTreeTable(treedict, x, _branch + (x,))
 
         # stringa += formatHTML_ClassTree(onto, treedict, x)
         # stringa += "</li>"

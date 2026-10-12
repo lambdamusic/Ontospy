@@ -445,6 +445,23 @@ def inferMainPropertyType(uriref):
         return None
 
 
+def mainPropertyType(types):
+    """
+    The main type of a property, given all its rdf:types (#10).
+    A declared owl:ObjectProperty, owl:DatatypeProperty or owl:AnnotationProperty wins,
+    whatever the other types, eg owl:FunctionalProperty. Otherwise the first type that
+    isn't rdf:Property is reduced to a main type by inferMainPropertyType.
+    """
+    for main_type in [rdflib.OWL.ObjectProperty, rdflib.OWL.DatatypeProperty,
+                      rdflib.OWL.AnnotationProperty]:
+        if main_type in types:
+            return main_type
+    for x in types:
+        if x != rdflib.RDF.Property:
+            return inferMainPropertyType(x)
+    return inferMainPropertyType(types[0]) if types else None
+
+
 def printGenericTree(element,
                      level=0,
                      showids=True,
@@ -516,8 +533,9 @@ def firstStringInList(literalEntities, prefLanguage="en"):
         match = literalEntities[0]
     elif len(literalEntities) > 1:
         for x in literalEntities:
-            if getattr(x, 'language') and getattr(x,
-                                                  'language') == prefLanguage:
+            # getattr default: values can be URIs, eg rdfs:comment <http://...> (#142)
+            lang = getattr(x, 'language', None)
+            if lang and lang == prefLanguage:
                 match = x
         if not match:  # don't bother about language
             match = literalEntities[0]
@@ -539,8 +557,9 @@ def joinStringsInList(literalEntities, prefLanguage="en"):
         return literalEntities[0]
     elif len(literalEntities) > 1:
         for x in literalEntities:
-            if getattr(x, 'language') and getattr(x,
-                                                  'language') == prefLanguage:
+            # getattr default: values can be URIs, eg rdfs:comment <http://...> (#142)
+            lang = getattr(x, 'language', None)
+            if lang and lang == prefLanguage:
                 match.append(x)
         if not match:  # don't bother about language
             for x in literalEntities:

@@ -22,6 +22,21 @@ from .shacl_helper import build_shacl_constraints
 # a PREFIX declaration in a sparql query, eg `PREFIX owl: <http://www.w3.org/2002/07/owl#>`
 PREFIX_DECLARATION = re.compile(r"PREFIX\s+([\w.-]*)\s*:\s*<([^>]*)>", re.IGNORECASE)
 
+def _remove_redundant_children(children):
+	"""
+	Leave out the children that are also descendants of another child, eg in a reasoned
+	graph with A > B > C and the materialised A > C, C is left out under A (PR #87).
+	Multiple inheritance is kept: C still appears under B, and under any other parent.
+	Children that are descendants of each other (a cycle) are all kept.
+	"""
+	if len(children) < 2:
+		return children
+	descendants = {c: set(c.descendants()) for c in children}
+	return [c for c in children
+			if not any(c in descendants[s] and s not in descendants[c]
+						for s in children if s is not c)]
+
+
 class Ontospy(object):
 	"""
 	Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
@@ -310,6 +325,8 @@ class Ontospy(object):
 
 		self.__computeInferredProperties()
 
+		self.__makeSlugsUnique()
+
 		if verbose:
 			printInfo("----------", "comment")
 
@@ -492,23 +509,24 @@ class Ontospy(object):
 		self.all_properties_datatype = []
 
 		qres = self.sparqlHelper.getAllProperties(hide_implicit_preds)
+		qres += self.sparqlHelper.getPropertiesTypedBySubclasses()
 		# print("rdflib query done")
 
+		# one row per (property, type): collect all the types first, so that the main
+		# type doesn't depend on which row comes first (#10)
+		candidate_types = {}
 		for candidate in qres:
+			types = candidate_types.setdefault(candidate[0], [])
+			if candidate[1] and candidate[1] not in types:
+				types.append(candidate[1])
 
-			test_existing_prop = self.get_property(uri=candidate[0])
-			if not test_existing_prop:
-				# create it
-				self.all_properties += [OntoProperty(candidate[0], candidate[1], 
-											self.namespaces, 
-											False,
-											self.pref_title,
-											self.pref_lang,
-											)]
-			else:
-				# update it
-				if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
-					test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
+		for uri, types in candidate_types.items():
+			self.all_properties += [OntoProperty(uri, mainPropertyType(types),
+										self.namespaces,
+										False,
+										self.pref_title,
+										self.pref_lang,
+										)]
 		# print("properties created")
 
 		# add more data
@@ -525,6 +543,9 @@ class Ontospy(object):
 
 			aProp.triples = self.sparqlHelper.entityTriples(aProp.uri)
 			aProp._buildGraph()  # force construction of mini graph
+			# all the rdf:types, for display (#53)
+			aProp.rdftypes_qnames = sorted(aProp._build_qname(x)
+				for x in aProp.getValuesForProperty(rdflib.RDF.type))
 
 			# attach to an ontology [2015-06-15: no property type distinction yet]
 			for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):
@@ -550,6 +571,8 @@ class Ontospy(object):
 
 		# sort alphabetically
 		self.all_properties = sorted(self.all_properties, key=lambda x: x.qname)
+
+		self.__buildInferredDomainRanges()
 
 		# computer top layer for properties
 		# print("calc toplayer")
@@ -792,7 +815,7 @@ class Ontospy(object):
 
 		for x in ranges:
 			if isBlankNode(x):
-				aProp.domains += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
+				aProp.ranges += [RdfEntity(x, None, self.namespaces, is_Bnode=True)]
 			else:
 				aClass = self.get_class(uri=str(x))
 				if aClass:
@@ -808,17 +831,72 @@ class Ontospy(object):
 									self.pref_title,
 									self.pref_lang,)]
 
+	def __buildInferredDomainRanges(self):
+		"""
+		2026-10-12: properties with no rdfs:domain (or rdfs:range) of their own inherit
+		the ones of their superproperties, all the way up (#126). As in RDFS, all of them
+		apply. They are kept apart from the declared ones, in <domains_inferred> and
+		<ranges_inferred>; classes list these properties in <domain_of_via_superproperties>
+		and <range_of_via_superproperties>.
+		"""
+		for aProp in self.all_properties:
+			if not aProp.domains:
+				for superprop in aProp.ancestors():
+					for x in superprop.domains:
+						if x.uri not in [y.uri for y in aProp.domains_inferred]:
+							aProp.domains_inferred.append(x)
+							if hasattr(x, "domain_of_via_superproperties"):  # not a blank node
+								x.domain_of_via_superproperties.append(aProp)
+			if not aProp.ranges:
+				for superprop in aProp.ancestors():
+					for x in superprop.ranges:
+						if x.uri not in [y.uri for y in aProp.ranges_inferred]:
+							aProp.ranges_inferred.append(x)
+							if hasattr(x, "range_of_via_superproperties"):  # not a blank node
+								x.range_of_via_superproperties.append(aProp)
+
+	def __makeSlugsUnique(self):
+		"""
+		Slugs name the documentation pages and are lowercase, so URIs that differ only by
+		case (eg FOAF's givenName and givenname) would get the same page. The first entity
+		(in qname order) keeps its slug, the others get -2, -3 etc.
+		"""
+		seen = set()
+		for entities in [self.all_ontologies, self.all_classes, self.all_properties,
+						 self.all_skos_concepts, self.all_shapes, self.all_individuals]:
+			for x in entities:
+				slug, n = x.slug, 1
+				while slug in seen:
+					n += 1
+					slug = "%s-%d" % (x.slug, n)
+				x.slug = slug
+				seen.add(slug)
+
 	def __computeInferredProperties(self):
 		"""
 
 		:return: attach a list of dicts to each class, detailing valid props up the subsumption tree
 		"""
-		exit = []
+		# the same for every class: compute once, not once per class (#142)
+		top_level = {rel: self._topLevelProperties(rel) for rel in ("domain_of", "range_of")}
 		for c in self.all_classes:
-			c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of")
-			c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of")
+			c.domain_of_inferred = self.getInferredPropertiesForClass(c, "domain_of", top_level["domain_of"])
+			c.range_of_inferred = self.getInferredPropertiesForClass(c, "range_of", top_level["range_of"])
 
-	def getInferredPropertiesForClass(self, aClass, rel="domain_of"):
+	def _topLevelProperties(self, rel="domain_of"):
+		"""
+		properties with no domain (or range) info, which apply to owl:Thing.
+		Properties that apply to a class via a SHACL PropertyShape are not top-level.
+		"""
+		if rel == "domain_of":
+			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
+			return [p for p in self.all_properties if p.domains == [] and p.domains_inferred == []
+						and not p.uri in properties_applicable_by_shapes]
+		elif rel == "range_of":
+			return [p for p in self.all_properties if p.ranges == [] and p.ranges_inferred == []]
+		return []
+
+	def getInferredPropertiesForClass(self, aClass, rel="domain_of", topLevelProps=None):
 		"""
 		returns all properties valid for a class (as they have it in their domain)
 		recursively ie traveling up the descendants tree
@@ -836,27 +914,26 @@ class Ontospy(object):
 		_list = []
 
 		if rel == "domain_of":
-			_list.append({aClass: aClass.domain_of})
-			for x in aClass.ancestors():
-				if x.domain_of:
-					_list.append({x: x.domain_of})
+			for x in [aClass] + aClass.ancestors():
+				props = x.domain_of + x.domain_of_via_superproperties
+				if props or x is aClass:
+					_list.append({x: props})
 
 			# add properties from Owl:Thing ie the inference layer
-
-			properties_applicable_by_shapes = {x[0] for x in self.sparqlHelper.getPropsApplicableByShapes()}
-			topLevelProps = [p for p in self.all_properties if p.domains == [] and not p.uri in properties_applicable_by_shapes]
+			if topLevelProps is None:
+				topLevelProps = self._topLevelProperties(rel)
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 
 		elif rel == "range_of":
-			_list.append({aClass: aClass.range_of})
-			for x in aClass.ancestors():
-				if x.domain_of:
-					_list.append({x: x.range_of})
+			for x in [aClass] + aClass.ancestors():
+				props = x.range_of + x.range_of_via_superproperties
+				if props or x is aClass:
+					_list.append({x: props})
 
 			# add properties from Owl:Thing ie the inference layer
-
-			topLevelProps = [p for p in self.all_properties if p.ranges == []]
+			if topLevelProps is None:
+				topLevelProps = self._topLevelProperties(rel)
 			if topLevelProps:
 				_list.append({self.OWLTHING: topLevelProps})
 
@@ -1037,49 +1114,60 @@ class Ontospy(object):
 	# ================
 
 
-	def _tree_helper(self, entities_list, toplayer):
+	def _tree_helper(self, entities_list, toplayer, non_redundant=False):
 		"""Common helper method for building super/sub trees"""
 		treedict = {}
 		if entities_list:
 			treedict[0] = toplayer
 			for element in entities_list:
-				if element.children():
-					treedict[element] = element.children()
+				children = element.children()
+				if non_redundant:
+					children = _remove_redundant_children(children)
+				if children:
+					treedict[element] = children
 			return treedict
 		return treedict
 
 
-	def ontologyClassTree(self):
+	def ontologyClassTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the ontology class tree
 		Top level = {0:[top classes]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_classes, self.toplayer_classes)
+		return self._tree_helper(self.all_classes, self.toplayer_classes, non_redundant)
 
-	def ontologyPropTree(self):
+	def ontologyPropTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the ontology properties tree
 		Top level = {0:[top properties]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_properties, self.toplayer_properties)
+		return self._tree_helper(self.all_properties, self.toplayer_properties, non_redundant)
 
-	def ontologyConceptTree(self):
+	def ontologyConceptTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the skos tree
 		Top level = {0:[top concepts]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos)
+		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos, non_redundant)
 
-	def ontologyShapeTree(self):
+	def ontologyShapeTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the shapes tree
 		Top level = {0:[top shapes]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_shapes, self.toplayer_shapes)
+		return self._tree_helper(self.all_shapes, self.toplayer_shapes, non_redundant)
 
 
 	def ontologyIndividualsTree(self):

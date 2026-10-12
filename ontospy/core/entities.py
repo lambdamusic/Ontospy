@@ -10,6 +10,21 @@ from . import *
 from .utils import *
 
 
+def _walk_hierarchy(start, next_entities):
+    """ depth-first walk from <start> via <next_entities> (eg parents), in pre-order and
+    without duplicates; each entity is expanded once, so cycles terminate """
+    out, seen = [], set()
+    stack = list(reversed(next_entities(start)))
+    while stack:
+        x = stack.pop()
+        if x in seen:
+            continue
+        seen.add(x)
+        out.append(x)
+        stack.extend(reversed(next_entities(x)))
+    return out
+
+
 class RdfEntity(object):
     """
     Pythonic representation of an RDF resource - normally not instantiated but used for
@@ -118,42 +133,17 @@ class RdfEntity(object):
     # methods added to RdfEntity even though they apply only to some subs
 
     def ancestors(self, cl=None, noduplicates=True):
-        """ returns all ancestors in the taxonomy """
-        if not cl:
-            cl = self
-        if cl.parents():
-            bag = []
-            for x in cl.parents():
-                if x.uri != cl.uri:  # avoid circular relationships
-                    bag += [x] + self.ancestors(x, noduplicates)
-                else:
-                    bag += [x]
-            # finally:
-            if noduplicates:
-                return remove_duplicates(bag)
-            else:
-                return bag
-        else:
-            return []
+        """ returns all ancestors in the taxonomy, depth first
+
+        2026-10-12: iterative, so cycles and deep taxonomies don't raise a
+        RecursionError (#142). `noduplicates` is kept for compatibility, but
+        duplicates are always removed.
+        """
+        return _walk_hierarchy(cl or self, lambda x: x.parents())
 
     def descendants(self, cl=None, noduplicates=True):
-        """ returns all descendants in the taxonomy """
-        if not cl:
-            cl = self
-        if cl.children():
-            bag = []
-            for x in cl.children():
-                if x.uri != cl.uri:  # avoid circular relationships
-                    bag += [x] + self.descendants(x, noduplicates)
-                else:
-                    bag += [x]
-            # finally:
-            if noduplicates:
-                return remove_duplicates(bag)
-            else:
-                return bag
-        else:
-            return []
+        """ returns all descendants in the taxonomy, depth first (see ancestors) """
+        return _walk_hierarchy(cl or self, lambda x: x.children())
 
     def parents(self):
         """wrapper around property"""
@@ -178,6 +168,10 @@ class RdfEntity(object):
         if not type(aPropURIRef) == rdflib.URIRef:
             aPropURIRef = rdflib.URIRef(aPropURIRef)
         return list(self.rdflib_graph.objects(None, aPropURIRef))
+
+    def seeAlso(self):
+        """The rdfs:seeAlso values for this entity, sorted"""
+        return sorted(self.getValuesForProperty(rdflib.RDFS.seeAlso))
 
     def bestLabel(self, prefLanguage="", qname_allowed=True, quotes=False):
         """
@@ -330,6 +324,9 @@ class OntoClass(RdfEntity):
         self.range_of = []
         self.domain_of_inferred = []
         self.range_of_inferred = []
+        # properties whose domain/range is inherited from a superproperty (#126)
+        self.domain_of_via_superproperties = []
+        self.range_of_via_superproperties = []
         self.ontology = None
         self._instances = False  # calc on demand at runtime
         self.sparqlHelper = None  # the original graph the class derives from
@@ -392,9 +389,14 @@ class OntoProperty(RdfEntity):
 
         self.slug = "prop-" + slugify(self.qname)
         self.rdftype = inferMainPropertyType(rdftype)
+        self.rdftype_qname = self._build_qname(self.rdftype)  # the main type, not the raw one (#10)
+        self.rdftypes_qnames = []  # all the rdf:types, set when the ontology is built (#53)
 
         self.domains = []
         self.ranges = []
+        # inherited from superproperties, when there are no domains/ranges (#126)
+        self.domains_inferred = []
+        self.ranges_inferred = []
         self.ontology = None
 
     def __repr__(self):

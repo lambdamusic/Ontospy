@@ -18,7 +18,7 @@
 {% set variable_watcher = each.1 %}
 {% else %}
 {% endif %}
-    * {{each.2}}
+    * {% if each.2 is url %}[{{each.2}}]({{each.2}}){% else %}{{each.2}}{% endif %}
 {% endfor %}
 {% else %}
 _No ontology metadata available_

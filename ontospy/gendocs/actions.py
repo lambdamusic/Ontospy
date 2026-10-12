@@ -38,6 +38,14 @@ def random_theme():
     return random.choice(BOOTSWATCH_THEMES)
 
 
+def stable_theme(name):
+    """A theme picked from <name>, eg a file name: the same name always gets the same
+    theme, also across runs (Python's hash() is salted per process, md5 isn't)"""
+    import hashlib
+    digest = hashlib.md5(name.encode("utf-8")).hexdigest()
+    return BOOTSWATCH_THEMES[int(digest, 16) % len(BOOTSWATCH_THEMES)]
+
+
 def validate_theme(theme_try, default=BOOTSWATCH_THEME_DEFAULT):
     # print theme_try
     if not theme_try:
@@ -94,9 +102,12 @@ def select_visualization(n):
 # ===========
 
 
-def build_visualization(g, viz_index, path=None, title="", theme=""):
+def build_visualization(g, viz_index, path=None, title="", theme="", empty_folder=False,
+                        non_redundant=False):
     """
     2017-01-20: new verion, less clever but also simpler
+
+    non_redundant: non-redundant trees (PR #87), only used by html-complex
     """
 
     this_viz = VISUALIZATIONS_LIST[viz_index]
@@ -107,7 +118,7 @@ def build_visualization(g, viz_index, path=None, title="", theme=""):
 
     elif this_viz['ID'] == "html-complex":
         from .viz.viz_html_multi import KompleteViz
-        v = KompleteViz(g, title, theme)
+        v = KompleteViz(g, title, theme, non_redundant=non_redundant)
 
     elif this_viz['ID'] == "markdown":
         from .viz.viz_markdown import MarkdownViz
@@ -144,7 +155,7 @@ def build_visualization(g, viz_index, path=None, title="", theme=""):
     else:
         return False
 
-    url = v.build(path)
+    url = v.build(path, empty_folder=empty_folder)
 
     return url
 

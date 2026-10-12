@@ -60,7 +60,15 @@ def d3_dendogram_height_filter(tot_objects):
     else:
         return n
     
+_url_re = re.compile(r'^(https?://|mailto:)\S+$')
+
+def url_test(value):
+    """A Jinja test: is the whole value a URL (http, https or mailto)?
+    Works for rdflib URIRefs and Literals too. Use as `{% if value is url %}`."""
+    return bool(value) and bool(_url_re.match(str(value).strip()))
+
 def add_default_filters(env):
+    env.tests['url'] = url_test
     env.filters['slugify'] = slugify_filter
     env.filters['linebreaks'] = linebreaks_filter
     env.filters['capfirst'] = capfirst_filter

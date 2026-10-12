@@ -9,6 +9,9 @@ Script to generate docs for all models in the local library. Using the Complex-h
 """
 
 import os
+import html
+import datetime
+import traceback
 import click, sys
 # http://click.pocoo.org/5/arguments/
 # http://click.pocoo.org/5/options/
@@ -18,7 +21,7 @@ from ..core.manager import get_home_location, get_localontologies
 from ..core.utils import *  
 
 from ..gendocs.viz.viz_html_multi import KompleteViz, KompleteVizMultiModel
-from ..gendocs.actions import random_theme
+from ..gendocs.actions import random_theme, stable_theme
 from ..gendocs.CONFIG import BOOTSWATCH_THEME_DEFAULT
 import webbrowser
 
@@ -31,7 +34,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option(
     '--theme',
     help=
-    'CSS Theme for the html-complex visualization (random=use a random theme).'
+    'CSS Theme for the html-complex visualization (random=use a random theme, stable=a theme picked from the file name, the same at every run).'
 )
 @click.option('--verbose', is_flag=True, help='Verbose mode.')
 @click.pass_context
@@ -70,7 +73,7 @@ This application is a wrapper on the main ontospy-gendocs utility. It generates 
 
         files_list = [
             f for f in os.listdir(source_folder)
-            if os.path.isfile(os.path.join(source_folder, f))
+            if os.path.isfile(os.path.join(source_folder, f)) and not f.startswith(".")
         ]
         click.secho(
             "Exporting the directory: '%s'" % source_folder, fg="green")
@@ -84,14 +87,17 @@ This application is a wrapper on the main ontospy-gendocs utility. It generates 
         files_list = get_localontologies()
         source_folder = get_home_location()
 
-    report_pages = []
+    report_rows = []
+    failed = []
 
-    for onto_name in sorted(files_list):
+    for onto_name in sorted(files_list, key=str.lower):
 
         full_uri = os.path.join(source_folder, onto_name)
         if theme:
             if theme == "random":
                 _theme = random_theme()
+            elif theme == "stable":
+                _theme = stable_theme(onto_name)
             else:
                 _theme = theme
         else:
@@ -114,43 +120,99 @@ This application is a wrapper on the main ontospy-gendocs utility. It generates 
                 static_url="../static/",
                 output_path_static=static_outputpath)
             try:
-                # note: onto_outputpath is wiped out each time as part of the build
-                url = v.build(onto_outputpath)
-                report_pages.append(
-                    "<li><a href='%s/index.html' target='_blank'>%s</a> ('%s' theme)</li>"
-                    % (onto_name_safe, onto_name, _theme))
-            except:
-                e = sys.exc_info()[0]
-                printDebug("Error: " + str(e), "red")
+                # the per-ontology folders belong to this script, so they're rebuilt from scratch
+                url = v.build(onto_outputpath, empty_folder=True)
+                report_rows.append(_index_row(g, onto_name, onto_name_safe, _theme))
+            except Exception:
+                printDebug("Error building <%s>:\n%s" % (onto_name, traceback.format_exc()), "red")
+                failed.append(onto_name)
                 continue
+        else:
+            failed.append(onto_name)
 
-    # generate a report page
+    # generate the index page
     report_path = os.path.join(outputpath, "index.html")
-    html = """
-<html>
-<head>
-  <style media="screen">
-    body {margin: 40px 10px 100px 50px;}
-    li a {font-size: 20px; font- text-transform: lowercase; text-decoration: none; font-family: monospace;}
-    li a:hover {text-decoration: underline;}
-  </style>
-</head>
-<body>
-<h1>Examples of ontology documentation generated with <a href="https://github.com/lambdamusic/ontospy" target="_blank">Ontospy</a></h1>
-<p>Source code on <a href="https://github.com/lambdamusic/ontospy-examples">GitHub</a></p>
-<hr>
-<ol>
-%s
-</ol>
-</body>
-</html>
-    """
-    with open(report_path, "w") as text_file:
-        text_file.write(html % ("".join([x for x in report_pages])))
+    with open(report_path, "w", encoding="utf-8") as text_file:
+        text_file.write(_index_page(report_rows))
+    if failed:
+        printDebug("Failed: %s" % ", ".join(failed), "red")
     # open report
     webbrowser.open("file:///" + report_path)
 
-    raise SystemExit(1)
+
+# columns of the index table: (heading, Ontospy.stats() label)
+INDEX_COUNTS = [("Classes", "Classes"), ("Properties", "Properties"),
+                ("Concepts", "Skos Concepts"), ("Shapes", "Data Shapes")]
+
+
+def _ontology_title_and_description(g):
+    """title and description of the first ontology declared in the graph, if any"""
+    for onto in g.all_ontologies:
+        title = ""
+        for pred in [rdflib.RDFS.label, rdflib.namespace.DCTERMS.title, rdflib.namespace.DC.title]:
+            values = onto.getValuesForProperty(pred)
+            if values:
+                title = str(firstStringInList(values, "en"))
+                break
+        return title, str(onto.bestDescription(prefLanguage="en") or "")
+    return "", ""
+
+
+def _truncate(text, length=220):
+    text = " ".join(text.split())
+    if len(text) <= length:
+        return text
+    return text[:length].rsplit(" ", 1)[0] + "…"
+
+
+def _index_row(g, onto_name, folder, theme):
+    """a row of the index table (#8): the ontology's title, description and counts"""
+    title, description = _ontology_title_and_description(g)
+    stats = dict(g.stats())
+    cells = "".join('<td class="count">%d</td>' % stats.get(label, 0) for _, label in INDEX_COUNTS)
+    return """<tr>
+  <td><a href="%s/index.html"><code>%s</code></a></td>
+  <td><b>%s</b>%s<div class="theme">theme: %s</div></td>
+  %s
+</tr>""" % (folder, html.escape(onto_name), html.escape(_truncate(title, 100)),
+         ("<br>" + html.escape(_truncate(description))) if description else "",
+         html.escape(theme), cells)
+
+
+def _index_page(rows):
+    headings = "".join('<th class="count">%s</th>' % h for h, _ in INDEX_COUNTS)
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ontospy examples</title>
+  <link href="static/libs/bootstrap-3_3_7-dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { margin: 40px 0 80px; }
+    td.count, th.count { text-align: right; white-space: nowrap; }
+    td .theme { color: #999; font-size: 85%%; margin-top: 4px; }
+    td code { font-size: 100%%; white-space: nowrap; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Examples of ontology documentation generated with <a href="https://github.com/lambdamusic/ontospy">Ontospy</a></h1>
+  <p>%d ontologies, documented with the <i>html-complex</i> visualization. Source files and code on <a href="https://github.com/lambdamusic/ontospy-examples">GitHub</a>.</p>
+  <div class="table-responsive">
+  <table class="table table-hover">
+    <thead><tr><th>Ontology</th><th>Title and description</th>%s</tr></thead>
+    <tbody>
+%s
+    </tbody>
+  </table>
+  </div>
+  <hr>
+  <p class="text-muted">Generated on %s with Ontospy %s.</p>
+</div>
+</body>
+</html>
+""" % (len(rows), headings, "\n".join(rows), datetime.date.today().isoformat(), VERSION)
 
 
 if __name__ == '__main__':

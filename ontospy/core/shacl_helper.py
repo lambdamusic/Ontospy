@@ -425,44 +425,24 @@ def get_lineage(onto_class: OntoClass) -> List[OntoClass]:
         Remaining items are ancestor classes in breadth-first search order
     '''
     # Start with self
-    onto_classes: List[OntoClass] = [onto_class]
+    unique_onto_classes: List[OntoClass] = [onto_class]
+    seen: Set[OntoClass] = {onto_class}
 
-    # Add ancestors
-    # Inner class -- recursively add ancestors, one generation at a time (breadth-first)
-    def _add_ancestors(sibling_classes: List[OntoClass]) -> None:
-        '''
-        Arguments:
-            sibling_classes  LIST of ontoClass objects whose parents to add
-
-        Closure:
-            onto_classes   Accumulating list of ancestor classes in breadth first order
-        '''
-        # Get next generation
+    # Add ancestors one generation at a time (breadth-first), each generation in
+    # alphabetical order. Iterative and skipping classes already seen, so cycles and
+    # deep or multiply-inherited hierarchies don't recurse forever (#142).
+    generation: List[OntoClass] = [onto_class]
+    while generation:
         parent_classes: List[OntoClass] = []
-        for sibling_class in sibling_classes:
+        for sibling_class in generation:
             for parent_class in sibling_class.parents():
                 assert isinstance(parent_class, OntoClass)
-                parent_classes.append(parent_class)
-
-        # If no parents, done
-        if not parent_classes:
-            return
-
-        # Add parents in alphabetical order
-        parent_classes.sort(key=lambda x:x.qname)
-        onto_classes.extend(parent_classes)
-
-        # Call self with parents
-        _add_ancestors(parent_classes)
-
-
-    _add_ancestors(onto_classes)
-
-    # Remove duplicates while maintaining order
-    unique_onto_classes: List[OntoClass] = []
-    for onto_class in onto_classes:
-        if onto_class not in unique_onto_classes:
-            unique_onto_classes.append(onto_class)
+                if parent_class not in seen:
+                    seen.add(parent_class)
+                    parent_classes.append(parent_class)
+        parent_classes.sort(key=lambda x: x.qname)
+        unique_onto_classes.extend(parent_classes)
+        generation = parent_classes
 
     # Return results
     return unique_onto_classes

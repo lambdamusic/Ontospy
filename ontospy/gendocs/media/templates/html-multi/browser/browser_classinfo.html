@@ -129,6 +129,9 @@
       </div>
     {% endif %}
 
+    {# See also panel #}
+    {% include "shared/seealso_panel.html" %}
+
 
     {# Superclasses panel #}
     {% if each.ancestors() %}
@@ -225,8 +228,9 @@
                           <span>{{prop.bestDescription()|default("--")}}</span>
                         </td>
                         <td class="fourthtd">
-                          {% if prop.ranges %}
-                            {% for range in prop.ranges  %}
+                          {% set ranges = prop.ranges or prop.ranges_inferred %}
+                          {% if ranges %}
+                            {% for range in ranges  %}
                                 {% if not range.ext_model %}
                                   <a title="{{range.qname}}" href="{{range.slug}}.html" class="rdfclass">{{range.title}}</a>
                                 {% else %}

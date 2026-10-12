@@ -227,6 +227,14 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
     is_flag=True,
     help="NO-BROWSER: prevents opening the html output in the browser by default.")
 @click.option(
+    '--emptyfolder',
+    is_flag=True,
+    help="EMPTY-FOLDER: delete everything in the output folder before generating the documentation. By default, files already there are kept (and overwritten when needed).")
+@click.option(
+    '--nonredundant',
+    is_flag=True,
+    help="NON-REDUNDANT: in the class, property, concept and shape trees, don't repeat a child under a parent when it's already a descendant of one of the parent's other children, eg for reasoned ontologies. Only used by the html-complex visualization.")
+@click.option(
     '--showtypes',
     is_flag=True,
     help='SHOW-TYPES: show the available visualization types.')
@@ -249,6 +257,8 @@ def gendocs(ctx,
             preflabel="",
             preflang="",
             nobrowser=False,
+            emptyfolder=False,
+            nonredundant=False,
             showthemes=False,
             showtypes=False,
             verbose=False):
@@ -311,7 +321,9 @@ def gendocs(ctx,
         preflang=preflang,
         extra= extra,
         individuals= individuals,
-        verbose=verbose)
+        verbose=verbose,
+        empty_folder=emptyfolder,
+        non_redundant=nonredundant)
 
 
     if url and (not nobrowser):  # open browser

@@ -29,7 +29,7 @@
 				{% set variable_watcher = each.1 %}
 			{% else %}
 			{% endif %}
-			<dd>{{each.2|linebreaks}}</dd>
+			<dd>{% if each.2 is url %}<a href="{{each.2}}" target="_blank">{{each.2}}</a>{% else %}{{each.2|linebreaks}}{% endif %}</dd>
 		{% endfor %}
 
 	{% else %}
@@ -182,12 +182,14 @@
 		<p><b class="section-title">Has Sub Property (all):</b> {% for s in each.descendants() %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
-	{% if each.domains %}
-		<p><b class="section-title">Domain:</b> {% for s in each.domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+	{% set domains = each.domains or each.domains_inferred %}
+	{% if domains %}
+		<p><b class="section-title">Domain{% if not each.domains %} (inferred){% endif %}:</b> {% for s in domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
-	{% if each.ranges %}
-		<p><b class="section-title">Range:</b> {% for s in each.ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+	{% set ranges = each.ranges or each.ranges_inferred %}
+	{% if ranges %}
+		<p><b class="section-title">Range{% if not each.ranges %} (inferred){% endif %}:</b> {% for s in ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
 	{% endif %}
 	
 	<hr>
