@@ -40,7 +40,7 @@
 {{each.uri}}
 
 #### Description
-{{each.bestDescription()|linebreaks|default("--")}}
+{{each.bestDescription()|default("--")}}
 
 
 {% if each.ancestors() %}
@@ -72,59 +72,32 @@ owl:Thing
 {% if each.domain_of_inferred %}
 #### Instances of {{each.title}} can have the following properties:
 
-<table border="1" cellspacing="3" cellpadding="5" class="classproperties table-hover ">
+{% for group in each.domain_of_inferred  %}      
+    {%- for k,v in group.items()  -%}
+          
+##### From [{{k.title}}]({{k.slug}}.md):
 
-    <tr>
-        <th height="40">Property</th><th>Description</th><th>Expected Type</th>
-    </tr>
-
-    {% for group in each.domain_of_inferred  %}      
-
-        {% for k,v in group.items()  %}
-            
-        
-        <tr style="background: lightcyan;text-align: left;">
-            <th colspan="3" height="10" class="treeinfo"><span style="font-size: 80%;">
-            From <a title="{{k.qname}}" href="{{k.slug}}.md" class="rdfclass">{{k.title}}</a></span>
-            </th>
-        </tr>       
-
-            {% for prop in v  %}
-            <tr>
-                <td class="firsttd">
-                    <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.md">{{prop.title}}</a>         
-                </td>
-                <td class="thirdtd">
-                    <span>{{prop.bestDescription}}</span>
-                </td>
-                <td class="secondtd">
-                    {% if  prop.ranges %}
-                    {% for range in prop.ranges  %}
-
-                        <a title="{{range.qname}}" href="{{range.slug}}.md" class="rdfclass">{{range.title}}</a>
-
-                    {% endfor %}
-                    {% else %}
-                        <i>owl:Thing</i>
-                    {% endif %}
-                </td>
-            </tr>
-
-            {% endfor %}
-
-        {% endfor %}
-
-    {% endfor %}
-
-</table>
+| Property | Description | Expected Type |
+|----------|-------------|---------------|
+{% for prop in v -%}
+{#- a table row must stay on one line: line breaks become spaces, and | is escaped -#}
+| [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription()|replace("\r\n", " ")|replace("\n", " ")|replace("|", "\\|")}} | 
+            {%- if  prop.ranges -%}
+                {%- for range in prop.ranges -%} 
+[{{range.title}}]({{range.slug}}.md)
+                {%- if not loop.last %}, {% endif -%}
+                {%- endfor -%}
+            {%- else -%} 
+*owl:Thing*
+            {%- endif -%} 
+|
+{% endfor %}
+{% endfor %}
+{% endfor %}
 
 {% endif %}
 
 
-
 {% endif %}
-
-
-
 
 {% endblock main_column %}

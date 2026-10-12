@@ -33,6 +33,10 @@ echo "Distribution built"
 echo "=================="
 ls dist/
 
+# setuptools deletes its sdist staging folder (eg ontospy-2.2/) after the build, but
+# inside Dropbox parts of it can survive, so remove what's left
+rm -rf ontospy-*/
+
 echo "=================="
 echo "..uploading"
 echo "=================="

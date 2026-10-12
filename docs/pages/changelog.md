@@ -2,6 +2,19 @@
 
 Summary of changes.
 
+## Oct, 2026: v 2.3
+
+- Namespace prefixes: the prefixes declared in an RDF file now win over rdflib's defaults. Since rdflib 7, an ontology declaring `schema:` for `http://schema.org/` was shown with `schema1:` names, because rdflib binds `schema` to `https://schema.org/` by default [issue-135](https://github.com/lambdamusic/Ontospy/issues/135)
+- Load RDF from existing rdflib graphs, with the new `graph_obj` parameter [issue-111](https://github.com/lambdamusic/Ontospy/issues/111), based on the idea in [pull-114](https://github.com/lambdamusic/Ontospy/pull/114)
+- Fix loading from open files (`file_obj`), broken since Python 3
+- Paths, strings, open files and rdflib graphs can be combined when creating an `Ontospy` object
+- Every `Ontospy` parameter is now documented: `help(ontospy.Ontospy)`
+- Documentation generation (`gendocs`)
+    - Custom templates: every visualization takes a `jinja2env` parameter, so you can override any of Ontospy's templates with your own, see "Customising the templates" in the docs [pull-138](https://github.com/lambdamusic/Ontospy/pull/138), answers [issue-140](https://github.com/lambdamusic/Ontospy/issues/140) and [issue-143](https://github.com/lambdamusic/Ontospy/issues/143)
+    - Markdown: descriptions are no longer wrapped in HTML, so Markdown in them is rendered [pull-133](https://github.com/lambdamusic/Ontospy/pull/133), fixes [issue-64](https://github.com/lambdamusic/Ontospy/issues/64)
+    - Markdown: the class pages list properties in Markdown tables instead of HTML [pull-137](https://github.com/lambdamusic/Ontospy/pull/137); descriptions with line breaks or `|` no longer break the tables, and multiple ranges are comma-separated
+- Packaging: the licence is declared as an SPDX expression (`License-Expression: MIT`), replacing the deprecated licence classifier
+
 ## Oct, 2026: v 2.2
 
 - Support Python 3.12+: replace the removed `SafeConfigParser` with `ConfigParser` [pull-144](https://github.com/lambdamusic/Ontospy/pull/144), fixes [issue-129](https://github.com/lambdamusic/Ontospy/issues/129) and [issue-141](https://github.com/lambdamusic/Ontospy/issues/141)

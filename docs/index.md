@@ -234,6 +234,28 @@ Out[12]: []
 
 For a longer walkthrough, see the [getting started notebook](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb): it loads an ontology, prints its hierarchies, inspects classes, properties and individuals, and returns the data as [pandas](https://pandas.pydata.org/) data frames, including the results of SPARQL queries.
 
+**Other ways to load RDF**
+
+Besides file paths and URLs, `Ontospy` can load RDF from strings, open files and existing [rdflib](https://rdflib.readthedocs.io/) graphs. Each parameter takes one item or a list, and they can be combined: everything ends up in one graph.
+
+```python
+import rdflib
+import ontospy
+
+g = ontospy.Ontospy(data="@prefix ex: <http://example.org/> . ex:Cat a <http://www.w3.org/2002/07/owl#Class> .",
+                    rdf_format="turtle")           # a string of RDF
+
+with open("foaf.rdf") as f:
+    g = ontospy.Ontospy(file_obj=f)                 # an open file
+
+my_graph = rdflib.Graph().parse("foaf.rdf")
+g = ontospy.Ontospy(graph_obj=my_graph)             # an rdflib graph, eg built by your own code
+
+g = ontospy.Ontospy("foaf.rdf", graph_obj=[my_graph, rdflib.Graph()])   # a mix of sources
+```
+
+All the parameters are described in the `Ontospy` class docstring: `help(ontospy.Ontospy)`.
+
 
 ## Is Ontospy for me?
 
@@ -304,6 +326,42 @@ v.build() # => render visualization. You can pass an 'output_path' parameter too
 v.preview() # => open in browser
 
 ```
+
+**Customising the templates**
+
+The documentation is rendered with [Jinja2](https://jinja.palletsprojects.com/) templates, which live in the package's [templates folder](https://github.com/lambdamusic/Ontospy/tree/master/ontospy/gendocs/media/templates). To change how the output looks, eg to add your own CSS, or to remove a section you don't need, you can override any of them with your own version:
+
+1. Copy the template you want to change into a folder of your own, keeping its path relative to the templates folder, eg `my-templates/html-multi/base.html`.
+2. Edit your copy.
+3. Pass a Jinja2 environment that looks in your folder first, and falls back to Ontospy's own templates for everything else:
+
+```python
+import ontospy
+from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader, select_autoescape
+from ontospy.gendocs.jinja_env import add_default_filters
+from ontospy.gendocs.viz.viz_html_multi import KompleteViz
+
+my_env = Environment(
+    loader=ChoiceLoader([
+        FileSystemLoader("my-templates"),                        # your versions first
+        PackageLoader("ontospy.gendocs.media", "templates"),     # then Ontospy's
+    ]),
+    autoescape=select_autoescape(["html", "xml"]),
+    extensions=["jinja2_time.TimeExtension"],
+)
+add_default_filters(my_env)   # the filters Ontospy's templates use
+
+g = ontospy.Ontospy("my-ontology.ttl")
+v = KompleteViz(g, title="My ontology", jinja2env=my_env)
+v.build("my-docs")
+```
+
+Every visualization type accepts the `jinja2env` parameter. For example, with the multi-page HTML (`KompleteViz`):
+
+-   to add your own stylesheet, override `html-multi/base.html` and add a `<link>` after the existing ones
+-   to change what a class page shows, eg remove its "Usage" section, override `html-multi/browser/browser_classinfo.html`
+
+Custom templates are only available from Python, not from the `ontospy gendocs` command.
 
 ## Miscellaneous Tips
 

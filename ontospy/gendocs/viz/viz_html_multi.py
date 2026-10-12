@@ -39,11 +39,11 @@ class KompleteViz(VizFactory):
     """
 
 
-    def __init__(self, ontospy_graph, title="", theme=""):
+    def __init__(self, ontospy_graph, title="", theme="", *args, **kwargs):
         """
         Init
         """
-        super(KompleteViz, self).__init__(ontospy_graph, title)
+        super(KompleteViz, self).__init__(ontospy_graph, title, *args, **kwargs)
         self.static_files = [
                 "custom",
                 "libs/bootswatch3_2",
@@ -229,11 +229,11 @@ class KompleteVizMultiModel(KompleteViz):
     """
 
 
-    def __init__(self, ontospy_graph, title="", theme="", static_url="", output_path_static=""):
+    def __init__(self, ontospy_graph, title="", theme="", static_url="", output_path_static="", **kwargs):
         """
         Init
         """
-        super(KompleteVizMultiModel, self).__init__(ontospy_graph, title, theme)
+        super(KompleteVizMultiModel, self).__init__(ontospy_graph, title, theme, **kwargs)
         self.static_files = ["custom", "libs"]
         self.theme = validate_theme(theme)
         self.static_url = static_url  # eg "../static"

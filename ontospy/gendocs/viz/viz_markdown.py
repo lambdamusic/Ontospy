@@ -19,11 +19,11 @@ class MarkdownViz(VizFactory):
 
     """
 
-    def __init__(self, ontospy_graph, title=""):
+    def __init__(self, *args, **kwargs):
         """
         Init
         """
-        super(MarkdownViz, self).__init__(ontospy_graph, title)
+        super(MarkdownViz, self).__init__(*args, **kwargs)
 
     def _buildTemplates(self):
         """

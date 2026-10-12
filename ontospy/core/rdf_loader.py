@@ -17,10 +17,11 @@ from .utils import *
 class RDFLoader(object):
     """Utility to Load any RDF source into an RDFLIB graph instance.
 
-    Accepts: [single item or list]
+    Accepts: [single item or list, and the different kinds can be combined]
     :: uri_or_path = a uri or local path
     :: data = a string containing rdf
     :: file_obj = a python file object
+    :: graph_obj = an rdflib graph
 
     Returns: rdflib graph instance.
 
@@ -51,6 +52,25 @@ class RDFLoader(object):
         self.sources_valid = []
         self.sources_invalid = []
         self.verbose = verbose
+        self.declared_prefixes = {}  # prefix => namespace, as declared in the sources
+
+    def _remember_prefixes(self, graph):
+        """Record the prefixes declared in a source, parsed into a graph with only rdflib's
+        core prefixes bound. The first declaration of a prefix wins."""
+        for prefix, namespace in graph.namespaces():
+            self.declared_prefixes.setdefault(prefix, namespace)
+
+    def _apply_declared_prefixes(self):
+        """Make the prefixes declared in the sources win over rdflib's defaults.
+
+        Since rdflib 7 a new Graph comes with ~30 well-known prefixes already bound, eg
+        `schema` for <https://schema.org/>, so a source declaring `schema` for <http://schema.org/>
+        ended up as `schema1` (#135). Merging graphs with `+` rebinds rdflib's defaults too, so
+        the sources' own prefixes are re-applied at the end. rdflib's defaults still apply to
+        namespaces the sources don't declare a prefix for.
+        """
+        for prefix, namespace in self.declared_prefixes.items():
+            self.rdflib_graph.namespace_manager.bind(prefix, namespace, override=True, replace=True)
 
     def _debugGraph(self):
         """internal util to print out contents of graph"""
@@ -58,7 +78,7 @@ class RDFLoader(object):
         for x, y, z in self.rdflib_graph:
             printDebug(x, y, z)
 
-    def load(self, uri_or_path=None, data=None, file_obj=None, rdf_format=""):
+    def load(self, uri_or_path=None, data=None, file_obj=None, rdf_format="", graph_obj=None):
 
         if not rdf_format:
             self.rdf_format_opts = self.SERIALIZATIONS
@@ -85,21 +105,30 @@ class RDFLoader(object):
                     self.load_uri(uri)
 
         # DATA STRING
-        elif data:
+        if data:
             if not type(data) in [list, tuple]:
                 data = [data]
             for each in data:
                 self.load_data(each)
 
         # FILE OBJECT
-        elif file_obj:
+        if file_obj:
             if not type(file_obj) in [list, tuple]:
                 file_obj = [file_obj]
             for each in file_obj:
                 self.load_file(each)
 
-        else:
+        # RDFLIB GRAPH
+        if graph_obj is not None:
+            if not type(graph_obj) in [list, tuple]:
+                graph_obj = [graph_obj]
+            for each in graph_obj:
+                self.load_graph(each)
+
+        if not (uri_or_path or data or file_obj or graph_obj is not None):
             raise Exception("You must specify where to load RDF from.")
+
+        self._apply_declared_prefixes()
 
         if self.verbose: self.print_summary()
 
@@ -132,9 +161,13 @@ class RDFLoader(object):
                             "Detected JSONLD - loading data into rdflib.ConjunctiveGraph()",
                             fg='green')
                     temp_graph = rdflib.ConjunctiveGraph()
+                    # ConjunctiveGraph doesn't take `bind_namespaces`, so set it on its manager
+                    temp_graph.namespace_manager = rdflib.namespace.NamespaceManager(
+                        temp_graph, bind_namespaces="core")
                 else:
-                    temp_graph = rdflib.Graph()
+                    temp_graph = rdflib.Graph(bind_namespaces="core")
                 temp_graph.parse(uri, format=f)
+                self._remember_prefixes(temp_graph)
                 if self.verbose: printDebug("..... success!", bold=True)
                 success = True
                 self.sources_valid += [uri]
@@ -150,49 +183,68 @@ class RDFLoader(object):
             self.loading_failed(sorted_fmt_opts, uri=uri)
             self.sources_invalid += [uri]
 
-    def load_data(self, data):
-        """
+    def load_data(self, data, label=None, rdf_format_opts=None):
+        """Load a string containing RDF into the graph for this object.
 
-        :param data:
-        :param rdf_format_opts:
-        :return:
+        :param data: a string containing RDF
+        :param label: how to refer to this source in `sources_valid` (default: its first characters)
+        :param rdf_format_opts: the serializations to try, in order (default: self.rdf_format_opts)
         """
+        label = label or "Data: '%s ...'" % data[:10]
+        rdf_format_opts = rdf_format_opts or self.rdf_format_opts
         if self.verbose: printDebug("----------")
-        if self.verbose: printDebug("Reading: '%s ...'" % data[:10])
+        if self.verbose: printDebug("Reading: %s" % label)
         success = False
-        for f in self.rdf_format_opts:
+        for f in rdf_format_opts:
             if self.verbose:
                 printDebug(".. trying rdf serialization: <%s>" % f)
             try:
                 # TODO ??
                 # if f == 'json-ld':
                 #     self._fix_default_graph_for_jsonld()
-                self.rdflib_graph.parse(data=data, format=f)
+                temp_graph = rdflib.Graph(bind_namespaces="core")
+                temp_graph.parse(data=data, format=f)
+                self._remember_prefixes(temp_graph)
+                self.rdflib_graph = self.rdflib_graph + temp_graph
                 if self.verbose: printDebug("..... success!")
                 success = True
-                self.sources_valid += ["Data: '%s ...'" % data[:10]]
+                self.sources_valid += [label]
                 break
             except:
                 if self.verbose: printDebug("..... failed", "error")
 
         if not success == True:
-            self.loading_failed(self.rdf_format_opts)
-            self.sources_invalid += ["Data: '%s ...'" % data[:10]]
+            self.loading_failed(rdf_format_opts)
+            self.sources_invalid += [label]
 
     def load_file(self, file_obj):
-        """
-        The type of open file objects such as sys.stdout; alias of the built-in file.
-        @TODO: when is this used?
-        """
-        if self.verbose: printDebug("----------")
-        if self.verbose: printDebug("Reading: <%s> ...'" % file_obj.name)
+        """Load an open file object (text or binary) containing RDF into the graph for this object.
 
-        if type(file_obj) == file:
-            self.rdflib_graph = self.rdflib_graph + file_obj
-            self.sources_valid += [file_obj.NAME]
+        Its contents are read and loaded like a string of RDF data. If the file has a name,
+        its extension is used to try the most likely serialization first.
+        """
+        name = getattr(file_obj, "name", "")
+        data = file_obj.read()
+        if isinstance(data, bytes):
+            data = data.decode("utf-8")
+        rdf_format_opts = try_sort_fmt_opts(self.rdf_format_opts, name) if name else None
+        self.load_data(data, label="File: <%s>" % (name or "file object"), rdf_format_opts=rdf_format_opts)
+
+    def load_graph(self, graph):
+        """Load the triples of an existing rdflib graph into the graph for this object.
+
+        The graph passed is not modified. Its prefix bindings are kept, like the prefixes
+        declared in an RDF file.
+        """
+        if isinstance(graph.identifier, rdflib.URIRef):
+            label = "Graph: <%s>" % graph.identifier
         else:
-            self.loading_failed(self.rdf_format_opts)
-            self.sources_invalid += [file_obj.NAME]
+            label = "Graph: rdflib graph with %d triples" % len(graph)
+        if self.verbose: printDebug("----------")
+        if self.verbose: printDebug("Reading: %s" % label, fg="green")
+        self._remember_prefixes(graph)
+        self.rdflib_graph = self.rdflib_graph + graph
+        self.sources_valid += [label]
 
     def resolve_redirects_if_needed(self, uri):
         """
