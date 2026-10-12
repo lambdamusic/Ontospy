@@ -48,6 +48,8 @@ class VizFactory(object):
         self.title = title or self.infer_best_title()
         self.basic_context_data = self._build_basic_context()
         self.jinja2env = jinja2env or get_default_env()
+        self.written_files = set()  # absolute paths of the files written by the last build
+        self.leftover_files = []  # files in the output folder that the last build didn't write
 
     def infer_best_title(self):
         """Selects something usable as a title for an ontospy graph. 
@@ -65,12 +67,20 @@ class VizFactory(object):
         else:
             return "Untitled"
 
-    def build(self, output_path=""):
-        """method that should be inherited by all vis classes"""
+    def build(self, output_path="", empty_folder=False):
+        """method that should be inherited by all vis classes
 
-        self.output_path = self.checkOutputPath(output_path)
+        Files already in the output folder are kept (and overwritten if the build writes
+        a file with the same name), unless `empty_folder` is True: then everything in the
+        output folder is deleted first. Afterwards, files that the build didn't write are
+        reported, as they may be left over from earlier builds.
+        """
+
+        self.written_files = set()
+        self.output_path = self.checkOutputPath(output_path, empty_folder)
         self._buildStaticFiles()
         self.final_url = self._buildTemplates()
+        self._warn_leftover_files()
         printDebug("Done.", "comment")
         printDebug("=> %s" % (self.final_url), "comment")
         return self.final_url
@@ -119,16 +129,20 @@ class VizFactory(object):
             source_f = os.path.join(self.static_root, x)
             dest_f = os.path.join(self.output_path_static, x)
             if os.path.isdir(source_f):
-                if os.path.exists(dest_f):
-                    # delete first if exists, as copytree will throw an error otherwise
-                    shutil.rmtree(dest_f)
-                shutil.copytree(source_f, dest_f)
+                # copy over any existing files, rather than deleting the folder first
+                shutil.copytree(source_f, dest_f, dirs_exist_ok=True)
+                for root, dirs, files in os.walk(dest_f):
+                    for f in files:
+                        self._record_written(os.path.join(root, f))
             else:
                 shutil.copyfile(source_f, dest_f)
+                self._record_written(dest_f)
                 if x.endswith('.zip'):
                     printDebug("..unzipping")
                     zip_ref = zipfile.ZipFile(os.path.join(dest_f), 'r')
                     zip_ref.extractall(self.output_path_static)
+                    for name in zip_ref.namelist():
+                        self._record_written(os.path.join(self.output_path_static, name))
                     zip_ref.close()
                     printDebug("..cleaning up")
                     os.remove(dest_f)
@@ -184,21 +198,59 @@ class VizFactory(object):
         f = open(filename, 'wb')
         f.write(contents)  # python will convert \n to os.linesep
         f.close()  # you can omit in most cases as the destructor will call it
+        self._record_written(filename)
         url = "file://" + filename
         return url
 
-    def checkOutputPath(self, output_path):
+    def checkOutputPath(self, output_path, empty_folder=False):
         """
-        Create or clean up output path
+        Create the output path if needed. Files already there are kept, unless
+        `empty_folder` is True: then the folder's contents are deleted (the folder itself
+        is kept, eg in case it's a mounted volume).
         """
         if not output_path:
             # output_path = self.output_path_DEFAULT
             output_path = os.path.join(self.output_path_DEFAULT,
                                        slugify(unicode(self.title)))
         if os.path.exists(output_path):
-            shutil.rmtree(output_path)
-        os.makedirs(output_path)
+            if empty_folder:
+                self._empty_folder(output_path)
+        else:
+            os.makedirs(output_path)
         return output_path
+
+    def _empty_folder(self, path):
+        """Delete everything inside a folder, but not the folder itself"""
+        printDebug("Emptying the output folder: %s" % path, dim=True)
+        for entry in os.scandir(path):
+            if entry.is_dir(follow_symlinks=False):
+                shutil.rmtree(entry.path)
+            else:
+                os.remove(entry.path)
+
+    def _record_written(self, filename):
+        self.written_files.add(os.path.abspath(filename))
+
+    def _warn_leftover_files(self):
+        """Report files in the output folder that this build didn't write: they may be
+        left over from earlier builds, eg pages for entities no longer in the ontology.
+        Hidden files (eg .DS_Store, .git) are ignored."""
+        self.leftover_files = []
+        for root, dirs, files in os.walk(self.output_path):
+            dirs[:] = [d for d in dirs if not d.startswith(".")]
+            for f in files:
+                path = os.path.abspath(os.path.join(root, f))
+                if not f.startswith(".") and path not in self.written_files:
+                    self.leftover_files.append(path)
+        if self.leftover_files:
+            n = len(self.leftover_files)
+            examples = ", ".join(os.path.relpath(x, self.output_path) for x in sorted(self.leftover_files)[:3])
+            printDebug(
+                "WARNING: %d file%s in the output folder %s not written by this build, eg %s. "
+                "They may be left over from earlier builds: use the --emptyfolder option "
+                "(or `empty_folder=True`) to delete everything in the folder first."
+                % (n, "s" if n > 1 else "", "were" if n > 1 else "was", examples),
+                fg="red")
 
     def highlight_code(self, ontospy_entity):
         """

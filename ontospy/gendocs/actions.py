@@ -94,7 +94,7 @@ def select_visualization(n):
 # ===========
 
 
-def build_visualization(g, viz_index, path=None, title="", theme=""):
+def build_visualization(g, viz_index, path=None, title="", theme="", empty_folder=False):
     """
     2017-01-20: new verion, less clever but also simpler
     """
@@ -144,7 +144,7 @@ def build_visualization(g, viz_index, path=None, title="", theme=""):
     else:
         return False
 
-    url = v.build(path)
+    url = v.build(path, empty_folder=empty_folder)
 
     return url
 

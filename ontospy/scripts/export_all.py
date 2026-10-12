@@ -114,8 +114,8 @@ This application is a wrapper on the main ontospy-gendocs utility. It generates 
                 static_url="../static/",
                 output_path_static=static_outputpath)
             try:
-                # note: onto_outputpath is wiped out each time as part of the build
-                url = v.build(onto_outputpath)
+                # the per-ontology folders belong to this script, so they're rebuilt from scratch
+                url = v.build(onto_outputpath, empty_folder=True)
                 report_pages.append(
                     "<li><a href='%s/index.html' target='_blank'>%s</a> ('%s' theme)</li>"
                     % (onto_name_safe, onto_name, _theme))
