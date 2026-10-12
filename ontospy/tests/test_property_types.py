@@ -94,3 +94,16 @@ def test_all_types_listed(g):
 	assert g.get_property(uri=NS + "hasBase").rdftypes_qnames == [
 		"owl:FunctionalProperty", "owl:InverseFunctionalProperty", "owl:ObjectProperty"]
 	assert g.get_property(uri=NS + "depth").rdftypes_qnames == ["b:Length", "owl:FunctionalProperty"]
+
+
+def test_unique_slugs():
+	"""URIs that differ only by case, eg FOAF's givenname and givenName, are two
+	properties since 2.4: their slugs, ie their page names, must differ too"""
+	g = Ontospy(data=ONTO + """
+	:givenName a owl:DatatypeProperty .
+	:givenname a owl:DatatypeProperty .
+	""", rdf_format="turtle", verbose=False)
+	slugs = {p.uri.split("#")[1]: p.slug for p in g.all_properties if "iven" in p.uri}
+	assert slugs == {"givenName": "prop-bgivenname", "givenname": "prop-bgivenname-2"}
+	entities = g.all_ontologies + g.all_classes + g.all_properties + g.all_skos_concepts + g.all_shapes
+	assert len({e.slug for e in entities}) == len(entities)

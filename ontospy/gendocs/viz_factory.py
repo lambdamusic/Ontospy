@@ -257,9 +257,12 @@ class VizFactory(object):
         produce an html version of Turtle code with syntax highlighted
         using Pygments CSS
         """
+        source = ontospy_entity.rdf_source()
+        if not source:
+            # no triples about the entity in the graph, eg an external superclass
+            return {}
         try:
-            pygments_code = highlight(ontospy_entity.rdf_source(),
-                                      TurtleLexer(), HtmlFormatter())
+            pygments_code = highlight(source, TurtleLexer(), HtmlFormatter())
             pygments_code_css = HtmlFormatter().get_style_defs('.highlight')
             return {
                 "pygments_code": pygments_code,

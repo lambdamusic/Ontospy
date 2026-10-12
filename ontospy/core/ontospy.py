@@ -325,6 +325,8 @@ class Ontospy(object):
 
 		self.__computeInferredProperties()
 
+		self.__makeSlugsUnique()
+
 		if verbose:
 			printInfo("----------", "comment")
 
@@ -852,6 +854,23 @@ class Ontospy(object):
 							aProp.ranges_inferred.append(x)
 							if hasattr(x, "range_of_via_superproperties"):  # not a blank node
 								x.range_of_via_superproperties.append(aProp)
+
+	def __makeSlugsUnique(self):
+		"""
+		Slugs name the documentation pages and are lowercase, so URIs that differ only by
+		case (eg FOAF's givenName and givenname) would get the same page. The first entity
+		(in qname order) keeps its slug, the others get -2, -3 etc.
+		"""
+		seen = set()
+		for entities in [self.all_ontologies, self.all_classes, self.all_properties,
+						 self.all_skos_concepts, self.all_shapes, self.all_individuals]:
+			for x in entities:
+				slug, n = x.slug, 1
+				while slug in seen:
+					n += 1
+					slug = "%s-%d" % (x.slug, n)
+				x.slug = slug
+				seen.add(slug)
 
 	def __computeInferredProperties(self):
 		"""
