@@ -80,7 +80,7 @@ class MarkdownViz(VizFactory):
                 contents = self._renderTemplate(
                     "markdown/markdown_conceptinfo.md",
                     extraContext=extra_context)
-                FILE_NAME = entity.slug + ".ms"
+                FILE_NAME = entity.slug + ".md"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 
         if self.ontospy_graph.all_individuals:
@@ -95,7 +95,7 @@ class MarkdownViz(VizFactory):
                 contents = self._renderTemplate(
                     "markdown/markdown_individualinfo.md",
                     extraContext=extra_context)
-                FILE_NAME = entity.slug + ".ms"
+                FILE_NAME = entity.slug + ".md"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 
         return main_url
