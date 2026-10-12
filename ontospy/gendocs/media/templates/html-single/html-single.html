@@ -516,6 +516,12 @@
                     <small>NOTE</small> {{each.qname}} is a leaf node.</p>
                 {% endif %}
 
+				{% if each.rdftypes_qnames %}
+				<p class="section-desc"><b>Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}:</b>
+                    {{each.rdftypes_qnames|join(", ")}}
+                </p>
+                {% endif %}
+
 				<p class="section-desc"><b>Description</b>
                     <br>
                     {{each.bestDescription()|linebreaks}}
@@ -598,6 +604,12 @@
                     <small>NOTE</small> {{each.title}} is a leaf node.</p>
                 {% endif %}
 
+				{% if each.rdftypes_qnames %}
+				<p class="section-desc"><b>Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}:</b>
+                    {{each.rdftypes_qnames|join(", ")}}
+                </p>
+                {% endif %}
+
 				<p class="section-desc"><b>Description</b>
                     <br>
                     {{each.bestDescription()|linebreaks}}
@@ -678,6 +690,12 @@
                 {% if not each.children()  %}
                 <p class="section-desc">
                     <small>NOTE</small> {{each.title}} is a leaf node.</p>
+                {% endif %}
+
+				{% if each.rdftypes_qnames %}
+				<p class="section-desc"><b>Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}:</b>
+                    {{each.rdftypes_qnames|join(", ")}}
+                </p>
                 {% endif %}
 
 				<p class="section-desc"><b>Description</b>

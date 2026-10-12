@@ -445,6 +445,23 @@ def inferMainPropertyType(uriref):
         return None
 
 
+def mainPropertyType(types):
+    """
+    The main type of a property, given all its rdf:types (#10).
+    A declared owl:ObjectProperty, owl:DatatypeProperty or owl:AnnotationProperty wins,
+    whatever the other types, eg owl:FunctionalProperty. Otherwise the first type that
+    isn't rdf:Property is reduced to a main type by inferMainPropertyType.
+    """
+    for main_type in [rdflib.OWL.ObjectProperty, rdflib.OWL.DatatypeProperty,
+                      rdflib.OWL.AnnotationProperty]:
+        if main_type in types:
+            return main_type
+    for x in types:
+        if x != rdflib.RDF.Property:
+            return inferMainPropertyType(x)
+    return inferMainPropertyType(types[0]) if types else None
+
+
 def printGenericTree(element,
                      level=0,
                      showids=True,

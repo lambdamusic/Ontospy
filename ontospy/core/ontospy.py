@@ -495,21 +495,21 @@ class Ontospy(object):
 		qres += self.sparqlHelper.getPropertiesTypedBySubclasses()
 		# print("rdflib query done")
 
+		# one row per (property, type): collect all the types first, so that the main
+		# type doesn't depend on which row comes first (#10)
+		candidate_types = {}
 		for candidate in qres:
+			types = candidate_types.setdefault(candidate[0], [])
+			if candidate[1] and candidate[1] not in types:
+				types.append(candidate[1])
 
-			test_existing_prop = self.get_property(uri=candidate[0])
-			if not test_existing_prop:
-				# create it
-				self.all_properties += [OntoProperty(candidate[0], candidate[1], 
-											self.namespaces, 
-											False,
-											self.pref_title,
-											self.pref_lang,
-											)]
-			else:
-				# update it
-				if candidate[1] and (test_existing_prop.rdftype == rdflib.RDF.Property):
-					test_existing_prop.rdftype = inferMainPropertyType(candidate[1])
+		for uri, types in candidate_types.items():
+			self.all_properties += [OntoProperty(uri, mainPropertyType(types),
+										self.namespaces,
+										False,
+										self.pref_title,
+										self.pref_lang,
+										)]
 		# print("properties created")
 
 		# add more data
@@ -526,6 +526,9 @@ class Ontospy(object):
 
 			aProp.triples = self.sparqlHelper.entityTriples(aProp.uri)
 			aProp._buildGraph()  # force construction of mini graph
+			# all the rdf:types, for display (#53)
+			aProp.rdftypes_qnames = sorted(aProp._build_qname(x)
+				for x in aProp.getValuesForProperty(rdflib.RDF.type))
 
 			# attach to an ontology [2015-06-15: no property type distinction yet]
 			for uri in aProp.getValuesForProperty(rdflib.RDFS.isDefinedBy):

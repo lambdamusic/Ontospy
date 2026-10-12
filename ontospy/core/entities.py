@@ -389,6 +389,8 @@ class OntoProperty(RdfEntity):
 
         self.slug = "prop-" + slugify(self.qname)
         self.rdftype = inferMainPropertyType(rdftype)
+        self.rdftype_qname = self._build_qname(self.rdftype)  # the main type, not the raw one (#10)
+        self.rdftypes_qnames = []  # all the rdf:types, set when the ontology is built (#53)
 
         self.domains = []
         self.ranges = []

@@ -75,7 +75,7 @@
 
                     {% else %}
 
-                        <li><a href="entities-tree-properties.html">rdf:Property</a>
+                        <li><a href="entities-tree-properties.html">{{each.rdftype_qname|default("rdf:Property", true)}}</a>
 
                           <ul>
                             <li><a style="font-weight: bold;" title="'{{each.bestLabel()}}'{% if each.bestDescription() %} - {{each.bestDescription()|truncatewords(20)}}{% endif %}">{{each.title}}</a>
@@ -110,6 +110,19 @@
              </div>
            </div>
             </div></div>
+
+            {% if each.rdftypes_qnames %}
+            <div class="row"><div class="col-md-12">
+               <div class="panel panel-default">
+             <div class="panel-heading">
+               <h3 class="panel-title">Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}</h3>
+             </div>
+             <div class="panel-body">
+                 {% for t in each.rdftypes_qnames %}<code>{{t}}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+             </div>
+           </div>
+            </div></div>
+            {% endif %}
 
 
 

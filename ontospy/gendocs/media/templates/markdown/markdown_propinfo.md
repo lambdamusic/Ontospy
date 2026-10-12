@@ -22,7 +22,7 @@
 {% endif %}
 
 {% else %}
-* rdf:Property
+* {{each.rdftype_qname|default("rdf:Property", true)}}
     * {{each.title}}
 {% if each.children()  %}
 {% for s in each.children() %}
@@ -38,6 +38,12 @@
 
 #### URI
 {{each.uri}}
+
+{% if each.rdftypes_qnames %}
+#### Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}
+
+{% for t in each.rdftypes_qnames %}`{{t}}`{% if not loop.last %}, {% endif %}{% endfor %}
+{% endif %}
 
 #### Description
 {{each.bestDescription()|default("--")}}
