@@ -38,6 +38,14 @@ def random_theme():
     return random.choice(BOOTSWATCH_THEMES)
 
 
+def stable_theme(name):
+    """A theme picked from <name>, eg a file name: the same name always gets the same
+    theme, also across runs (Python's hash() is salted per process, md5 isn't)"""
+    import hashlib
+    digest = hashlib.md5(name.encode("utf-8")).hexdigest()
+    return BOOTSWATCH_THEMES[int(digest, 16) % len(BOOTSWATCH_THEMES)]
+
+
 def validate_theme(theme_try, default=BOOTSWATCH_THEME_DEFAULT):
     # print theme_try
     if not theme_try:
