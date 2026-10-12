@@ -7,6 +7,7 @@ Summary of changes.
 - Support Python 3.12+: replace the removed `SafeConfigParser` with `ConfigParser` [pull-144](https://github.com/lambdamusic/Ontospy/pull/144), fixes [issue-129](https://github.com/lambdamusic/Ontospy/issues/129) and [issue-141](https://github.com/lambdamusic/Ontospy/issues/141)
 - Packaging: dependency minimum versions are now enforced on install (eg `rdflib>=6.0.0`), `pygments>=2.15`, and Python 3.10 or later is required; the source distribution (`.tar.gz`) can be installed again
 - Fix `gendocs -i` (documenting individuals) failing with `TypeError: 'method' object is not iterable` on every template; the multi page HTML now has pages for individuals again [issue-145](https://github.com/lambdamusic/Ontospy/issues/145)
+- Reorganise `ontospy/extras`: the interactive shell (`ontospy shell`) moves to `ontospy/shell`; the old, unmaintained experiments in `extras/hacks` move out of the package to a top-level `archive/` folder
 - SPARQL endpoints
     - `load_sparql` now uses rdflib's `SPARQLStore`; pass credentials as a `(user, password)` tuple
     - Results are requested as JSON, which fixes the `Repeat node-elements inside property elements` error with Virtuoso endpoints such as DBpedia

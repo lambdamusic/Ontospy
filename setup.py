@@ -127,7 +127,6 @@ setup(
         },
     entry_points={
         'console_scripts': [
-            # 'ontospy-sketch=ontospy.extras.sketch:main',
             'ontospy=ontospy.cli:main_cli',
             'ontospy_quicktest=ontospy.tests.quick:main'
         ],
