@@ -46,9 +46,8 @@ venv
 .vsdocs
 .vscode
 
-# private files
-README_PRIVATE.md
-notebooks/scratch.ipynb
+# private files, never committed
+/private/
 backlog
 
 # local-only tests, eg against private endpoints (see docs/pages/tests.md)
