@@ -55,6 +55,39 @@ def test_html_multi_individual_pages(pizza, tmp_path):
 		assert (tmp_path / (x.slug + ".html")).exists()
 
 
+EDGE_CASES_TTL = """
+@prefix : <http://example.org/edge#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+:Thing a owl:Class .
+:Range1 a owl:Class .
+:Range2 a owl:Class .
+:multiLine a owl:ObjectProperty ; rdfs:domain :Thing ; rdfs:range :Range1 ;
+    rdfs:comment \"\"\"First line.
+Second line.\"\"\" .
+:withPipe a owl:ObjectProperty ; rdfs:domain :Thing ; rdfs:range :Range1 ;
+    rdfs:comment "Either A | B" .
+:twoRanges a owl:ObjectProperty ; rdfs:domain :Thing ; rdfs:range :Range1, :Range2 .
+"""
+
+
+def test_markdown_property_table_rows(tmp_path):
+	"""the markdown class pages list properties in a table (#137): each row must stay
+	on one line and have exactly 3 columns, whatever is in the descriptions"""
+	g = Ontospy(data=EDGE_CASES_TTL, rdf_format="turtle")
+	viz_index = [n for n, v in VIZ_TYPES if v == "markdown"][0]
+	build_visualization(g, viz_index, path=str(tmp_path))
+	page = (tmp_path / "class-edgething.md").read_text(encoding="utf-8")
+	rows = [l for l in page.split("\n") if l.startswith("| [")]
+	assert len(rows) == 3
+	for row in rows:
+		# 4 unescaped | delimit 3 columns
+		assert row.replace("\\|", "").count("|") == 4, row
+	assert "First line. Second line." in page
+	assert "Either A \\| B" in page
+	assert "class-edgerange2.md), [" in page or "class-edgerange1.md), [" in page
+
+
 def test_individual_instance_of(pizza):
 	italy = [x for x in pizza.all_individuals if x.qname.endswith("Italy")][0]
 	assert [c.qname for c in italy.instance_of()] == ["pizza.owl:Country"]

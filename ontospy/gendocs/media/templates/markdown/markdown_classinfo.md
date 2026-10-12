@@ -80,10 +80,12 @@ owl:Thing
 | Property | Description | Expected Type |
 |----------|-------------|---------------|
 {% for prop in v -%}
-| [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription()}} | 
+{#- a table row must stay on one line: line breaks become spaces, and | is escaped -#}
+| [{{prop.title}}]({{prop.slug}}.md) | {{prop.bestDescription()|replace("\r\n", " ")|replace("\n", " ")|replace("|", "\\|")}} | 
             {%- if  prop.ranges -%}
                 {%- for range in prop.ranges -%} 
 [{{range.title}}]({{range.slug}}.md)
+                {%- if not loop.last %}, {% endif -%}
                 {%- endfor -%}
             {%- else -%} 
 *owl:Thing*
