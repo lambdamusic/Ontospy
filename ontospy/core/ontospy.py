@@ -22,6 +22,21 @@ from .shacl_helper import build_shacl_constraints
 # a PREFIX declaration in a sparql query, eg `PREFIX owl: <http://www.w3.org/2002/07/owl#>`
 PREFIX_DECLARATION = re.compile(r"PREFIX\s+([\w.-]*)\s*:\s*<([^>]*)>", re.IGNORECASE)
 
+def _remove_redundant_children(children):
+	"""
+	Leave out the children that are also descendants of another child, eg in a reasoned
+	graph with A > B > C and the materialised A > C, C is left out under A (PR #87).
+	Multiple inheritance is kept: C still appears under B, and under any other parent.
+	Children that are descendants of each other (a cycle) are all kept.
+	"""
+	if len(children) < 2:
+		return children
+	descendants = {c: set(c.descendants()) for c in children}
+	return [c for c in children
+			if not any(c in descendants[s] and s not in descendants[c]
+						for s in children if s is not c)]
+
+
 class Ontospy(object):
 	"""
 	Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
@@ -1080,49 +1095,60 @@ class Ontospy(object):
 	# ================
 
 
-	def _tree_helper(self, entities_list, toplayer):
+	def _tree_helper(self, entities_list, toplayer, non_redundant=False):
 		"""Common helper method for building super/sub trees"""
 		treedict = {}
 		if entities_list:
 			treedict[0] = toplayer
 			for element in entities_list:
-				if element.children():
-					treedict[element] = element.children()
+				children = element.children()
+				if non_redundant:
+					children = _remove_redundant_children(children)
+				if children:
+					treedict[element] = children
 			return treedict
 		return treedict
 
 
-	def ontologyClassTree(self):
+	def ontologyClassTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the ontology class tree
 		Top level = {0:[top classes]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_classes, self.toplayer_classes)
+		return self._tree_helper(self.all_classes, self.toplayer_classes, non_redundant)
 
-	def ontologyPropTree(self):
+	def ontologyPropTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the ontology properties tree
 		Top level = {0:[top properties]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_properties, self.toplayer_properties)
+		return self._tree_helper(self.all_properties, self.toplayer_properties, non_redundant)
 
-	def ontologyConceptTree(self):
+	def ontologyConceptTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the skos tree
 		Top level = {0:[top concepts]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos)
+		return self._tree_helper(self.all_skos_concepts, self.toplayer_skos, non_redundant)
 
-	def ontologyShapeTree(self):
+	def ontologyShapeTree(self, non_redundant=False):
 		"""
 		Returns a dict representing the shapes tree
 		Top level = {0:[top shapes]}
 		Multi inheritance is represented explicitly
+		non_redundant: leave out children that are also descendants of another child,
+		eg in reasoned graphs where subclass relations are materialised (PR #87)
 		"""
-		return self._tree_helper(self.all_shapes, self.toplayer_shapes)
+		return self._tree_helper(self.all_shapes, self.toplayer_shapes, non_redundant)
 
 
 	def ontologyIndividualsTree(self):

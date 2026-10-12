@@ -133,3 +133,24 @@ def test_custom_jinja2env_multimodel(pizza, tmp_path):
 def test_individual_instance_of(pizza):
 	italy = [x for x in pizza.all_individuals if x.qname.endswith("Italy")][0]
 	assert [c.qname for c in italy.instance_of()] == ["pizza.owl:Country"]
+
+
+REASONED_TTL = """
+@prefix : <http://example.org/r#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+:Mammal a owl:Class .
+:Human a owl:Class ; rdfs:subClassOf :Mammal .
+:RedBeardedGuy a owl:Class ; rdfs:subClassOf :Human, :Mammal .
+"""
+
+
+@pytest.mark.parametrize("non_redundant,expected", [(False, 2), (True, 1)])
+def test_html_multi_non_redundant_tree(tmp_path, non_redundant, expected):
+	"""PR #87: with non_redundant, RedBeardedGuy appears once in the class tree page,
+	under Human, and not again under Mammal"""
+	g = Ontospy(data=REASONED_TTL, rdf_format="turtle")
+	viz_index = [n for n, v in VIZ_TYPES if v == "html-complex"][0]
+	build_visualization(g, viz_index, path=str(tmp_path), non_redundant=non_redundant)
+	page = (tmp_path / "entities-tree-classes.html").read_text(encoding="utf-8")
+	assert page.count('class="treelinks" href="class-rredbeardedguy.html"') == expected

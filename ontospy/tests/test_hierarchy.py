@@ -104,3 +104,61 @@ def test_description_with_uri_values():
 	assert str(a.bestDescription()) == "a class"
 	b = g.get_class(uri="http://example.org/h#B")
 	assert str(b.bestLabel()) == "B"
+
+
+def tree_qnames(treedict):
+	return {(k if k == 0 else k.qname): qnames(v) for k, v in treedict.items()}
+
+
+def test_non_redundant_tree():
+	"""PR #87: in a reasoned graph RedBeardedGuy is also a direct subclass of Mammal"""
+	g = load("""
+	:Mammal a owl:Class .
+	:Human a owl:Class ; rdfs:subClassOf :Mammal .
+	:RedBeardedGuy a owl:Class ; rdfs:subClassOf :Human, :Mammal .
+	""")
+	assert tree_qnames(g.ontologyClassTree()) == {
+		0: ["h:Mammal"], "h:Human": ["h:RedBeardedGuy"], "h:Mammal": ["h:Human", "h:RedBeardedGuy"]}
+	assert tree_qnames(g.ontologyClassTree(non_redundant=True)) == {
+		0: ["h:Mammal"], "h:Human": ["h:RedBeardedGuy"], "h:Mammal": ["h:Human"]}
+
+
+def test_non_redundant_tree_partly_reasoned():
+	"""A > B > C > D plus A > D: D is redundant under A, though C isn't a child of A"""
+	g = load("""
+	:A a owl:Class .
+	:B a owl:Class ; rdfs:subClassOf :A .
+	:C a owl:Class ; rdfs:subClassOf :B .
+	:D a owl:Class ; rdfs:subClassOf :C, :A .
+	""")
+	assert tree_qnames(g.ontologyClassTree(non_redundant=True))["h:A"] == ["h:B"]
+
+
+def test_non_redundant_tree_keeps_multiple_inheritance():
+	g = load("""
+	:P a owl:Class .
+	:Q a owl:Class .
+	:X a owl:Class ; rdfs:subClassOf :P, :Q .
+	""")
+	tree = tree_qnames(g.ontologyClassTree(non_redundant=True))
+	assert tree["h:P"] == ["h:X"] and tree["h:Q"] == ["h:X"]
+
+
+def test_non_redundant_tree_sibling_cycle():
+	"""Siblings in a cycle are descendants of each other: neither is dropped"""
+	g = load("""
+	:A a owl:Class .
+	:B a owl:Class ; rdfs:subClassOf :A, :C .
+	:C a owl:Class ; rdfs:subClassOf :A, :B .
+	""")
+	assert tree_qnames(g.ontologyClassTree(non_redundant=True))["h:A"] == ["h:B", "h:C"]
+
+
+def test_non_redundant_property_tree():
+	g = load("""
+	:p a owl:ObjectProperty .
+	:q a owl:ObjectProperty ; rdfs:subPropertyOf :p .
+	:r a owl:ObjectProperty ; rdfs:subPropertyOf :q, :p .
+	""")
+	assert tree_qnames(g.ontologyPropTree())["h:p"] == ["h:q", "h:r"]
+	assert tree_qnames(g.ontologyPropTree(non_redundant=True))["h:p"] == ["h:q"]

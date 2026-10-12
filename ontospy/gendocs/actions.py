@@ -94,9 +94,12 @@ def select_visualization(n):
 # ===========
 
 
-def build_visualization(g, viz_index, path=None, title="", theme="", empty_folder=False):
+def build_visualization(g, viz_index, path=None, title="", theme="", empty_folder=False,
+                        non_redundant=False):
     """
     2017-01-20: new verion, less clever but also simpler
+
+    non_redundant: non-redundant trees (PR #87), only used by html-complex
     """
 
     this_viz = VISUALIZATIONS_LIST[viz_index]
@@ -107,7 +110,7 @@ def build_visualization(g, viz_index, path=None, title="", theme="", empty_folde
 
     elif this_viz['ID'] == "html-complex":
         from .viz.viz_html_multi import KompleteViz
-        v = KompleteViz(g, title, theme)
+        v = KompleteViz(g, title, theme, non_redundant=non_redundant)
 
     elif this_viz['ID'] == "markdown":
         from .viz.viz_markdown import MarkdownViz

@@ -39,11 +39,15 @@ class KompleteViz(VizFactory):
     """
 
 
-    def __init__(self, ontospy_graph, title="", theme="", *args, **kwargs):
+    def __init__(self, ontospy_graph, title="", theme="", *args, non_redundant=False, **kwargs):
         """
         Init
+
+        non_redundant: in the tree pages, leave out children that are also descendants
+        of another child, eg for reasoned graphs (PR #87)
         """
         super(KompleteViz, self).__init__(ontospy_graph, title, *args, **kwargs)
+        self.non_redundant = non_redundant
         self.static_files = [
                 "custom",
                 "libs/bootswatch3_2",
@@ -82,7 +86,7 @@ class KompleteViz(VizFactory):
             # CLASSES = ENTITIES TREE
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "classes",
-                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyClassTree())}
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyClassTree(self.non_redundant))}
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-classes.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
@@ -106,7 +110,7 @@ class KompleteViz(VizFactory):
             # PROPERTIES = ENTITIES TREE
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "properties",
-                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyPropTree())}
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyPropTree(self.non_redundant))}
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-properties.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
@@ -131,7 +135,7 @@ class KompleteViz(VizFactory):
 
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
                             "treetype" : "concepts",
-                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree())}
+                'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyConceptTree(self.non_redundant))}
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-concepts.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
@@ -155,7 +159,7 @@ class KompleteViz(VizFactory):
             # SHAPES = ENTITIES TREE
 
             extra_context = {"ontograph": self.ontospy_graph, "theme": self.theme,
-                            "treetype" : "shapes", 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyShapeTree()) }
+                            "treetype" : "shapes", 'treeTable' : formatHTML_EntityTreeTable(self.ontospy_graph.ontologyShapeTree(self.non_redundant)) }
             contents = self._renderTemplate("html-multi/browser/browser_entities_tree.html", extraContext=extra_context)
             FILE_NAME = "entities-tree-shapes.html"
             self._save2File(contents, FILE_NAME, browser_output_path)
