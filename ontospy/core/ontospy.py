@@ -492,6 +492,7 @@ class Ontospy(object):
 		self.all_properties_datatype = []
 
 		qres = self.sparqlHelper.getAllProperties(hide_implicit_preds)
+		qres += self.sparqlHelper.getPropertiesTypedBySubclasses()
 		# print("rdflib query done")
 
 		for candidate in qres:
