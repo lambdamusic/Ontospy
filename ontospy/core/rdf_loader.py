@@ -51,6 +51,25 @@ class RDFLoader(object):
         self.sources_valid = []
         self.sources_invalid = []
         self.verbose = verbose
+        self.declared_prefixes = {}  # prefix => namespace, as declared in the sources
+
+    def _remember_prefixes(self, graph):
+        """Record the prefixes declared in a source, parsed into a graph with only rdflib's
+        core prefixes bound. The first declaration of a prefix wins."""
+        for prefix, namespace in graph.namespaces():
+            self.declared_prefixes.setdefault(prefix, namespace)
+
+    def _apply_declared_prefixes(self):
+        """Make the prefixes declared in the sources win over rdflib's defaults.
+
+        Since rdflib 7 a new Graph comes with ~30 well-known prefixes already bound, eg
+        `schema` for <https://schema.org/>, so a source declaring `schema` for <http://schema.org/>
+        ended up as `schema1` (#135). Merging graphs with `+` rebinds rdflib's defaults too, so
+        the sources' own prefixes are re-applied at the end. rdflib's defaults still apply to
+        namespaces the sources don't declare a prefix for.
+        """
+        for prefix, namespace in self.declared_prefixes.items():
+            self.rdflib_graph.namespace_manager.bind(prefix, namespace, override=True, replace=True)
 
     def _debugGraph(self):
         """internal util to print out contents of graph"""
@@ -101,6 +120,8 @@ class RDFLoader(object):
         else:
             raise Exception("You must specify where to load RDF from.")
 
+        self._apply_declared_prefixes()
+
         if self.verbose: self.print_summary()
 
         return self.rdflib_graph
@@ -132,9 +153,13 @@ class RDFLoader(object):
                             "Detected JSONLD - loading data into rdflib.ConjunctiveGraph()",
                             fg='green')
                     temp_graph = rdflib.ConjunctiveGraph()
+                    # ConjunctiveGraph doesn't take `bind_namespaces`, so set it on its manager
+                    temp_graph.namespace_manager = rdflib.namespace.NamespaceManager(
+                        temp_graph, bind_namespaces="core")
                 else:
-                    temp_graph = rdflib.Graph()
+                    temp_graph = rdflib.Graph(bind_namespaces="core")
                 temp_graph.parse(uri, format=f)
+                self._remember_prefixes(temp_graph)
                 if self.verbose: printDebug("..... success!", bold=True)
                 success = True
                 self.sources_valid += [uri]
@@ -167,7 +192,10 @@ class RDFLoader(object):
                 # TODO ??
                 # if f == 'json-ld':
                 #     self._fix_default_graph_for_jsonld()
-                self.rdflib_graph.parse(data=data, format=f)
+                temp_graph = rdflib.Graph(bind_namespaces="core")
+                temp_graph.parse(data=data, format=f)
+                self._remember_prefixes(temp_graph)
+                self.rdflib_graph = self.rdflib_graph + temp_graph
                 if self.verbose: printDebug("..... success!")
                 success = True
                 self.sources_valid += ["Data: '%s ...'" % data[:10]]
