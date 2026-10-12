@@ -26,25 +26,35 @@ class Ontospy(object):
 	"""
 	Object that extracts schema definitions (aka 'ontologies') from an rdf graph.
 
-	In [3]: import ontospy
+	Load some RDF, and Ontospy extracts the ontologies, classes, properties, SKOS concepts,
+	SHACL shapes and (optionally) individuals it defines, as Python objects:
 
-	In [5]: o = ontospy.Ontospy()
+	In [1]: import ontospy
 
-	In [7]: o.load_rdf("foaf.rdf")
+	In [2]: o = ontospy.Ontospy("foaf.rdf")
 
-	In [11]: o.build_all()
-
-	In [13]: o.stats()
-	Out[13]:
+	In [3]: o.stats()
+	Out[3]:
 	[('Ontologies', 1),
 	 ('Triples', 630),
-	 ('Classes', 15),
+	 ('Classes', 16),
 	 ('Properties', 67),
 	 ('Annotation Properties', 7),
 	 ('Object Properties', 34),
 	 ('Datatype Properties', 26),
 	 ('Skos Concepts', 0),
+	 ('Data Shapes', 0),
 	 ('Data Sources', 1)]
+
+	In [4]: o.all_classes[:2]
+	Out[4]:
+	[<Class *http://xmlns.com/foaf/0.1/Agent*>,
+	 <Class *http://xmlns.com/foaf/0.1/Document*>]
+
+	The extracted entities are in the `all_*` attributes (`all_ontologies`, `all_classes`,
+	`all_properties`, `all_skos_concepts`, `all_shapes`, `all_individuals`), and can be
+	looked up with `get_class()`, `get_property()` etc. The underlying rdflib graph is
+	`rdflib_graph`, and `query()` runs SPARQL on it.
 
 	"""
 
@@ -63,39 +73,66 @@ class Ontospy(object):
 				 build_all=True,
 				 pref_title="qname",
 				 pref_lang="en",
+				 graph_obj=None,
 				 ):
 		"""Load the graph in memory, then setup all necessary attributes.
 
+		RDF can come from files or URLs (`uri_or_path`), strings (`data`), open files
+		(`file_obj`), existing rdflib graphs (`graph_obj`), or a mix of these: everything
+		is loaded into a single graph. Alternatively, `sparql_endpoint` connects to a remote
+		endpoint instead of loading anything in memory.
+
 		Parameters
 		----------
-		uri_or_path : [type], optional
-			[description], by default None
-		data : [type], optional
-			[description], by default None
-		file_obj : [type], optional
-			[description], by default None
+		uri_or_path : str or list of str, optional
+			A local file path, a folder (all the RDF files in it are loaded), or a URL.
+			A list loads all of them into one graph. By default None
+		data : str or list of str, optional
+			A string (or list of strings) containing RDF, eg Turtle. By default None
+		file_obj : file object or list of file objects, optional
+			An open file (text or binary mode) containing RDF. By default None
 		rdf_format : str, optional
-			[description], by default ""
+			The RDF serialization of the sources: "turtle", "xml", "n3", "nt", "json-ld"
+			or "rdfa". By default "", which tries each of them in turn, starting from the
+			most likely one given the file extension.
 		verbose : bool, optional
-			[description], by default False
+			Print out what is being loaded and extracted. By default False
 		hide_base_schemas : bool, optional
-			[description], by default True
+			Leave out the classes and properties of the RDF, RDFS, OWL and XML Schema
+			vocabularies themselves (eg rdfs:Resource), so that only the ontology's own
+			entities are listed. By default True
 		hide_implicit_types : bool, optional
-			[description], by default True
+			Leave out classes that are only used as the type of something (`?x rdf:type ?c`)
+			but never declared as classes or used in subClassOf, domain or range statements.
+			By default True
 		hide_implicit_preds : bool, optional
-			[description], by default True
-		hide_individuals: bool, opt
-			Extract class instances or not, by default True
-		sparql_endpoint : [type], optional
-			[description], by default None
-		credentials : [type], optional
-			[description], by default None
+			Leave out properties that are only used in triples, without being declared as
+			properties. By default True
+		hide_individuals : bool, optional
+			Don't extract individuals, ie instances of the classes. Set it to False to get
+			them in `all_individuals`. By default True
+		sparql_endpoint : str, optional
+			The URL of a SPARQL endpoint to query, instead of loading RDF in memory. Only
+			used if no other source is given. Entities aren't extracted automatically for
+			endpoints, as that can mean many slow queries: call `build_all()`, or eg
+			`build_ontologies()`, when needed. By default None
+		credentials : tuple, optional
+			A (user, password) tuple, for SPARQL endpoints that need authentication.
+			By default None
 		build_all : bool, optional
-			[description], by default True
+			Extract the ontologies, classes, properties etc. as soon as the RDF is loaded.
+			Set it to False to only load the graph, then call `build_all()` later.
+			By default True
 		pref_title : str, optional
-			How to display entities by default. Two options accepted: "qname" (default) or "label" for rdfs:label. 
+			How entities are named by default, eg in their `title` and in generated
+			documentation: "qname" for their prefixed name, eg foaf:Person (default), or
+			"label" for their rdfs:label.
 		pref_lang : str, optional
-			Default: 'en'
+			The preferred language for labels and descriptions, when an entity has them
+			in several languages. By default "en"
+		graph_obj : rdflib.Graph or list of rdflib.Graph, optional
+			An existing rdflib graph (or several) to load. The graphs passed are not
+			modified, and their prefix bindings are kept. By default None
 		"""
 		
 		super(Ontospy, self).__init__()
@@ -132,8 +169,8 @@ class Ontospy(object):
 									self.pref_lang)
 
 		# finally:
-		if uri_or_path or data or file_obj:
-			self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose)
+		if uri_or_path or data or file_obj or graph_obj is not None:
+			self.load_rdf(uri_or_path, data, file_obj, rdf_format, verbose, graph_obj)
 			if build_all:
 				self.build_all(
 					verbose=verbose,
@@ -166,10 +203,11 @@ class Ontospy(object):
 				 data=None,
 				 file_obj=None,
 				 rdf_format="",
-				 verbose=False):
-		"""Load an RDF source into an ontospy/rdflib graph"""
+				 verbose=False,
+				 graph_obj=None):
+		"""Load RDF sources into an ontospy/rdflib graph. See `__init__` for the parameters."""
 		loader = RDFLoader(verbose=verbose)
-		loader.load(uri_or_path, data, file_obj, rdf_format)
+		loader.load(uri_or_path, data, file_obj, rdf_format, graph_obj=graph_obj)
 		self.rdflib_graph = loader.rdflib_graph
 		self.sources = loader.sources_valid
 		self.sparqlHelper = SparqlHelper(self.rdflib_graph)
