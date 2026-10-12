@@ -254,6 +254,13 @@ g = ontospy.Ontospy(graph_obj=my_graph)             # an rdflib graph, eg built 
 g = ontospy.Ontospy("foaf.rdf", graph_obj=[my_graph, rdflib.Graph()])   # a mix of sources
 ```
 
+Tip: Ontospy keeps the namespace prefixes declared in your RDF files. When you build an rdflib graph yourself, though, rdflib can rename them while parsing: since rdflib 7, a new `Graph()` comes with ~30 well-known prefixes, so eg a file declaring `schema:` for `http://schema.org/` ends up as `schema1:` (rdflib's own `schema` is `https://schema.org/`). To keep your files' prefixes, create the graph with only rdflib's core prefixes; Ontospy still adds the well-known ones for any namespace your data doesn't declare:
+
+```python
+my_graph = rdflib.Graph(bind_namespaces="core").parse("my-ontology.ttl")
+g = ontospy.Ontospy(graph_obj=my_graph)
+```
+
 All the parameters are described in the `Ontospy` class docstring: `help(ontospy.Ontospy)`.
 
 
