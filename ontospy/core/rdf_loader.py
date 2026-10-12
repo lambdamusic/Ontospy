@@ -179,7 +179,7 @@ class RDFLoader(object):
             self.loading_failed(self.rdf_format_opts)
             self.sources_invalid += ["Data: '%s ...'" % data[:10]]
 
-    def load_file(file_obj):
+    def load_file(self, file_obj):
         """
         The type of open file objects such as sys.stdout; alias of the built-in file.
         @TODO: when is this used?
@@ -252,7 +252,7 @@ class RDFLoader(object):
             "----------\nFatal error parsing graph%s\n(tried RDF serializations: %s)"
             % (uri, str(rdf_format_opts)), "red")
         printDebug(
-            "----------\nTIP: You can try one of the following RDF validation services\n<http://mowl-power.cs.man.ac.uk:8080/validator/validate>\n<http://rdfvalidator.mybluemix.net/>\n<https://json-ld.org/playground/>"
+            "----------\nTIP: You can try one of the following RDF validation services\n<https://www.easyrdf.org/converter>\n<https://www.w3.org/RDF/Validator/>\n<http://ttl.summerofcode.be/>\n<https://json-ld.org/playground/>"
         )
 
         return

@@ -232,6 +232,8 @@ In [12]: c1.children()
 Out[12]: []
 ```
 
+For a longer walkthrough, see the [getting started notebook](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb): it loads an ontology, prints its hierarchies, inspects classes, properties and individuals, and returns the data as [pandas](https://pandas.pydata.org/) data frames, including the results of SPARQL queries.
+
 
 ## Is Ontospy for me?
 
@@ -326,6 +328,7 @@ For the majority of users this upgrade should cause any issues, but since variou
 -   Github: [https://github.com/lambdamusic/ontospy](https://github.com/lambdamusic/ontospy)
 -   CheeseShop: [https://pypi.python.org/pypi/ontospy](https://pypi.python.org/pypi/ontospy)
 -   Docs: [http://lambdamusic.github.io/Ontospy/](http://lambdamusic.github.io/Ontospy/)
+-   Getting started notebook: [examples/getting-started.ipynb](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb)
 
 Also:
 

@@ -44,32 +44,54 @@ def main(test_number):
 
 		print("=================\n*** QUICK TEST 2 ***\n=================\n")
 
-		uri, title = "http://examples.com", "My ontology"
-		printDebug(click.style("[%d]" % 1, fg='blue') +
-				click.style(uri + " ==> ", fg='black') +
-				click.style(title, fg='red'))
+		o = Ontospy(sparql_endpoint="http://dbpedia.org/sparql", verbose=True)		
 
+		print(o), print("---------")
 
-		from colorama import Fore, Style
-
-		printDebug(Fore.BLUE + Style.BRIGHT + "[%d]" % 1 + 
-              Style.RESET_ALL + uri + " ==> " + Fore.RED + title + 
-              Style.RESET_ALL)
+		q = o.query("select distinct ?b where {?x a ?b} limit 10")
+		if q:
+			for el in q:
+				print(el)
+		else:
+			print("No results")
 
 
 	if test_number == 3:
 
-		print("=================\n*** QUICK TEST 1 ***\n=================\n")
+		from rdflib import Graph, Namespace, URIRef
+		from rdflib.plugins.stores.sparqlstore import SPARQLStore
+		from rdflib.term import Identifier
+
+		print("Triple navigation using SPARQLStore as a Graph():")
+		graph = Graph("SPARQLStore", identifier="http://dbpedia.org")
+		graph.open("http://dbpedia.org/sparql")
+		# we are asking DBPedia for 3 skos:Concept instances
+		count = 0
+		from rdflib.namespace import RDF, SKOS
+
+		for s in graph.subjects(predicate=RDF.type, object=SKOS.Concept):
+			count += 1
+			print(f"\t- {s}")
+			if count >= 3:
+				break
+
+		q = graph.query("select distinct ?b where {?x a ?b} limit 10")
+		if q:
+			for el in q:
+				print(el)
+		
+
+
+	if test_number == 4:
+
+		print("=================\n*** QUICK TEST 4 ***\n=================\n")
 
 		f = TEST_RDF_FOLDER + "pizza.ttl"
 
 		o = Ontospy(f, verbose=True, rdf_format="ttl", hide_implicit_types=False, hide_base_schemas=True, hide_implicit_preds=False, hide_individuals=False)
 		print(f)
 		for x in o.all_individuals:
-			print(x.qname, [z.uri for z in x.instance_of()])			
-
-
-
+			print(x.qname, [z.uri for z in x.instance_of()])
 
 
 if __name__ == '__main__':

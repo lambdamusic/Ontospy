@@ -487,7 +487,7 @@ def lib(ctx,
 def shell(sources=None):
     """SHELL: launch ontospy's interactive mode. If an rdf source path is provided the shell is preloaded with it."
     """
-    from .extras.shell import launch_shell
+    from .shell.shell import launch_shell
     launch_shell(sources)
 
 

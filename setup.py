@@ -25,14 +25,13 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 
 
 # Parse requirements.txt file so to have one single source of truth
+# note: version specifiers are kept, comments and blank lines dropped
 REQUIREMENTS_DATA = []
 with open(path.join(HERE, 'requirements.txt'), encoding='utf-8') as f:
     for l in f.readlines():
-        if not l.startswith("#"):
-            if (">=" in l):
-                REQUIREMENTS_DATA.append([l.split(">=")[0]])
-            elif ("=" in l):
-                REQUIREMENTS_DATA.append([l.split("=")[0]])
+        l = l.split("#")[0].strip()
+        if l:
+            REQUIREMENTS_DATA.append(l)
 
 
 
@@ -101,14 +100,15 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
     ],
     keywords='ontology semantic web linked data rdf owl visualization documentation knowledge graph',
+    python_requires='>=3.10',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed. For an analysis of "install_requires" vs pip's
@@ -127,7 +127,6 @@ setup(
         },
     entry_points={
         'console_scripts': [
-            # 'ontospy-sketch=ontospy.extras.sketch:main',
             'ontospy=ontospy.cli:main_cli',
             'ontospy_quicktest=ontospy.tests.quick:main'
         ],

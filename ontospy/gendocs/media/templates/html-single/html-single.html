@@ -842,8 +842,8 @@
 
                 <div class="tree">
                     <ul>
-                        {% if each.instance_of %}
-                            {% for s in each.instance_of %}<li> <a href="#{{s.qname}}">{{s.title}}</a>
+                        {% if each.instance_of() %}
+                            {% for s in each.instance_of() %}<li> <a href="#{{s.qname}}">{{s.title}}</a>
 
                             <ul>
 
@@ -864,10 +864,10 @@
                     {{each.bestDescription()|linebreaks}}
                 </p>
 
-                {% if each.instance_of %}
-					<p class="section-desc"><b>Is instance of <small>({{ each.instance_of|length }})</small>:</b>
+                {% if each.instance_of() %}
+					<p class="section-desc"><b>Is instance of <small>({{ each.instance_of()|length }})</small>:</b>
                         <br />
-                        {% for s in each.instance_of %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}
+                        {% for s in each.instance_of() %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}
                     </p>
 				{% endif %}
 

@@ -16,9 +16,9 @@
 {{each.bestDescription()|linebreaks|default("--")}}
 
 
-{% if each.instance_of %}
-#### Is instance of ({{ each.instance_of|length }})
-{% for s in each.instance_of %}
+{% if each.instance_of() %}
+#### Is instance of ({{ each.instance_of()|length }})
+{% for s in each.instance_of() %}
 - [{{s.title}}]({{s.slug}}.md)
 {% endfor %}
 {% else %}

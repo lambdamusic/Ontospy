@@ -6,7 +6,7 @@ from ..VERSION import __version__, VERSION
 import logging
 logging.basicConfig()
 
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 import sys, os
 import pickle as cPickle
 
