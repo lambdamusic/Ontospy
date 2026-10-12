@@ -295,7 +295,7 @@
 				  {% set variable_watcher = each.1 %}
 			{% else %}
 			{% endif %}
-			<dd>{{each.2|linebreaks}}</dd>
+			<dd>{% if each.2 is url %}<a href="{{each.2}}" target="_blank">{{each.2}}</a>{% else %}{{each.2|linebreaks}}{% endif %}</dd>
 			{% endfor %}
 
 			</fieldset>
@@ -446,6 +446,8 @@
                     {{each.bestDescription()|linebreaks}}
                 </p>
 
+                {% include "shared/seealso_section.html" %}
+
                 {% if each.ancestors() %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors()|length }})</small>:</b>
                         <br />
@@ -518,6 +520,8 @@
                     <br>
                     {{each.bestDescription()|linebreaks}}
                 </p>
+
+                {% include "shared/seealso_section.html" %}
 
                 {% if each.ancestors() %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors()|length }})</small>:</b>
@@ -597,6 +601,8 @@
                     {{each.bestDescription()|linebreaks}}
                 </p>
 
+                {% include "shared/seealso_section.html" %}
+
                 {% if each.ancestors() %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors()|length }})</small>:</b>
                         <br />
@@ -674,6 +680,8 @@
                     <br>
                     {{each.bestDescription()|linebreaks}}
                 </p>
+
+                {% include "shared/seealso_section.html" %}
 
                 {% if each.ancestors() %}
 					<p class="section-desc"><b>Inherits from <small>({{ each.ancestors()|length }})</small>:</b>
@@ -796,6 +804,8 @@
                     {{each.bestDescription()|linebreaks}}
                 </p>
 
+                {% include "shared/seealso_section.html" %}
+
                 {% if each.ancestors() %}
 					<p class="section-desc"><b>Has Broader concept <small>({{ each.ancestors()|length }})</small>:</b>
                         <br />
@@ -863,6 +873,8 @@
                     <br>
                     {{each.bestDescription()|linebreaks}}
                 </p>
+
+                {% include "shared/seealso_section.html" %}
 
                 {% if each.instance_of() %}
 					<p class="section-desc"><b>Is instance of <small>({{ each.instance_of()|length }})</small>:</b>

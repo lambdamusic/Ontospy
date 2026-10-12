@@ -42,6 +42,13 @@
 #### Description
 {{each.bestDescription()|default("--")}}
 
+{% if each.seeAlso() %}
+#### See also
+{% for x in each.seeAlso() %}
+* {% if x is url %}[{{x}}]({{x}}){% else %}{{x}}{% endif %}
+{% endfor %}
+{% endif %}
+
 
 {% if each.ancestors() %}
 #### Inherits from ({{ each.ancestors()|length }})

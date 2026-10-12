@@ -179,6 +179,10 @@ class RdfEntity(object):
             aPropURIRef = rdflib.URIRef(aPropURIRef)
         return list(self.rdflib_graph.objects(None, aPropURIRef))
 
+    def seeAlso(self):
+        """The rdfs:seeAlso values for this entity, sorted"""
+        return sorted(self.getValuesForProperty(rdflib.RDFS.seeAlso))
+
     def bestLabel(self, prefLanguage="", qname_allowed=True, quotes=False):
         """
         facility for extrating the best available label for an entity

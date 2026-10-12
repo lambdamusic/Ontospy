@@ -1,0 +1,19 @@
+{# rdfs:seeAlso links for an entity (`each`), as a panel for the html-multi pages #}
+{% if each.seeAlso() %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">See also</h3>
+            </div>
+            <div class="panel-body">
+              <ul>
+              {% for x in each.seeAlso() %}
+                <li>{% if x is url %}<a href="{{x}}" target="_blank">{{x}}</a>{% else %}{{x}}{% endif %}</li>
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endif %}

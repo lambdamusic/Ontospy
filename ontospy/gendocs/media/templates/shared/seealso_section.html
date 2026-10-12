@@ -1,0 +1,8 @@
+{# rdfs:seeAlso links for an entity (`each`), as a section for the html-single page #}
+{% if each.seeAlso() %}
+				<p class="section-desc"><b>See also</b>
+                    <br>
+                    {% for x in each.seeAlso() %}{% if x is url %}<a href="{{x}}" target="_blank">{{x}}</a>{% else %}{{x}}{% endif %}{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </p>
+{% endif %}
