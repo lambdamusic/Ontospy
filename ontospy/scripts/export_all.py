@@ -172,10 +172,12 @@ def _index_row(g, onto_name, folder, theme):
     cells = "".join('<td class="count">%d</td>' % stats.get(label, 0) for _, label in INDEX_COUNTS)
     return """<tr>
   <td><a href="%s/index.html"><code>%s</code></a></td>
-  <td><b>%s</b>%s<div class="theme">theme: %s</div></td>
+  <td>%s<div class="theme">theme: %s</div></td>
   %s
-</tr>""" % (folder, html.escape(onto_name), html.escape(_truncate(title, 100)),
-         ("<br>" + html.escape(_truncate(description))) if description else "",
+</tr>""" % (folder, html.escape(onto_name),
+         "<br>".join(x for x in [
+             "<b>%s</b>" % html.escape(_truncate(title, 100)) if title else "",
+             html.escape(_truncate(description)) if description else ""] if x),
          html.escape(theme), cells)
 
 
