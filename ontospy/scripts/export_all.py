@@ -185,7 +185,7 @@ def _index_row(g, onto_name, folder, theme):
     stats = dict(g.stats())
     cells = "".join('<td class="count">%d</td>' % stats.get(label, 0) for _, label in INDEX_COUNTS)
     return """<tr>
-  <td><a href="%s/index.html"><code>%s</code></a></td>
+  <td><a href="%s/index.html" target="_blank"><code>%s</code></a></td>
   <td>%s<div class="theme">theme: %s</div></td>
   %s
 </tr>""" % (folder, html.escape(onto_name),
