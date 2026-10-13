@@ -284,6 +284,36 @@ class Ontology(RdfEntity):
         else:
             return sorted(self.triples)
 
+    def metadata(self):
+        """ the ontology's own properties, for display (#23): a list of
+        (property qname, [values]) sorted by qname, each property once. A blank-node
+        value, eg an editor with a foaf:name, is a dict {"properties": [...]} in the same
+        shape, so it can be shown nested rather than as a node id, plus a "label" taken from
+        its name or label, if any.
+        """
+        return self._metadata_for(self.uri, set())
+
+    def _bnode_label(self, node):
+        for pred in [rdflib.RDFS.label, rdflib.FOAF.name, rdflib.SKOS.prefLabel,
+                     rdflib.namespace.DCTERMS.title, rdflib.URIRef("https://schema.org/name"),
+                     rdflib.URIRef("http://schema.org/name")]:
+            values = list(self.rdflib_graph.objects(node, pred))
+            if values:
+                return str(firstStringInList(values, self._pref_lang))
+        return ""
+
+    def _metadata_for(self, subject, seen):
+        seen = seen | {subject}
+        props = {}
+        for p, o in self.rdflib_graph.predicate_objects(subject):
+            if isinstance(o, rdflib.BNode):
+                o = {"properties": self._metadata_for(o, seen) if o not in seen else [],
+                     "label": self._bnode_label(o)}
+            props.setdefault(self._build_qname(p), []).append(o)
+        # values sorted as text, nested ones last
+        return sorted((prop, sorted(values, key=lambda v: (isinstance(v, dict), str(v))))
+                      for prop, values in props.items())
+
     def describe(self):
         """ shotcut to pull out useful info for interactive use """
         # self.printGenericTree()

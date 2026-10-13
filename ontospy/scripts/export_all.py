@@ -145,17 +145,31 @@ INDEX_COUNTS = [("Classes", "Classes"), ("Properties", "Properties"),
                 ("Concepts", "Skos Concepts"), ("Shapes", "Data Shapes")]
 
 
+SCHEMA_HTTP, SCHEMA_HTTPS = rdflib.Namespace("http://schema.org/"), rdflib.Namespace("https://schema.org/")
+TITLE_PREDICATES = [rdflib.RDFS.label, rdflib.namespace.DCTERMS.title, rdflib.namespace.DC.title,
+                    rdflib.SKOS.prefLabel, SCHEMA_HTTPS.name, SCHEMA_HTTP.name]
+DESCRIPTION_PREDICATES = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description,
+                          rdflib.namespace.DC.description, rdflib.SKOS.definition,
+                          SCHEMA_HTTPS.description, SCHEMA_HTTP.description]
+
+
 def _ontology_title_and_description(g):
-    """title and description of the first ontology declared in the graph, if any"""
-    for onto in g.all_ontologies:
-        title = ""
-        for pred in [rdflib.RDFS.label, rdflib.namespace.DCTERMS.title, rdflib.namespace.DC.title]:
-            values = onto.getValuesForProperty(pred)
-            if values:
-                title = str(firstStringInList(values, "en"))
-                break
-        return title, str(onto.bestDescription(prefLanguage="en") or "")
-    return "", ""
+    """title and description from the graph's headers: its owl:Ontology declarations or, eg
+    for SKOS thesauri, its skos:ConceptSchemes. Each is taken from the first header that has
+    one (eg PROV-O declares two ontologies, only the second with a title)."""
+    graph = g.rdflib_graph
+    headers = [o.uri for o in g.all_ontologies] or sorted(
+        graph.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))
+
+    def first_value(predicates):
+        for header in headers:
+            for pred in predicates:
+                values = list(graph.objects(header, pred))
+                if values:
+                    return str(joinStringsInList(values, "en"))
+        return ""
+
+    return first_value(TITLE_PREDICATES), first_value(DESCRIPTION_PREDICATES)
 
 
 def _truncate(text, length=220):
@@ -171,7 +185,7 @@ def _index_row(g, onto_name, folder, theme):
     stats = dict(g.stats())
     cells = "".join('<td class="count">%d</td>' % stats.get(label, 0) for _, label in INDEX_COUNTS)
     return """<tr>
-  <td><a href="%s/index.html"><code>%s</code></a></td>
+  <td><a href="%s/index.html" target="_blank"><code>%s</code></a></td>
   <td>%s<div class="theme">theme: %s</div></td>
   %s
 </tr>""" % (folder, html.escape(onto_name),

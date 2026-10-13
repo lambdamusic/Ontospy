@@ -2,6 +2,16 @@
 
 Summary of changes.
 
+## Oct, 2026: v 2.5
+
+- Namespaces
+    - `Ontospy.namespaces`, and the namespaces section of the documentation, list only the prefixes an ontology uses or declares, plus `rdf`, `rdfs`, `owl` and `xsd`, instead of all of rdflib's ~30 defaults (brick, csvw, dcat, odrl, sosa...). Eg Pizza goes from 30 prefixes to 5. No qnames change
+    - `add_namespace()` now also updates `Ontospy.namespaces`
+    - SPARQL endpoints: queries send only the prefixes they use, instead of all of rdflib's defaults; eg a query on DBpedia went from 29 `PREFIX` lines to 11. Queries through `Ontospy.query()` can still use rdflib's well-known prefixes (`foaf:`, `schema:`...) without declaring them. If you call `rdflib_graph.query()` directly on an endpoint, declare the prefixes your query uses
+- Documentation generation (`gendocs`)
+    - Ontology metadata is listed in alphabetical order, each property once, and nested values such as an ontology's editors (blank nodes) are shown with their names and details instead of as node ids
+- [Examples](https://lambdamusic.github.io/ontospy-examples/): a refreshed selection of 32 ontologies, adding widely used standards (PROV-O, DCAT 3, Dublin Core Terms, SKOS, SOSA/SSN, W3C ORG, ODRL, GeoSPARQL 1.1, BFO 2020, FIBO Business Entities, the COAR Resource Types thesaurus and the DCAT-AP SHACL shapes); the index shows more titles and descriptions, and opens each example in a new tab
+
 ## Oct, 2026: v 2.4
 
 - Large and complex ontologies

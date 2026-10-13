@@ -177,3 +177,46 @@ def test_build_with_cycle(viz_index, viz_id, tmp_path):
 		# Top > A > B > A: A is shown again under B, but not expanded a second time
 		assert page.count('class="treelinks" href="class-ca.html"') == 2
 		assert page.count('class="treelinks" href="class-cb.html"') == 1
+
+
+ONTO_METADATA_TTL = """
+@prefix : <http://example.org/m#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+<http://example.org/m> a owl:Ontology ;
+    rdfs:label "Metadata test" ;
+    dcterms:title "Metadata test" ;
+    dcterms:creator [ foaf:name "Ada Lovelace" ; foaf:homepage <http://example.org/ada> ] ,
+                    [ foaf:name "Alan Turing" ] ;
+    owl:versionInfo "1.0" .
+:Thing a owl:Class .
+"""
+
+
+def test_ontology_metadata():
+	"""#23: the ontology's own properties, sorted, each once; blank nodes nested, not flattened"""
+	g = Ontospy(data=ONTO_METADATA_TTL, rdf_format="turtle")
+	meta = g.all_ontologies[0].metadata()
+	assert [prop for prop, _ in meta] == ["dcterms:creator", "dcterms:title", "owl:versionInfo", "rdf:type", "rdfs:label"]
+	creators = dict(meta)["dcterms:creator"]
+	names = sorted(str(dict(c["properties"])["foaf:name"][0]) for c in creators)
+	assert names == ["Ada Lovelace", "Alan Turing"]
+
+
+@pytest.mark.parametrize("viz_id", ["html-complex", "html-simple", "markdown", "d3-dendogram"])
+def test_ontology_metadata_rendered(viz_id, tmp_path):
+	"""each property shown once, in order; no blank-node ids, nested values shown"""
+	g = Ontospy(data=ONTO_METADATA_TTL, rdf_format="turtle")
+	viz_index = [n for n, v in VIZ_TYPES if v == viz_id][0]
+	build_visualization(g, viz_index, path=str(tmp_path))
+	out = read_all_output(tmp_path)
+	assert "Ada Lovelace" in out and "Alan Turing" in out
+	# the metadata entries, not eg the Turtle source some pages show too
+	entry = "* {}" if viz_id == "markdown" else "<dt>{}</dt>"
+	assert out.count(entry.format("dcterms:creator")) == 1
+	assert (out.index(entry.format("dcterms:creator")) < out.index(entry.format("owl:versionInfo"))
+		< out.index(entry.format("rdfs:label")))
+	import re
+	assert not re.search(r"\bn[0-9a-f]{32}b\d+\b", out), "a blank-node id is shown"

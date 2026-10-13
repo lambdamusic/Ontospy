@@ -1,0 +1,18 @@
+{#
+  Renders Ontology.metadata(): (property, [values]) pairs, each property once, sorted.
+  A blank-node value (eg an editor with a foaf:name) is a dict with its own "properties",
+  shown as a nested list under its name, if it has one (#23).
+
+  Usage: {% from "shared/ontology_metadata.html" import metadata_list %}
+         {{ metadata_list(ontology.metadata()) }}
+#}
+{% macro metadata_list(items, nested=False) -%}
+<dl{% if nested %} style="margin: 4px 0 8px 2px; padding-left: 12px; border-left: 2px solid #ddd;"{% endif %}>
+{%- for prop, values in items %}
+  <dt>{{prop}}</dt>
+  {%- for v in values %}
+  <dd>{% if v is mapping %}{% if v.label %}<b>{{v.label}}</b>{% endif %}{{ metadata_list(v.properties, nested=True) }}{% elif v is url %}<a href="{{v}}" target="_blank">{{v}}</a>{% else %}{{v|linebreaks}}{% endif %}</dd>
+  {%- endfor %}
+{%- endfor %}
+</dl>
+{%- endmacro %}

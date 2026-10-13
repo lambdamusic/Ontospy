@@ -11,15 +11,13 @@
 #### Metadata
 {% for ontology in ontologies %}
 **{{ontology.uri}}**
-{% if ontology.annotations() %}
-{% for each in ontology.annotations() %}
-{% if each.1 != variable_watcher  %}
-* {{each.1}}
-{% set variable_watcher = each.1 %}
-{% else %}
-{% endif %}
-    * {% if each.2 is url %}[{{each.2}}]({{each.2}}){% else %}{{each.2}}{% endif %}
-{% endfor %}
+{% if ontology.metadata() %}
+{#- each property once, sorted; blank nodes (eg an editor) nested under a bullet with their name (#23) -#}
+{% macro md_metadata(items, indent) %}{% for prop, values in items %}
+{{indent}}* {{prop}}{% for v in values %}{% if v is mapping %}
+{{indent}}    * {{ v.label or "_(blank node)_" }}{{ md_metadata(v.properties, indent ~ "        ") }}{% else %}
+{{indent}}    * {% if v is url %}[{{v}}]({{v}}){% else %}{{ v|replace("\r\n", " ")|replace("\n", " ") }}{% endif %}{% endif %}{% endfor %}{% endfor %}{% endmacro %}
+{{ md_metadata(ontology.metadata(), "") }}
 {% else %}
 _No ontology metadata available_
 {% endif %}
