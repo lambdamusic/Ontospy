@@ -257,11 +257,19 @@ class Ontospy(object):
 		return keep
 
 	def _filter_namespaces(self):
-		"""the graph's prefix bindings, limited to the namespaces in <self._namespaces_kept>
-		(None for SPARQL endpoints: there's no graph in memory to check, so all are kept)"""
-		bindings = self.rdflib_graph.namespaces()
+		"""the graph's prefix bindings, limited to the namespaces in <self._namespaces_kept>.
+
+		None is for SPARQL endpoints: there's no graph in memory to check, so rdflib's
+		well-known prefixes are listed too, as before, for readable qnames. They're not bound
+		on the endpoint graph itself, which has only the prefixes its queries need (#14).
+		"""
+		bindings = list(self.rdflib_graph.namespaces())
 		if self._namespaces_kept is None:
-			return sorted(bindings)
+			listed = {p: ns for p, ns in rdflib.Graph().namespaces()}
+			bound_ns = {str(ns) for _, ns in bindings}
+			listed = {p: ns for p, ns in listed.items() if str(ns) not in bound_ns}
+			listed.update(dict(bindings))  # the graph's own bindings win
+			return sorted(listed.items())
 		return sorted((prefix, ns) for prefix, ns in bindings if str(ns) in self._namespaces_kept)
 
 
@@ -288,7 +296,11 @@ class Ontospy(object):
 			else:
 				store = SPARQLStore(sparql_endpoint, returnFormat="json")
 
-			graph = rdflib.Graph(store)
+			# only rdflib's core prefixes on the store: SPARQLStore prepends every prefix
+			# bound there to each query it sends, and rdflib's ~30 defaults were mostly
+			# unused (#14). Ontospy's own queries add theirs (see SparqlHelper), user queries
+			# get the ones they use (see query)
+			graph = rdflib.Graph(store, bind_namespaces="core")
 
 			self.rdflib_graph = graph
 			self.sparql_endpoint = sparql_endpoint
@@ -1245,6 +1257,16 @@ class Ontospy(object):
 
 
 
+	def _prefixes_used_in(self, sparql_q):
+		"""
+		The prefixes from <self.namespaces> that a query uses, eg {"foaf": ...} for
+		`?x a foaf:Person`. For SPARQL endpoints: rdflib's SPARQLStore declares the prefixes it
+		gets at the top of the query, so a query sends only these plus the graph's own
+		bindings, instead of all of rdflib's defaults (#14).
+		"""
+		used = set(re.findall(r"(?<![\w:/#.-])([A-Za-z][\w.-]*):", sparql_q))
+		return {prefix: ns for prefix, ns in self.namespaces if prefix in used}
+
 	def _cleanup_ns_declarations(self, sparql_q):
 		"""Removes PREFIX declarations from a sparql query and adds them to the graph namespaces.
 
@@ -1285,7 +1307,9 @@ class Ontospy(object):
 
 		if self.sparql_endpoint:
 			stringa = self._cleanup_ns_declarations(stringa)
-		qres = self.rdflib_graph.query(stringa)
+			qres = self.rdflib_graph.query(stringa, initNs=self._prefixes_used_in(stringa))
+		else:
+			qres = self.rdflib_graph.query(stringa)
 
 		if format == "list":
 			return list(qres)
