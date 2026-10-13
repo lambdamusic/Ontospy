@@ -22,15 +22,8 @@
 
 		{# <h1><a name="annotations">&nbsp;</a>Ontology annotations</h1> #}
 		
-		{% for each in o.annotations() %}
-			{% if each.1 != variable_watcher  %}
-				{% if not loop.first %}</dl>{% endif %}
-					<dt>{{each.1}}</dt>
-				{% set variable_watcher = each.1 %}
-			{% else %}
-			{% endif %}
-			<dd>{% if each.2 is url %}<a href="{{each.2}}" target="_blank">{{each.2}}</a>{% else %}{{each.2|linebreaks}}{% endif %}</dd>
-		{% endfor %}
+		{% from "shared/ontology_metadata.html" import metadata_list %}
+		{{ metadata_list(o.metadata()) }}
 
 	{% else %}
 		<em>No annotations available</em>

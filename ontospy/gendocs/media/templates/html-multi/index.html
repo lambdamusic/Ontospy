@@ -71,16 +71,9 @@
                 <dt>URI</dt>
                 <dd><code>{{ ontology.uri }}</code></dd>
               </dl>
-                {% if ontology.annotations() %}
-                    <dl>
-                      {% for each in ontology.annotations() %}
-                          {% if each.1 != variable_watcher  %}
-                                <dt>{{each.1}}</dt>
-                              {% set variable_watcher = each.1 %}
-                          {% else %}{% endif %}
-                    <dd>{% if each.2 is url %}<a href="{{each.2}}" target="_blank">{{each.2}}</a>{% else %}{{each.2|linebreaks}}{% endif %}</dd>
-                    {% endfor %}
-                    </dl>
+                {% if ontology.metadata() %}
+                    {% from "shared/ontology_metadata.html" import metadata_list %}
+                    {{ metadata_list(ontology.metadata()) }}
                 {% else %}
                     <i>No metadata available</i>
                 {% endif %}
