@@ -54,11 +54,18 @@ class RDFLoader(object):
         self.verbose = verbose
         self.declared_prefixes = {}  # prefix => namespace, as declared in the sources
 
-    def _remember_prefixes(self, graph):
+    def _remember_prefixes(self, graph, skip_rdflib_defaults=False):
         """Record the prefixes declared in a source, parsed into a graph with only rdflib's
-        core prefixes bound. The first declaration of a prefix wins."""
+        core prefixes bound. The first declaration of a prefix wins.
+
+        skip_rdflib_defaults: for graphs passed in by the user, which normally come with
+        rdflib's ~30 default bindings: those aren't declarations (#14)"""
+        defaults = set()
+        if skip_rdflib_defaults:
+            defaults = {(p, str(ns)) for p, ns in rdflib.Graph().namespaces()}
         for prefix, namespace in graph.namespaces():
-            self.declared_prefixes.setdefault(prefix, namespace)
+            if (prefix, str(namespace)) not in defaults:
+                self.declared_prefixes.setdefault(prefix, namespace)
 
     def _apply_declared_prefixes(self):
         """Make the prefixes declared in the sources win over rdflib's defaults.
@@ -242,7 +249,7 @@ class RDFLoader(object):
             label = "Graph: rdflib graph with %d triples" % len(graph)
         if self.verbose: printDebug("----------")
         if self.verbose: printDebug("Reading: %s" % label, fg="green")
-        self._remember_prefixes(graph)
+        self._remember_prefixes(graph, skip_rdflib_defaults=True)
         self.rdflib_graph = self.rdflib_graph + graph
         self.sources_valid += [label]
 

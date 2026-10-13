@@ -162,6 +162,7 @@ class Ontospy(object):
 		self.pref_lang = pref_lang
 		self.hide_individuals = hide_individuals
 		self.namespaces = []
+		self._namespaces_kept = None  # see _namespaces_in_use
 		# entities buckets start with 'all_'
 		self.all_ontologies = []
 		self.all_classes = []
@@ -226,7 +227,42 @@ class Ontospy(object):
 		self.rdflib_graph = loader.rdflib_graph
 		self.sources = loader.sources_valid
 		self.sparqlHelper = SparqlHelper(self.rdflib_graph)
-		self.namespaces = sorted(self.rdflib_graph.namespaces())
+		self._namespaces_kept = self._namespaces_in_use(loader.declared_prefixes)
+		self.namespaces = self._filter_namespaces()
+
+	def _namespaces_in_use(self, declared_prefixes):
+		"""
+		The namespaces worth listing in <self.namespaces> (#14): since rdflib 7 every graph
+		comes with ~30 well-known prefixes bound (brick, csvw, dcat, odrl, sosa...), whether
+		the RDF uses them or not. Keeps the namespaces that a URI in the graph starts with
+		(subjects, predicates, objects, literal datatypes), the ones the sources declare, and
+		rdf/rdfs/owl/xsd, which Ontospy uses itself (eg owl:Thing). Dropping the others can't
+		change any qname: they don't match any URI in the graph.
+		"""
+		uris = set()
+		for triple in self.rdflib_graph:
+			for x in triple:
+				if isinstance(x, rdflib.URIRef):
+					uris.add(str(x))
+			if isinstance(triple[2], rdflib.Literal) and triple[2].datatype:
+				uris.add(str(triple[2].datatype))
+		keep = {str(rdflib.RDF), str(rdflib.RDFS), str(rdflib.OWL), str(rdflib.XSD)}
+		# the sources are parsed with rdflib's core prefixes bound, so `xml` always looks
+		# declared: like the other defaults, keep it only if used
+		keep |= {str(ns) for ns in declared_prefixes.values()} - {"http://www.w3.org/XML/1998/namespace"}
+		for _, ns in self.rdflib_graph.namespaces():
+			ns = str(ns)
+			if ns and ns not in keep and any(u.startswith(ns) for u in uris):
+				keep.add(ns)
+		return keep
+
+	def _filter_namespaces(self):
+		"""the graph's prefix bindings, limited to the namespaces in <self._namespaces_kept>
+		(None for SPARQL endpoints: there's no graph in memory to check, so all are kept)"""
+		bindings = self.rdflib_graph.namespaces()
+		if self._namespaces_kept is None:
+			return sorted(bindings)
+		return sorted((prefix, ns) for prefix, ns in bindings if str(ns) in self._namespaces_kept)
 
 
 	def load_sparql(self,
@@ -258,7 +294,8 @@ class Ontospy(object):
 			self.sparql_endpoint = sparql_endpoint
 			self.sources = [sparql_endpoint]
 			self.sparqlHelper = SparqlHelper(self.rdflib_graph, self.sparql_endpoint)
-			self.namespaces = sorted(self.rdflib_graph.namespaces())
+			self._namespaces_kept = None  # all of them, see _filter_namespaces
+			self.namespaces = self._filter_namespaces()
 		except:
 			printDebug("Error trying to connect to Endpoint.")
 			raise
@@ -270,6 +307,9 @@ class Ontospy(object):
 		eg o.add_namespace("schema", "http://schema.org/")
 		"""
 		self.rdflib_graph.bind(ns_prefix, ns_url, override=True, replace=True)
+		if self._namespaces_kept is not None:
+			self._namespaces_kept.add(str(ns_url))
+		self.namespaces = self._filter_namespaces()
 
 
 	# ------------

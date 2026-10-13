@@ -50,3 +50,59 @@ def test_jsonld_still_loads():
 	g = Ontospy(TEST_RDF_FOLDER + "paper.jsonld")
 	assert g.sources
 	assert len(g.rdflib_graph) > 0
+
+
+# #14: Ontospy.namespaces lists only the prefixes that matter for the graph, not all of
+# rdflib's ~30 defaults (brick, csvw, dcat, odrl, sosa...)
+
+SMALL_TTL = """
+@prefix ex: <http://example.org/onto#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix unused: <http://example.org/unused#> .
+ex:Person a owl:Class ; rdfs:label "Person" ; rdfs:seeAlso <http://xmlns.com/foaf/0.1/Person> .
+"""
+
+
+def prefixes(g):
+	return {prefix for prefix, _ in g.namespaces}
+
+
+def test_unused_rdflib_defaults_dropped():
+	g = Ontospy(data=SMALL_TTL, rdf_format="turtle")
+	assert {"brick", "csvw", "dcat", "odrl", "sosa", "xml"}.isdisjoint(prefixes(g))
+	assert g.namespaces == sorted(g.namespaces)
+
+
+def test_used_declared_and_core_prefixes_kept():
+	g = Ontospy(data=SMALL_TTL, rdf_format="turtle")
+	p = prefixes(g)
+	assert {"ex", "owl", "rdfs"} <= p  # used
+	assert "foaf" in p  # an rdflib default, used by a URI in the graph
+	assert "unused" in p  # declared in the source, even if unused
+	assert {"rdf", "xsd"} <= p  # core, eg for owl:Thing
+
+
+def test_namespaces_with_graph_obj():
+	"""a plain rdflib.Graph comes with rdflib's defaults bound: they don't count as declared"""
+	graph = rdflib.Graph()
+	graph.parse(data=SMALL_TTL, format="turtle")
+	g = Ontospy(graph_obj=graph)
+	assert {"brick", "csvw", "dcat", "odrl", "sosa"}.isdisjoint(prefixes(g))
+	assert {"ex", "foaf", "unused"} <= prefixes(g)
+
+
+def test_qnames_unchanged():
+	"""only unused prefixes go, so no qname changes"""
+	g = Ontospy(TEST_RDF_FOLDER + "pizza.ttl")
+	all_prefixes = sorted(g.rdflib_graph.namespaces())
+	from ..core.utils import uri2niceString
+	for e in g.all_classes + g.all_properties:
+		assert e.qname == uri2niceString(e.uri, all_prefixes)
+
+
+def test_add_namespace_updates_namespaces():
+	g = Ontospy(data=SMALL_TTL, rdf_format="turtle")
+	g.add_namespace("myex", "http://example.org/onto#")
+	assert ("myex", rdflib.URIRef("http://example.org/onto#")) in g.namespaces
+	assert "ex" not in prefixes(g)  # rebinding the namespace replaces its old prefix
