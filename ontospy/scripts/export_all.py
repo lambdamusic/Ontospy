@@ -145,17 +145,31 @@ INDEX_COUNTS = [("Classes", "Classes"), ("Properties", "Properties"),
                 ("Concepts", "Skos Concepts"), ("Shapes", "Data Shapes")]
 
 
+SCHEMA_HTTP, SCHEMA_HTTPS = rdflib.Namespace("http://schema.org/"), rdflib.Namespace("https://schema.org/")
+TITLE_PREDICATES = [rdflib.RDFS.label, rdflib.namespace.DCTERMS.title, rdflib.namespace.DC.title,
+                    rdflib.SKOS.prefLabel, SCHEMA_HTTPS.name, SCHEMA_HTTP.name]
+DESCRIPTION_PREDICATES = [rdflib.RDFS.comment, rdflib.namespace.DCTERMS.description,
+                          rdflib.namespace.DC.description, rdflib.SKOS.definition,
+                          SCHEMA_HTTPS.description, SCHEMA_HTTP.description]
+
+
 def _ontology_title_and_description(g):
-    """title and description of the first ontology declared in the graph, if any"""
-    for onto in g.all_ontologies:
-        title = ""
-        for pred in [rdflib.RDFS.label, rdflib.namespace.DCTERMS.title, rdflib.namespace.DC.title]:
-            values = onto.getValuesForProperty(pred)
-            if values:
-                title = str(firstStringInList(values, "en"))
-                break
-        return title, str(onto.bestDescription(prefLanguage="en") or "")
-    return "", ""
+    """title and description from the graph's headers: its owl:Ontology declarations or, eg
+    for SKOS thesauri, its skos:ConceptSchemes. Each is taken from the first header that has
+    one (eg PROV-O declares two ontologies, only the second with a title)."""
+    graph = g.rdflib_graph
+    headers = [o.uri for o in g.all_ontologies] or sorted(
+        graph.subjects(rdflib.RDF.type, rdflib.SKOS.ConceptScheme))
+
+    def first_value(predicates):
+        for header in headers:
+            for pred in predicates:
+                values = list(graph.objects(header, pred))
+                if values:
+                    return str(joinStringsInList(values, "en"))
+        return ""
+
+    return first_value(TITLE_PREDICATES), first_value(DESCRIPTION_PREDICATES)
 
 
 def _truncate(text, length=220):
