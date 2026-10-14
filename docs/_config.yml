@@ -27,7 +27,3 @@ defaults:
       path: ""
     values:
       layout: default
-
-# old wiki and RST docs from 2018, kept in git but not published
-exclude:
-  - _legacy
