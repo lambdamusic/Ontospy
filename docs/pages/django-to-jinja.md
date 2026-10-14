@@ -1,3 +1,8 @@
+---
+title: Django to Jinja migration
+parent: Upgrading to 2.0
+---
+
 # Django to Jinja migration
 
 As of version 2.0 (Oct 2022) Ontospy's visualization module replaces [Django](https://docs.djangoproject.com/en/4.1/ref/templates/builtins/) with [Jinja](https://jinja.palletsprojects.com/en/3.1.x/). 

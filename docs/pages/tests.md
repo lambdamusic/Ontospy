@@ -1,3 +1,8 @@
+---
+title: Running the tests
+nav_order: 8
+---
+
 # Running the tests
 
 Ontospy's tests use [pytest](https://docs.pytest.org/). They live in `ontospy/tests`, together with the RDF files they load (`ontospy/tests/rdf`).

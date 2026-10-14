@@ -1,3 +1,8 @@
+---
+title: Changelog
+nav_order: 7
+---
+
 # Changelog
 
 Summary of changes.
