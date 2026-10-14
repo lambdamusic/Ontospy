@@ -1,1 +1,33 @@
-theme: jekyll-theme-architect
+title: Ontospy
+description: Python library and command line tool for inspecting and visualizing RDF vocabularies and ontologies
+url: https://lambdamusic.github.io
+baseurl: /Ontospy
+
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
+
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  GitHub: https://github.com/lambdamusic/ontospy
+  PyPI: https://pypi.org/project/ontospy/
+  Examples: https://lambdamusic.github.io/ontospy-examples/
+aux_links_new_tab: true
+
+footer_content: >-
+  Ontospy is open source (MIT). Questions or bugs?
+  <a href="https://github.com/lambdamusic/ontospy/issues">Open an issue on GitHub</a>.
+
+# GitHub Pages applies the default layout implicitly (jekyll-default-layout); say it explicitly
+# so local builds match
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# old wiki and RST docs from 2018, kept in git but not published
+exclude:
+  - _legacy

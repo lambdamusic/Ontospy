@@ -1,26 +1,22 @@
-![logo](static/logo_sm.jpg)
+---
+title: Home
+nav_order: 1
+---
 
-## Index
+![Ontospy](static/logo_sm.jpg)
 
-- [Index](#index)
-- [Welcome to Ontospy's Documentation!](#welcome-to-ontospys-documentation)
-- [In a Nutshell](#in-a-nutshell)
-- [Installation](#installation)
-- [Quick Example](#quick-example)
-- [Is Ontospy for Me?](#is-ontospy-for-me)
-- [Generating Ontology Documentation](#generating-ontology-documentation)
-- [Miscellaneous Tips](#miscellaneous-tips)
-- [Version 2 Upgrade](#upgrading-to-v-20)
-- [Quick Links](#quick-links)
+# Ontospy
 
-## Welcome to Ontospy's Documentation!
+Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages: RDFS, OWL, SKOS and SHACL.
 
-Ontospy is a lightweight Python library and command line tool for working with vocabularies encoded in the [RDF](https://en.wikipedia.org/wiki/Resource_Description_Framework) family of languages.
+```bash
+$ pip install ontospy
+```
 
-## In a Nutshell
+## In a nutshell
 
 Ontospy can be used either as an interactive command line interface (a
-[repl](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop>)) or as a Python package.
+[repl](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)) or as a Python package.
 
 Calling the `ontospy` command from a terminal window launches a utility for scanning a knowledge model encoded in RDF (or any of its dialects e.g. RDFS, OWL or SKOS).
 
@@ -36,233 +32,7 @@ Many other options are available, in particular Ontospy allows to load/save onto
 
 [![OntospyVideo](static/ontospyvideo_sm.jpg)](https://youtu.be/MkKrtVHi_Ks)
 
-
-## Installation
-
-Prerequisites:
-
--   Python (3.x)
--   A python package manager: [setuptools](https://pypi.python.org/pypi/setuptools) or [pip](https://pip.pypa.io/en/stable/installing/).
-
-Once you have a package manager installed, simply install Ontospy from the Python Package Index. There are three library versions you can choose from.
-
-**Standard Version**
-
-If you want to use ontospy as a Python module, or to automatically create some [HTML documentation](<(#generating-ontology-documentation)>) for an ontology, you can install the standard version of the library like this:
-
-```bash
-$ pip install ontospy
-```
-The python library, its dependencies and all of its command-line executables will be installed. The only thing which is left out is the bash autocomplete external dependencies.
-
-NOTE: 
-As of Ontospy version 2.0, the documentation generation libraries are installed by default with Ontospy. Previously, third party dependencies (e.g. Django) had to be installed separately. 
-
-
-**Standard Version plus Shell**
-
-The 'shell' or interactive command line interface requires the [readline](https://pypi.org/project/readline/) module, a set of functions for use by applications that allow users to edit command lines as they are typed in.  
-
-This module is optionally installed with Ontospy like this:
-
-```bash
-$ pip install ontospy[SHELL]
-```
-
-**Upgrading**
-
-If you’re upgrading from an older version, make sure you use the -U flag:
-
-```bash
-$ pip install ontospy -U
-```
-
-## Quick Example
-
-If used as a Python package, the basic workflow is the following: load a graph by instantiating the `Ontospy` class with a file containing RDFS, OWL or SKOS definitions; you get back an object that lets you interrogate the ontology. That's all!
-
-Let's take a look at the [Friend Of A Friend](http://semanticweb.org/wiki/FOAF) vocabulary.
-
-
-```python
-In [1]: import ontospy
-
-In [2]: ontospy.__version__
-Out[2]: '1.9.8'
-
-In [3]: model = ontospy.Ontospy("http://xmlns.com/foaf/0.1/", verbose=True)
-Reading: <http://xmlns.com/foaf/0.1/>
-.. trying rdf serialization: <xml>
-..... success!
-----------
-Loaded 631 triples.
-----------
-RDF sources loaded successfully: 1 of 1.
-..... 'http://xmlns.com/foaf/0.1/'
-----------
-Scanning entities...
-----------
-Ontologies.........: 1
-Classes............: 15
-Properties.........: 67
-..annotation.......: 7
-..datatype.........: 26
-..object...........: 34
-Concepts (SKOS)....: 0
-Shapes (SHACL).....: 0
-----------
-
-In [4]: model.all_classes
-Out[4]:
-[<Class *http://xmlns.com/foaf/0.1/Agent*>,
-<Class *http://xmlns.com/foaf/0.1/Document*>,
-<Class *http://xmlns.com/foaf/0.1/Group*>,
-<Class *http://xmlns.com/foaf/0.1/Image*>,
-<Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-<Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-<Class *http://xmlns.com/foaf/0.1/OnlineChatAccount*>,
-<Class *http://xmlns.com/foaf/0.1/OnlineEcommerceAccount*>,
-<Class *http://xmlns.com/foaf/0.1/OnlineGamingAccount*>,
-<Class *http://xmlns.com/foaf/0.1/Organization*>,
-<Class *http://xmlns.com/foaf/0.1/Person*>,
-<Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>,
-<Class *http://xmlns.com/foaf/0.1/Project*>,
-<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-<Class *http://www.w3.org/2004/02/skos/core#Concept*>]
-
-In [5]: model.all_properties_object
-Out[5]:
-[<Property *http://xmlns.com/foaf/0.1/account*>,
-<Property *http://xmlns.com/foaf/0.1/accountServiceHomepage*>,
-<Property *http://xmlns.com/foaf/0.1/based_near*>,
-<Property *http://xmlns.com/foaf/0.1/currentProject*>,
-<Property *http://xmlns.com/foaf/0.1/depiction*>,
-<Property *http://xmlns.com/foaf/0.1/depicts*>,
-<Property *http://xmlns.com/foaf/0.1/focus*>,
-<Property *http://xmlns.com/foaf/0.1/fundedBy*>,
-<Property *http://xmlns.com/foaf/0.1/holdsAccount*>,
-<Property *http://xmlns.com/foaf/0.1/homepage*>,
-<Property *http://xmlns.com/foaf/0.1/img*>,
-<Property *http://xmlns.com/foaf/0.1/interest*>,
-<Property *http://xmlns.com/foaf/0.1/isPrimaryTopicOf*>,
-<Property *http://xmlns.com/foaf/0.1/knows*>,
-<Property *http://xmlns.com/foaf/0.1/logo*>,
-<Property *http://xmlns.com/foaf/0.1/made*>,
-<Property *http://xmlns.com/foaf/0.1/maker*>,
-<Property *http://xmlns.com/foaf/0.1/mbox*>,
-<Property *http://xmlns.com/foaf/0.1/member*>,
-<Property *http://xmlns.com/foaf/0.1/openid*>,
-<Property *http://xmlns.com/foaf/0.1/page*>,
-<Property *http://xmlns.com/foaf/0.1/pastProject*>,
-<Property *http://xmlns.com/foaf/0.1/phone*>,
-<Property *http://xmlns.com/foaf/0.1/primaryTopic*>,
-<Property *http://xmlns.com/foaf/0.1/publications*>,
-<Property *http://xmlns.com/foaf/0.1/schoolHomepage*>,
-<Property *http://xmlns.com/foaf/0.1/theme*>,
-<Property *http://xmlns.com/foaf/0.1/thumbnail*>,
-<Property *http://xmlns.com/foaf/0.1/tipjar*>,
-<Property *http://xmlns.com/foaf/0.1/topic*>,
-<Property *http://xmlns.com/foaf/0.1/topic_interest*>,
-<Property *http://xmlns.com/foaf/0.1/weblog*>,
-<Property *http://xmlns.com/foaf/0.1/workInfoHomepage*>,
-<Property *http://xmlns.com/foaf/0.1/workplaceHomepage*>]
-
-In [6]: model.printClassTree()
-foaf:Agent
-----foaf:Group
-----foaf:Organization
-----foaf:Person
-foaf:Document
-----foaf:Image
-----foaf:PersonalProfileDocument
-foaf:LabelProperty
-foaf:OnlineAccount
-----foaf:OnlineChatAccount
-----foaf:OnlineEcommerceAccount
-----foaf:OnlineGamingAccount
-foaf:Project
-http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing
-----foaf:Person
-skos:Concept
-
-In [7]: model.toplayer_classes
-Out[7]:
-[<Class *http://xmlns.com/foaf/0.1/Agent*>,
-<Class *http://xmlns.com/foaf/0.1/Document*>,
-<Class *http://xmlns.com/foaf/0.1/LabelProperty*>,
-<Class *http://xmlns.com/foaf/0.1/OnlineAccount*>,
-<Class *http://xmlns.com/foaf/0.1/Project*>,
-<Class *http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing*>,
-<Class *http://www.w3.org/2004/02/skos/core#Concept*>]
-
-In [8]: model.get_class('document')
-Out[8]:
-[<Class *http://xmlns.com/foaf/0.1/Document*>,
-<Class *http://xmlns.com/foaf/0.1/PersonalProfileDocument*>]
-
-In [9]: c1 = _[1]
-
-In [10]: print(c1.rdf_source())
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix vann: <http://purl.org/vocab/vann/> .
-@prefix void: <http://rdfs.org/ns/void#> .
-@prefix vs: <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
-@prefix wot: <http://xmlns.com/wot/0.1/> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-
-foaf:PersonalProfileDocument a rdfs:Class,
-        owl:Class ;
-    rdfs:label "PersonalProfileDocument" ;
-    rdfs:comment "A personal profile RDF document." ;
-    rdfs:subClassOf foaf:Document ;
-    vs:term_status "testing" .
-
-
-In [11]: c1.parents()
-Out[11]: [<Class *http://xmlns.com/foaf/0.1/Document*>]
-
-In [12]: c1.children()
-Out[12]: []
-```
-
-For a longer walkthrough, see the [getting started notebook](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb): it loads an ontology, prints its hierarchies, inspects classes, properties and individuals, and returns the data as [pandas](https://pandas.pydata.org/) data frames, including the results of SPARQL queries.
-
-**Other ways to load RDF**
-
-Besides file paths and URLs, `Ontospy` can load RDF from strings, open files and existing [rdflib](https://rdflib.readthedocs.io/) graphs. Each parameter takes one item or a list, and they can be combined: everything ends up in one graph.
-
-```python
-import rdflib
-import ontospy
-
-g = ontospy.Ontospy(data="@prefix ex: <http://example.org/> . ex:Cat a <http://www.w3.org/2002/07/owl#Class> .",
-                    rdf_format="turtle")           # a string of RDF
-
-with open("foaf.rdf") as f:
-    g = ontospy.Ontospy(file_obj=f)                 # an open file
-
-my_graph = rdflib.Graph().parse("foaf.rdf")
-g = ontospy.Ontospy(graph_obj=my_graph)             # an rdflib graph, eg built by your own code
-
-g = ontospy.Ontospy("foaf.rdf", graph_obj=[my_graph, rdflib.Graph()])   # a mix of sources
-```
-
-Tip: Ontospy keeps the namespace prefixes declared in your RDF files. When you build an rdflib graph yourself, though, rdflib can rename them while parsing: since rdflib 7, a new `Graph()` comes with ~30 well-known prefixes, so eg a file declaring `schema:` for `http://schema.org/` ends up as `schema1:` (rdflib's own `schema` is `https://schema.org/`). To keep your files' prefixes, create the graph with only rdflib's core prefixes; Ontospy still adds the well-known ones for any namespace your data doesn't declare:
-
-```python
-my_graph = rdflib.Graph(bind_namespaces="core").parse("my-ontology.ttl")
-g = ontospy.Ontospy(graph_obj=my_graph)
-```
-
-All the parameters are described in the `Ontospy` class docstring: `help(ontospy.Ontospy)`.
-
+Ontospy can also [generate documentation](gendocs.html) for an ontology, as HTML pages, Markdown files or interactive charts. Have a look at the [examples](https://lambdamusic.github.io/ontospy-examples/): 32 well-known ontologies, from FOAF and SKOS to PROV-O, GeoSPARQL and FIBO.
 
 ## Is Ontospy for me?
 
@@ -275,163 +45,13 @@ Here are some reasons why you should use it:
 
 > note: Ontospy does not offer any ontology-editing features
 
-## Generating Ontology Documentation
+## Where to go next
 
-Ontospy allows to generate documentation for an RDF vocabulary, using visualization algorithms that create simple HTML pages, Markdown files, or more complex javascript interactive charts based on D3.js.
+-   [Installation](installation.html)
+-   [Quick start](quick-start.html): load an ontology in Python and explore it
+-   [Command line](command-line.html): the `ontospy` command and its subcommands
+-   [Generating documentation](gendocs.html), and how to customise it
+-   The [getting started notebook](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb), for a longer walkthrough
+-   What's new: the [changelog](pages/changelog.html)
 
-One can then manually customize these outputs by editing the source html files.
-
-For example:
-
--   [Pizza](https://lambdamusic.github.io/ontospy-examples/pizzattl/index.html) documentation
--   [FOAF](https://lambdamusic.github.io/ontospy-examples/foafrdf/index.html) documentation
-
-That's the kind of documentation Ontospy can generate out-of-the-box. For even more examples, [take a look at this page](https://lambdamusic.github.io/ontospy-examples/index.html).
-
-
-**How to**
-
-This feature is normally used from the command line:
-
-```bash
-$ ontospy gendocs --help
-
-Ontospy v2.4
-Usage: ontospy gendocs [OPTIONS] [SOURCE]...
-
-  GENDOCS: generate documentation in html or markdown format.
-
-Options:
-  -l, --lib              LIBRARY: choose an ontology from your local library.
-  -o, --outputpath TEXT  OUTPUT-PATH: where to save the visualization files
-                         (default: home folder).
-  -x, --extra            EXTRA-DATA: extract implicit types and predicates
-                         using basic inference rules. Note: by default ontospy
-                         extracts only classes/properties which are explictly
-                         declared.
-  -i, --individuals      INDIVIDUALS: extract class instances as well. Note:
-                         by default ontospy extracts only instances of
-                         explicitly declared classes. Use with -x option to
-                         get all possible instances.
-  --type TEXT            VIZ-TYPE: specify which viz type to use as an integer
-                         (eg 1=single-page html, 2=multi-page etc..).
-  --title TEXT           TITLE: custom title for the visualization
-                         (default=graph uri).
-  --theme TEXT           THEME: select bootstrap style (only for the html-
-                         multi-page visualization). Default: simplex
-                         (random=use a random theme).
-  --preflabel TEXT       PREF-LABEL: default value to use for entity titles
-                         (qname|label - default=qname).
-  --preflang TEXT        PREF-LANGUAGE: default language for multilingual
-                         strings (default=en).
-  --nobrowser            NO-BROWSER: prevents opening the html output in the
-                         browser by default.
-  --emptyfolder          EMPTY-FOLDER: delete everything in the output folder
-                         before generating the documentation. By default,
-                         files already there are kept (and overwritten when
-                         needed).
-  --nonredundant         NON-REDUNDANT: in the class, property, concept and
-                         shape trees, don't repeat a child under a parent when
-                         it's already a descendant of one of the parent's
-                         other children, eg for reasoned ontologies. Only used
-                         by the html-complex visualization.
-  --showtypes            SHOW-TYPES: show the available visualization types.
-  --showthemes           SHOW-THEMES: show the available css theme choices.
-  -v, --verbose          VERBOSE: print out debug messages.
-  -h, --help             Show this message and exit.
-```
-
-By default, files already in the output folder are kept and overwritten when needed; Ontospy warns about files it didn't write, eg left over from an earlier build. Use `--emptyfolder` to clear the folder first.
-
-For reasoned ontologies, where inferred subclass relations are stated explicitly (eg `:RedBeardedGuy rdfs:subClassOf :Mammal` as well as `:Human`), the `--nonredundant` option shows each class only under its most specific parents in the html-complex tree pages. From Python, the same is available as `ontologyClassTree(non_redundant=True)` and the other tree methods.
-
-This feature is not really meant to be used via Python, but I'm sure there are a few constructs in the source code which can be reused.
-
-In a nutshell, all visualizations inherit from a [VizFactory](https://github.com/lambdamusic/Ontospy/blob/master/ontospy/gendocs/viz_factory.py) class that abstracts away the most common operations involved in rendering a dataviz.
-
-This is how you would invoke a visualization from a script:
-
-```python
-import ontospy
-from ontospy.gendocs.viz.viz_html_single import *
-
-g = ontospy.Ontospy("http://cohere.open.ac.uk/ontology/cohere.owl#")
-
-v = HTMLVisualizer(g) # => instantiate the visualization object
-v.build() # => render visualization. You can pass an 'output_path' parameter too
-v.preview() # => open in browser
-
-```
-
-**Customising the templates**
-
-The documentation is rendered with [Jinja2](https://jinja.palletsprojects.com/) templates, which live in the package's [templates folder](https://github.com/lambdamusic/Ontospy/tree/master/ontospy/gendocs/media/templates). To change how the output looks, eg to add your own CSS, or to remove a section you don't need, you can override any of them with your own version:
-
-1. Copy the template you want to change into a folder of your own, keeping its path relative to the templates folder, eg `my-templates/html-multi/base.html`.
-2. Edit your copy.
-3. Pass a Jinja2 environment that looks in your folder first, and falls back to Ontospy's own templates for everything else:
-
-```python
-import ontospy
-from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader, select_autoescape
-from ontospy.gendocs.jinja_env import add_default_filters
-from ontospy.gendocs.viz.viz_html_multi import KompleteViz
-
-my_env = Environment(
-    loader=ChoiceLoader([
-        FileSystemLoader("my-templates"),                        # your versions first
-        PackageLoader("ontospy.gendocs.media", "templates"),     # then Ontospy's
-    ]),
-    autoescape=select_autoescape(["html", "xml"]),
-    extensions=["jinja2_time.TimeExtension"],
-)
-add_default_filters(my_env)   # the filters Ontospy's templates use
-
-g = ontospy.Ontospy("my-ontology.ttl")
-v = KompleteViz(g, title="My ontology", jinja2env=my_env)
-v.build("my-docs")
-```
-
-Every visualization type accepts the `jinja2env` parameter. For example, with the multi-page HTML (`KompleteViz`):
-
--   to add your own stylesheet, override `html-multi/base.html` and add a `<link>` after the existing ones
--   to change what a class page shows, eg remove its "Usage" section, override `html-multi/browser/browser_classinfo.html`
-
-Custom templates are only available from Python, not from the `ontospy gendocs` command.
-
-## Miscellaneous Tips
-
-If you are using OSx El Capitan your installation line probably will look like this
-
-    > sudo pip install ontospy -U --user python
-
-This is due to the new [System Integrity Protection](https://support.apple.com/en-us/HT204899) (more info on this [stackoverflow post](http://stackoverflow.com/questions/33234665/upgrading-setuptools-on-osx-el-capitan))
-
-
-## Upgrading to V 2.0
-
-Ontospy version 2 provides new SHACL support, as well as it changes some of its internal dependencies (primarily, it moves from Django to Jinja for the HTML documentation part). 
-
-For the majority of users this upgrade should cause any issues, but since various internals have changed  this release may be backward-incompatible for users that have created custom extensions building upon Ontospy's documentation generation code.
-
--   Please have a look at the [Django to Jinja migration](pages/django-to-jinja.html) page for more information
-
-
-## Quick Links
-
--   Github: [https://github.com/lambdamusic/ontospy](https://github.com/lambdamusic/ontospy)
--   CheeseShop: [https://pypi.python.org/pypi/ontospy](https://pypi.python.org/pypi/ontospy)
--   Docs: [http://lambdamusic.github.io/Ontospy/](http://lambdamusic.github.io/Ontospy/)
--   Getting started notebook: [examples/getting-started.ipynb](https://github.com/lambdamusic/ontospy/blob/master/examples/getting-started.ipynb)
-
-Also:
-
--   Youtube: [hhttps://youtu.be/MkKrtVHi_Ks](https://youtu.be/MkKrtVHi_Ks)
-
-Issues or questions?
-
--   Then head over to the [issues](https://github.com/lambdamusic/Ontospy/issues) page.
-
-What's changed recently?
-
--   Please have a look at the [Changelog](pages/changelog.html)
+Issues or questions? Head over to the [issues](https://github.com/lambdamusic/Ontospy/issues) page.
