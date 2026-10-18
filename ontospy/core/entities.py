@@ -509,6 +509,11 @@ class OntoShape(RdfEntity):
         self.ontology = None
         self.targetClasses = []
         self.sparqlHelper = None  # the original graph the class derives from
+        # set by shacl_helper.build_shacl_constraints, for the docs
+        self.shacl_constraints = []  # the shape's own property constraints
+        self.targets = []  # what the shape applies to: (kind, Term)
+        self.node_constraints = []  # constraints on the focus node itself: (name, [values])
+        self.used_by = []  # for a property shape, the shapes that use it
 
     def __repr__(self):
         return "<SHACL shape *%s*>" % (self.uri)
