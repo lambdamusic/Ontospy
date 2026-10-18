@@ -7,6 +7,15 @@ nav_order: 7
 
 Summary of changes.
 
+## Unreleased
+
+- Shell
+    - Properties with no domain or range of their own show those inherited from their superproperties, marked "(inferred)", instead of `owl:Thing`, as the documentation has done since 2.4
+    - `info inferred_usage` on a class also lists the properties whose domain or range is that class via a superproperty, under "Inferred from superproperties"
+- Loading
+    - JSON-LD is parsed with rdflib's `Dataset` instead of the deprecated `ConjunctiveGraph`, which a future rdflib release will remove. JSON-LD loaded from a string or an open file no longer drops triples in named graphs
+    - `.nt` files are parsed as N-Triples first, rather than as N3: faster, and without a warning per triple. The test suite's warnings go from about 4,200 to 34
+
 ## Oct, 2026: v 2.5
 
 - Namespaces
