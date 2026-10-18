@@ -213,6 +213,10 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
     # Start with empty results
     all_shacl_constraints: Dict[OntoClass, List[Constraint]] = dict()
 
+    # A shape's triples as a graph, made once per shape rather than each time the shape
+    # turns up in a class's lineage (backlog #13)
+    shape_graphs: Dict[OntoShape, Graph] = dict()
+
     # Compute {property_uri:OntoProperty}
     for onto_prop in ontology_object.all_properties:
         all_properties[onto_prop.uri] = onto_prop
@@ -250,7 +254,10 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
                 assert isinstance(shaped_property_dict["shape"], OntoShape)
                 shape: OntoShape = shaped_property_dict["shape"]
                 # Parse triples to get property constraints for this shape and add to property_constraints
-                add_property_constraints_from_shape_triples(lineage_class.uri, property_constraints, shape.triples)
+                if shape not in shape_graphs:
+                    shape_graphs[shape] = _graph_of(shape.triples)
+                add_property_constraints_from_shape_triples(lineage_class.uri, property_constraints,
+                                                            shape.triples, shape_graphs[shape])
 
             # Add property constraints from owl property descriptions to constraints
             add_owl_property_constraints(property_constraints)
@@ -272,16 +279,26 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
     return all_shacl_constraints
 
 
+def _graph_of(triples):
+    """ an rdflib Graph with <triples>, to get access to RDFLib iterators """
+    graph = Graph()
+    for triple in triples or []:
+        graph.add(triple)
+    return graph
+
+
 def add_property_constraints_from_shape_triples(
     class_uri: URIRef,
     property_constraints: Dict[URIRef, Constraint],
-    shacl_triples: Optional[List[Tuple[IdentifiedNode, IdentifiedNode, Node]]]
+    shacl_triples: Optional[List[Tuple[IdentifiedNode, IdentifiedNode, Node]]],
+    tmp_graph: Optional[Graph] = None
 ) -> None:
     '''
     Arguments:
         class_uri                 URI of current class
         property_constraints      {property_uri:Constraint}
         shacl_triples             List of shacl triples [(s, p, o)] pertaining to sh:PropertyShapes attached to the current class.
+        tmp_graph                 Optional: the same triples as a Graph, if already made
 
     Action:
         Modify property_constraints by property_uris and their Constraint object derived from the shacl triples
@@ -291,9 +308,8 @@ def add_property_constraints_from_shape_triples(
         return
 
     # Build temporary graph to get access to RDFLib iterators.
-    tmp_graph = Graph()
-    for shacl_triple in shacl_triples:
-        tmp_graph.add(shacl_triple)
+    if tmp_graph is None:
+        tmp_graph = _graph_of(shacl_triples)
 
     # From sh:path, get property URI when object of sh:path triple is a named concept.
     # Once found, property_uri will be used to guarantee an entry for property_constraints.
