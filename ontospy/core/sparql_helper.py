@@ -82,6 +82,9 @@ class SparqlHelper(object):
         * hide_base_schemas: by default, obscure all RDF/RDFS/OWL/XML stuff
         * hide_implicit_types: don't make any inference based on rdf:type declarations
         """
+        if not self.sparql_endpoint:
+            return self._allClassesInMemory(hide_base_schemas, hide_implicit_types)
+
         query = """SELECT DISTINCT ?x ?c
                  WHERE {
                          {
@@ -130,6 +133,39 @@ class SparqlHelper(object):
 
         qres = self.rdflib_graph.query(query)
         return list(qres)
+
+    BASE_SCHEMAS = ("http://www.w3.org/2002/07/owl",
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns",
+                    "http://www.w3.org/2000/01/rdf-schema",
+                    "http://www.w3.org/2001/XMLSchema",
+                    "http://www.w3.org/XML/1998/namespace")
+
+    def _allClassesInMemory(self, hide_base_schemas=True, hide_implicit_types=True):
+        """ The rows of the getAllClasses query, in the same order, using the graph API:
+        on large ontologies the query's FILTER and ORDER BY took most of its time (backlog #13).
+
+        Each candidate class ?x comes with each of its rdf:types ?c, in the order the graph
+        returns them (as the query's OPTIONAL does), or with None if it has none.
+        """
+        g = self.rdflib_graph
+        RDF, RDFS, OWL = rdflib.RDF, rdflib.RDFS, rdflib.OWL
+        candidates = set(g.subjects(RDF.type, OWL.Class))
+        candidates.update(g.subjects(RDF.type, RDFS.Class))
+        for x, _, y in g.triples((None, RDFS.subClassOf, None)):
+            candidates.add(x)
+            candidates.add(y)
+        candidates.update(g.objects(None, RDFS.domain))
+        candidates.update(g.objects(None, RDFS.range))
+        if not hide_implicit_types:
+            candidates.update(g.objects(None, RDF.type))
+        if hide_base_schemas:
+            candidates = [x for x in candidates if not isinstance(x, rdflib.BNode)
+                          and not str(x).startswith(self.BASE_SCHEMAS)]
+        out = []
+        for x in sorted(candidates, key=_sparql_order_key):
+            types = list(g.objects(x, RDF.type))
+            out += [(x, c) for c in types] if types else [(x, None)]
+        return out
 
     def getClassInstances(self, aURI):
         if not self.sparql_endpoint:
