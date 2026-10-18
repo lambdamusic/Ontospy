@@ -10,6 +10,11 @@ $ pytest ontospy/tests/test_shacl_constraints.py
 """
 
 from .. import Ontospy
+from ..gendocs.actions import build_visualization
+from ..gendocs.CONFIG import VISUALIZATIONS_LIST
+
+
+HTML_MULTI = [n for n, v in enumerate(VISUALIZATIONS_LIST["Visualizations"]) if v["ID"] == "html-complex"][0]
 
 
 # classes that are node shapes themselves (implicit class targets), with blank-node
@@ -109,3 +114,19 @@ def test_no_state_across_graphs():
 	shape = g.get_shapes(uri="http://example.org/n#DatasetShape")
 	assert [t.href for _, t in shape.targets] == [None]
 
+
+def test_shape_pages_rendered(tmp_path):
+	g = Ontospy(data=NAMED_TTL, rdf_format="turtle")
+	build_visualization(g, HTML_MULTI, path=str(tmp_path))
+	page = (tmp_path / "shape-ndatasetshape.html").read_text(encoding="utf-8")
+	assert "Property Constraints (2)" in page
+	assert "A name given to the dataset." in page
+	assert "ex:creator / ex:name" in page
+	assert 'href=".html"' not in page  # no links to pages that don't exist
+
+	g = Ontospy(data=IMPLICIT_TTL, rdf_format="turtle")
+	build_visualization(g, HTML_MULTI, path=str(tmp_path / "implicit"))
+	page = (tmp_path / "implicit" / "class-iperson.html").read_text(encoding="utf-8")
+	assert "Property Shapes" in page
+	assert 'href="prop-iname.html"' in page
+	assert "&lt;br&gt;" not in page
