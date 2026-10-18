@@ -45,7 +45,7 @@ def test_rdflib_defaults_fill_gaps():
 
 
 def test_jsonld_still_loads():
-	"""JSON-LD is parsed into a ConjunctiveGraph, which rejects `bind_namespaces`: a wrong
+	"""JSON-LD is parsed into a Dataset, which rejects `bind_namespaces`: a wrong
 	call there made JSON-LD sources fail silently"""
 	g = Ontospy(TEST_RDF_FOLDER + "paper.jsonld")
 	assert g.sources
