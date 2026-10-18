@@ -255,6 +255,7 @@ class SparqlHelper(object):
         """
             Find all properties that should not be "top-level" because they
             apply to some class via some SHACL PropertyShape.
+            Returns a list of 1-tuples, in no particular order.
         """
 
         # This query finds classes by explicit class statement, and
@@ -263,6 +264,16 @@ class SparqlHelper(object):
         # "Implicit Class Targets", a reflective sh:targetClass is
         # implied.
         # https://www.w3.org/TR/shacl/#implicit-targetClass
+        if not self.sparql_endpoint:
+            # the same rows (order aside) with the graph API: on large ontologies the
+            # query took a while, checking each class for shapes (backlog #13)
+            g, SH = self.rdflib_graph, rdflib.SH
+            out = []
+            for class_type in (rdflib.RDFS.Class, rdflib.OWL.Class):
+                for n_class in g.subjects(rdflib.RDF.type, class_type):
+                    for n_shape in g.objects(n_class, SH.property):
+                        out += [(x,) for x in g.objects(n_shape, SH.path)]
+            return out
         qres = self.rdflib_graph.query("""SELECT ?nProperty
                 WHERE {
                         {
