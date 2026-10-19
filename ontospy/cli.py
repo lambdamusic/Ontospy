@@ -204,7 +204,7 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
 @click.option(
     '--type',
     help=
-    'VIZ-TYPE: specify which viz type to use as an integer (eg 1=single-page html, 2=multi-page etc..).'
+    'VIZ-TYPE: specify which viz type to use, by its number or ID (eg 1 or html-simple for single-page html, 2 or html-complex for multi-page). See --showtypes.'
 )
 @click.option(
     '--title',

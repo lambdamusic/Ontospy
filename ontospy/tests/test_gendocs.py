@@ -14,7 +14,7 @@ import os
 import pytest
 
 from .. import Ontospy
-from ..gendocs.actions import build_visualization
+from ..gendocs.actions import build_visualization, select_visualization, ask_visualization
 from ..gendocs.CONFIG import VISUALIZATIONS_LIST
 from .context import TEST_RDF_FOLDER
 
@@ -28,10 +28,6 @@ VIZ_CLASSES = {
 	"d3-dendogram": ("viz_d3dendogram", "Dataviz"),
 	"d3-bubble-chart": ("viz_d3bubble_chart", "Dataviz"),
 	"d3-pack-hierarchy": ("viz_d3pack_hierarchy", "Dataviz"),
-	"d3-bar-hierarchy": ("viz_d3bar_hierarchy", "Dataviz"),
-	"d3-partition-table": ("viz_d3partition_table", "Dataviz"),
-	"d3-rotating-cluster": ("viz_d3rotating_cluster", "Dataviz"),
-	"sigma-force-directed": ("viz_sigmajs", "Dataviz"),
 }
 
 
@@ -60,6 +56,44 @@ def test_build_with_individuals(pizza, viz_index, viz_id, tmp_path):
 	url = build_visualization(pizza, viz_index, path=str(tmp_path))
 	assert url
 	assert "Italy" in read_all_output(tmp_path)
+
+
+def test_kept_visualizations():
+	"""#25: the six kept, with their --type numbers unchanged"""
+	assert [v for _, v in VIZ_TYPES] == ["html-simple", "html-complex", "markdown",
+		"d3-dendogram", "d3-bubble-chart", "d3-pack-hierarchy"]
+
+
+@pytest.mark.parametrize("choice,expected", [("1", 0), ("6", 5), (4, 3), (" 2 ", 1),
+	("d3-dendogram", 3), ("markdown", 2)])
+def test_select_visualization(choice, expected):
+	"""#25: a viz is chosen by its number (from 1) or by its ID"""
+	assert select_visualization(choice) == expected
+
+
+@pytest.mark.parametrize("choice", ["0", "-1", "11", "x", "", "d3-nope"])
+def test_select_visualization_invalid(choice, capsys):
+	"""#25: 0 and -1 used to pick the last vizs, by indexing the list from the end"""
+	with pytest.raises(SystemExit) as e:
+		select_visualization(choice)
+	assert e.value.code == 1
+	assert "Invalid viz-type option" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("choice", ["7", "8", "9", "10", "d3-bar-hierarchy", "sigma-force-directed"])
+def test_select_removed_visualization(choice, capsys):
+	"""#25: the removed vizs fail with a message saying so, rather than as invalid"""
+	with pytest.raises(SystemExit) as e:
+		select_visualization(choice)
+	assert e.value.code == 1
+	assert "was removed in Ontospy 2.6" in capsys.readouterr().err
+
+
+def test_ask_visualization_rejects_zero(monkeypatch):
+	"""#25: the interactive menu had the same bug: 0 picked the last viz"""
+	answers = iter(["0", "11", "4"])
+	monkeypatch.setattr("builtins.input", lambda prompt="": next(answers))
+	assert ask_visualization() == 3
 
 
 def test_html_multi_individual_pages(pizza, tmp_path):

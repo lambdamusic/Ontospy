@@ -86,3 +86,17 @@ def test_class_range_of(g, shell):
 	assert "fam:Person => fam:hasRelative => fam:Person" in lines
 	assert "fam:Person (inferred) => fam:hasParent => fam:Person" in lines
 	assert "owl:Thing => fam:related => fam:Person" in lines
+
+
+def test_visualize_command(shell, monkeypatch):
+	"""#25: `visualize` imported action_visualize from the wrong module, so it always
+	said "This command requires the ontodocs package" """
+	from ..core import actions
+	calls = []
+	monkeypatch.setattr(actions, "action_visualize", lambda **kw: calls.append(kw))
+	shell.current = {'file': "pizza.ttl"}
+	buf = io.StringIO()
+	with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+		shell.do_visualize("")
+	assert calls == [{'args': "pizza.ttl", 'fromshell': True}]
+	assert "ontodocs" not in buf.getvalue()

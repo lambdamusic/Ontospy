@@ -959,15 +959,10 @@ class Shell(cmd.Cmd):
 
         line = line.split()
 
-        try:
-            # from ..viz.actions import action_visualize
-            from ..gendocs.actions import action_visualize
-        except:
-            self._print("This command requires the ontodocs package: `pip install ontodocs`")
-            return
-
+        # action_visualize is in core.actions: it used to be imported from gendocs.actions,
+        # which failed and was reported as a missing 'ontodocs' package (#25)
         import webbrowser
-        url = action_visualize(args=self.current['file'], fromshell=True)
+        url = actions.action_visualize(args=self.current['file'], fromshell=True)
         if url:
             webbrowser.open(url)
         return

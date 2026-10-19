@@ -9,6 +9,13 @@ Summary of changes.
 
 ## Unreleased
 
+- Documentation generation (`gendocs`)
+    - Removed four interactive visualizations: D3 Bar hierarchy, D3 Partition table, D3 Rotating cluster and the Sigma.js force-directed graph (`--type` 7 to 10). They drew the same class tree as the others, less legibly. Asking for one now fails with a message saying so; their numbers won't be reused for now. The six left keep their numbers: Html single page, Html multi page, Markdown, D3 Dendrogram, D3 Bubble chart and D3 Pack hierarchy
+    - `--type` takes a visualization's ID as well as its number, eg `--type d3-dendogram`, and `--showtypes` lists both
+    - Fix `--type 0` and `--type -1` (and 0 in the interactive menu) silently building the last visualizations instead of reporting an invalid choice
+    - The package is about 2.5 MB smaller: the removed visualizations' libraries (Sigma.js) and some no visualization used (d3 v4, d3pie, tooltipster) are gone
+- Shell
+    - Fix the `visualize` command, which always answered "This command requires the ontodocs package"
 - Command line
     - A source file that doesn't exist is reported as "File not found", instead of a parse error after trying every RDF serialization. `gendocs` and `ser` stop there and exit with an error, rather than carrying on with an empty graph (`gendocs` used to ask for a format and then write empty documentation)
     - `gendocs` loads the ontology before asking which visualization to build, so a source that fails to load stops it before the question
