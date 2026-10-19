@@ -447,19 +447,28 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
         shape.used_by = sorted((reader.term(x) for x in reader.graph.subjects(SH.property, shape.uri)),
                                key=lambda t: t.qname)
 
+    # A class's own group of constraints, read once and reused for each of its subclasses
+    # rather than read again every time the class turns up in a lineage (backlog #13)
+    groups: Dict[OntoClass, List[Constraint]] = dict()
+
+    def group_of(lineage_class: OntoClass) -> List[Constraint]:
+        if lineage_class not in groups:
+            constraints: Dict[Node, Constraint] = dict()
+            for shape in lineage_class.all_shapes:
+                reader.add_constraints(constraints, shape.uri)
+            group: List[Constraint] = []
+            if constraints:
+                add_owl_property_constraints(constraints, reader)
+                group.append(Constraint(header=lineage_class.qname))
+                group.extend(_sorted_constraints(constraints))
+            groups[lineage_class] = group
+        return groups[lineage_class]
+
     for onto_class in ontology_object.all_classes:
         constraints_list: List[Constraint] = []
         for lineage_class in get_lineage(onto_class):
-            if not lineage_class.all_shapes:
-                continue
-            constraints = dict()
-            for shape in lineage_class.all_shapes:
-                reader.add_constraints(constraints, shape.uri)
-            if not constraints:
-                continue
-            add_owl_property_constraints(constraints, reader)
-            constraints_list.append(Constraint(header=lineage_class.qname))
-            constraints_list.extend(_sorted_constraints(constraints))
+            if lineage_class.all_shapes:
+                constraints_list.extend(group_of(lineage_class))
         all_shacl_constraints[onto_class] = constraints_list
 
     return all_shacl_constraints
