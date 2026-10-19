@@ -14,6 +14,7 @@ Summary of changes.
     - `--type` takes a visualization's ID as well as its number, eg `--type d3-dendogram`, and `--showtypes` lists both
     - Fix `--type 0` and `--type -1` (and 0 in the interactive menu) silently building the last visualizations instead of reporting an invalid choice
     - The package is about 2.5 MB smaller: the removed visualizations' libraries (Sigma.js) and some no visualization used (d3 v4, d3pie, tooltipster) are gone
+    - SHACL shapes in the single-page html and the markdown docs, as in the multi-page html: a Shapes section (html) or a page per shape (markdown) with each shape's targets, the shapes that use it, its node constraints and a table of its property constraints, and the constraints table in each class's section or page
     - Single-page html: the page is as wide as the window, rather than about 48,000 pixels; a class tree wider than the page scrolls on its own
 - Shell
     - Fix the `visualize` command, which always answered "This command requires the ontodocs package"

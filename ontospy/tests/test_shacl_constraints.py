@@ -15,6 +15,8 @@ from ..gendocs.CONFIG import VISUALIZATIONS_LIST
 
 
 HTML_MULTI = [n for n, v in enumerate(VISUALIZATIONS_LIST["Visualizations"]) if v["ID"] == "html-complex"][0]
+HTML_SINGLE = [n for n, v in enumerate(VISUALIZATIONS_LIST["Visualizations"]) if v["ID"] == "html-simple"][0]
+MARKDOWN = [n for n, v in enumerate(VISUALIZATIONS_LIST["Visualizations"]) if v["ID"] == "markdown"][0]
 
 
 # classes that are node shapes themselves (implicit class targets), with blank-node
@@ -130,3 +132,46 @@ def test_shape_pages_rendered(tmp_path):
 	assert "Property Shapes" in page
 	assert 'href="prop-iname.html"' in page
 	assert "&lt;br&gt;" not in page
+
+
+
+def test_html_single_shapes(tmp_path):
+	"""#37: html-single has a Shapes section, and class sections their constraints, with
+	links to anchors in the page; a shape's anchor is prefixed, as i:Person is a class too"""
+	import re
+	g = Ontospy(data=IMPLICIT_TTL, rdf_format="turtle")
+	build_visualization(g, HTML_SINGLE, path=str(tmp_path))
+	page = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert '<a href="#shapes">Shapes</a>' in page
+	assert 'name="shape-i:Person"' in page and 'name="i:Person"' in page
+	assert page.count("SHACL property constraints:") == 2  # i:Agent and i:Person
+	assert 'href="#i:name"' in page
+	assert "an age is a number" in page
+	anchors = set(re.findall(r'name="([^"]+)"', page))
+	links = set(re.findall(r'href="#([^"]+)"', page))
+	assert links <= anchors | {"a-z", "toc"}, links - anchors
+
+
+def test_markdown_shapes(tmp_path):
+	"""#37: markdown has a page per shape, listed in the index, and class pages their
+	constraints; table rows stay on one line with 6 (shape) or 8 (class) columns"""
+	# a description over two lines (Turtle's \n escape) and with a |
+	ttl = IMPLICIT_TTL.replace('"The name."', '"The name,\\nor | an alias."')
+	g = Ontospy(data=ttl, rdf_format="turtle")
+	build_visualization(g, MARKDOWN, path=str(tmp_path))
+	for shape in g.all_shapes:
+		assert (tmp_path / (shape.slug + ".md")).exists()
+	assert "#### Shapes (2)" in (tmp_path / "index.md").read_text(encoding="utf-8")
+	shape_page = (tmp_path / "shape-iperson.md").read_text(encoding="utf-8")
+	class_page = (tmp_path / "class-iperson.md").read_text(encoding="utf-8")
+	assert "#### SHACL property constraints" in class_page
+	assert "[i:name](prop-iname.md)" in class_page
+	assert "The name, or \\| an alias." in class_page
+	assert "( `xsd:integer` \\| `xsd:decimal` )" in shape_page
+	for page, heading, columns in [(shape_page, "#### Property constraints", 6),
+			(class_page, "#### SHACL property constraints", 8)]:
+		table = page.split(heading)[1].split("\n\n\n")[0]
+		rows = [l for l in table.split("\n") if l.startswith("| ")]
+		assert len(rows) >= 3
+		for row in rows:
+			assert row.replace("\\|", "").count("|") == columns + 1, row

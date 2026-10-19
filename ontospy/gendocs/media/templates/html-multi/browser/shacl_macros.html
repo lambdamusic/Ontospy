@@ -1,10 +1,23 @@
-{# Macros for SHACL constraints, see ontospy/core/shacl_helper.py #}
+{# Macros for SHACL constraints, see ontospy/core/shacl_helper.py. Used by html-multi
+   (a page per entity) and html-single (one page, imported "with context" after setting
+   shacl_anchor_links, so that links go to anchors in the page, backlog #37) #}
+
+
+{# the link to an entity: its page, or its anchor in the single page; a shape's anchor
+   is prefixed, since a class can be a shape too (eg in QUDT) #}
+{% macro href(entity) -%}
+  {%- if shacl_anchor_links is defined and shacl_anchor_links -%}
+    #{% if entity.slug.startswith("shape-") %}shape-{% endif %}{{entity.qname}}
+  {%- else -%}
+    {{entity.slug}}.html
+  {%- endif -%}
+{%- endmacro %}
 
 
 {# a Term: linked to its page if the graph defines it, else in italics #}
 {% macro term(t, css="rdfclass") -%}
-  {%- if t.href -%}
-    <a title="{{t.node}}" href="{{t.href}}" class="{{css}}">{{t.qname}}</a>
+  {%- if t.entity -%}
+    <a title="{{t.node}}" href="{{ href(t.entity) }}" class="{{css}}">{{t.qname}}</a>
   {%- else -%}
     <i title="{{t.node}}">{{t.qname}}</i>
   {%- endif -%}
@@ -36,7 +49,7 @@
 {% macro path(constraint) -%}
   {%- set prop = constraint.property_obj.onto_property -%}
   {%- if prop -%}
-    <a class="propcolor" title="{{prop.uri}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
+    <a class="propcolor" title="{{prop.uri}}" href="{{ href(prop) }}">{{prop.qname}}</a>
   {%- else -%}
     <code title="{{constraint.property_obj.path}}">{{constraint.property_obj.qname}}</code>
   {%- endif -%}

@@ -1,4 +1,6 @@
-
+{#- SHACL constraints: the html-multi macros, linking to anchors in this page (#37) -#}
+{%- set shacl_anchor_links = True -%}
+{%- import "html-multi/browser/shacl_macros.html" as shacl with context -%}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -107,6 +109,28 @@
     margin-bottom: 15px;
 }
 
+
+{#      CSS FOR SHACL CONSTRAINT TABLES (#37)   #}
+
+        table.shacl-constraints {
+            border-collapse: collapse;
+            margin: 8px 0px;
+            font-size: 90%;
+        }
+        table.shacl-constraints th, table.shacl-constraints td {
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table.shacl-constraints th {
+            background: aliceblue;
+            font-size: 85%;
+        }
+        table.shacl-constraints .label {
+            font-weight: bold;
+            color: grey;
+        }
 
 {#      CSS FOR TREE   2016-07-26   #}
 
@@ -271,6 +295,7 @@
 		{% if annotationproperties %}<li><a href="#annotationproperties">Annotation properties</a></li>{% endif %}
 		{% if skosConcepts %}<li><a href="#skosconcepts">SKOS Concepts</a></li>{% endif %}
 		{% if individuals %}<li><a href="#individuals">Individuals</a></li>{% endif %}
+		{% if ontospy_graph.all_shapes %}<li><a href="#shapes">Shapes</a></li>{% endif %}
 	</ul>
 
 
@@ -356,6 +381,15 @@
 
 	<fieldset> <legend>Individuals ({{individuals|length}})</legend>
 		&nbsp;{% for each in individuals  %}<a href="#{{each.qname}}">{{each.title}}</a>
+		{% if not loop.last %}|{% endif %}  {% endfor %}
+	</fieldset>
+
+	{% endif %}
+
+	{% if ontospy_graph.all_shapes %}
+
+	<fieldset> <legend>Shapes ({{ontospy_graph.all_shapes|length}})</legend>
+		&nbsp;{% for each in ontospy_graph.all_shapes  %}<a href="#shape-{{each.qname}}">{{each.title}}</a>
 		{% if not loop.last %}|{% endif %}  {% endfor %}
 	</fieldset>
 
@@ -474,6 +508,12 @@
 					<br>
 					{% for s in each.instances %}<a href="#{{s.qname}}">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}
 				</p>
+				{% endif %}
+
+				{% if each.shacl_constraints %}
+				<div class="section-desc"><b>SHACL property constraints:</b>
+					{{ shacl.constraints_table(each.shacl_constraints, with_property_info=True) }}
+				</div>
 				{% endif %}
 
                 <small class="implementation_title">Implementation:</small>
@@ -916,6 +956,72 @@
 
 
 
+
+
+	{# SHAPES SECTION (#37), as on the html-multi shape pages #}
+
+	{% if ontospy_graph.all_shapes %}
+
+		<hr class="margintop">
+		<h1 class="margintop"><a  name="shapes">&nbsp;</a>Shapes</h1>
+
+			{% for each in ontospy_graph.all_shapes  %}
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Shape: <a name="shape-{{each.qname}}" href="#shape-{{each.qname}}">{{each.title}}</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+				<p class="section-desc"><b>URI</b>
+					<br>
+					<code>{{each.uri}}</code>
+				</p>
+
+				{% if each.bestDescription() %}
+				<p class="section-desc"><b>Description</b>
+					<br>
+					{{each.bestDescription()|linebreaks}}
+				</p>
+				{% endif %}
+
+				{% if each.targets %}
+				<p class="section-desc"><b>Targets <small>({{each.targets|length}})</small>:</b>
+					<br>
+					{% for kind, t in each.targets %}{{ shacl.term(t) }} <small>{{kind}}</small>{% if not loop.last %} | {% endif %}{% endfor %}
+				</p>
+				{% endif %}
+
+				{% if each.used_by %}
+				<p class="section-desc"><b>Used by <small>({{each.used_by|length}})</small>:</b>
+					<br>
+					{% for t in each.used_by %}{{ shacl.term(t) }}{% if not loop.last %} | {% endif %}{% endfor %}
+				</p>
+				{% endif %}
+
+				{% if each.node_constraints %}
+				<div class="section-desc"><b>Node constraints:</b>
+					{{ shacl.constraint_list(each.node_constraints) }}
+				</div>
+				{% endif %}
+
+				{% if each.shacl_constraints %}
+				<div class="section-desc"><b>Property constraints <small>({{each.shacl_constraints|length}})</small>:</b>
+					{{ shacl.constraints_table(each.shacl_constraints) }}
+				</div>
+				{% endif %}
+
+				<small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code>{{each.rdf_source()|linebreaks}}</code>
+				</div>
+
+			</div>
+
+			{% endfor %}
+
+	{% endif %}
 
 
 	<hr>

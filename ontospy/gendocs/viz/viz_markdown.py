@@ -98,6 +98,21 @@ class MarkdownViz(VizFactory):
                 FILE_NAME = entity.slug + ".md"
                 self._save2File(contents, FILE_NAME, browser_output_path)
 
+        if self.ontospy_graph.all_shapes:
+
+        # BROWSER PAGES - SHAPES (#37) ======
+            for entity in self.ontospy_graph.all_shapes:
+                extra_context = {
+                    "main_entity": entity,
+                    "main_entity_type": "shape",
+                    "ontograph": self.ontospy_graph
+                }
+                contents = self._renderTemplate(
+                    "markdown/markdown_shapeinfo.md",
+                    extraContext=extra_context)
+                FILE_NAME = entity.slug + ".md"
+                self._save2File(contents, FILE_NAME, browser_output_path)
+
         return main_url
 
 
