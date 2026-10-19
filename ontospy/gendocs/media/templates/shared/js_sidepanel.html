@@ -1,7 +1,8 @@
-{# The side panel and the tooltip of the D3 visualizations, in plain JavaScript.
-   showpanel(id) copies the hidden div with that id (shared/d3_hiddendivs.html) into the
-   panel; links inside the panel call showpanel too, and the back button returns to the
-   previous entity. Replaces jQuery 1.7.1 and slideReveal (backlog #34). #}
+{# The side panel of the D3 visualizations, in plain JavaScript; the tooltip and labels are
+   in shared/js_d3_helpers.html. showpanel(id) copies the hidden div with that id
+   (shared/d3_hiddendivs.html) into the panel; links inside the panel call showpanel too,
+   and the back button returns to the previous entity. Replaces jQuery 1.7.1 and
+   slideReveal (backlog #34). #}
 
 <script type="text/javascript">
 
@@ -129,67 +130,5 @@
 			hidepanel();
 		}
 	});
-
-
-	// the tooltip: showTooltip(event, html) on mouseover/mousemove, hideTooltip() on mouseout
-	var tooltipDiv = document.getElementById("tooltip");
-
-	function showTooltip(event, html) {
-		if (html !== undefined) {
-			tooltipDiv.innerHTML = html;
-		}
-		tooltipDiv.style.display = "block";
-		var x = event.pageX + 14,
-			y = event.pageY + 14;
-		// keep it inside the window
-		var maxX = window.scrollX + document.documentElement.clientWidth - tooltipDiv.offsetWidth - 10;
-		tooltipDiv.style.left = Math.min(x, maxX) + "px";
-		tooltipDiv.style.top = y + "px";
-	}
-
-	function hideTooltip() {
-		tooltipDiv.style.display = "none";
-	}
-
-	// a label that fits a width: the full name, else the part after the prefix
-	// (eg "AmericanHot" for "pizza.owl:AmericanHot"), else none
-	function shortName(name) {
-		var i = String(name).lastIndexOf(":");
-		return i > 0 && i < name.length - 1 ? name.slice(i + 1) : null;
-	}
-
-	function fitLabel(textEl, name, width) {
-		textEl.textContent = name;
-		if (textEl.getComputedTextLength() <= width) {
-			return true;
-		}
-		var shorter = shortName(name);
-		if (shorter) {
-			textEl.textContent = shorter;
-			if (textEl.getComputedTextLength() <= width) {
-				return true;
-			}
-		}
-		textEl.textContent = "";
-		return false;
-	}
-
-	// text for the tooltip: the title, and the qname if different
-	function escapeHtml(s) {
-		return String(s == null ? "" : s).replace(/[&<>"']/g, function(c) {
-			return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
-		});
-	}
-
-	function entityTooltip(data, extra) {
-		var html = "<b>" + escapeHtml(data.name) + "</b>";
-		if (data.qname && data.qname != data.name) {
-			html += "<br>" + escapeHtml(data.qname);
-		}
-		if (extra) {
-			html += "<br><span style='color: #ccc'>" + escapeHtml(extra) + "</span>";
-		}
-		return html;
-	}
 
 </script>

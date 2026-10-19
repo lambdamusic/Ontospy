@@ -17,6 +17,7 @@ import json
 from ..utils import *
 from ..actions import *
 from ..viz_factory import VizFactory
+from ...core.utils import uri2niceString
 
 
 
@@ -59,6 +60,47 @@ def sidebar_js(g):
     return ("var SIDEBAR = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
 
 
+
+def statistics_charts(g):
+    """For the statistics page: (key, label, bubble chart tree, pack tree) for each kind of
+    entity the graph has, built as for the D3 vizs"""
+    out = []
+    for key, label, toplayer, root in [
+            ("classes", "Classes", g.toplayer_classes, "owl:Thing"),
+            ("properties", "Properties", g.toplayer_properties, "Properties"),
+            ("concepts", "Concepts", g.toplayer_skos, "Concepts")]:
+        if toplayer:
+            out.append((key, label,
+                {'children': build_D3bubbleChart(0, 99, 1, toplayer), 'name': root, 'id': "None"},
+                {'children': build_D3treeStandard(0, 99, 1, toplayer), 'name': root, 'id': "None"}))
+    return out
+
+
+def entity_info(g, max_description=300):
+    """For the drawer of the statistics page, the basics of each entity, by kind and id:
+    [title, qname, page (without .html), description (shortened), [parent ids], number of
+    children], and for properties also [domains] and [ranges], each as [id or None, name]"""
+    def short(text):
+        text = " ".join((text or "").split())
+        if len(text) > max_description:
+            text = text[:max_description].rsplit(" ", 1)[0] + "…"
+        return text
+
+    def named(entities):
+        # an entity of the graph, or a URI outside it (eg xsd:string)
+        return [[e.id, e.title] if hasattr(e, "id") else [None, uri2niceString(e, g.namespaces)]
+                for e in entities]
+
+    def info(e):
+        return [e.title, e.qname, e.slug, short(e.bestDescription()),
+                [p.id for p in e.parents()], len(e.children())]
+
+    return {
+        "classes": {c.id: info(c) for c in g.all_classes},
+        "properties": {p.id: info(p) + [named(p.domains), named(p.ranges)] for p in g.all_properties},
+        "concepts": {c.id: info(c) for c in g.all_skos_concepts},
+    }
+
 class KompleteViz(VizFactory):
     """
 
@@ -82,7 +124,8 @@ class KompleteViz(VizFactory):
                 "libs/bootswatch3_2/fonts",
                 "libs/bootstrap-3_3_7-dist",
                 "libs/jquery/1_12_4/",
-                "libs/chartjs-2_4_0"
+                "libs/chartjs-2_4_0",
+                "libs/d3-v7"
                 ]
 
     def _buildTemplates(self):
@@ -97,8 +140,19 @@ class KompleteViz(VizFactory):
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-        # DASHBOARD
-        contents = self._renderTemplate("html-multi/statistics.html", extraContext={"theme": self.theme})
+        # DASHBOARD - with the hierarchy and the density of the classes, properties and
+        # concepts, drawn as in the D3 vizs (shared/js_d3_charts.html)
+        extra_context = {"theme": self.theme}
+        charts = statistics_charts(self.ontospy_graph)
+        if charts:
+            # "</" escaped, since it goes in a <script>
+            extra_context["CHARTS"] = [(key, label) for key, label, _, _ in charts]
+            extra_context["CHARTS_DATA"] = json.dumps(
+                {key: {"bubble": bubble, "pack": pack} for key, _, bubble, pack in charts},
+                ensure_ascii=False).replace("</", "<\\/")
+            extra_context["ENTITY_INFO"] = json.dumps(
+                entity_info(self.ontospy_graph), ensure_ascii=False).replace("</", "<\\/")
+        contents = self._renderTemplate("html-multi/statistics.html", extraContext=extra_context)
         FILE_NAME = "statistics.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 

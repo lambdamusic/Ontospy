@@ -89,22 +89,6 @@
     }
 
 
-    /* TOOLTIP */
-
-    .d3-tooltip {
-        position: absolute;
-        z-index: 10;
-        display: none;
-        max-width: 400px;
-        padding: 6px 9px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.8);
-        border-radius: 4px;
-        font: 12px sans-serif;
-        pointer-events: none;
-    }
-
-
     /* SIDE PANEL */
 
     .hidden {
@@ -303,10 +287,9 @@
 	</div>
 
 
-	<div id="tooltip" class="d3-tooltip"></div>
-
-
 	<script type="text/javascript" src="{{STATIC_URL}}libs/d3-v7/d3.v7.min.js"></script>
+
+	{% include "shared/js_d3_helpers.html" %}
 
 	{% if PANEL_DATA %}
 	<script type="text/javascript">

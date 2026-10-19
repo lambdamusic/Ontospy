@@ -5,33 +5,6 @@
    (d3 v7, backlog #32 and #34) #}
 
 
-{% block custom_css %}
-
-	<style type="text/css" media="screen">
-
-		.bubble circle {
-			stroke: #999;
-			stroke-width: 0.5px;
-			cursor: pointer;
-		}
-
-		.bubble circle:hover {
-			stroke: #ff7f0e;
-			stroke-width: 2px;
-		}
-
-		.bubble text {
-			font-size: 11px;
-			pointer-events: none;
-			fill: #222;
-		}
-
-	</style>
-
-{% endblock custom_css %}
-
-
-
 {% block hint %}
 	A circle per entity, sized by its number of direct sub-entities and coloured by its parent.
 	Hover a circle to see its name, click it to see its details.
@@ -41,79 +14,12 @@
 
 {% block the_javascript %}
 
+{% include "shared/js_d3_charts.html" %}
+
 <script type="text/javascript">
-
 {% if TOTAL_OBJECTS > 0 %}
-
-	var data = {{JSON_DATA_OBJECTS|safe}};
-
-	var diameter = 960;
-
-	// the entities as a flat list of leaves: an entity with children appears once as a
-	// circle of its own, and its children carry its name as their group (see
-	// build_D3bubbleChart)
-	function flatten(root) {
-		var out = [];
-		function recurse(groupName, node) {
-			if (node.children) {
-				node.children.forEach(function(child) { recurse(node.name, child); });
-			} else {
-				out.push({group: groupName, name: node.name, qname: node.qname,
-					value: node.size, realsize: node.realsize, objid: node.objid});
-			}
-		}
-		recurse(null, root);
-		return {children: out};
-	}
-
-	var root = d3.hierarchy(flatten(data))
-		.sum(function(d) { return d.value; });
-
-	d3.pack()
-		.size([diameter, diameter])
-		.padding(1.5)(root);
-
-	var color = d3.scaleOrdinal(d3.schemeTableau10.concat(d3.schemeSet3));
-
-	var svg = d3.select("#the_graph").append("svg")
-		.attr("class", "bubble")
-		.attr("viewBox", [0, 0, diameter, diameter])
-		.attr("width", diameter)
-		.style("max-width", "100%")
-		.style("height", "auto");
-
-	var node = svg.selectAll("g")
-		.data(root.leaves())
-		.join("g")
-		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-
-	node.append("circle")
-		.attr("r", function(d) { return d.r; })
-		.attr("fill", function(d) { return color(d.data.group); })
-		.attr("fill-opacity", 0.75)
-		.on("mouseover", function(event, d) {
-			var n = d.data.realsize;
-			var extra = (n ? n + " direct sub-entities" : "") +
-				(d.data.group && d.data.group != d.data.name ? (n ? " · " : "") + "in " + d.data.group : "");
-			showTooltip(event, entityTooltip(d.data, extra));
-		})
-		.on("mousemove", function(event) { showTooltip(event); })
-		.on("mouseout", hideTooltip)
-		.on("click", function(event, d) { hideTooltip(); showpanel(d.data.objid); });
-
-	// the label inside the circle: always the name without its prefix, so that all
-	// bubbles read the same way, and only when it fits (the tooltip has the full name)
-	node.append("text")
-		.attr("dy", "0.32em")
-		.attr("text-anchor", "middle")
-		.each(function(d) {
-			if (!fitLabel(this, shortName(d.data.name) || d.data.name, 2 * d.r - 6)) {
-				d3.select(this).remove();
-			}
-		});
-
+	drawBubbleChart("#the_graph", {{JSON_DATA_OBJECTS|safe}}, showpanel);
 {% endif %}
-
 </script>
 
 {% endblock the_javascript %}

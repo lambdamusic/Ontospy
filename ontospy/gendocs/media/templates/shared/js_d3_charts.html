@@ -1,0 +1,269 @@
+{# The bubble chart and the zoomable pack, as functions, used by the D3 visualizations
+   (d3/d3_bubble_chart.html, d3/d3_pack_hierarchy.html) and by html-multi's statistics
+   page. Each draws into a container (a CSS selector) the tree built by
+   build_D3bubbleChart / build_D3treeStandard (gendocs/utils.py); a click on an entity
+   calls onSelect(objid): the D3 visualizations open the side panel, html-multi opens the
+   entity's page. Needs d3 v7 and shared/js_d3_helpers.html. #}
+
+<style type="text/css">
+
+	.bubble circle {
+		stroke: #999;
+		stroke-width: 0.5px;
+		cursor: pointer;
+	}
+
+	.bubble circle:hover {
+		stroke: #ff7f0e;
+		stroke-width: 2px;
+	}
+
+	.bubble text {
+		font-size: 11px;
+		pointer-events: none;
+		fill: #222;
+	}
+
+	.pack circle {
+		cursor: pointer;
+	}
+
+	.pack circle:hover {
+		stroke: #ff7f0e;
+		stroke-width: 1.5px;
+	}
+
+	.pack circle.focus {
+		stroke: #555;
+		stroke-width: 1px;
+	}
+
+	.pack text {
+		font-size: 12px;
+		pointer-events: none;
+		paint-order: stroke;
+		stroke: white;
+		stroke-width: 3px;
+		stroke-linejoin: round;
+		fill: #222;
+	}
+
+	.focus-bar {
+		font-size: 13px;
+		margin-bottom: 8px;
+		min-height: 1.4em;
+	}
+
+</style>
+
+<script type="text/javascript">
+
+	// the bubble chart: the entities as a flat list of circles, sized by their number of
+	// sub-entities and coloured by their parent
+	function drawBubbleChart(container, data, onSelect, diameter) {
+
+		diameter = diameter || 960;
+
+		// an entity with children appears once as a circle of its own, and its children
+		// carry its name as their group (see build_D3bubbleChart)
+		function flatten(root) {
+			var out = [];
+			function recurse(groupName, node) {
+				if (node.children) {
+					node.children.forEach(function(child) { recurse(node.name, child); });
+				} else {
+					out.push({group: groupName, name: node.name, qname: node.qname,
+						value: node.size, realsize: node.realsize, objid: node.objid});
+				}
+			}
+			recurse(null, root);
+			return {children: out};
+		}
+
+		var root = d3.hierarchy(flatten(data))
+			.sum(function(d) { return d.value; });
+
+		d3.pack()
+			.size([diameter, diameter])
+			.padding(1.5)(root);
+
+		var color = d3.scaleOrdinal(d3.schemeTableau10.concat(d3.schemeSet3));
+
+		var svg = d3.select(container).append("svg")
+			.attr("class", "bubble")
+			.attr("viewBox", [0, 0, diameter, diameter])
+			.attr("width", diameter)
+			.style("max-width", "100%")
+			.style("height", "auto");
+
+		var node = svg.selectAll("g")
+			.data(root.leaves())
+			.join("g")
+			.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+		node.append("circle")
+			.attr("r", function(d) { return d.r; })
+			.attr("fill", function(d) { return color(d.data.group); })
+			.attr("fill-opacity", 0.75)
+			.on("mouseover", function(event, d) {
+				var n = d.data.realsize;
+				var extra = (n ? n + " direct sub-entities" : "") +
+					(d.data.group && d.data.group != d.data.name ? (n ? " · " : "") + "in " + d.data.group : "");
+				showTooltip(event, entityTooltip(d.data, extra));
+			})
+			.on("mousemove", function(event) { showTooltip(event); })
+			.on("mouseout", hideTooltip)
+			.on("click", function(event, d) { hideTooltip(); onSelect(d.data.objid); });
+
+		// the label inside the circle: always the name without its prefix, so that all
+		// bubbles read the same way, and only when it fits (the tooltip has the full name)
+		node.append("text")
+			.attr("dy", "0.32em")
+			.attr("text-anchor", "middle")
+			.each(function(d) {
+				if (!fitLabel(this, shortName(d.data.name) || d.data.name, 2 * d.r - 6)) {
+					d3.select(this).remove();
+				}
+			});
+	}
+
+
+	// the zoomable pack: the hierarchy as nested circles. A click on a circle zooms into
+	// it; on the circle in focus, or on one with no children, it selects the entity; on
+	// the background it zooms out. A bar above shows the path to the circle in focus.
+	function drawPackChart(container, data, onSelect, size) {
+
+		size = size || 900;
+
+		var root = d3.pack()
+			.size([size, size])
+			.padding(3)(
+				d3.hierarchy(data)
+					.sum(function(d) { return d.children ? 0 : 1; })
+					.sort(function(a, b) { return b.value - a.value; })
+			);
+
+		var color = d3.scaleLinear()
+			.domain([0, Math.max(root.height, 1)])
+			.range(["hsl(205,60%,92%)", "hsl(220,45%,45%)"])
+			.interpolate(d3.interpolateHcl);
+
+		var focusBar = d3.select(container).append("div").attr("class", "focus-bar");
+
+		var svg = d3.select(container).append("svg")
+			.attr("class", "pack")
+			.attr("viewBox", [-size / 2, -size / 2, size, size])
+			.attr("width", size)
+			.style("max-width", "100%")
+			.style("height", "auto")
+			.style("background", "white")
+			.style("cursor", "pointer")
+			.on("click", function(event) { zoom(event, focus.parent || root); });
+
+		var circle = svg.append("g")
+			.selectAll("circle")
+			.data(root.descendants())
+			.join("circle")
+			.attr("fill", function(d) { return d.children ? color(d.depth) : "white"; })
+			.attr("stroke", function(d) { return d.children ? null : "hsl(220,30%,70%)"; })
+			.on("mouseover", function(event, d) {
+				var n = d.children ? d.children.length : 0;
+				showTooltip(event, entityTooltip(d.data, n ? n + " direct sub-entities" : ""));
+			})
+			.on("mousemove", function(event) { showTooltip(event); })
+			.on("mouseout", hideTooltip)
+			.on("click", function(event, d) {
+				event.stopPropagation();
+				hideTooltip();
+				if (focus === d || !d.children) {
+					onSelect(d.data.objid);
+				} else {
+					zoom(event, d);
+				}
+			});
+
+		var label = svg.append("g")
+			.selectAll("text")
+			.data(root.descendants())
+			.join("text")
+			.attr("dy", "0.32em")
+			.attr("text-anchor", "middle")
+			.style("display", "none")
+			.text(function(d) { return d.data.name; });
+
+		// measure the labels once, to show only those that fit their circle: the full name,
+		// else the name without its prefix
+		label.each(function(d) {
+			this.style.display = null;
+			d.labelWidth = this.getComputedTextLength();
+			d.shortLabel = shortName(d.data.name);
+			if (d.shortLabel) {
+				this.textContent = d.shortLabel;
+				d.shortWidth = this.getComputedTextLength();
+				this.textContent = d.data.name;
+			}
+			this.style.display = "none";
+		});
+
+		var focus = root;
+		var view;
+		zoomTo([root.x, root.y, root.r * 2]);
+		showLabels();
+
+
+		function zoomTo(v) {
+			var k = size / v[2];
+			view = v;
+			label.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+			circle.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+			circle.attr("r", function(d) { return d.r * k; });
+		}
+
+		// labels for the children of the circle in focus, when they fit inside their circle
+		function labelText(d) {
+			var room = 2 * d.r * size / (focus.r * 2) - 4;
+			if (d.parent !== focus) return null;
+			if (d.labelWidth <= room) return d.data.name;
+			if (d.shortLabel && d.shortWidth <= room) return d.shortLabel;
+			return null;
+		}
+
+		function showLabels() {
+			label.each(function(d) {
+				var text = labelText(d);
+				this.style.display = text ? null : "none";
+				if (text) this.textContent = text;
+			});
+			circle.classed("focus", function(d) { return d === focus; });
+			var path = focus.ancestors().reverse().map(function(d) {
+				return "<a href='#' data-depth='" + d.depth + "'>" + escapeHtml(d.data.name) + "</a>";
+			});
+			focusBar.html(path.join(" &rsaquo; ") +
+				(focus.data.objid && focus.data.objid != "None" ? " &nbsp; <a href='#' class='greylink' data-select>details</a>" : ""));
+			focusBar.selectAll("a[data-depth]").on("click", function(event) {
+				event.preventDefault();
+				var depth = +this.getAttribute("data-depth");
+				var target = focus;
+				while (target.depth > depth) target = target.parent;
+				zoom(event, target);
+			});
+			focusBar.selectAll("a[data-select]").on("click", function(event) {
+				event.preventDefault();
+				onSelect(focus.data.objid);
+			});
+		}
+
+		function zoom(event, d) {
+			focus = d;
+			label.style("display", "none");
+			var transition = svg.transition()
+				.duration(event && event.altKey ? 7500 : 750)
+				.tween("zoom", function() {
+					var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+					return function(t) { zoomTo(i(t)); };
+				});
+			transition.on("end", showLabels);
+		}
+	}
+
+</script>

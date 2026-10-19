@@ -425,3 +425,24 @@ def test_html_multi_multimodel(pizza, tmp_path):
 	assert (tmp_path / "pizza" / "sidebar.js").exists()
 	assert not (tmp_path / "pizza" / "static").exists()
 	assert 'href="../static/libs/bootswatch3_2/' in (tmp_path / "pizza" / "index.html").read_text(encoding="utf-8")
+
+
+def test_html_multi_statistics_charts(pizza, tmp_path):
+	"""the statistics page draws the hierarchy and the density of classes and properties
+	as in the D3 vizs, with the basics of each entity for a drawer; d3 is copied with the
+	static files"""
+	import json, re
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	page = (tmp_path / "statistics.html").read_text(encoding="utf-8")
+	assert "libs/d3-v7/d3.v7.min.js" in page
+	assert (tmp_path / "static" / "libs" / "d3-v7" / "d3.v7.min.js").exists()
+	assert 'id="chart-pack-classes"' in page and 'id="chart-bubble-properties"' in page
+	assert 'id="chart-pack-concepts"' not in page  # pizza has no SKOS concepts
+	info = json.loads(re.search(r"var info = (.*);\n", page).group(1))
+	veneziana = [c for c in pizza.all_classes if c.qname == "pizza.owl:Veneziana"][0]
+	title, qname, slug, description, parents, children = info["classes"][str(veneziana.id)]
+	assert (title, qname, slug) == (veneziana.title, veneziana.qname, veneziana.slug)
+	assert sorted(parents) == sorted(p.id for p in veneziana.parents())
+	assert "toplayerChart" not in page
+	# the number of triples, without a chart
+	assert "{:,}".format(pizza.triplesCount()) in page and "triplesStats" not in page

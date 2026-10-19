@@ -3,46 +3,6 @@
 {# The hierarchy as nested circles, zoomable (d3 v7, backlog #33 and #34) #}
 
 
-{% block custom_css %}
-
-	<style type="text/css" media="screen">
-
-		.pack circle {
-			cursor: pointer;
-		}
-
-		.pack circle:hover {
-			stroke: #ff7f0e;
-			stroke-width: 1.5px;
-		}
-
-		.pack circle.focus {
-			stroke: #555;
-			stroke-width: 1px;
-		}
-
-		.pack text {
-			font-size: 12px;
-			pointer-events: none;
-			paint-order: stroke;
-			stroke: white;
-			stroke-width: 3px;
-			stroke-linejoin: round;
-			fill: #222;
-		}
-
-		.focus-bar {
-			font-size: 13px;
-			margin-bottom: 8px;
-			min-height: 1.4em;
-		}
-
-	</style>
-
-{% endblock custom_css %}
-
-
-
 {% block hint %}
 	Click a circle to zoom into it, click the circle in focus (or a circle with no children) to see its details, click outside the circles to zoom out.
 {% endblock hint %}
@@ -51,142 +11,12 @@
 
 {% block the_javascript %}
 
+{% include "shared/js_d3_charts.html" %}
+
 <script type="text/javascript">
-
 {% if TOTAL_OBJECTS > 0 %}
-
-	var data = {{JSON_DATA_OBJECTS|safe}};
-
-	var size = 900;
-
-	var root = d3.pack()
-		.size([size, size])
-		.padding(3)(
-			d3.hierarchy(data)
-				.sum(function(d) { return d.children ? 0 : 1; })
-				.sort(function(a, b) { return b.value - a.value; })
-		);
-
-	var color = d3.scaleLinear()
-		.domain([0, Math.max(root.height, 1)])
-		.range(["hsl(205,60%,92%)", "hsl(220,45%,45%)"])
-		.interpolate(d3.interpolateHcl);
-
-	var focusBar = d3.select("#the_graph").append("div").attr("class", "focus-bar");
-
-	var svg = d3.select("#the_graph").append("svg")
-		.attr("class", "pack")
-		.attr("viewBox", [-size / 2, -size / 2, size, size])
-		.attr("width", size)
-		.style("max-width", "100%")
-		.style("height", "auto")
-		.style("background", "white")
-		.style("cursor", "pointer")
-		.on("click", function(event) { zoom(event, focus.parent || root); });
-
-	var circle = svg.append("g")
-		.selectAll("circle")
-		.data(root.descendants())
-		.join("circle")
-		.attr("fill", function(d) { return d.children ? color(d.depth) : "white"; })
-		.attr("stroke", function(d) { return d.children ? null : "hsl(220,30%,70%)"; })
-		.on("mouseover", function(event, d) {
-			var n = d.children ? d.children.length : 0;
-			showTooltip(event, entityTooltip(d.data, n ? n + " direct sub-entities" : ""));
-		})
-		.on("mousemove", function(event) { showTooltip(event); })
-		.on("mouseout", hideTooltip)
-		.on("click", function(event, d) {
-			event.stopPropagation();
-			hideTooltip();
-			if (focus === d || !d.children) {
-				showpanel(d.data.objid);
-			} else {
-				zoom(event, d);
-			}
-		});
-
-	var label = svg.append("g")
-		.selectAll("text")
-		.data(root.descendants())
-		.join("text")
-		.attr("dy", "0.32em")
-		.attr("text-anchor", "middle")
-		.style("display", "none")
-		.text(function(d) { return d.data.name; });
-
-	// measure the labels once, to show only those that fit their circle: the full name,
-	// else the name without its prefix
-	label.each(function(d) {
-		this.style.display = null;
-		d.labelWidth = this.getComputedTextLength();
-		d.shortLabel = shortName(d.data.name);
-		if (d.shortLabel) {
-			this.textContent = d.shortLabel;
-			d.shortWidth = this.getComputedTextLength();
-			this.textContent = d.data.name;
-		}
-		this.style.display = "none";
-	});
-
-	var focus = root;
-	var view;
-	zoomTo([root.x, root.y, root.r * 2]);
-	showLabels();
-
-
-	function zoomTo(v) {
-		var k = size / v[2];
-		view = v;
-		label.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
-		circle.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
-		circle.attr("r", function(d) { return d.r * k; });
-	}
-
-	// labels for the children of the circle in focus, when they fit inside their circle
-	function labelText(d) {
-		var room = 2 * d.r * size / (focus.r * 2) - 4;
-		if (d.parent !== focus) return null;
-		if (d.labelWidth <= room) return d.data.name;
-		if (d.shortLabel && d.shortWidth <= room) return d.shortLabel;
-		return null;
-	}
-
-	function showLabels() {
-		label.each(function(d) {
-			var text = labelText(d);
-			this.style.display = text ? null : "none";
-			if (text) this.textContent = text;
-		});
-		circle.classed("focus", function(d) { return d === focus; });
-		var path = focus.ancestors().reverse().map(function(d) {
-			return "<a href='#' data-depth='" + d.depth + "'>" + escapeHtml(d.data.name) + "</a>";
-		});
-		focusBar.html(path.join(" &rsaquo; ") +
-			(focus.data.objid ? " &nbsp; <a href=\"javascript:showpanel('" + focus.data.objid + "');\" class='greylink'>details</a>" : ""));
-		focusBar.selectAll("a[data-depth]").on("click", function(event) {
-			event.preventDefault();
-			var depth = +this.getAttribute("data-depth");
-			var target = focus;
-			while (target.depth > depth) target = target.parent;
-			zoom(event, target);
-		});
-	}
-
-	function zoom(event, d) {
-		focus = d;
-		label.style("display", "none");
-		var transition = svg.transition()
-			.duration(event && event.altKey ? 7500 : 750)
-			.tween("zoom", function() {
-				var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
-				return function(t) { zoomTo(i(t)); };
-			});
-		transition.on("end", showLabels);
-	}
-
+	drawPackChart("#the_graph", {{JSON_DATA_OBJECTS|safe}}, showpanel);
 {% endif %}
-
 </script>
 
 {% endblock the_javascript %}

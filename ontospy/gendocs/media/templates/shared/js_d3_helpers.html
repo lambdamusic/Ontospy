@@ -1,0 +1,85 @@
+{# Helpers for the D3 charts, used by the D3 visualizations (shared/d3_base.html) and by
+   the charts embedded in html-multi (shared/js_d3_charts.html): a tooltip, labels that fit
+   a width. To be included after d3, at the end of the body. #}
+
+<style type="text/css">
+	.d3-tooltip {
+		position: absolute;
+		z-index: 1050;
+		display: none;
+		max-width: 400px;
+		padding: 6px 9px;
+		color: white;
+		background-color: rgba(0, 0, 0, 0.8);
+		border-radius: 4px;
+		font: 12px sans-serif;
+		pointer-events: none;
+	}
+</style>
+
+<script type="text/javascript">
+
+	// the tooltip: showTooltip(event, html) on mouseover/mousemove, hideTooltip() on mouseout
+	var tooltipDiv = document.createElement("div");
+	tooltipDiv.className = "d3-tooltip";
+	document.body.appendChild(tooltipDiv);
+
+	function showTooltip(event, html) {
+		if (html !== undefined) {
+			tooltipDiv.innerHTML = html;
+		}
+		tooltipDiv.style.display = "block";
+		var x = event.pageX + 14,
+			y = event.pageY + 14;
+		// keep it inside the window
+		var maxX = window.scrollX + document.documentElement.clientWidth - tooltipDiv.offsetWidth - 10;
+		tooltipDiv.style.left = Math.min(x, maxX) + "px";
+		tooltipDiv.style.top = y + "px";
+	}
+
+	function hideTooltip() {
+		tooltipDiv.style.display = "none";
+	}
+
+	// a label that fits a width: the full name, else the part after the prefix
+	// (eg "AmericanHot" for "pizza.owl:AmericanHot"), else none
+	function shortName(name) {
+		var i = String(name).lastIndexOf(":");
+		return i > 0 && i < name.length - 1 ? name.slice(i + 1) : null;
+	}
+
+	function fitLabel(textEl, name, width) {
+		textEl.textContent = name;
+		if (textEl.getComputedTextLength() <= width) {
+			return true;
+		}
+		var shorter = shortName(name);
+		if (shorter) {
+			textEl.textContent = shorter;
+			if (textEl.getComputedTextLength() <= width) {
+				return true;
+			}
+		}
+		textEl.textContent = "";
+		return false;
+	}
+
+	// text for the tooltip: the title, and the qname if different
+	function escapeHtml(s) {
+		return String(s == null ? "" : s).replace(/[&<>"']/g, function(c) {
+			return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+		});
+	}
+
+	function entityTooltip(data, extra) {
+		var html = "<b>" + escapeHtml(data.name) + "</b>";
+		if (data.qname && data.qname != data.name) {
+			html += "<br>" + escapeHtml(data.qname);
+		}
+		if (extra) {
+			html += "<br><span style='color: #ccc'>" + escapeHtml(extra) + "</span>";
+		}
+		return html;
+	}
+
+</script>
