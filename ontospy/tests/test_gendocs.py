@@ -102,6 +102,30 @@ def test_html_single_not_too_wide(pizza, tmp_path):
 	assert "3000em" not in (tmp_path / "index.html").read_text(encoding="utf-8")
 
 
+RDF_PROPERTY_TTL = """
+@prefix ex: <http://example.org/p#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+ex:Thing a owl:Class .
+ex:plain a rdf:Property ; rdfs:domain ex:Thing ; rdfs:comment "Only an rdf:Property." .
+ex:linked a owl:ObjectProperty ; rdfs:domain ex:Thing ; rdfs:range ex:Thing .
+"""
+
+
+def test_html_single_other_properties(tmp_path):
+	"""#39: a property typed only rdf:Property had no section in the single page, as
+	most of QUDT's; now it has one, under Other Properties, and an A-Z entry"""
+	g = Ontospy(data=RDF_PROPERTY_TTL, rdf_format="turtle")
+	build_visualization(g, 0, path=str(tmp_path))
+	page = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert '<a href="#otherproperties">Other properties</a>' in page
+	assert 'Property: <a name="ex:plain"' in page
+	assert "Only an rdf:Property." in page
+	assert 'Object Property: <a name="ex:linked"' in page
+	assert page.count('<a name="ex:linked"') == 1  # not repeated under Other Properties
+
+
 def test_html_multi_individual_pages(pizza, tmp_path):
 	"""issue #134: the multi page html had no pages for individuals (the build crashed before writing them)"""
 	build_visualization(pizza, 1, path=str(tmp_path))
