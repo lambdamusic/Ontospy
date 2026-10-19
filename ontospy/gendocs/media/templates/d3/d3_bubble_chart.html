@@ -101,13 +101,13 @@
 		.on("mouseout", hideTooltip)
 		.on("click", function(event, d) { hideTooltip(); showpanel(d.data.objid); });
 
-	// the label inside the circle only when it fits, else the name without its prefix,
-	// else none (the tooltip has it anyway)
+	// the label inside the circle: always the name without its prefix, so that all
+	// bubbles read the same way, and only when it fits (the tooltip has the full name)
 	node.append("text")
 		.attr("dy", "0.32em")
 		.attr("text-anchor", "middle")
 		.each(function(d) {
-			if (!fitLabel(this, d.data.name, 2 * d.r - 6)) {
+			if (!fitLabel(this, shortName(d.data.name) || d.data.name, 2 * d.r - 6)) {
 				d3.select(this).remove();
 			}
 		});
