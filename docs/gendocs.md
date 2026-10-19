@@ -76,13 +76,13 @@ The visualizations, as listed by `--showtypes`; `--type` takes the number or the
 | `--type` | ID | Output |
 |---|---|---|
 | 1 | `html-simple` | Html, a single page with the whole vocabulary |
-| 2 | `html-complex` | Html, a page per entity, with trees, an A–Z index, statistics and SHACL shapes. What the [examples](https://lambdamusic.github.io/ontospy-examples/index.html) use |
+| 2 | `html-complex` | Html, a page per entity, with trees, an A–Z index, statistics and SHACL shapes. What the [examples](https://lambdamusic.github.io/ontospy-examples/index.html) use. The sidebar's list of entities is in `sidebar.js`, next to the pages, and is shown with JavaScript |
 | 3 | `markdown` | Markdown, a file per entity, eg for a wiki or a Git repository |
 | 4 | `d3-dendogram` | D3 dendrogram: collapsible trees of classes, properties and concepts |
 | 5 | `d3-bubble-chart` | D3 bubble chart: shows where an ontology has most subclasses |
 | 6 | `d3-pack-hierarchy` | D3 pack hierarchy: the hierarchy as nested circles, click to zoom |
 
-Four interactive visualizations were removed in 2.6 (bar hierarchy, partition table, rotating cluster and the Sigma.js force-directed graph, `--type` 7 to 10). Their numbers aren't reused for now, so asking for one fails with a message rather than building something else.
+Four interactive visualizations were removed in 2.6 (bar hierarchy, partition table, rotating cluster and the Sigma.js force-directed graph, `--type` 7 to 10). Their numbers aren't reused for now, so asking for one fails with a message rather than building something else: new visualizations are numbered from 11.
 
 By default, files already in the output folder are kept and overwritten when needed; Ontospy warns about files it didn't write, eg left over from an earlier build. Use `--emptyfolder` to clear the folder first.
 

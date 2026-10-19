@@ -24,9 +24,15 @@ except:  # Mother of all exceptions
     raise
 
 
+def viz_number(index):
+    """the --type number of the viz at this index of VISUALIZATIONS_LIST: its position
+    from 1, unless the viz has a "Number" (see CONFIG.py)"""
+    return VISUALIZATIONS_LIST[index].get('Number', index + 1)
+
+
 def show_types():
     for n, t in enumerate(VISUALIZATIONS_LIST):
-        printInfo("%d. %s (%s)" % (n + 1, t['Title'], t['ID']), "green")
+        printInfo("%d. %s (%s)" % (viz_number(n), t['Title'], t['ID']), "green")
     printInfo("Note: select a viz type by its number or its ID, eg 4 or d3-dendogram.",
                "comment")
 
@@ -67,9 +73,8 @@ def ask_visualization():
         "important")
     while True:
         text = ""
-        for viz in VISUALIZATIONS_LIST:
-            text += "%d) %s\n" % (VISUALIZATIONS_LIST.index(viz) + 1,
-                                  viz['Title'])
+        for n, viz in enumerate(VISUALIZATIONS_LIST):
+            text += "%d) %s\n" % (viz_number(n), viz['Title'])
         var = input(text + ">")
         if var == "q":
             return ""
@@ -81,9 +86,9 @@ def ask_visualization():
 
 
 def _viz_index(choice):
-    """the index in VISUALIZATIONS_LIST of a viz given by its number (from 1, as listed
-    by show_types) or its ID; None if there is no such viz. Numbers below 1 are rejected:
-    they used to index the list from the end, so 0 picked the last viz (#25)"""
+    """the index in VISUALIZATIONS_LIST of a viz given by its number (as listed by
+    show_types, see viz_number) or its ID; None if there is no such viz. Numbers below 1
+    are rejected: they used to index the list from the end, so 0 picked the last viz (#25)"""
     choice = str(choice).strip()
     ids = [v['ID'] for v in VISUALIZATIONS_LIST]
     if choice in ids:
@@ -92,8 +97,9 @@ def _viz_index(choice):
         n = int(choice)
     except ValueError:
         return None
-    if 1 <= n <= len(VISUALIZATIONS_LIST):
-        return n - 1
+    for index in range(len(VISUALIZATIONS_LIST)):
+        if viz_number(index) == n:
+            return index
     return None
 
 

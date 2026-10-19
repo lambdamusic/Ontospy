@@ -5,6 +5,11 @@
 # ==================
 # VIZ HTML MULTI - html visualization with multiple files, one per entity
 # ==================
+#
+# The sidebar's list of entities is written once, in sidebar.js, and built in the browser
+# (templates/html-multi/sidebar.html), rather than repeated in every page, which made the
+# output grow with the square of the number of entities: 1.6 GB for Brick, 27 GB for
+# FOVT (backlog #21).
 
 import os, sys
 import json
@@ -33,6 +38,27 @@ def is_class_defined_as_shacl_node_shape(entity) -> bool:
     return (is_NodeShape and is_Class)
 
 
+def sidebar_js(g):
+    """The entities of the sidebar, as a script defining SIDEBAR: for each section a list
+    of [id, title, page (without .html), qname], the qname left out when it's the title"""
+    def entries(entities):
+        out = []
+        for e in entities:
+            entry = [e.id, e.title, e.slug]
+            if e.qname != e.title:
+                entry.append(e.qname)
+            out.append(entry)
+        return out
+    data = {
+        "classes": entries(g.all_classes),
+        "properties": entries(g.all_properties),
+        "concepts": entries(g.all_skos_concepts),
+        "individuals": entries(g.all_individuals),
+    }
+    # "</" escaped, in case the file is ever inlined in a <script>
+    return ("var SIDEBAR = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
+
+
 class KompleteViz(VizFactory):
     """
 
@@ -48,19 +74,24 @@ class KompleteViz(VizFactory):
         """
         super(KompleteViz, self).__init__(ontospy_graph, title, *args, **kwargs)
         self.non_redundant = non_redundant
+        self.theme = validate_theme(theme)
+        # only the chosen Bootswatch theme, not all of them
         self.static_files = [
                 "custom",
-                "libs/bootswatch3_2",
+                "libs/bootswatch3_2/" + self.theme,
+                "libs/bootswatch3_2/fonts",
                 "libs/bootstrap-3_3_7-dist",
                 "libs/jquery/1_12_4/",
                 "libs/chartjs-2_4_0"
                 ]
-        self.theme = validate_theme(theme)
 
     def _buildTemplates(self):
         """
         OVERRIDING THIS METHOD from Factory
         """
+        # SIDEBAR - the entities, for all pages
+        self._save2File(sidebar_js(self.ontospy_graph).encode("utf-8"), "sidebar.js", self.output_path)
+
         # INDEX - MAIN PAGE
         contents = self._renderTemplate("html-multi/index.html", extraContext={"theme": self.theme, "index_page_flag" : True})
         FILE_NAME = "index.html"
