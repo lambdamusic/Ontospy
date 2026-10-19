@@ -1,0 +1,13 @@
+# Line endings: git stores text files with LF (Unix) line endings, whatever the editor
+# or OS writes, so that a file can't be silently converted and show every line as
+# changed (backlog #38). Binary files are left alone.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.pickle binary
