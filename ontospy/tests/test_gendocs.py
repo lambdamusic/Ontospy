@@ -126,6 +126,18 @@ def test_html_single_other_properties(tmp_path):
 	assert page.count('<a name="ex:linked"') == 1  # not repeated under Other Properties
 
 
+def test_no_protocol_relative_urls():
+	"""#36: the Bootswatch themes imported Google Fonts as //fonts.googleapis.com, which
+	fails when the docs are opened from disk (file://)"""
+	import glob
+	from ..gendocs.actions import ONTODOCS_VIZ_STATIC
+	css = glob.glob(os.path.join(ONTODOCS_VIZ_STATIC, "**", "*.css"), recursive=True)
+	assert css
+	for f in css:
+		with open(f, encoding="utf-8") as fh:
+			assert 'url("//' not in fh.read(), f
+
+
 def test_html_multi_individual_pages(pizza, tmp_path):
 	"""issue #134: the multi page html had no pages for individuals (the build crashed before writing them)"""
 	build_visualization(pizza, 1, path=str(tmp_path))
