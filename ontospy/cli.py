@@ -204,7 +204,7 @@ def scan(ctx, sources=None, endpoint=False, raw=False, extra=False, individuals=
 @click.option(
     '--type',
     help=
-    'VIZ-TYPE: specify which viz type to use as an integer (eg 1=single-page html, 2=multi-page etc..).'
+    'VIZ-TYPE: specify which viz type to use, by its number or ID (eg 1 or html-simple for single-page html, 2 or html-complex for multi-page). See --showtypes.'
 )
 @click.option(
     '--title',
@@ -300,6 +300,10 @@ def gendocs(ctx,
     if source and len(source) > 1:
         printDebug(
             'Note: currently only one argument can be passed', fg='red')
+
+    if source and is_missing_file(source[0]):
+        printDebug("File not found: <%s>" % source[0], fg="red")
+        sys.exit(1)
 
     if lib:
         printDebug("Local library => '%s'" % get_home_location(), fg='white')
@@ -532,7 +536,8 @@ def ser(ctx, source, output_format, verbose=False):
         if not validate_format_string(output_format):
             return
         else:
-            action_serialize(source, output_format, verbose)
+            if not action_serialize(source, output_format, verbose):
+                sys.exit(1)
             eTime = time.time()
             tTime = eTime - sTime
             printDebug(

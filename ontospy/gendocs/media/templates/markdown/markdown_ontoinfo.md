@@ -118,5 +118,14 @@ Prefix   | URI      |
 
 {% endif %}
 
+{% if ontospy_graph.all_shapes %}
+#### Shapes ({{ontospy_graph.all_shapes|length}})
+
+{% for each in ontospy_graph.all_shapes  %}
+- [{{each.title}}]({{each.slug}}.md "Open")
+{% endfor %}
+
+{% endif %}
+
 
 {% endblock main_column %}

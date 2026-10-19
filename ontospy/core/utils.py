@@ -39,6 +39,13 @@ def is_http(stringa):
     return False
 
 
+def is_missing_file(location):
+    """True if <location> is a local path (not a URL, eg http:// or file://, nor a
+    www. address, which the loader treats as http://) and nothing exists there (#31)"""
+    return isinstance(location, str) and "://" not in location \
+        and not location.startswith("www.") and not os.path.exists(location)
+
+
 def safe_str(u, errors="replace"):
     """Safely print the given string.
 
@@ -941,7 +948,11 @@ def try_sort_fmt_opts(rdf_format_opts_list, uri):
         return ['turtle', 'n3', 'nt', 'json-ld', 'rdfa', 'xml']
     elif file_extension == ".xml" or file_extension == ".rdf":
         return ['xml', 'turtle', 'n3', 'nt', 'json-ld', 'rdfa']
-    elif file_extension == ".nt" or file_extension == ".n3":
+    elif file_extension == ".nt":
+        # N-Triples first: it's a subset of N3, but rdflib's N3 parser is slower and
+        # issues a DeprecationWarning per triple
+        return ['nt', 'n3', 'turtle', 'xml', 'json-ld', 'rdfa']
+    elif file_extension == ".n3":
         return ['n3', 'nt', 'turtle', 'xml', 'json-ld', 'rdfa']
     elif file_extension == ".json" or file_extension == ".jsonld":
         return [

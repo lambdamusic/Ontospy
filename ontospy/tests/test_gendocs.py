@@ -14,7 +14,7 @@ import os
 import pytest
 
 from .. import Ontospy
-from ..gendocs.actions import build_visualization
+from ..gendocs.actions import build_visualization, select_visualization, ask_visualization
 from ..gendocs.CONFIG import VISUALIZATIONS_LIST
 from .context import TEST_RDF_FOLDER
 
@@ -28,10 +28,6 @@ VIZ_CLASSES = {
 	"d3-dendogram": ("viz_d3dendogram", "Dataviz"),
 	"d3-bubble-chart": ("viz_d3bubble_chart", "Dataviz"),
 	"d3-pack-hierarchy": ("viz_d3pack_hierarchy", "Dataviz"),
-	"d3-bar-hierarchy": ("viz_d3bar_hierarchy", "Dataviz"),
-	"d3-partition-table": ("viz_d3partition_table", "Dataviz"),
-	"d3-rotating-cluster": ("viz_d3rotating_cluster", "Dataviz"),
-	"sigma-force-directed": ("viz_sigmajs", "Dataviz"),
 }
 
 
@@ -60,6 +56,86 @@ def test_build_with_individuals(pizza, viz_index, viz_id, tmp_path):
 	url = build_visualization(pizza, viz_index, path=str(tmp_path))
 	assert url
 	assert "Italy" in read_all_output(tmp_path)
+
+
+def test_kept_visualizations():
+	"""#25: the six kept, with their --type numbers unchanged"""
+	assert [v for _, v in VIZ_TYPES] == ["html-simple", "html-complex", "markdown",
+		"d3-dendogram", "d3-bubble-chart", "d3-pack-hierarchy"]
+
+
+@pytest.mark.parametrize("choice,expected", [("1", 0), ("6", 5), (4, 3), (" 2 ", 1),
+	("d3-dendogram", 3), ("markdown", 2)])
+def test_select_visualization(choice, expected):
+	"""#25: a viz is chosen by its number (from 1) or by its ID"""
+	assert select_visualization(choice) == expected
+
+
+@pytest.mark.parametrize("choice", ["0", "-1", "11", "x", "", "d3-nope"])
+def test_select_visualization_invalid(choice, capsys):
+	"""#25: 0 and -1 used to pick the last vizs, by indexing the list from the end"""
+	with pytest.raises(SystemExit) as e:
+		select_visualization(choice)
+	assert e.value.code == 1
+	assert "Invalid viz-type option" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("choice", ["7", "8", "9", "10", "d3-bar-hierarchy", "sigma-force-directed"])
+def test_select_removed_visualization(choice, capsys):
+	"""#25: the removed vizs fail with a message saying so, rather than as invalid"""
+	with pytest.raises(SystemExit) as e:
+		select_visualization(choice)
+	assert e.value.code == 1
+	assert "was removed in Ontospy 2.6" in capsys.readouterr().err
+
+
+def test_ask_visualization_rejects_zero(monkeypatch):
+	"""#25: the interactive menu had the same bug: 0 picked the last viz"""
+	answers = iter(["0", "11", "4"])
+	monkeypatch.setattr("builtins.input", lambda prompt="": next(answers))
+	assert ask_visualization() == 3
+
+
+def test_html_single_not_too_wide(pizza, tmp_path):
+	"""#35: a fixed 3000em width on the class trees made the page ~48,000px wide"""
+	build_visualization(pizza, 0, path=str(tmp_path))
+	assert "3000em" not in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
+RDF_PROPERTY_TTL = """
+@prefix ex: <http://example.org/p#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+ex:Thing a owl:Class .
+ex:plain a rdf:Property ; rdfs:domain ex:Thing ; rdfs:comment "Only an rdf:Property." .
+ex:linked a owl:ObjectProperty ; rdfs:domain ex:Thing ; rdfs:range ex:Thing .
+"""
+
+
+def test_html_single_other_properties(tmp_path):
+	"""#39: a property typed only rdf:Property had no section in the single page, as
+	most of QUDT's; now it has one, under Other Properties, and an A-Z entry"""
+	g = Ontospy(data=RDF_PROPERTY_TTL, rdf_format="turtle")
+	build_visualization(g, 0, path=str(tmp_path))
+	page = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert '<a href="#otherproperties">Other properties</a>' in page
+	assert 'Property: <a name="ex:plain"' in page
+	assert "Only an rdf:Property." in page
+	assert 'Object Property: <a name="ex:linked"' in page
+	assert page.count('<a name="ex:linked"') == 1  # not repeated under Other Properties
+
+
+def test_no_protocol_relative_urls():
+	"""#36: the Bootswatch themes imported Google Fonts as //fonts.googleapis.com, which
+	fails when the docs are opened from disk (file://)"""
+	import glob
+	from ..gendocs.actions import ONTODOCS_VIZ_STATIC
+	css = glob.glob(os.path.join(ONTODOCS_VIZ_STATIC, "**", "*.css"), recursive=True)
+	assert css
+	for f in css:
+		with open(f, encoding="utf-8") as fh:
+			assert 'url("//' not in fh.read(), f
 
 
 def test_html_multi_individual_pages(pizza, tmp_path):

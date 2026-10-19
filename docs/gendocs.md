@@ -41,8 +41,10 @@ Options:
                          by default ontospy extracts only instances of
                          explicitly declared classes. Use with -x option to
                          get all possible instances.
-  --type TEXT            VIZ-TYPE: specify which viz type to use as an integer
-                         (eg 1=single-page html, 2=multi-page etc..).
+  --type TEXT            VIZ-TYPE: specify which viz type to use, by its
+                         number or ID (eg 1 or html-simple for single-page
+                         html, 2 or html-complex for multi-page). See
+                         --showtypes.
   --title TEXT           TITLE: custom title for the visualization
                          (default=graph uri).
   --theme TEXT           THEME: select bootstrap style (only for the html-
@@ -68,6 +70,19 @@ Options:
   -v, --verbose          VERBOSE: print out debug messages.
   -h, --help             Show this message and exit.
 ```
+
+The visualizations, as listed by `--showtypes`; `--type` takes the number or the ID:
+
+| `--type` | ID | Output |
+|---|---|---|
+| 1 | `html-simple` | Html, a single page with the whole vocabulary |
+| 2 | `html-complex` | Html, a page per entity, with trees, an A–Z index, statistics and SHACL shapes. What the [examples](https://lambdamusic.github.io/ontospy-examples/index.html) use |
+| 3 | `markdown` | Markdown, a file per entity, eg for a wiki or a Git repository |
+| 4 | `d3-dendogram` | D3 dendrogram: collapsible trees of classes, properties and concepts |
+| 5 | `d3-bubble-chart` | D3 bubble chart: shows where an ontology has most subclasses |
+| 6 | `d3-pack-hierarchy` | D3 pack hierarchy: the hierarchy as nested circles, click to zoom |
+
+Four interactive visualizations were removed in 2.6 (bar hierarchy, partition table, rotating cluster and the Sigma.js force-directed graph, `--type` 7 to 10). Their numbers aren't reused for now, so asking for one fails with a message rather than building something else.
 
 By default, files already in the output folder are kept and overwritten when needed; Ontospy warns about files it didn't write, eg left over from an earlier build. Use `--emptyfolder` to clear the folder first.
 

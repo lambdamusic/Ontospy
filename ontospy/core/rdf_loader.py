@@ -144,7 +144,7 @@ class RDFLoader(object):
     def load_uri(self, uri):
         """Load a single resource into the graph for this object. 
 
-        Approach: try loading into a temporary graph first, if that succeeds merge it into the main graph. This allows to deal with the JSONLD loading issues which can solved only by using a  ConjunctiveGraph (https://github.com/RDFLib/rdflib/issues/436). Also it deals with the RDFA error message which seems to stick into a graph even if the parse operation fails. 
+        Approach: try loading into a temporary graph first, if that succeeds merge it into the main graph. This allows to deal with JSON-LD named graphs (see `_parse_jsonld`). Also it deals with the RDFA error message which seems to stick into a graph even if the parse operation fails. 
         
         TODO the final merge operation can be improved as graph-set operations involving blank nodes could case collisions (https://rdflib.readthedocs.io/en/stable/merging.html)  
 
@@ -156,6 +156,12 @@ class RDFLoader(object):
         if self.verbose: printDebug("Reading: <%s>" % uri, fg="green")
         success = False
 
+        if is_missing_file(uri):
+            # say so, rather than try every serialization and report a parse error (#31)
+            printDebug("----------\nFile not found: <%s>\n----------" % uri, "red")
+            self.sources_invalid += [uri]
+            return
+
         sorted_fmt_opts = try_sort_fmt_opts(self.rdf_format_opts, uri)
 
         for f in sorted_fmt_opts:
@@ -163,17 +169,10 @@ class RDFLoader(object):
                 printDebug(".. trying rdf serialization: <%s>" % f)
             try:
                 if f == 'json-ld':
-                    if self.verbose:
-                        printDebug(
-                            "Detected JSONLD - loading data into rdflib.ConjunctiveGraph()",
-                            fg='green')
-                    temp_graph = rdflib.ConjunctiveGraph()
-                    # ConjunctiveGraph doesn't take `bind_namespaces`, so set it on its manager
-                    temp_graph.namespace_manager = rdflib.namespace.NamespaceManager(
-                        temp_graph, bind_namespaces="core")
+                    temp_graph = self._parse_jsonld(source=uri)
                 else:
                     temp_graph = rdflib.Graph(bind_namespaces="core")
-                temp_graph.parse(uri, format=f)
+                    temp_graph.parse(uri, format=f)
                 self._remember_prefixes(temp_graph)
                 if self.verbose: printDebug("..... success!", bold=True)
                 success = True
@@ -189,6 +188,29 @@ class RDFLoader(object):
         if not success == True:
             self.loading_failed(sorted_fmt_opts, uri=uri)
             self.sources_invalid += [uri]
+
+    def _parse_jsonld(self, **source):
+        """Parse JSON-LD (`source=` a location, or `data=` a string) into a plain Graph
+        holding all its triples.
+
+        JSON-LD can put triples in named graphs (a `@graph` with an `@id`), and parsing
+        into a plain Graph silently drops those (https://github.com/RDFLib/rdflib/issues/436).
+        So parse into a Dataset whose default graph is the union of all its graphs, then
+        flatten that into a Graph: ontospy works on triples, not on which graph they're in.
+        A Dataset rather than the ConjunctiveGraph used before, which rdflib 7 deprecates (#7).
+        """
+        if self.verbose:
+            printDebug("Detected JSONLD - loading data into rdflib.Dataset()", fg='green')
+        dataset = rdflib.Dataset(default_union=True)
+        # Dataset doesn't take `bind_namespaces`, so set it on its manager
+        dataset.namespace_manager = rdflib.namespace.NamespaceManager(
+            dataset, bind_namespaces="core")
+        dataset.parse(format="json-ld", **source)
+        graph = rdflib.Graph(bind_namespaces="core")
+        for prefix, namespace in dataset.namespaces():
+            graph.bind(prefix, namespace, override=True, replace=True)
+        graph += dataset.triples((None, None, None))
+        return graph
 
     def load_data(self, data, label=None, rdf_format_opts=None):
         """Load a string containing RDF into the graph for this object.
@@ -206,11 +228,11 @@ class RDFLoader(object):
             if self.verbose:
                 printDebug(".. trying rdf serialization: <%s>" % f)
             try:
-                # TODO ??
-                # if f == 'json-ld':
-                #     self._fix_default_graph_for_jsonld()
-                temp_graph = rdflib.Graph(bind_namespaces="core")
-                temp_graph.parse(data=data, format=f)
+                if f == 'json-ld':
+                    temp_graph = self._parse_jsonld(data=data)
+                else:
+                    temp_graph = rdflib.Graph(bind_namespaces="core")
+                    temp_graph.parse(data=data, format=f)
                 self._remember_prefixes(temp_graph)
                 self.rdflib_graph = self.rdflib_graph + temp_graph
                 if self.verbose: printDebug("..... success!")

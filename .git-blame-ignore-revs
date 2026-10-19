@@ -1,0 +1,5 @@
+# Commits that `git blame` should skip: mechanical changes, eg line endings.
+# GitHub uses this file automatically; locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Line endings: core/actions.py from CRLF to LF (backlog #38)
+03b3255cc35276970036ff2f90ff3b00afcbf08d

@@ -726,6 +726,8 @@ class Ontospy(object):
 
 		# add more data
 		shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
+		# by exact URI, for the implicit class targets below
+		classes_by_uri = {c.uri: c for c in self.all_classes}
 
 		for aShape in self.all_shapes:
 
@@ -742,11 +744,12 @@ class Ontospy(object):
 					aShape.targetClasses += [aclass]
 					aclass.all_shapes += [aShape]
 
-					#add shaped properties of this class. later can be used for ontodocs
-					for propertyUri in aShape.getValuesForProperty(shacl['path']): 
-						propType = self.get_property(str(propertyUri))
-						if propType:
-							aclass.shapedProperties += [{'shape': aShape, 'property': propType}]
+			# implicit class target (SHACL 2.1.3.3): a class that is also a node shape,
+			# as in SPDX or QUDT (moved here from shacl_helper, backlog #30)
+			aclass = classes_by_uri.get(aShape.uri)
+			if aclass and aclass not in aShape.targetClasses:
+				aShape.targetClasses += [aclass]
+				aclass.all_shapes += [aShape]
 
 
 
@@ -997,12 +1000,39 @@ class Ontospy(object):
 	# methods for retrieving objects
 	# ================
 
-	def _get_defined_entity(self, id=None, uri=None, match=None, candidates_list=None):
+	def _uri_index(self, name, candidates_list):
+		"""
+		A dict from lowercased URI to entity for <candidates_list>, eg self.all_classes, so
+		that looking up a URI doesn't scan the whole list: during loading that made building
+		a large ontology quadratic (backlog #13). As with a scan, the first entity in the
+		list wins when URIs differ only by case.
+
+		The index is kept per list under <name> and follows the list: it's rebuilt when the
+		attribute is assigned a new list (eg sorted), and extended when entities are
+		appended to it, as the build_* methods do while creating entities.
+		"""
+		indexes = self.__dict__.setdefault("_uri_indexes", {})
+		entry = indexes.get(name)
+		if entry is None or entry[0] is not candidates_list or entry[1] > len(candidates_list):
+			entry = [candidates_list, 0, {}]
+			indexes[name] = entry
+		if entry[1] < len(candidates_list):
+			index = entry[2]
+			for x in candidates_list[entry[1]:]:
+				index.setdefault(x.uri.lower(), x)
+			entry[1] = len(candidates_list)
+		return entry[2]
+
+	def _get_defined_entity(self, id=None, uri=None, match=None, candidates_list=None,
+							index_name=None):
 		"""Inner method to help matching uris or strings to entities that have been added 
 		to Ontospy. 
 
 		candidates_list
 			A list of entities, eg self.all_classes, self.all_properties, self.all_skos_concepts
+		index_name
+			A name for <candidates_list>, eg "classes", to look URIs up in an index of it
+			rather than scanning it (see _uri_index)
 		"""
 
 		if not id and not uri and not match:
@@ -1027,6 +1057,8 @@ class Ontospy(object):
 					if match.lower() in x.uri.lower():
 						res += [x]
 			return res
+		elif uri and not id and index_name:
+			return self._uri_index(index_name, candidates_list).get(uri.lower())
 		else:
 			for x in candidates_list:
 				if id and x.id == id:
@@ -1059,7 +1091,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_classes)
+			candidates_list=self.all_classes,
+			index_name="classes")
 
 
 	def get_property(self, id=None, uri=None, match=None):
@@ -1069,7 +1102,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_properties)
+			candidates_list=self.all_properties,
+			index_name="properties")
 
 
 	def get_individual(self, id=None, uri=None, match=None):
@@ -1079,7 +1113,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_individuals)
+			candidates_list=self.all_individuals,
+			index_name="individuals")
 
 
 	def get_skos(self, id=None, uri=None, match=None):
@@ -1089,7 +1124,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_skos_concepts)
+			candidates_list=self.all_skos_concepts,
+			index_name="skos_concepts")
 
 	def get_shapes(self, id=None, uri=None, match=None):
 		"""Get the saved shacl shapes with given ID or via other methods...
@@ -1098,7 +1134,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_shapes)
+			candidates_list=self.all_shapes,
+			index_name="shapes")
 
 	def get_ontology(self, id=None, uri=None, match=None):
 		"""Get the saved-ontology with given ID or via other methods...
@@ -1107,7 +1144,8 @@ class Ontospy(object):
 			id=id, 
 			uri=uri, 
 			match=match, 
-			candidates_list=self.all_ontologies)
+			candidates_list=self.all_ontologies,
+			index_name="ontologies")
 
 	def get_any_entity(self, id=None, uri=None, match=None):
 		"""Get any entity-type with given ID or via other methods...

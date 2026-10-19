@@ -5,6 +5,7 @@
 
 
 {% extends "html-multi/base.html" %}
+{% import "html-multi/browser/shacl_macros.html" as shacl %}
 
 
 {% block navbar %}
@@ -154,18 +155,19 @@
     {% endif %}
 
 
-    {# Target classes panel #}
-    {% if each.targetClasses %}
+    {# Targets panel: what the shape applies to. A class not defined in this graph (eg
+       the DCAT-AP shapes target DCAT's classes) is shown in italics, without a link #}
+    {% if each.targets %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Target Classes ({{each.targetClasses|length}})</h3>
+              <h3 class="panel-title">Targets ({{each.targets|length}})</h3>
             </div>
             <div class="panel-body">
-              {% for s in each.targetClasses %}
-                <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
-                {% endfor %}
+              {% for kind, t in each.targets %}
+                <li>{{ shacl.term(t) }} <small class="text-muted">{{kind}}</small></li>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -173,85 +175,62 @@
     {% endif %}
 
 
-    {# Usage panel - the main panel #}
-    {# comment 
-    The OntoShape object may have zero, one or more target classes, which are OntoClass objects.
-    In practice, all our OntoShapes have exactly one target class, and we
-       use this class's shacl properties to populate this panel
-
-    If the OntoShape has no target classes, we skip this panel.
-    If the OntoShape has multiple target classes, we use the first one and ignore the rest.
-    #}
-    
-    {% if each.targetClasses %}       {# each is an OntoShape which may have target classes #}
-      {% set targetClass = each.targetClasses.0 %}   {# targetClass is an OntoClass object for the first target class #}
-        <div class="row">
-          <div class="col-md-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Shape Properties</h3>
-              </div>
-              <div class="panel-body" style="overflow: auto;">
-                <p>Instances of {{targetClass.qname}} can have the following properties:</p>
-              </div>
-              <table class="table table-bordered" style="overflow: auto;">
-                <tr class="table-classproperties">   {# Table header row #}
-                    <th><p style="text-align:center;">PROPERTY</p></th>
-                    <th><p style="text-align:center;">MIN COUNT</p></th>
-                    <th><p style="text-align:center;">MAX COUNT</p></th>
-                    <th><p style="text-align:center;">TYPE</p></th>
-                </tr>
-                {% for constraint in targetClass.shacl_constraints  %}   {# constraint is a Constraint object #}
-                  <tr>
-                    {% if constraint.header %} {# THIS ROW CONTAINS ONLY THE HEADER #}
-                      <td colspan="5">
-                        <small class="label label-info label-xs">{{constraint.header}}</small>
-                      </td>
-                        
-                    {% else %}   {# THIS ROW CONTAINS ALL THE COLUMNS #}
-                      <td>   {# PROPERTY #}
-                        {% set prop = constraint.property_obj.onto_property  %}
-                          <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
-                        
-                      </td>
- 
-                      <td>     {# MIN COUNT #}
-                        {{constraint.sh_minCount|join(", ")|default("0")}}
-                      </td>
- 
-                      <td>     {# MAX COUNT #}
-                        {{constraint.sh_maxCount|join(", ")|default("*")}}
-                      </td>
-                        
-                      <td>     {# LOCAL TYPE #}
-                        {% for value in constraint.sh_datatype %}
-                          {% if value.onto_class %}
-                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
-                          {% else %}
-                            <i>{{value.qname}}</i>
-                          {% endif %} 
-                            <br>
-                        {% endfor %}
-                        {% for value in constraint.sh_class %}
-                          {% if value.onto_class %}
-                            <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
-                          {% else %}
-                            <i>{{value.qname}}</i>
-                          {% endif %} 
-                          <br>
-                        {% endfor %}
-                      </td>
-                    {% endif %}
-                  </tr>
-                {% endfor %}
-
-              </table>
+    {# Used by panel: for a property shape, the node shapes that use it #}
+    {% if each.used_by %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Used By ({{each.used_by|length}})</h3>
+            </div>
+            <div class="panel-body">
+              {% for t in each.used_by %}
+                <li>{{ shacl.term(t) }}</li>
+              {% endfor %}
             </div>
           </div>
         </div>
-      
+      </div>
     {% endif %}
-    
+
+
+    {# Node constraints panel: constraints on the focus node itself, eg sh:closed #}
+    {% if each.node_constraints %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Node Constraints</h3>
+            </div>
+            <div class="panel-body">
+              {{ shacl.constraint_list(each.node_constraints) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
+    {# Property constraints panel: the shape's own property shapes (or, for a property
+       shape, the shape itself), see ontospy/core/shacl_helper.py #}
+    {% if each.shacl_constraints %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Property Constraints ({{each.shacl_constraints|length}})</h3>
+            </div>
+            <div class="panel-body" style="overflow: auto;">
+              {% if each.targets %}
+                <p>Focus nodes of this shape ({% for kind, t in each.targets %}{{ shacl.term(t) }}{% if not loop.last %}, {% endif %}{% endfor %}) can have the following properties:</p>
+              {% endif %}
+            </div>
+            {{ shacl.constraints_table(each.shacl_constraints) }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
 
     {# Implementation panel #}
     <div class="row">

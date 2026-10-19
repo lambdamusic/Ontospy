@@ -5,6 +5,7 @@
 
 
 {% extends "html-multi/base.html" %}
+{% import "html-multi/browser/shacl_macros.html" as shacl %}
 
 
 {% block navbar %}
@@ -253,7 +254,7 @@
     {% endif %}
 
 
-    {# Property Shapes #}
+    {# Property Shapes: the constraints of the shapes of this class and its ancestors #}
     {% if each.shacl_constraints %}
       <div class="row">
         <div class="col-md-12">
@@ -264,90 +265,7 @@
             <div class="panel-body" style="overflow: auto;">
               <p>By the associated SHACL property shapes, instances of {{each.title}} can have the following properties:</p>
             </div>
-            <table class="table table-bordered" style="overflow: auto;">
-              <tr class="table-classproperties">
-                <th><p style="text-align:center;">PROPERTY</p></th>
-                <th><p style="text-align:center;">PROPERTY TYPE</p></th>
-                <th><p style="text-align:center;">DESCRIPTION</p></th>
-                <th><p style="text-align:center;">MIN COUNT</p></th>
-                <th><p style="text-align:center;">MAX COUNT</p></th>
-                <th><p style="text-align:center;">LOCAL RANGE<br><i>(type range for property on this class)</i></p></th>
-                <th><p style="text-align:center;">GLOBAL RANGE<br><i>(type range for property globally)</i></p></th>
-              </tr>
-              {% for constraint in each.shacl_constraints  %}
-                <tr>
-                  {# LABEL ROW -- for constraint.headers, display the label #}
-                  {% if constraint.header %}
-                    <td colspan="8">
-                      <small class="label label-info label-xs">{{constraint.header}}</small>
-                    </td>
-
-
-                  {# DATA ROW -- for non-headers, display the data in columns #}
-                  {% else %}
-                    <td>    {# PROPERTY #}
-                      {% set prop = constraint.property_obj.onto_property %}
-                        <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.qname}}</a>
-                      
-                    </td>
-
-                    <td>    {# TYPE (owl:DatatypeProperty or owl:ObjectProperty #}
-                      {{constraint.rdftype_qname|join("<br>")|default("--")}}
-                    </td>
-
-                    <td>     {# DESCRIPTION #}
-                      {{constraint.rdfs_comment|join("<br>")}}
-                      <br>
-                      {{constraint.sh_description|join("<br>")}}
-                    </td>
-
-                    <td>     {# MIN COUNT #}
-                      {{constraint.sh_minCount|join(", ")|default("0")}}
-                    </td>
-
-                    <td>     {# MAX COUNT #}
-                      {{constraint.sh_maxCount|join(", ")|default("*")}}
-                    </td>
-
-                    <td>     {# LOCAL TYPE (type defined for property on this classe) #}
-                      {% for value in constraint.sh_datatype %}
-                        {% if value.onto_class %}
-                          <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
-                        {% else %}
-                          <i>{{value.qname}}</i>
-                        {% endif %} 
-                          <br>
-                      {% endfor %}
-                      {% for value in constraint.sh_class %}
-                        {% if value.onto_class %}
-                          <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
-                        {% else %}
-                          <i>{{value.qname}}</i>
-                        {% endif %} 
-                        <br>
-                      {% endfor %}
-                    </td>
-
-                    <td>    {# GLOBAL RANGE (type range for property globally) #}
-                      {% set values = constraint.rdfs_range %}
-                        {% if values %}
-                          {% for value in values %}
-                            {% if value.onto_class %}
-                              <a title="{{value.qname}}" href="{{value.onto_class.slug}}.html" class="rdfclass">{{value.onto_class.qname}}</a>
-                            {% else %}
-                              <i>{{value.qname}}</i>
-                            {% endif %} 
-                            <br>
-                          {% endfor %}                                     
-                        {% else %}
-                          <i>owl:Thing</i>
-                        {% endif %}
-                      
-                    </td>
-                  {% endif %}
-                </tr>
-              {% endfor %}
-            </table>
+            {{ shacl.constraints_table(each.shacl_constraints, with_property_info=True) }}
           </div>
         </div>
       </div>

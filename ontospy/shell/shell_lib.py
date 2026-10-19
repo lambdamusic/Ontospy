@@ -170,6 +170,23 @@ class Shell(cmd.Cmd):
         else:
             printInfo("Not implemented")
 
+    def _domainRangeNames(self, prop, which):
+        """
+        Names of a property's domains or ranges (which = "domains" | "ranges"), for display.
+        Falls back on those inherited from superproperties (#15, see #126), marked with an
+        "(inferred)" suffix (no colour codes of its own: callers print these dimmed), and on
+        owl:Thing when there are none at all.
+        :return: a list of strings
+        """
+        declared = getattr(prop, which)
+        inferred = getattr(prop, which + "_inferred", [])
+        names = lambda l: [y.qname if hasattr(y, "qname") else str(y) for y in l]
+        if declared:
+            return names(declared)
+        if inferred:
+            return [n + " (inferred)" for n in names(inferred)]
+        return ["owl:Thing"]
+
     def _joinedQnames(self, _list):
         """util for returning a string joinin names of entities *used only in info command*"""
         try:
@@ -308,18 +325,22 @@ class Shell(cmd.Cmd):
             self._print("DOMAIN OF:", "IMPORTANT")
             self._print("[%d] Explicitly declared" % len(x.domain_of), "IMPORTANT")
             for i in x.domain_of:
-                if i.ranges:
-                    ranges = ",".join([y.qname if hasattr(y, "qname") else str(y)
-                                       for y in i.ranges])
-                else:
-                    ranges = "owl:Thing"
-                    # print( Style.RESET_ALL + " => " + Fore.MAGENTA +
+                ranges = ",".join(self._domainRangeNames(i, "ranges"))
                 printInfo(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                       i.qname + Style.RESET_ALL + " => " + Style.DIM + ranges +
                       Style.RESET_ALL)
 
             # inferred stuff
             if print_inferred:
+                # properties whose domain is this class via a superproperty (#126)
+                _via = x.domain_of_via_superproperties
+                if _via:
+                    self._print("[%d] Inferred from superproperties" % len(_via), "IMPORTANT")
+                for i in _via:
+                    ranges = ",".join(self._domainRangeNames(i, "ranges"))
+                    printInfo(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                          i.qname + Style.RESET_ALL + " => " + Style.DIM + ranges +
+                          Style.RESET_ALL)
                 for _dict in x.domain_of_inferred:
                     _class = list(_dict.items())[0][0]
                     _propslist = list(_dict.items())[0][1]
@@ -327,12 +348,7 @@ class Shell(cmd.Cmd):
                         self._print("[%d] Inherited from [%s]" % (len(_propslist), _class.qname),
                                     "IMPORTANT")
                         for i in _propslist:
-                            if i.ranges:
-                                ranges = ",".join([y.qname if hasattr(y, "qname")
-                                                   else str(y) for y in i.ranges])
-                            else:
-                                ranges = "owl:Thing"
-                                # print(Style.RESET_ALL + " => " + Fore.MAGENTA +
+                            ranges = ",".join(self._domainRangeNames(i, "ranges"))
                             printInfo(Fore.GREEN + x.qname + Style.RESET_ALL + " => " + Fore.MAGENTA +
                                   i.qname + Style.RESET_ALL + " => " + Style.DIM +
                                   ranges + Style.RESET_ALL)
@@ -354,16 +370,20 @@ class Shell(cmd.Cmd):
             self._print("RANGE OF:", "IMPORTANT")
             self._print("[%d] Explicitly declared" % len(x.range_of), "IMPORTANT")
             for i in x.range_of:
-                if i.domains:
-                    domains = ",".join([y.qname if hasattr(y, "qname") else str(y)
-                                        for y in i.domains])
-                else:
-                    domains = "owl:Thing"
+                domains = ",".join(self._domainRangeNames(i, "domains"))
                 printInfo(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA + i.qname +
                       Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
             # inferred stuff
             if print_inferred:
+                # properties whose range is this class via a superproperty (#126)
+                _via = x.range_of_via_superproperties
+                if _via:
+                    self._print("[%d] Inferred from superproperties" % len(_via), "IMPORTANT")
+                for i in _via:
+                    domains = ",".join(self._domainRangeNames(i, "domains"))
+                    printInfo(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA +
+                          i.qname + Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
                 for _dict in x.range_of_inferred:
                     _class = list(_dict.items())[0][0]
                     _propslist = list(_dict.items())[0][1]
@@ -371,11 +391,7 @@ class Shell(cmd.Cmd):
                         self._print("[%d] Inherited from [%s]" % (len(_propslist), _class.qname),
                                     "IMPORTANT")
                         for i in _propslist:
-                            if i.domains:
-                                domains = ",".join(
-                                    [y.qname if hasattr(y, "qname") else str(y) for y in i.domains])
-                            else:
-                                domains = "owl:Thing"
+                            domains = ",".join(self._domainRangeNames(i, "domains"))
                             printInfo(Style.DIM + domains + Style.RESET_ALL + " => " + Fore.MAGENTA +
                                   i.qname + Style.RESET_ALL + " => " + Fore.GREEN + x.qname + Style.RESET_ALL)
 
@@ -393,29 +409,11 @@ class Shell(cmd.Cmd):
             if hrlinetop:
                 self._print("----------------")
             self._print("USAGE:", "IMPORTANT")
-            domains = x.domains
-            ranges = x.ranges
-            if x.domains:
-                for d in x.domains:
-                    # for domain/ranges which are not declared classes
-                    if hasattr(d, "qname"):
-                        _name = d.qname
-                    else:
-                        _name = str(d)
-                    self._print(_name)
-            else:
-                self._print("owl:Thing")
+            for _name in self._domainRangeNames(x, "domains"):
+                self._print(_name)
             self._print("  " + x.qname, "TEXT")
-            if x.ranges:
-                for d in x.ranges:
-                    # for domain/ranges which are not declared classes
-                    if hasattr(d, "qname"):
-                        _name = d.qname
-                    else:
-                        _name = str(d)
-                    self._print("  " + "   => " + _name)
-            else:
-                self._print("  " + "   => " + "owl:Thing")
+            for _name in self._domainRangeNames(x, "ranges"):
+                self._print("  " + "   => " + _name)
             self._print("----------------")
         return
 
@@ -961,15 +959,10 @@ class Shell(cmd.Cmd):
 
         line = line.split()
 
-        try:
-            # from ..viz.actions import action_visualize
-            from ..gendocs.actions import action_visualize
-        except:
-            self._print("This command requires the ontodocs package: `pip install ontodocs`")
-            return
-
+        # action_visualize is in core.actions: it used to be imported from gendocs.actions,
+        # which failed and was reported as a missing 'ontodocs' package (#25)
         import webbrowser
-        url = action_visualize(args=self.current['file'], fromshell=True)
+        url = actions.action_visualize(args=self.current['file'], fromshell=True)
         if url:
             webbrowser.open(url)
         return

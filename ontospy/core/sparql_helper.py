@@ -8,6 +8,7 @@ Copyright (c)  __Michele Pasin__ <http://www.michelepasin.org>. All rights reser
 """
 
 import rdflib
+from rdflib.plugins.sparql.evalutils import _val as _sparql_order_key
 from .utils import *
 
 DEFAULT_LANGUAGE = "en"
@@ -42,6 +43,25 @@ class SparqlHelper(object):
         self.rdflib_graph.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
         self.rdflib_graph.bind("sh", "http://www.w3.org/ns/shacl#")
 
+    def _directLinks(self, aURI, *links):
+        """ The non-blank nodes linked to <aURI>, as the `SELECT DISTINCT ?x ... FILTER
+        (!isBlank(?x)) ORDER BY ?x` queries below would return them: a list of 1-tuples,
+        deduplicated and in SPARQL order. Each link is (predicate, True) for
+        `<aURI> predicate ?x`, or (predicate, False) for `?x predicate <aURI>`.
+
+        For graphs in memory this uses the graph API: parsing the same SPARQL text again
+        for each entity took most of the loading time on large ontologies (backlog #13).
+        """
+        uri = rdflib.URIRef(str(aURI))
+        found = set()
+        for predicate, forward in links:
+            if forward:
+                found.update(self.rdflib_graph.objects(uri, predicate))
+            else:
+                found.update(self.rdflib_graph.subjects(predicate, uri))
+        return [(x,) for x in sorted(
+            (x for x in found if not isinstance(x, rdflib.BNode)), key=_sparql_order_key)]
+
     # ..................
     # ONTOLOGY
     # ..................
@@ -62,6 +82,9 @@ class SparqlHelper(object):
         * hide_base_schemas: by default, obscure all RDF/RDFS/OWL/XML stuff
         * hide_implicit_types: don't make any inference based on rdf:type declarations
         """
+        if not self.sparql_endpoint:
+            return self._allClassesInMemory(hide_base_schemas, hide_implicit_types)
+
         query = """SELECT DISTINCT ?x ?c
                  WHERE {
                          {
@@ -111,8 +134,42 @@ class SparqlHelper(object):
         qres = self.rdflib_graph.query(query)
         return list(qres)
 
+    BASE_SCHEMAS = ("http://www.w3.org/2002/07/owl",
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns",
+                    "http://www.w3.org/2000/01/rdf-schema",
+                    "http://www.w3.org/2001/XMLSchema",
+                    "http://www.w3.org/XML/1998/namespace")
+
+    def _allClassesInMemory(self, hide_base_schemas=True, hide_implicit_types=True):
+        """ The rows of the getAllClasses query, in the same order, using the graph API:
+        on large ontologies the query's FILTER and ORDER BY took most of its time (backlog #13).
+
+        Each candidate class ?x comes with each of its rdf:types ?c, in the order the graph
+        returns them (as the query's OPTIONAL does), or with None if it has none.
+        """
+        g = self.rdflib_graph
+        RDF, RDFS, OWL = rdflib.RDF, rdflib.RDFS, rdflib.OWL
+        candidates = set(g.subjects(RDF.type, OWL.Class))
+        candidates.update(g.subjects(RDF.type, RDFS.Class))
+        for x, _, y in g.triples((None, RDFS.subClassOf, None)):
+            candidates.add(x)
+            candidates.add(y)
+        candidates.update(g.objects(None, RDFS.domain))
+        candidates.update(g.objects(None, RDFS.range))
+        if not hide_implicit_types:
+            candidates.update(g.objects(None, RDF.type))
+        if hide_base_schemas:
+            candidates = [x for x in candidates if not isinstance(x, rdflib.BNode)
+                          and not str(x).startswith(self.BASE_SCHEMAS)]
+        out = []
+        for x in sorted(candidates, key=_sparql_order_key):
+            types = list(g.objects(x, RDF.type))
+            out += [(x, c) for c in types] if types else [(x, None)]
+        return out
+
     def getClassInstances(self, aURI):
-        aURI = aURI
+        if not self.sparql_endpoint:
+            return self._directLinks(aURI, (rdflib.RDF.type, False))
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
                  WHERE {
                      { ?x rdf:type <%s> }
@@ -122,7 +179,8 @@ class SparqlHelper(object):
         return list(qres)
 
     def getClassDirectSupers(self, aURI):
-        aURI = aURI
+        if not self.sparql_endpoint:
+            return self._directLinks(aURI, (rdflib.RDFS.subClassOf, True))
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
                  WHERE {
                      { <%s> rdfs:subClassOf ?x }
@@ -183,7 +241,8 @@ class SparqlHelper(object):
         return sorted(set(out))
 
     def getPropDirectSupers(self, aURI):
-        aURI = aURI
+        if not self.sparql_endpoint:
+            return self._directLinks(aURI, (rdflib.RDFS.subPropertyOf, True))
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
                  WHERE {
                      { <%s> rdfs:subPropertyOf ?x }
@@ -196,6 +255,7 @@ class SparqlHelper(object):
         """
             Find all properties that should not be "top-level" because they
             apply to some class via some SHACL PropertyShape.
+            Returns a list of 1-tuples, in no particular order.
         """
 
         # This query finds classes by explicit class statement, and
@@ -204,6 +264,16 @@ class SparqlHelper(object):
         # "Implicit Class Targets", a reflective sh:targetClass is
         # implied.
         # https://www.w3.org/TR/shacl/#implicit-targetClass
+        if not self.sparql_endpoint:
+            # the same rows (order aside) with the graph API: on large ontologies the
+            # query took a while, checking each class for shapes (backlog #13)
+            g, SH = self.rdflib_graph, rdflib.SH
+            out = []
+            for class_type in (rdflib.RDFS.Class, rdflib.OWL.Class):
+                for n_class in g.subjects(rdflib.RDF.type, class_type):
+                    for n_shape in g.objects(n_class, SH.property):
+                        out += [(x,) for x in g.objects(n_shape, SH.path)]
+            return out
         qres = self.rdflib_graph.query("""SELECT ?nProperty
                 WHERE {
                         {
@@ -230,7 +300,9 @@ class SparqlHelper(object):
         return list(qres)
 
     def getSKOSDirectSupers(self, aURI):
-        aURI = aURI
+        if not self.sparql_endpoint:
+            return self._directLinks(aURI, (rdflib.SKOS.broader, True),
+                                     (rdflib.SKOS.narrower, False))
         qres = self.rdflib_graph.query("""SELECT DISTINCT ?x
                  WHERE {
                          {

@@ -48,7 +48,9 @@ venv
 
 # private files, never committed
 /private/
-backlog
+# The maintainer's backlog: kept locally, out of the public repo. On their machine this
+# is a symlink into Dropbox (the central backlog folder), hence no trailing slash.
+/backlog
 
 # local-only tests, eg against private endpoints (see docs/pages/tests.md)
 ontospy/tests/local/

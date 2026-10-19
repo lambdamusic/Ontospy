@@ -16,7 +16,8 @@ ONTODOCS_VIZ_STATIC = _dirname + "/media/static/"
 
 
 try:
-    from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES, BOOTSWATCH_THEME_DEFAULT
+    from .CONFIG import VISUALIZATIONS_LIST, BOOTSWATCH_THEMES, BOOTSWATCH_THEME_DEFAULT, \
+        REMOVED_VISUALIZATIONS, REMOVED_IN
     VISUALIZATIONS_LIST = VISUALIZATIONS_LIST['Visualizations']
 except:  # Mother of all exceptions
     printDebug("Visualizations configuration file not found.", fg="red")
@@ -25,8 +26,8 @@ except:  # Mother of all exceptions
 
 def show_types():
     for n, t in enumerate(VISUALIZATIONS_LIST):
-        printInfo("%d. %s" % (n + 1, t['Title']), "green")
-    printInfo("Note: select a viz type by using its numerical index.",
+        printInfo("%d. %s (%s)" % (n + 1, t['Title'], t['ID']), "green")
+    printInfo("Note: select a viz type by its number or its ID, eg 4 or d3-dendogram.",
                "comment")
 
 def show_themes():
@@ -73,28 +74,47 @@ def ask_visualization():
         if var == "q":
             return ""
         else:
-            try:
-                n = int(var) - 1
-                test = VISUALIZATIONS_LIST[
-                    n]  # throw exception if number wrong
+            n = _viz_index(var)
+            if n is not None:
                 return n
-            except:
-                printDebug("Invalid selection. Please try again.", "red")
-                continue
+            printDebug("Invalid selection. Please try again.", "red")
+
+
+def _viz_index(choice):
+    """the index in VISUALIZATIONS_LIST of a viz given by its number (from 1, as listed
+    by show_types) or its ID; None if there is no such viz. Numbers below 1 are rejected:
+    they used to index the list from the end, so 0 picked the last viz (#25)"""
+    choice = str(choice).strip()
+    ids = [v['ID'] for v in VISUALIZATIONS_LIST]
+    if choice in ids:
+        return ids.index(choice)
+    try:
+        n = int(choice)
+    except ValueError:
+        return None
+    if 1 <= n <= len(VISUALIZATIONS_LIST):
+        return n - 1
+    return None
 
 
 def select_visualization(n):
     """
-    get viz choice based on numerical index
+    get viz choice based on its number or ID; exits if there is no such viz
     """
-    try:
-        n = int(n) - 1
-        test = VISUALIZATIONS_LIST[n]  # throw exception if number wrong
-        return n
-    except:
-        printDebug("Invalid viz-type option. Valid options are:", "red")
-        show_types()
-        raise SystemExit(1)
+    index = _viz_index(n)
+    if index is not None:
+        return index
+    for number, (viz_id, title) in REMOVED_VISUALIZATIONS.items():
+        if str(n).strip() in (str(number), viz_id):
+            printDebug(
+                "The '%s' visualization was removed in Ontospy %s. The interactive ones "
+                "left are 4 (d3-dendogram), 5 (d3-bubble-chart) and 6 (d3-pack-hierarchy):"
+                % (title, REMOVED_IN), "red")
+            show_types()
+            raise SystemExit(1)
+    printDebug("Invalid viz-type option. Valid options are:", "red")
+    show_types()
+    raise SystemExit(1)
 
 
 # ===========
@@ -134,22 +154,6 @@ def build_visualization(g, viz_index, path=None, title="", theme="", empty_folde
 
     elif this_viz['ID'] == "d3-pack-hierarchy":
         from .viz.viz_d3pack_hierarchy import Dataviz
-        v = Dataviz(g, title)
-
-    elif this_viz['ID'] == "d3-bar-hierarchy":
-        from .viz.viz_d3bar_hierarchy import Dataviz
-        v = Dataviz(g, title)
-
-    elif this_viz['ID'] == "d3-partition-table":
-        from .viz.viz_d3partition_table import Dataviz
-        v = Dataviz(g, title)
-
-    elif this_viz['ID'] == "d3-rotating-cluster":
-        from .viz.viz_d3rotating_cluster import Dataviz
-        v = Dataviz(g, title)
-
-    elif this_viz['ID'] == "sigma-force-directed":
-        from .viz.viz_sigmajs import Dataviz
         v = Dataviz(g, title)
 
     else:

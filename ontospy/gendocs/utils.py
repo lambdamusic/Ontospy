@@ -114,40 +114,6 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
     return out
 
 
-def build_D3treepie(old, MAX_DEPTH, level=1, toplayer=None):
-    """
-	Create the JSON needed by the treePie viz
-	http://bl.ocks.org/adewes/4710330/94a7c0aeb6f09d681dbfdd0e5150578e4935c6ae
-
-	Eg
-
-	['origin' , [n1, n2],
-			{ 'name1' :
-				['name1', [n1, n2],
-					{'name1-1' : ...}
-				] ,
-			} ,
-	]
-
-	"""
-    d = {}
-    if not old:
-        old = toplayer
-    for x in old:
-        label = x.bestLabel(quotes=False).replace("_", " ")
-        if x.children() and level < MAX_DEPTH:
-            size = len(x.children())
-            d[x.qname] = [
-                label, [size, size],
-                build_D3treepie(x.children(), MAX_DEPTH, level + 1)
-            ]
-        else:
-            size = 1
-            d[x.qname] = [label, [size, size], {}]
-
-    return d
-
-
 ##################
 #
 #  TREE DISPLAY FUNCTIONS [from ontospy web]

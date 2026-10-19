@@ -69,13 +69,10 @@ class TestShapes(unittest.TestCase):
 
 
 			for c in o.all_classes:
-				if c.shapedProperties:
+				if c.all_shapes:
 					printDebug("Class: %s" % str(c), "green")
-					for x in c.shapedProperties:
-						print(".....hasProperty: " + str(x["property"]))
-						print("     the property has %s associated shapes." % x["shape"])
-				else:
-					pass
+					for x in c.all_shapes:
+						printDebug(".....hasShape: " + str(x))
 
 
 

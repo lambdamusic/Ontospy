@@ -7,6 +7,38 @@ nav_order: 7
 
 Summary of changes.
 
+## Oct, 2026: v 2.6
+
+- Loading
+    - JSON-LD is parsed with rdflib's `Dataset` instead of the deprecated `ConjunctiveGraph`, which a future rdflib release will remove. JSON-LD loaded from a string or an open file no longer drops triples in named graphs
+    - `.nt` files are parsed as N-Triples first, rather than as N3: faster, and without a warning per triple. The test suite's warnings go from about 4,200 to 34
+    - Faster loading of large ontologies: superclasses, instances and classes are read with rdflib's graph API instead of a SPARQL query per entity, and entities are looked up by URI in an index instead of a scan. Building the model of [FOVT](http://purl.obolibrary.org/obo/fovt.owl) (12k classes) goes from 87s to 12s, after 14s parsing the file, so its total load time from 101s to 27s; [PATO](http://purl.obolibrary.org/obo/pato.owl) (9k classes) from 51s to 6s, after 7s parsing, so from 58s to 13s. Parsing, done by rdflib, is unchanged. SPARQL endpoints are queried as before [issue-44](https://github.com/lambdamusic/Ontospy/issues/44)
+- SHACL
+    - Shape pages show the shape's constraints in full: its targets, its constraints on the focus node (eg `sh:closed`), the shapes that use it, and a table of its property constraints (path, name and description, min and max count, value type, and the others, eg `sh:in`, `sh:pattern`, `sh:or`). Before, the table was filled only through a target class defined in the same file, so shapes targeting classes from other ontologies showed none
+    - Implicit class targets are recognised: a class that is also a `sh:NodeShape` (as in [SPDX](https://spdx.org/rdf/3.0.1/spdx-model.ttl) or [QUDT](https://qudt.org/3.5.2/schema/shacl/qudt)) gets the shape's constraints. So are named (non-blank) property shapes
+    - Class pages share the shape pages' table, fixing blank MIN and MAX columns, broken links and escaped `<br>` tags
+    - Fix: the property information (type, description, range) was missing for all a shape's properties after the first one the ontology doesn't define
+    - Faster: each class's constraints are read once, not again for each subclass
+    - `OntoClass.shapedProperties` is removed: nothing used it. A class's shapes are in `OntoClass.all_shapes`, including those of implicit class targets, and its constraints in `OntoClass.shacl_constraints`
+- Documentation generation (`gendocs`)
+    - Removed four interactive visualizations: D3 Bar hierarchy, D3 Partition table, D3 Rotating cluster and the Sigma.js force-directed graph (`--type` 7 to 10). They drew the same class tree as the others, less legibly. Asking for one now fails with a message saying so; their numbers won't be reused for now. The six left keep their numbers: Html single page, Html multi page, Markdown, D3 Dendrogram, D3 Bubble chart and D3 Pack hierarchy
+    - `--type` takes a visualization's ID as well as its number, eg `--type d3-dendogram`, and `--showtypes` lists both
+    - Fix `--type 0` and `--type -1` (and 0 in the interactive menu) silently building the last visualizations instead of reporting an invalid choice
+    - The package is about 2.5 MB smaller: the removed visualizations' libraries (Sigma.js) and some no visualization used (d3 v4, d3pie, tooltipster) are gone
+    - SHACL shapes in the single-page html and the markdown docs, as in the multi-page html: a Shapes section (html) or a page per shape (markdown) with each shape's targets, the shapes that use it, its node constraints and a table of its property constraints, and the constraints table in each class's section or page
+    - Single-page html: the page is as wide as the window, rather than about 48,000 pixels; a class tree wider than the page scrolls on its own
+    - Single-page html: properties typed only `rdf:Property` get a section, under "Other properties". They were left out: eg QUDT's single page documented 1 of its 167 properties
+    - Multi-page html: the Bootswatch themes load their Google Fonts over `https`, so the docs opened from disk (`file://`) use them too, instead of failing on a `//fonts.googleapis.com` address
+- Command line
+    - A source file that doesn't exist is reported as "File not found", instead of a parse error after trying every RDF serialization. `gendocs` and `ser` stop there and exit with an error, rather than carrying on with an empty graph (`gendocs` used to ask for a format and then write empty documentation)
+    - `gendocs` loads the ontology before asking which visualization to build, so a source that fails to load stops it before the question
+    - The local library (`ontospy lib`, `gendocs -l`, the shell) lists its files in alphabetical order ignoring case, eg `Brick.ttl` between `bfo.owl` and `cito.rdf` instead of before all the lowercase names
+- Shell
+    - Properties with no domain or range of their own show those inherited from their superproperties, marked "(inferred)", instead of `owl:Thing`, as the documentation has done since 2.4
+    - `info inferred_usage` on a class also lists the properties whose domain or range is that class via a superproperty, under "Inferred from superproperties"
+    - Fix the `visualize` command, which always answered "This command requires the ontodocs package"
+- [Examples](https://lambdamusic.github.io/ontospy-examples/): added two ontologies that ship with SHACL shapes, SPDX 3.0.1 and the QUDT 3.5.2 schema; removed the DCAT-AP shapes, which constrain classes from other ontologies and so had little to browse. Now 33 ontologies
+
 ## Oct, 2026: v 2.5
 
 - Namespaces

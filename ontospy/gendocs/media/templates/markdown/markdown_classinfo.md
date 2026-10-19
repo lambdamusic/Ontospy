@@ -1,4 +1,5 @@
 {% extends "markdown/markdown_base.md" %}
+{% import "markdown/shacl_macros.md" as shacl %}
 {% block main_column %}
 
 
@@ -68,6 +69,12 @@ owl:Thing
 {% endfor %}
 {% endif %}
 
+
+{% if each.shacl_constraints %}
+#### SHACL property constraints
+
+{{ shacl.constraints_table(each.shacl_constraints, with_property_info=True) }}
+{% endif %}
 
 #### Implementation
 ```rdf
