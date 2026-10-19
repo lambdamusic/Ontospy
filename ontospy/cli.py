@@ -301,6 +301,10 @@ def gendocs(ctx,
         printDebug(
             'Note: currently only one argument can be passed', fg='red')
 
+    if source and is_missing_file(source[0]):
+        printDebug("File not found: <%s>" % source[0], fg="red")
+        sys.exit(1)
+
     if lib:
         printDebug("Local library => '%s'" % get_home_location(), fg='white')
         ontouri = action_listlocal(all_details=False)
@@ -532,7 +536,8 @@ def ser(ctx, source, output_format, verbose=False):
         if not validate_format_string(output_format):
             return
         else:
-            action_serialize(source, output_format, verbose)
+            if not action_serialize(source, output_format, verbose):
+                sys.exit(1)
             eTime = time.time()
             tTime = eTime - sTime
             printDebug(

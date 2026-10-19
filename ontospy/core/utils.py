@@ -39,6 +39,13 @@ def is_http(stringa):
     return False
 
 
+def is_missing_file(location):
+    """True if <location> is a local path (not a URL, eg http:// or file://, nor a
+    www. address, which the loader treats as http://) and nothing exists there (#31)"""
+    return isinstance(location, str) and "://" not in location \
+        and not location.startswith("www.") and not os.path.exists(location)
+
+
 def safe_str(u, errors="replace"):
     """Safely print the given string.
 

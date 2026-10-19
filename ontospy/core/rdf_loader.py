@@ -156,6 +156,12 @@ class RDFLoader(object):
         if self.verbose: printDebug("Reading: <%s>" % uri, fg="green")
         success = False
 
+        if is_missing_file(uri):
+            # say so, rather than try every serialization and report a parse error (#31)
+            printDebug("----------\nFile not found: <%s>\n----------" % uri, "red")
+            self.sources_invalid += [uri]
+            return
+
         sorted_fmt_opts = try_sort_fmt_opts(self.rdf_format_opts, uri)
 
         for f in sorted_fmt_opts:

@@ -121,8 +121,11 @@ def action_serialize(source, out_fmt="turtle", verbose=False):
     """
 
     o = Ontospy(uri_or_path=source, verbose=verbose, build_all=False)
+    if not o.sources:
+        return False  # the loader has said why (#31)
     s = o.serialize(out_fmt)
     printInfo(s)
+    return True
 
 
 def action_jsonld_playground(source_path, verbose=False):
@@ -663,14 +666,11 @@ def action_visualize(args,
     else:
         hide_individuals = True
 
-    # select a visualization
+    # a visualization given as an option is checked before loading anything
     if viztype:
         viztype = select_visualization(viztype)
     else:
-        viztype = ask_visualization()
-        if viztype == "":
-            return None
-        # raise SystemExit, 1
+        viztype = None
 
     # 2017-01-23: bypass pickled stuff as it has wrong counts etc..
     # get ontospy graph
@@ -685,6 +685,18 @@ def action_visualize(args,
         hide_implicit_types=hide_implicit_types,
         hide_implicit_preds=hide_implicit_preds,
         hide_individuals=hide_individuals)
+
+    # stop if the source didn't load, rather than document an empty graph (#31)
+    if not g.sources:
+        printDebug("Nothing to document: no visualization built.", fg="red")
+        return None
+
+    # otherwise ask for one, once the graph has loaded (#31)
+    if viztype is None:
+        viztype = ask_visualization()
+        if viztype == "":
+            return None
+        # raise SystemExit, 1
 
     # put viz in home folder by default: <ontouri>/<viztype>/files..
     if not path:
