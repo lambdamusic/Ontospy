@@ -110,13 +110,15 @@
 
 {#      CSS FOR TREE   2016-07-26   #}
 
+        {# the tree is as wide as its nodes need (max-content keeps the floated nodes on
+           one row) and the container scrolls only if that is wider than the page; a fixed
+           3000em width made every page ~48,000px wide (backlog #35) #}
         .tree-container {
-            width: 3000em;
             overflow-x: auto;
             white-space: nowrap;
         }
 
-		.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
+		.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block; width: max-content;}
 
 		.tree ul {
 			padding-top: 20px; position: relative;

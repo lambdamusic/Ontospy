@@ -96,6 +96,12 @@ def test_ask_visualization_rejects_zero(monkeypatch):
 	assert ask_visualization() == 3
 
 
+def test_html_single_not_too_wide(pizza, tmp_path):
+	"""#35: a fixed 3000em width on the class trees made the page ~48,000px wide"""
+	build_visualization(pizza, 0, path=str(tmp_path))
+	assert "3000em" not in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
 def test_html_multi_individual_pages(pizza, tmp_path):
 	"""issue #134: the multi page html had no pages for individuals (the build crashed before writing them)"""
 	build_visualization(pizza, 1, path=str(tmp_path))
