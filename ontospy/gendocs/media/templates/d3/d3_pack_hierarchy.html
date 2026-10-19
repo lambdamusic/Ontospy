@@ -1,287 +1,192 @@
 {% extends "shared/d3_base.html" %}
 
-
+{# The hierarchy as nested circles, zoomable (d3 v7, backlog #33 and #34) #}
 
 
 {% block custom_css %}
 
+	<style type="text/css" media="screen">
 
-<style type="text/css" media="screen">
+		.pack circle {
+			cursor: pointer;
+		}
 
+		.pack circle:hover {
+			stroke: #ff7f0e;
+			stroke-width: 1.5px;
+		}
 
+		.pack circle.focus {
+			stroke: #555;
+			stroke-width: 1px;
+		}
 
-text {
-  font-size: 11px;
-  pointer-events: none;
-}
+		.pack text {
+			font-size: 12px;
+			pointer-events: none;
+			paint-order: stroke;
+			stroke: white;
+			stroke-width: 3px;
+			stroke-linejoin: round;
+			fill: #222;
+		}
 
-text.parent {
-  fill: #1f77b4;
-}
+		.focus-bar {
+			font-size: 13px;
+			margin-bottom: 8px;
+			min-height: 1.4em;
+		}
 
-circle {
-  fill: #ccc;
-  stroke: #999;
-  pointer-events: all;
-}
-
-circle.parent {
-  fill: #1f77b4;
-  fill-opacity: .1;
-  stroke: steelblue;
-}
-
-circle.parent:hover {
-  stroke: #ff7f0e;
-  stroke-width: .5px;
-}
-
-
-circle.child:hover {
-  stroke: #ff7f0e;
-  stroke-width: .5px;
-  fill: #eaeaea;
-  fill-opacity: .9;
-}
-
-
-
-/*extra css*/
-
-.node circle {
-	cursor: pointer;
-	fill: #fff;
-	stroke: steelblue;
-	stroke-width: 1.5px;
-}
-
-.node text {
-	font-size: 11px;
-}
-
-path.link {
-	fill: none;
-	stroke: #ccc;
-	stroke-width: 1.5px;
-}
-
-
-.infoentity {
-	stroke: white;
-	stroke-width: 2.5px;
-	opacity: 0.7;
-	background: linen;
-	line-height: 0.7em;
-}
-
-
-.smalldesc {
-	font-size: 20px;
-	margin-top: 0px;
-	color: black;
-}
-
-</style>
-
+	</style>
 
 {% endblock custom_css %}
 
 
 
-
-
-
-
-
-
-{% block main_content %}
-
-
-	<div class="row header">
-		
-		
-		
-			
-		{% if TOTAL_CLASSES %}
-			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
-		{% endif %}
-		
-		{% if TOTAL_PROPERTIES %}
-			<a href="properties.html" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
-		{% endif %}
-		
-		{% if TOTAL_CONCEPTS %}
-			<a href="skos.html" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
-		{% endif %}
-			
-			
-		
-
-	</div>
-
-
-	<div class="row">
-
-		<!-- the graph -->
-		
-		<div class="col-md-12" id="the_graph">
-
-
-		</div>
-
-
-	</div>
-
-
-
-
-{% endblock main_content %}
-
-
-
-
-{% block extra_footer %}
-
-Visualization developed with <a class="greylink" href="https://github.com/d3/d3">d3.js</a>.
-
-{% endblock extra_footer %}
-
-
-
+{% block hint %}
+	Click a circle to zoom into it, click the circle in focus (or a circle with no children) to see its details, click outside the circles to zoom out.
+{% endblock hint %}
 
 
 
 {% block the_javascript %}
 
-
-
-
-
-	<script type="text/javascript" src="{{STATIC_URL}}libs/d3-v3/d3.min.js"></script>
-
-  <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript" src="{{STATIC_URL}}libs/jquery/jquery.slidereveal.min.js"></script>
-
-
-
-	{% include 'shared/js_slidereveal.html' %}
-
-
-
-
 <script type="text/javascript">
 
-    var data = {{JSON_DATA_OBJECTS|safe}};
+{% if TOTAL_OBJECTS > 0 %}
 
-    var w = 1280,
-        h = 800,
-        r = 720,
-        x = d3.scale.linear().range([0, r]),
-        y = d3.scale.linear().range([0, r]),
-        node,
-        root;
+	var data = {{JSON_DATA_OBJECTS|safe}};
 
-    var pack = d3.layout.pack()
-        .sort(d3.descending)
-        .size([r, r])
-        .value(function(d) { return d.size; });
+	var size = 900;
 
-    var vis = d3.select("#the_graph").insert("svg:svg", "h2")
-        .attr("width", w)
-        .attr("height", h)
-        .append("svg:g")
-        .attr("transform", "translate(" + (w - r) / 2 + "," + (h - r) / 2 + ")");
+	var root = d3.pack()
+		.size([size, size])
+		.padding(3)(
+			d3.hierarchy(data)
+				.sum(function(d) { return d.children ? 0 : 1; })
+				.sort(function(a, b) { return b.value - a.value; })
+		);
+
+	var color = d3.scaleLinear()
+		.domain([0, Math.max(root.height, 1)])
+		.range(["hsl(205,60%,92%)", "hsl(220,45%,45%)"])
+		.interpolate(d3.interpolateHcl);
+
+	var focusBar = d3.select("#the_graph").append("div").attr("class", "focus-bar");
+
+	var svg = d3.select("#the_graph").append("svg")
+		.attr("class", "pack")
+		.attr("viewBox", [-size / 2, -size / 2, size, size])
+		.attr("width", size)
+		.style("max-width", "100%")
+		.style("height", "auto")
+		.style("background", "white")
+		.style("cursor", "pointer")
+		.on("click", function(event) { zoom(event, focus.parent || root); });
+
+	var circle = svg.append("g")
+		.selectAll("circle")
+		.data(root.descendants())
+		.join("circle")
+		.attr("fill", function(d) { return d.children ? color(d.depth) : "white"; })
+		.attr("stroke", function(d) { return d.children ? null : "hsl(220,30%,70%)"; })
+		.on("mouseover", function(event, d) {
+			var n = d.children ? d.children.length : 0;
+			showTooltip(event, entityTooltip(d.data, n ? n + " direct sub-entities" : ""));
+		})
+		.on("mousemove", function(event) { showTooltip(event); })
+		.on("mouseout", hideTooltip)
+		.on("click", function(event, d) {
+			event.stopPropagation();
+			hideTooltip();
+			if (focus === d || !d.children) {
+				showpanel(d.data.objid);
+			} else {
+				zoom(event, d);
+			}
+		});
+
+	var label = svg.append("g")
+		.selectAll("text")
+		.data(root.descendants())
+		.join("text")
+		.attr("dy", "0.32em")
+		.attr("text-anchor", "middle")
+		.style("display", "none")
+		.text(function(d) { return d.data.name; });
+
+	// measure the labels once, to show only those that fit their circle: the full name,
+	// else the name without its prefix
+	label.each(function(d) {
+		this.style.display = null;
+		d.labelWidth = this.getComputedTextLength();
+		d.shortLabel = shortName(d.data.name);
+		if (d.shortLabel) {
+			this.textContent = d.shortLabel;
+			d.shortWidth = this.getComputedTextLength();
+			this.textContent = d.data.name;
+		}
+		this.style.display = "none";
+	});
+
+	var focus = root;
+	var view;
+	zoomTo([root.x, root.y, root.r * 2]);
+	showLabels();
 
 
-    var tooltip = d3.select("body")
-	    .append("div")
-	    .style("position", "absolute")
-	    .style("border-radius", "5px")
-	    .style("z-index", "100")
-	    .style("visibility", "hidden")
-	    .style("opacity", ".85")
-	    .style("color", "lightsteelblue")
-	    .style("background", "white")
-	    .style("font-size", "40px")
-	    .text("a simple tooltip");
+	function zoomTo(v) {
+		var k = size / v[2];
+		view = v;
+		label.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+		circle.attr("transform", function(d) { return "translate(" + (d.x - v[0]) * k + "," + (d.y - v[1]) * k + ")"; });
+		circle.attr("r", function(d) { return d.r * k; });
+	}
 
+	// labels for the children of the circle in focus, when they fit inside their circle
+	function labelText(d) {
+		var room = 2 * d.r * size / (focus.r * 2) - 4;
+		if (d.parent !== focus) return null;
+		if (d.labelWidth <= room) return d.data.name;
+		if (d.shortLabel && d.shortWidth <= room) return d.shortLabel;
+		return null;
+	}
 
-    node = root = data;
+	function showLabels() {
+		label.each(function(d) {
+			var text = labelText(d);
+			this.style.display = text ? null : "none";
+			if (text) this.textContent = text;
+		});
+		circle.classed("focus", function(d) { return d === focus; });
+		var path = focus.ancestors().reverse().map(function(d) {
+			return "<a href='#' data-depth='" + d.depth + "'>" + escapeHtml(d.data.name) + "</a>";
+		});
+		focusBar.html(path.join(" &rsaquo; ") +
+			(focus.data.objid ? " &nbsp; <a href=\"javascript:showpanel('" + focus.data.objid + "');\" class='greylink'>details</a>" : ""));
+		focusBar.selectAll("a[data-depth]").on("click", function(event) {
+			event.preventDefault();
+			var depth = +this.getAttribute("data-depth");
+			var target = focus;
+			while (target.depth > depth) target = target.parent;
+			zoom(event, target);
+		});
+	}
 
-    var nodes = pack.nodes(data);
+	function zoom(event, d) {
+		focus = d;
+		label.style("display", "none");
+		var transition = svg.transition()
+			.duration(event && event.altKey ? 7500 : 750)
+			.tween("zoom", function() {
+				var i = d3.interpolateZoom(view, [focus.x, focus.y, focus.r * 2]);
+				return function(t) { zoomTo(i(t)); };
+			});
+		transition.on("end", showLabels);
+	}
 
-      vis.selectAll("circle")
-          .data(nodes)
-          .enter().append("svg:circle")
-          .attr("class", function(d) { return d.children ? "parent" : "child"; })
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; })
-          .attr("r", function(d) { return d.r; })
-          .on("mouseover", function(d){
-			d3.select(this).attr("fill", "darkorange");
-			tooltip.text(d.name);
-			tooltip.style("visibility", "visible"); })
-          .on("mousemove", function(d){return tooltip.style("top",
-		      (d3.event.pageY-100)+"px").style("left",(d3.event.pageX+50)+"px");})
-          .on("mouseout", function(d){
-                d3.select(this).attr("fill", ""); // default = no stroke
-                return tooltip.style("visibility", "hidden");}
-                )
-          .on("click", function(d) { return zoom(node == d ? root : d); });
-
-      vis.selectAll("text")
-          .data(nodes)
-          .enter().append("svg:text")
-          .attr("class", function(d) { return d.children ? "parent" : "child"; })
-          .attr("x", function(d) { return d.x; })
-          .attr("y", function(d) {
-              if (d.children) {
-                  return d.y - (d.r - d.r/20);
-              } else {
-                  return d.y ;
-              };
-          })
-          .attr("dy", ".35em")
-          .attr("text-anchor", "middle")
-          .style("opacity", function(d) { return d.r > 20 ? 1 : 0; })
-          .text(function(d) { return d.name; });
-
-      d3.select(window).on("click", function() { zoom(root); });
-
-
-    function zoom(d, i) {
-      var k = r / d.r / 2;
-      x.domain([d.x - d.r, d.x + d.r]);
-      y.domain([d.y - d.r, d.y + d.r]);
-
-      var t = vis.transition()
-          .duration(d3.event.altKey ? 7500 : 750);
-
-      t.selectAll("circle")
-          .attr("cx", function(d) { return x(d.x); })
-          .attr("cy", function(d) { return y(d.y); })
-          .attr("r", function(d) { return k * d.r; });
-
-      t.selectAll("text")
-          .attr("x", function(d) { return x(d.x); })
-          .attr("y", function(d) {
-              if (d.children) {
-                  return y(d.y - (d.r - d.r/20));
-              } else {
-                  return y(d.y) ;
-              };
-          })
-          .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
-
-      node = d;
-      d3.event.stopPropagation();
-    }
-
+{% endif %}
 
 </script>
 
-
-
 {% endblock the_javascript %}
-
-

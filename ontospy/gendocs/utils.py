@@ -99,7 +99,8 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
         if x.children() and level < MAX_DEPTH:
             duplicate_row = {}
             duplicate_row['qname'] = x.qname
-            duplicate_row['name'] = x.bestLabel(quotes=False).replace("_", " ")
+            # the same label as everywhere else, so that --preflabel/--preflang apply (#32)
+            duplicate_row['name'] = x.title
             duplicate_row['objid'] = x.id
             duplicate_row['size'] = len(x.children()) + 5  # fake size
             duplicate_row['realsize'] = len(x.children())  # real size
@@ -112,6 +113,67 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
         out += [d]
 
     return out
+
+
+def build_D3panelData(g):
+    """
+    The data the side panel of the D3 visualizations uses to build a class's Usage table
+    (the properties its instances can have, its own and its superclasses'), in JavaScript
+    when the panel opens (#26). Written once per page rather than as a table per class,
+    which would repeat the properties of the top classes for every class: on schema.org
+    that took a page from 3 to 14 MB.
+
+    {"classes": {id: [title, [ancestor ids], [own property ids]]},
+     "props": {id: [title, qname, [[range id or None, range title], ...]]},
+     "thing": [ids of the properties with no domain, which apply to every class],
+     "shapes": {id: [headers of the class's groups of SHACL constraints]},
+     "shape_groups": {header: [[property id or None, property qname, min, max,
+                                [[value type id or None, qname], ...]], ...]}}
+
+    The SHACL constraints of a class include those of its superclasses, a group per class
+    after a header naming it (shacl_helper.build_shacl_constraints), so each group is
+    written once too.
+    """
+    thing = []
+    for c in g.all_classes:
+        for group in c.domain_of_inferred:
+            for k, v in group.items():
+                if k is g.OWLTHING:
+                    thing = [p.id for p in v]
+        if thing:
+            break
+    classes = {}
+    for c in g.all_classes:
+        if not c.domain_of_inferred:
+            continue
+        own = [p.id for p in c.domain_of + c.domain_of_via_superproperties]
+        classes[c.id] = [c.title, [x.id for x in c.ancestors()], own]
+    props = {}
+    for p in g.all_properties:
+        ranges = p.ranges or p.ranges_inferred
+        props[p.id] = [p.title, p.qname,
+                       [[getattr(r, "id", None), getattr(r, "title", str(r))] for r in ranges]]
+    shapes, shape_groups = {}, {}
+    for c in g.all_classes:
+        headers, rows = [], None
+        for x in getattr(c, "shacl_constraints", []):
+            if x.header:
+                headers.append(x.header)
+                if x.header in shape_groups:
+                    rows = None  # this group was already written
+                else:
+                    rows = shape_groups[x.header] = []
+            elif rows is not None:
+                prop = x.property_obj.onto_property
+                rows.append([prop.id if prop else None,
+                             prop.title if prop else x.property_obj.qname,
+                             ", ".join(sorted(map(str, x.sh_minCount))) or "0",
+                             ", ".join(sorted(map(str, x.sh_maxCount))) or "*",
+                             [[t.entity.id if t.entity else None, t.qname] for t in x.value_types]])
+        if headers:
+            shapes[c.id] = headers
+    return {"classes": classes, "props": props, "thing": thing,
+            "shapes": shapes, "shape_groups": shape_groups}
 
 
 ##################

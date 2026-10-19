@@ -5,20 +5,23 @@
 <title>Ontospy > {{docs_title}}</title>
 
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
+{# The base page of the D3 visualizations: the tabs (classes, properties, concepts), the
+   side panel with the details of an entity, and a tooltip. Plain JavaScript and d3 v7,
+   bundled locally, so the pages work offline and from disk (backlog #34). #}
 
 <style type="text/css" media="screen">
 
 
-    /*STANDARD CSS */
-
+    /* STANDARD CSS */
 
     body {
-        margin-left: 6em;
-        margin-right: 12em;
+        margin: 0 3em 2em 3em;
         font-size: 14px;
-        font-family: "Helvetica Neue", Helvetica;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #222;
     }
 
     h1, h2, h3, h4, h5, h6 { text-align: left }
@@ -34,58 +37,13 @@
         margin-top: 40px;
     }
 
-
     a:link, a:visited {
         color: #666;
         text-decoration: none;
-        }
-    
+    }
+
     a:hover {
-    color: #000
-    }
-
-    
-    /*SLIDER CSS */
-
-
-    .hidden {
-        display: none;
-    }
-
-    
-    .side-panel{
-        background-color: #E6E6E6;
-        padding: 10px;
-        /*word-wrap: break-word;*/
-        overflow: auto;
-    }
-
-    .side-panel-left{
-        box-shadow: -5px 0 15px -6px #585858 inset;
-    }
-
-    .side-panel-right{
-        box-shadow: 5px 0 15px -6px #585858 inset;
-    }
-
-    a.class {
-        color: darkred;
-    }
-    a.prop {
-        color: darkblue;
-    }
-
-    .turtlesource {
-        font-size: 12px;
-        overflow: auto;
-    }
-
-    dt {
-        color: darkslategrey;
-    }
-
-    .text-muted {
-        color: grey;
+        color: #000
     }
 
     hr {
@@ -102,19 +60,181 @@
         text-decoration: underline;
     }
 
-    .section-title {
-        font-size: smaller;
-    }
-
     .header {
         font-size: 15px;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
     }
+
     a.active {
         font-weight: bold;
         color: black;
     }
 
+    .hint {
+        color: grey;
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+
+    kbd {
+        padding: 2px 4px;
+        font-size: 90%;
+        color: #fff;
+        background-color: #333;
+        border-radius: 3px;
+    }
+
+    #the_graph svg {
+        display: block;
+    }
+
+
+    /* TOOLTIP */
+
+    .d3-tooltip {
+        position: absolute;
+        z-index: 10;
+        display: none;
+        max-width: 400px;
+        padding: 6px 9px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 4px;
+        font: 12px sans-serif;
+        pointer-events: none;
+    }
+
+
+    /* SIDE PANEL */
+
+    .hidden {
+        display: none;
+    }
+
+    #panel-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    #side-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 30;
+        box-sizing: border-box;
+        width: 50%;
+        min-width: 320px;
+        max-width: 100%;
+        padding: 10px 20px 20px 20px;
+        overflow: auto;
+        background-color: #F2F2F2;
+        box-shadow: -4px 0 15px -4px #585858;
+        transform: translateX(105%);
+        visibility: hidden;
+        transition: transform 0.35s ease, visibility 0.35s;
+    }
+
+    body.panel-open #side-panel {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    body.panel-open #panel-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .panel-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: grey;
+        font-size: 12px;
+    }
+
+    .panel-bar button {
+        border: none;
+        background: none;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        color: #666;
+        padding: 0 4px;
+    }
+
+    .panel-bar button:hover {
+        color: black;
+    }
+
+    .panel-bar button:disabled {
+        visibility: hidden;
+    }
+
+    a.class {
+        color: darkred;
+    }
+    a.prop {
+        color: darkblue;
+    }
+
+    .turtlesource {
+        font-size: 12px;
+        overflow: auto;
+        background: white;
+        padding: 8px;
+    }
+
+    dt {
+        color: darkslategrey;
+    }
+
+    .text-muted {
+        color: grey;
+    }
+
+    .section-title {
+        font-size: smaller;
+    }
+
+    table.panel-table {
+        border-collapse: collapse;
+        font-size: 12px;
+        margin: 6px 0 12px 0;
+        width: 100%;
+    }
+
+    table.panel-table th, table.panel-table td {
+        border: 1px solid #ccc;
+        padding: 3px 6px;
+        text-align: left;
+        vertical-align: top;
+        background: white;
+    }
+
+    table.panel-table th {
+        background: #e6e6e6;
+    }
+
+    table.panel-table td.group {
+        background: #f7f7f7;
+        font-style: italic;
+    }
+
+    @media (max-width: 700px) {
+        body {
+            margin: 0 16px 2em 16px;
+        }
+        #side-panel {
+            width: 100%;
+            min-width: 0;
+        }
+    }
 
 </style>
 
@@ -122,13 +242,7 @@
 
 {% block custom_css %}
 
-
-    
 {% endblock custom_css %}
-
-
-
-
 
 
 </head>
@@ -138,58 +252,74 @@
 
 	{# VISIBLE PAGE HTML #}
 
-	{# note: showpanel arg is the ID of the div that is showing.. #}
-
-	<h1 class="title"><a href="javascript:showpanel('ontoinfo');">{{docs_title}}</a></h1>
+	<h1 class="title"><a href="javascript:showpanel('ontoinfo');" title="Ontology information">{{docs_title}}</a></h1>
 
 	<hr>
 
 
+	{% block main_content %}
 
+	<div class="header">
+		{% if TOTAL_CLASSES %}
+			<a href="index.html" class="{% if thispage=="classes" %}active{% endif %}">Classes ({{TOTAL_CLASSES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		{% if TOTAL_PROPERTIES %}
+			<a href="{% if TOTAL_CLASSES %}properties.html{% else %}index.html{% endif %}" class="{% if thispage=="properties" %}active{% endif %}">Properties ({{TOTAL_PROPERTIES}})</a>&nbsp;&nbsp;
+		{% endif %}
+		{% if TOTAL_CONCEPTS %}
+			<a href="{% if TOTAL_CLASSES or TOTAL_PROPERTIES %}skos.html{% else %}index.html{% endif %}" class="{% if thispage=="concepts" %}active{% endif %}">Concepts ({{TOTAL_CONCEPTS}})</a>
+		{% endif %}
+	</div>
 
-    {% block main_content %}
+	<div class="hint">{% block hint %}{% endblock hint %}</div>
 
+	<!-- the graph -->
+	<div id="the_graph"></div>
 
-    {% endblock main_content %}
-
-
+	{% endblock main_content %}
 
 
 	<hr>
-    <small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://lambdamusic.github.io/Ontospy/" target="_blank">Ontospy</a> on {% now 'utc', '%a, %d %b %Y %H:%M:%S' %}.
-    
-        {% block extra_footer %}
+	<small class="credits">Ontology documentation automatically generated with <a class="greylink" href="http://lambdamusic.github.io/Ontospy/" target="_blank">Ontospy</a> on {% now 'utc', '%a, %d %b %Y %H:%M:%S' %}.
+		{% block extra_footer %}
+		Visualization developed with <a class="greylink" href="https://d3js.org/" target="_blank">d3.js</a>.
+		{% endblock extra_footer %}
+	</small>
 
 
-        {% endblock extra_footer %}
-    </small>
-
-
-
-	{# SLIDER AND HIDDEN TABS #}
+	{# SIDE PANEL AND THE HIDDEN DIVS IT SHOWS #}
 
 	{% include "shared/d3_hiddendivs.html" %}
 
+	<div id="panel-overlay"></div>
 
-	<div id='slider' class="side-panel side-panel-left">
-		<span class="text-muted">Press <kbd>ESC</kbd> to close</span>
-		<div id="slide_contents"></div>
+	<div id="side-panel" role="dialog" aria-hidden="true">
+		<div class="panel-bar">
+			<button type="button" id="panel-back" title="Back" disabled>&larr;</button>
+			<span>Press <kbd>ESC</kbd> to close</span>
+			<button type="button" id="panel-close" title="Close">&times;</button>
+		</div>
+		<div id="panel-contents"></div>
 	</div>
 
-	{# <button id='trigger'>Trigger</button> #}
+
+	<div id="tooltip" class="d3-tooltip"></div>
 
 
-    
+	<script type="text/javascript" src="{{STATIC_URL}}libs/d3-v7/d3.v7.min.js"></script>
+
+	{% if PANEL_DATA %}
+	<script type="text/javascript">
+		var PANEL_DATA = {{PANEL_DATA|safe}};
+	</script>
+	{% endif %}
+
+	{% include "shared/js_sidepanel.html" %}
 
 
+	{% block the_javascript %}
 
-    {% block the_javascript %}
-
-
-    {% endblock the_javascript %}
-
-
-
+	{% endblock the_javascript %}
 
 
 </body>

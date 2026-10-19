@@ -1,0 +1,195 @@
+{# The side panel and the tooltip of the D3 visualizations, in plain JavaScript.
+   showpanel(id) copies the hidden div with that id (shared/d3_hiddendivs.html) into the
+   panel; links inside the panel call showpanel too, and the back button returns to the
+   previous entity. Replaces jQuery 1.7.1 and slideReveal (backlog #34). #}
+
+<script type="text/javascript">
+
+	var panelHistory = [];
+
+	function showpanel(id, fromBack) {
+		if (!id || id == "None") {
+			id = "ontoinfo";
+		}
+		var source = document.getElementById(id);
+		if (!source) {
+			return;
+		}
+		var current = document.body.getAttribute("data-panel");
+		if (!fromBack && current && current != id && document.body.classList.contains("panel-open")) {
+			panelHistory.push(current);
+		}
+		var contents = document.getElementById("panel-contents");
+		contents.innerHTML = source.innerHTML;
+		contents.querySelectorAll(".usage[data-class]").forEach(function(div) {
+			div.innerHTML = usageTable(div.getAttribute("data-class"));
+		});
+		contents.querySelectorAll(".shapes[data-class]").forEach(function(div) {
+			div.innerHTML = shapesTable(div.getAttribute("data-class"));
+		});
+		// links to entities with no div of their own (eg owl:Thing, xsd:string) become text
+		contents.querySelectorAll("a[href^='javascript:showpanel(']").forEach(function(a) {
+			var target = a.getAttribute("href").match(/showpanel\('([^']*)'\)/);
+			if (!target || !target[1] || !document.getElementById(target[1])) {
+				var i = document.createElement("i");
+				i.textContent = a.textContent;
+				i.title = a.title;
+				a.replaceWith(i);
+			}
+		});
+		document.getElementById("panel-back").disabled = (panelHistory.length == 0);
+		document.getElementById("side-panel").scrollTop = 0;
+		document.getElementById("side-panel").setAttribute("aria-hidden", "false");
+		document.body.setAttribute("data-panel", id);
+		document.body.classList.add("panel-open");
+	}
+
+	// the Usage table of a class: the properties of the class and of its superclasses,
+	// then those with no domain, as the html-multi class pages show them
+	function usageTable(classId) {
+		var data = (typeof PANEL_DATA !== "undefined") ? PANEL_DATA : null;
+		var c = data && data.classes[classId];
+		if (!c) {
+			return "";
+		}
+		function link(id, title, css) {
+			return "<a href=\"javascript:showpanel('" + id + "');\" class='" + css + "'>" + escapeHtml(title) + "</a>";
+		}
+		function rows(propIds) {
+			return propIds.map(function(pid) {
+				var p = data.props[pid];
+				if (!p) return "";
+				var ranges = p[2].length ? p[2].map(function(r) {
+					return r[0] != null ? link(r[0], r[1], "class") : "<i>" + escapeHtml(r[1]) + "</i>";
+				}).join(", ") : "<i>owl:Thing</i>";
+				return "<tr><td>" + link(pid, p[0], "prop") + "</td><td>" + ranges + "</td></tr>";
+			}).join("");
+		}
+		var html = "";
+		[classId].concat(c[1]).forEach(function(id) {
+			var x = data.classes[id];
+			if (x && x[2].length) {
+				html += "<tr><td colspan='2' class='group'>" +
+					(id == classId ? "Defined on this class" : "From " + link(id, x[0], "class")) +
+					"</td></tr>" + rows(x[2]);
+			}
+		});
+		if (data.thing.length) {
+			html += "<tr><td colspan='2' class='group'>From <i>owl:Thing</i> (properties with no domain)</td></tr>" + rows(data.thing);
+		}
+		if (!html) {
+			return "";
+		}
+		return "<hr><b class='section-title'>Usage: instances of " + escapeHtml(c[0]) +
+			" can have the following properties</b>" +
+			"<table class='panel-table'><tr><th>Property</th><th>Range</th></tr>" + html + "</table>";
+	}
+
+	// the SHACL property shapes of a class and of its superclasses, a group per class
+	function shapesTable(classId) {
+		var data = (typeof PANEL_DATA !== "undefined") ? PANEL_DATA : null;
+		var headers = data && data.shapes[classId];
+		if (!headers) {
+			return "";
+		}
+		function term(id, title, css) {
+			return id != null ?
+				"<a href=\"javascript:showpanel('" + id + "');\" class='" + css + "'>" + escapeHtml(title) + "</a>" :
+				"<code>" + escapeHtml(title) + "</code>";
+		}
+		var html = "";
+		headers.forEach(function(header) {
+			html += "<tr><td colspan='4' class='group'>" + escapeHtml(header) + "</td></tr>";
+			(data.shape_groups[header] || []).forEach(function(row) {
+				html += "<tr><td>" + term(row[0], row[1], "prop") + "</td><td>" + escapeHtml(row[2]) +
+					"</td><td>" + escapeHtml(row[3]) + "</td><td>" +
+					row[4].map(function(t) { return term(t[0], t[1], "class"); }).join(", ") + "</td></tr>";
+			});
+		});
+		return "<hr><b class='section-title'>Property Shapes:</b>" +
+			"<table class='panel-table'><tr><th>Property</th><th>Min</th><th>Max</th><th>Value type</th></tr>" +
+			html + "</table>";
+	}
+
+	function hidepanel() {
+		document.body.classList.remove("panel-open");
+		document.getElementById("side-panel").setAttribute("aria-hidden", "true");
+		panelHistory = [];
+	}
+
+	document.getElementById("panel-close").addEventListener("click", hidepanel);
+	document.getElementById("panel-overlay").addEventListener("click", hidepanel);
+	document.getElementById("panel-back").addEventListener("click", function() {
+		if (panelHistory.length) {
+			showpanel(panelHistory.pop(), true);
+		}
+	});
+	document.addEventListener("keydown", function(event) {
+		if (event.key == "Escape") {
+			hidepanel();
+		}
+	});
+
+
+	// the tooltip: showTooltip(event, html) on mouseover/mousemove, hideTooltip() on mouseout
+	var tooltipDiv = document.getElementById("tooltip");
+
+	function showTooltip(event, html) {
+		if (html !== undefined) {
+			tooltipDiv.innerHTML = html;
+		}
+		tooltipDiv.style.display = "block";
+		var x = event.pageX + 14,
+			y = event.pageY + 14;
+		// keep it inside the window
+		var maxX = window.scrollX + document.documentElement.clientWidth - tooltipDiv.offsetWidth - 10;
+		tooltipDiv.style.left = Math.min(x, maxX) + "px";
+		tooltipDiv.style.top = y + "px";
+	}
+
+	function hideTooltip() {
+		tooltipDiv.style.display = "none";
+	}
+
+	// a label that fits a width: the full name, else the part after the prefix
+	// (eg "AmericanHot" for "pizza.owl:AmericanHot"), else none
+	function shortName(name) {
+		var i = String(name).lastIndexOf(":");
+		return i > 0 && i < name.length - 1 ? name.slice(i + 1) : null;
+	}
+
+	function fitLabel(textEl, name, width) {
+		textEl.textContent = name;
+		if (textEl.getComputedTextLength() <= width) {
+			return true;
+		}
+		var shorter = shortName(name);
+		if (shorter) {
+			textEl.textContent = shorter;
+			if (textEl.getComputedTextLength() <= width) {
+				return true;
+			}
+		}
+		textEl.textContent = "";
+		return false;
+	}
+
+	// text for the tooltip: the title, and the qname if different
+	function escapeHtml(s) {
+		return String(s == null ? "" : s).replace(/[&<>"']/g, function(c) {
+			return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+		});
+	}
+
+	function entityTooltip(data, extra) {
+		var html = "<b>" + escapeHtml(data.name) + "</b>";
+		if (data.qname && data.qname != data.name) {
+			html += "<br>" + escapeHtml(data.qname);
+		}
+		if (extra) {
+			html += "<br><span style='color: #ccc'>" + escapeHtml(extra) + "</span>";
+		}
+		return html;
+	}
+
+</script>

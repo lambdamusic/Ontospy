@@ -296,3 +296,80 @@ def test_ontology_metadata_rendered(viz_id, tmp_path):
 		< out.index(entry.format("rdfs:label")))
 	import re
 	assert not re.search(r"\bn[0-9a-f]{32}b\d+\b", out), "a blank-node id is shown"
+
+
+D3_VIZS = ["d3-dendogram", "d3-bubble-chart", "d3-pack-hierarchy"]
+
+
+@pytest.mark.parametrize("viz_id", D3_VIZS)
+def test_d3_libraries(pizza, viz_id, tmp_path):
+	"""#34: the D3 vizs use d3 v7, bundled, and plain JavaScript for the side panel: no
+	jQuery, slideReveal or older d3, and nothing loaded from the network"""
+	viz_index = [n for n, v in VIZ_TYPES if v == viz_id][0]
+	build_visualization(pizza, viz_index, path=str(tmp_path))
+	assert os.listdir(tmp_path / "static" / "libs") == ["d3-v7"]
+	assert (tmp_path / "static" / "libs" / "d3-v7" / "d3.v7.min.js").exists()
+	out = read_all_output(tmp_path)
+	for old in ["jquery", "slideReveal", "d3.v2", "d3-v3", "http://d3js.org"]:
+		assert old not in out, old
+	assert 'src="static/libs/d3-v7/d3.v7.min.js"' in out
+
+
+def _panel_data(html):
+	import json, re
+	return json.loads(re.search(r"var PANEL_DATA = (.*?);\n", html).group(1))
+
+
+def test_d3_panel_usage_data(pizza, tmp_path):
+	"""#26: a class's Usage table (its properties and its superclasses') is built in the
+	browser from data written once per page, not as a table per class"""
+	from ..gendocs.utils import build_D3panelData
+	data = build_D3panelData(pizza)
+	topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#SundriedTomatoTopping")
+	pizza_topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#PizzaTopping")
+	title, ancestors, own = data["classes"][topping.id]
+	assert title == topping.title
+	assert pizza_topping.id in ancestors
+	is_topping_of = [p.id for p in pizza_topping.domain_of]
+	assert is_topping_of and set(is_topping_of) <= set(data["classes"][pizza_topping.id][2])
+	# the properties with no domain apply to every class, and are listed once
+	assert [p.id for p in pizza.all_properties if p.qname == "pizza.owl:hasCountryOfOrigin"][0] in data["thing"]
+	# in the page, as JSON
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "d3-dendogram"][0], path=str(tmp_path))
+	html = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert _panel_data(html)["classes"][str(topping.id)][0] == topping.title
+	assert '<div class="usage" data-class="{}">'.format(topping.id) in html
+
+
+def test_d3_panel_shapes_data(tmp_path):
+	"""#26: the SHACL property shapes of a class, and of its superclasses, a group per
+	class written once"""
+	from .test_shacl_constraints import IMPLICIT_TTL
+	from ..gendocs.utils import build_D3panelData
+	g = Ontospy(data=IMPLICIT_TTL, rdf_format="turtle")
+	data = build_D3panelData(g)
+	person = g.get_class(uri="http://example.org/i#Person")
+	assert data["shapes"][person.id] == ["i:Person", "i:Agent"]
+	name_row = data["shape_groups"]["i:Agent"][0]
+	assert name_row[1:4] == ["i:name", "1", "1"]
+	assert name_row[0] == g.get_property(uri="http://example.org/i#name").id
+	assert name_row[4] == [[None, "xsd:string"]]
+	build_visualization(g, [n for n, v in VIZ_TYPES if v == "d3-dendogram"][0], path=str(tmp_path))
+	html = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert _panel_data(html)["shape_groups"]["i:Agent"][0][1] == "i:name"
+
+
+def test_d3_bubble_labels(tmp_path):
+	"""#32: in the bubble chart, parents and children are labelled the same way, honouring
+	--preflabel/--preflang (pizza's labels are Portuguese, with English qnames)"""
+	from ..gendocs.utils import build_D3bubbleChart
+	for pref_title in ["qname", "label"]:
+		g = Ontospy(TEST_RDF_FOLDER + "pizza.ttl", pref_title=pref_title)
+		by_id = {c.id: c for c in g.all_classes}
+		names = []
+		def walk(nodes):
+			for d in nodes:
+				names.append((d["name"], by_id[d["objid"]].title))
+				walk(d.get("children", []))
+		walk(build_D3bubbleChart(0, 99, 1, g.toplayer_classes))
+		assert names and all(name == title for name, title in names)
