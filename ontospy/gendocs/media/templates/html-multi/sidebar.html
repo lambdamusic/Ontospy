@@ -1,68 +1,72 @@
+{# The sidebar, written once (backlog #21). Repeating the whole list of entities in every
+   page made the output grow with the square of their number; instead the list is in
+   sidebar.js, written once next to the pages and loaded with a plain script tag (not
+   fetch(), which fails when the docs are opened from disk), and the entries are built
+   in the browser, under the section headers below. Without JavaScript, the headers
+   still link to the trees. #}
 
 <!-- Sidebar -->
 <div id="sidebar-wrapper">
-    <ul class="sidebar-nav">
-
+    <ul class="sidebar-nav" id="sidebar-list" data-thispage="{{thispage}}">
 
         <li>
           <input style="margin-top: 30px;  margin-bottom: 20px;" type="text" id="search-input-sidebar" name="" value="" placeholder="Type to search">
         </li>
 
-        {% if ontospy_graph.all_classes%}
-          <li class="-second-level" id="sd_classes"><a {% if thispage == "classes" %}class="active"{% endif %}href="entities-tree-classes.html">Classes ({{ontospy_graph.all_classes|length}})</a>
+        {% if ontospy_graph.all_classes %}
+          <li class="-second-level sidebar-section" id="sd_classes" data-section="classes"><a {% if thispage == "classes" %}class="active" {% endif %}href="entities-tree-classes.html">Classes ({{ontospy_graph.all_classes|length}})</a>
           </li>
-
-            {# simulated second level #}
-          {% for each in  ontospy_graph.all_classes%}
-              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% if thispage == each.qname %}class="active"{% endif %} href="{{each.slug}}.html">{{each.title}}</a></li>
-          {% endfor %}
         {% endif %}
 
         {% if ontospy_graph.all_properties %}
-            <li class="-second-level" id="sd_properties"><a {% if thispage == "properties" %}class="active"{% endif %} href="entities-tree-properties.html">Properties ({{ontospy_graph.all_properties|length}})</a>
-            </li>
-
-            {# simulated second level #}
-          {% for each in  ontospy_graph.all_properties %}
-              <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% if thispage == each.qname %}class="active"{% endif %}  href="{{each.slug}}.html">{{each.title}}</a></li>
-          {% endfor %}
-
+          <li class="-second-level sidebar-section" id="sd_properties" data-section="properties"><a {% if thispage == "properties" %}class="active" {% endif %}href="entities-tree-properties.html">Properties ({{ontospy_graph.all_properties|length}})</a>
+          </li>
         {% endif %}
 
-        {% if ontospy_graph.all_skos_concepts  %}
-            <li class="-second-level" id="sd_concepts"><a {% if thispage == "concepts" %}class="active"{% endif %}href="entities-tree-concepts.html">Concepts ({{ontospy_graph.all_skos_concepts|length}})</a>
-            </li>
-
-              {# simulated second level #}
-            {% for each in  ontospy_graph.all_skos_concepts %}
-                <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% if thispage == each.qname %}class="active"{% endif %}  href="{{each.slug}}.html">{{each.title}}</a></li>
-            {% endfor %}
-
+        {% if ontospy_graph.all_skos_concepts %}
+          <li class="-second-level sidebar-section" id="sd_concepts" data-section="concepts"><a {% if thispage == "concepts" %}class="active" {% endif %}href="entities-tree-concepts.html">Concepts ({{ontospy_graph.all_skos_concepts|length}})</a>
+          </li>
         {% endif %}
 
-
-        {% if ontospy_graph.all_individuals  %}
-        <li class="-second-level" id="sd_individuals"><a {% if thispage == "individuals" %}class="active"{% endif %}href="entities-tree-individuals.html">Individuals ({{ontospy_graph.all_individuals|length}})</a>
-        </li>
-
-          {# simulated second level #}
-        {% for each in  ontospy_graph.all_individuals %}
-            <li class="second-level" style="line-height: 20px;" id="sd_{{each.id}}"><a {% if thispage == each.qname %}class="active"{% endif %}  href="{{each.slug}}.html">{{each.title}}</a></li>
-        {% endfor %}
-
+        {% if ontospy_graph.all_individuals %}
+          <li class="-second-level sidebar-section" id="sd_individuals" data-section="individuals"><a {% if thispage == "individuals" %}class="active" {% endif %}href="entities-tree-individuals.html">Individuals ({{ontospy_graph.all_individuals|length}})</a>
+          </li>
         {% endif %}
 
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
+        <li style="height: 140px;"></li>
 
     </ul>
-
 </div>
 
-
+<script src="sidebar.js"></script>
+<script type="text/javascript">
+  // build the entries of each section from SIDEBAR (sidebar.js): [id, title, page, qname],
+  // the qname left out when it is the title; the entry of this page is highlighted
+  (function() {
+    var data = window.SIDEBAR;
+    var list = document.getElementById("sidebar-list");
+    if (!data || !list) return;
+    var thispage = list.getAttribute("data-thispage");
+    var escape = function(s) {
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+      });
+    };
+    list.querySelectorAll("li.sidebar-section").forEach(function(header) {
+      var items = data[header.getAttribute("data-section")] || [];
+      var html = items.map(function(e) {
+        var active = (e[3] || e[1]) === thispage;
+        return '<li class="second-level" style="line-height: 20px;" id="sd_' + e[0] + '">' +
+          '<a ' + (active ? 'class="active" ' : '') + 'href="' + e[2] + '.html">' + escape(e[1]) + '</a></li>';
+      }).join("");
+      header.insertAdjacentHTML("afterend", html);
+    });
+    // scroll the sidebar to the entry of this page, or to the section of a tree page
+    var active = list.querySelector("li.second-level a.active") || list.querySelector("li.sidebar-section a.active");
+    var wrapper = document.getElementById("sidebar-wrapper");
+    if (active && wrapper) {
+      wrapper.scrollTop = active.parentNode.offsetTop - 100;
+    }
+  })();
+</script>
 <!-- /#sidebar-wrapper -->

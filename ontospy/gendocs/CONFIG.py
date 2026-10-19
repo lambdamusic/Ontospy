@@ -34,6 +34,9 @@ VISUALIZATIONS_LIST = {
                        }]
 }
 
+# A viz's --type number is its position in the list above, from 1, unless it has a
+# "Number": new vizs take numbers above 10, so that the removed ones below aren't reused.
+
 # Removed in 2.6 (backlog #25), by their former --type number: (ID, title). Their numbers
 # aren't reused for a release or two, so that a script asking for one fails clearly
 # rather than getting another visualization.

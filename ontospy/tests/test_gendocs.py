@@ -373,3 +373,55 @@ def test_d3_bubble_labels(tmp_path):
 				walk(d.get("children", []))
 		walk(build_D3bubbleChart(0, 99, 1, g.toplayer_classes))
 		assert names and all(name == title for name, title in names)
+
+
+def test_viz_numbers(monkeypatch):
+	"""#21: a new viz can take a number above 10 (CONFIG.py), so that the numbers of the
+	vizs removed in 2.6 still fail with a message rather than picking the new one"""
+	from ..gendocs import actions
+	vizs = actions.VISUALIZATIONS_LIST + [{"ID": "new-viz", "Title": "New", "Number": 11}]
+	monkeypatch.setattr(actions, "VISUALIZATIONS_LIST", vizs)
+	assert [actions.viz_number(n) for n in range(len(vizs))] == [1, 2, 3, 4, 5, 6, 11]
+	assert actions._viz_index("11") == actions._viz_index("new-viz") == 6
+	assert actions._viz_index("7") is None
+	assert actions._viz_index("12") is None
+
+
+def test_html_multi_sidebar(pizza, tmp_path):
+	"""#21: html-multi writes the sidebar's entities once, in sidebar.js, rather than in
+	every page"""
+	import json
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	js = (tmp_path / "sidebar.js").read_text(encoding="utf-8")
+	assert js.startswith("var SIDEBAR = ")
+	data = json.loads(js[len("var SIDEBAR = "):].rstrip().rstrip(";"))
+	assert len(data["classes"]) == len(pizza.all_classes)
+	assert len(data["properties"]) == len(pizza.all_properties)
+	assert len(data["individuals"]) == len(pizza.all_individuals)
+	veneziana = [c for c in pizza.all_classes if c.qname == "pizza.owl:Veneziana"][0]
+	assert [veneziana.id, veneziana.title, veneziana.slug] in data["classes"]
+	# a page has the section headers and the script, not the entries
+	page = (tmp_path / (veneziana.slug + ".html")).read_text(encoding="utf-8")
+	assert page.count('class="second-level"') == 1  # in the script that builds the entries
+	assert 'href="entities-tree-classes.html">Classes (' in page
+	assert '<script src="sidebar.js"></script>' in page
+	assert 'data-thispage="pizza.owl:Veneziana"' in page
+
+
+def test_html_multi_one_theme(pizza, tmp_path):
+	"""#21: only the chosen Bootswatch theme is copied, not all 14"""
+	from ..gendocs.viz.viz_html_multi import KompleteViz
+	KompleteViz(pizza, theme="flatly").build(str(tmp_path))
+	themes = os.listdir(tmp_path / "static" / "libs" / "bootswatch3_2")
+	assert sorted(themes) == ["flatly", "fonts"]
+	assert 'bootswatch3_2/flatly/bootstrap.min.css' in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
+def test_html_multi_multimodel(pizza, tmp_path):
+	"""for the examples site: static files shared by several outputs, sidebar.js with each"""
+	from ..gendocs.viz.viz_html_multi import KompleteVizMultiModel
+	v = KompleteVizMultiModel(pizza, static_url="../static/", output_path_static=str(tmp_path / "static"))
+	v.build(str(tmp_path / "pizza"))
+	assert (tmp_path / "pizza" / "sidebar.js").exists()
+	assert not (tmp_path / "pizza" / "static").exists()
+	assert 'href="../static/libs/bootswatch3_2/' in (tmp_path / "pizza" / "index.html").read_text(encoding="utf-8")
