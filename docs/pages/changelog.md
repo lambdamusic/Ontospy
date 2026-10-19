@@ -12,6 +12,7 @@ Summary of changes.
 - Command line
     - A source file that doesn't exist is reported as "File not found", instead of a parse error after trying every RDF serialization. `gendocs` and `ser` stop there and exit with an error, rather than carrying on with an empty graph (`gendocs` used to ask for a format and then write empty documentation)
     - `gendocs` loads the ontology before asking which visualization to build, so a source that fails to load stops it before the question
+    - The local library (`ontospy lib`, `gendocs -l`, the shell) lists its files in alphabetical order ignoring case, eg `Brick.ttl` between `bfo.owl` and `cito.rdf` instead of before all the lowercase names
 - Shell
     - Properties with no domain or range of their own show those inherited from their superproperties, marked "(inferred)", instead of `owl:Thing`, as the documentation has done since 2.4
     - `info inferred_usage` on a class also lists the properties whose domain or range is that class via a superproperty, under "Inferred from superproperties"

@@ -88,7 +88,8 @@ def get_home_location():
 
 
 def get_localontologies(pattern=""):
-    "returns a list of file names in the ontologies folder (not the full path)"
+    """returns a list of file names in the ontologies folder (not the full path), in
+    alphabetical order ignoring case, so that eg 'Brick.ttl' doesn't come before 'agrovoc.ttl'"""
     res = []
     ONTOSPY_LOCAL_MODELS = get_home_location()
     if not os.path.exists(ONTOSPY_LOCAL_MODELS):
@@ -101,7 +102,7 @@ def get_localontologies(pattern=""):
                 else:
                     if pattern in f:
                         res += [f]
-    return sorted(res)
+    return sorted(res, key=lambda f: (f.lower(), f))
 
 
 def get_random_ontology(TOP_RANGE=10, pattern=""):
