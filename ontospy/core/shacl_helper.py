@@ -412,8 +412,8 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
         class, and within a group sorted by sh:order then path.
 
     Also sets the shapes' shacl_constraints, targets, node_constraints and used_by (see the module
-    docstring), and links each shape to the classes it applies to implicitly, ie a class
-    that is itself a sh:NodeShape (OntoShape.targetClasses and OntoClass.all_shapes).
+    docstring). The shapes must already be linked to their classes, explicit and implicit
+    targets alike (OntoShape.targetClasses, OntoClass.all_shapes): Ontospy.build_shapes does it.
 
     For each property shape:
         (a) sh:path, a property or a property path, goes in the PROPERTY column
@@ -428,15 +428,8 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, List[C
         return all_shacl_constraints
 
     reader = _Reader(ontology_object)
-    classes: Dict[URIRef, OntoClass] = {c.uri: c for c in ontology_object.all_classes}
 
     for shape in ontology_object.all_shapes:
-        # implicit class targets (SHACL 2.1.3.3): a class that is also a node shape
-        onto_class = classes.get(shape.uri)
-        if onto_class is not None and onto_class not in shape.targetClasses:
-            shape.targetClasses.append(onto_class)
-            if shape not in onto_class.all_shapes:
-                onto_class.all_shapes.append(shape)
         # the shape's own constraints
         constraints: Dict[Node, Constraint] = dict()
         reader.add_constraints(constraints, shape.uri)

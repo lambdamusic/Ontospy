@@ -726,6 +726,8 @@ class Ontospy(object):
 
 		# add more data
 		shacl = rdflib.Namespace('http://www.w3.org/ns/shacl#')
+		# by exact URI, for the implicit class targets below
+		classes_by_uri = {c.uri: c for c in self.all_classes}
 
 		for aShape in self.all_shapes:
 
@@ -742,11 +744,12 @@ class Ontospy(object):
 					aShape.targetClasses += [aclass]
 					aclass.all_shapes += [aShape]
 
-					#add shaped properties of this class. later can be used for ontodocs
-					for propertyUri in aShape.getValuesForProperty(shacl['path']): 
-						propType = self.get_property(str(propertyUri))
-						if propType:
-							aclass.shapedProperties += [{'shape': aShape, 'property': propType}]
+			# implicit class target (SHACL 2.1.3.3): a class that is also a node shape,
+			# as in SPDX or QUDT (moved here from shacl_helper, backlog #30)
+			aclass = classes_by_uri.get(aShape.uri)
+			if aclass and aclass not in aShape.targetClasses:
+				aShape.targetClasses += [aclass]
+				aclass.all_shapes += [aShape]
 
 
 
