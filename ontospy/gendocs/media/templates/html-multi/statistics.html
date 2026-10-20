@@ -279,8 +279,14 @@
         var onSelect = function(objid) { showEntity(kind, objid); };
         if (chart == "bubble") {
           drawBubbleChart("#" + id, data[kind].bubble, onSelect);
-        } else {
+        } else if (data[kind].pack) {
           drawPackChart("#" + id, data[kind].pack, onSelect);
+        } else {
+          // too many circles to draw (MAX_PACK_NODES in viz_html_multi.py)
+          document.getElementById(id).innerHTML = "<p class='text-muted chart-too-big'><i>" +
+            "This hierarchy is too large to draw here: " + data[kind].pack_nodes.toLocaleString("en") +
+            " circles, as an entity with several parents appears under each of them. " +
+            "See the <a href='entities-tree-" + kind + ".html'>tree page</a>, or the density chart below.</i></p>";
         }
       }
     }

@@ -95,18 +95,32 @@ def usage_js(g):
 
 
 
-def statistics_charts(g):
-    """For the statistics page: (key, label, bubble chart tree, pack tree) for each kind of
-    entity the graph has, built as for the D3 vizs"""
+# The most circles the statistics page's pack chart draws. The pack repeats an entity
+# under each of its parents, so with multiple inheritance it can far outgrow the number
+# of entities: 221k circles for FOVT's 12k classes, which kept the page from loading
+# (backlog #45). Above this, the chart is left out, with a note.
+MAX_PACK_NODES = 20000
+
+
+def _count_nodes(tree):
+    return 1 + sum(_count_nodes(x) for x in tree.get("children", []))
+
+
+def statistics_charts(g, max_pack_nodes=MAX_PACK_NODES):
+    """For the statistics page: (key, label, bubble chart tree, pack tree, number of pack
+    nodes) for each kind of entity the graph has, built as for the D3 vizs; the pack tree
+    is None when it has more than max_pack_nodes"""
     out = []
     for key, label, toplayer, root in [
             ("classes", "Classes", g.toplayer_classes, "owl:Thing"),
             ("properties", "Properties", g.toplayer_properties, "Properties"),
             ("concepts", "Concepts", g.toplayer_skos, "Concepts")]:
         if toplayer:
+            pack = {'children': build_D3treeStandard(0, 99, 1, toplayer), 'name': root, 'id': "None"}
+            nodes = _count_nodes(pack)
             out.append((key, label,
                 {'children': build_D3bubbleChart(0, 99, 1, toplayer), 'name': root, 'id': "None"},
-                {'children': build_D3treeStandard(0, 99, 1, toplayer), 'name': root, 'id': "None"}))
+                pack if nodes <= max_pack_nodes else None, nodes))
     return out
 
 
@@ -182,9 +196,10 @@ class KompleteViz(VizFactory):
         charts = statistics_charts(self.ontospy_graph)
         if charts:
             # "</" escaped, since it goes in a <script>
-            extra_context["CHARTS"] = [(key, label) for key, label, _, _ in charts]
+            extra_context["CHARTS"] = [(key, label) for key, label, _, _, _ in charts]
             extra_context["CHARTS_DATA"] = json.dumps(
-                {key: {"bubble": bubble, "pack": pack} for key, _, bubble, pack in charts},
+                {key: {"bubble": bubble, "pack": pack, "pack_nodes": nodes}
+                 for key, _, bubble, pack, nodes in charts},
                 ensure_ascii=False).replace("</", "<\\/")
             extra_context["ENTITY_INFO"] = json.dumps(
                 entity_info(self.ontospy_graph), ensure_ascii=False).replace("</", "<\\/")

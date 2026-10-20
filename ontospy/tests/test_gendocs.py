@@ -506,3 +506,14 @@ def test_html_multi_statistics_charts(pizza, tmp_path):
 	assert "toplayerChart" not in page
 	# the number of triples, without a chart
 	assert "{:,}".format(pizza.triplesCount()) in page and "triplesStats" not in page
+
+
+def test_html_multi_statistics_pack_limit(pizza, monkeypatch):
+	"""#45: a pack with too many circles (an entity is repeated under each of its parents)
+	is left out of the statistics page, which otherwise couldn't load: FOVT had 221k"""
+	from ..gendocs.viz import viz_html_multi
+	charts = {key: (pack, nodes) for key, _, _, pack, nodes in viz_html_multi.statistics_charts(pizza)}
+	pack, nodes = charts["classes"]
+	assert pack is not None and nodes > len(pizza.all_classes)  # the root, and repeats
+	charts = {key: (pack, nodes) for key, _, _, pack, nodes in viz_html_multi.statistics_charts(pizza, max_pack_nodes=50)}
+	assert charts["classes"] == (None, nodes)
