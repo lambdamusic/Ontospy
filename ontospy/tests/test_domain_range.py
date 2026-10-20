@@ -91,3 +91,29 @@ def test_blank_node_range(g):
 	p = g.get_property(uri=NS + "range_bnode")
 	assert p.domains == []
 	assert len(p.ranges) == 1 and p.ranges[0].is_Bnode
+
+
+SCHEMA_TTL = """
+@prefix schema: <%s> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+schema:Thing a rdfs:Class .
+schema:Person a rdfs:Class ; rdfs:subClassOf schema:Thing .
+schema:Place a rdfs:Class ; rdfs:subClassOf schema:Thing .
+schema:birthPlace a rdf:Property ; schema:domainIncludes schema:Person ;
+    schema:rangeIncludes schema:Place .
+"""
+
+
+@pytest.mark.parametrize("ns", ["http://schema.org/", "https://schema.org/"])
+def test_schema_org_domain_range_includes(ns):
+	"""schema:domainIncludes / rangeIncludes are domains and ranges in both of schema.org's
+	namespaces: its current files use https://schema.org/, which was ignored, so every
+	property seemed to apply to every class"""
+	g = Ontospy(data=SCHEMA_TTL % ns, rdf_format="turtle")
+	prop = g.get_property(uri=ns + "birthPlace")
+	assert [x.uri for x in prop.domains] == [g.get_class(uri=ns + "Person").uri]
+	assert [x.uri for x in prop.ranges] == [g.get_class(uri=ns + "Place").uri]
+	person = g.get_class(uri=ns + "Person")
+	assert prop in person.domain_of
+	assert prop not in g._topLevelProperties("domain_of")

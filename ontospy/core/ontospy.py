@@ -842,15 +842,19 @@ class Ontospy(object):
 	def __buildDomainRanges(self, aProp):
 		"""
 		extract domain/range details and add to Python objects
+
+		schema.org's domainIncludes / rangeIncludes count as domains and ranges, in both
+		its namespaces: schema.org recommends https://schema.org/ and publishes its files
+		in both, and older copies (eg Ontospy's test file) use http://schema.org/
 		"""
 
-		domains = chain(aProp.rdflib_graph.objects(
-			None, rdflib.term.URIRef(u'http://schema.org/domainIncludes')), aProp.rdflib_graph.objects(
-			None, rdflib.RDFS.domain))
+		domains = chain(*[aProp.rdflib_graph.objects(None, rdflib.term.URIRef(ns + 'domainIncludes'))
+						  for ns in ('http://schema.org/', 'https://schema.org/')],
+						aProp.rdflib_graph.objects(None, rdflib.RDFS.domain))
 
-		ranges = chain(aProp.rdflib_graph.objects(
-			None, rdflib.term.URIRef(u'http://schema.org/rangeIncludes')), aProp.rdflib_graph.objects(
-			None, rdflib.RDFS.range))
+		ranges = chain(*[aProp.rdflib_graph.objects(None, rdflib.term.URIRef(ns + 'rangeIncludes'))
+						 for ns in ('http://schema.org/', 'https://schema.org/')],
+					   aProp.rdflib_graph.objects(None, rdflib.RDFS.range))
 
 		for x in domains:
 			if isBlankNode(x):
