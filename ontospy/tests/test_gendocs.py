@@ -375,6 +375,33 @@ def test_d3_bubble_labels(tmp_path):
 		assert names and all(name == title for name, title in names)
 
 
+DIAMOND_TTL = """
+@prefix : <http://example.org/d#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+:A a owl:Class .
+:B a owl:Class .
+:C a owl:Class ; rdfs:subClassOf :A, :B .
+:D a owl:Class ; rdfs:subClassOf :C .
+"""
+
+
+def test_d3_bubble_no_duplicates():
+	"""#21: the bubble chart shows density, so a class with several parents is one bubble,
+	not one under each parent (with its subtree repeated too)"""
+	from ..gendocs.utils import build_D3bubbleChart
+	g = Ontospy(data=DIAMOND_TTL, rdf_format="turtle")
+	bubbles = []
+	def walk(nodes):  # as drawBubbleChart's flatten(): a bubble per node with no children
+		for d in nodes:
+			if "children" in d:
+				walk(d["children"])
+			else:
+				bubbles.append(d["qname"])
+	walk(build_D3bubbleChart(0, 99, 1, g.toplayer_classes))
+	assert sorted(bubbles) == ["d:A", "d:B", "d:C", "d:D"]
+
+
 def test_viz_numbers(monkeypatch):
 	"""#21: a new viz can take a number above 10 (CONFIG.py), so that the numbers of the
 	vizs removed in 2.6 still fail with a message rather than picking the new one"""

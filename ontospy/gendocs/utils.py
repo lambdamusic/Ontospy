@@ -60,7 +60,7 @@ def truncchar_inverse(value, arg):
         return '...' + value[x:]
 
 
-def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
+def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None, _seen=None):
     """
 	  Similar to standar d3, but nodes with children need to be duplicated otherwise they are
 	   not depicted explicitly but just color coded
@@ -85,11 +85,20 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
 			{"name": "Drug discovery B", "size": 3620, },
 		 ]},
 		etc...
+
+	Each entity appears once, under the first parent the walk reaches it from: the chart
+	shows density, so an entity with several parents (and its subtree) isn't repeated
+	under each of them, which on FOVT made 288k bubbles for 12k classes (backlog #21).
 	"""
     out = []
+    if _seen is None:
+        _seen = set()
     if not old:
         old = toplayer
     for x in old:
+        if x.id in _seen:
+            continue
+        _seen.add(x.id)
         d = {}
         # print "*" * level, x.label
         d['qname'] = x.qname
@@ -106,7 +115,7 @@ def build_D3bubbleChart(old, MAX_DEPTH, level=1, toplayer=None):
             duplicate_row['realsize'] = len(x.children())  # real size
             out += [duplicate_row]
             d['children'] = build_D3bubbleChart(x.children(), MAX_DEPTH,
-                                                level + 1)
+                                                level + 1, _seen=_seen)
         else:
             d['size'] = 1  # default size
             d['realsize'] = 0  # default size
