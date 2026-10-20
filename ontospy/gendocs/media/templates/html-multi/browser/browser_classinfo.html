@@ -150,6 +150,7 @@
               {% else %}
                 <li>owl:Thing</li>
               {% endif %}
+              </ul>
             </div>
           </div>
         </div>
@@ -194,8 +195,10 @@
    {% endif %}
 
 
-    {# Usage panel #}
-    {% if each.domain_of_inferred %}
+    {# Usage panel: the rows are built in the browser (custom/js/usage.js) from usage.js,
+       written once next to the pages, rather than repeated on every class page (backlog
+       #21); usage_groups are the ids of the classes whose properties the table lists #}
+    {% if usage_groups %}
       <div class="row">
         <div class="col-md-12">
           <div class="panel panel-default">
@@ -204,53 +207,18 @@
             </div>
             <div class="panel-body" style="overflow: auto;">
               <p>Instances of {{each.title}} can have the following properties:</p>
+              <noscript><p><i>The list of properties needs JavaScript.</i></p></noscript>
             </div>
-            <table class="table table-bordered" style="overflow: auto;">
+            <table class="table table-bordered" style="overflow: auto;" id="usage-table" data-groups="{{usage_groups|join(' ')}}">
               <tr class="table-classproperties">
                 <th>PROPERTY</th><th>TYPE</th><th>DESCRIPTION</th><th>RANGE</th>
               </tr>
-              {% for group in each.domain_of_inferred  %}
-                {% for k,v in group.items()  %}
-                  {% if v %}
-                      <tr class="table-inheritanceinfo">
-                        <th colspan="4" class="treeinfo">
-                          <span class="label label-default">From class <a title="{{k.qname}}" href="{{k.slug}}.html" class="fromclass_link">{{k.title}}</a></span>
-                        </th>
-                      </tr>
-                    {% for prop in v %}
-                      <tr>
-                        <td class="firsttd">
-                          <a class="propcolor" title="{{prop.qname}}" href="{{prop.slug}}.html">{{prop.title}}</a>
-                        </td>
-                        <td class="secondtd">
-                          <i>{{prop.rdftype_qname}}<i>
-                        </td>
-                        <td class="thirdtd">
-                          <span>{{prop.bestDescription()|default("--")}}</span>
-                        </td>
-                        <td class="fourthtd">
-                          {% set ranges = prop.ranges or prop.ranges_inferred %}
-                          {% if ranges %}
-                            {% for range in ranges  %}
-                                {% if not range.ext_model %}
-                                  <a title="{{range.qname}}" href="{{range.slug}}.html" class="rdfclass">{{range.title}}</a>
-                                {% else %}
-                                  <i>{{range.title}}</i>
-                                {% endif %}
-                            {% endfor %}
-                          {% else %}
-                              <i>owl:Thing</i>
-                          {% endif %}
-                        </td>
-                      </tr>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              {% endfor %}
             </table>
           </div>
         </div>
       </div>
+      <script src="usage.js"></script>
+      <script src="{{STATIC_URL}}custom/js/usage.js"></script>
     {% endif %}
 
 

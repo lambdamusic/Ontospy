@@ -408,6 +408,36 @@ def test_html_multi_sidebar(pizza, tmp_path):
 	assert 'data-thispage="pizza.owl:Veneziana"' in page
 
 
+def test_html_multi_usage(pizza, tmp_path):
+	"""#21: the rows of the class pages' Usage tables are written once, in usage.js; a
+	page names the classes whose properties it lists, and builds the rows in the browser"""
+	import json
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	js = (tmp_path / "usage.js").read_text(encoding="utf-8")
+	assert js.startswith("var USAGE = ")
+	data = json.loads(js[len("var USAGE = "):].rstrip().rstrip(";"))
+	topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#SundriedTomatoTopping")
+	pizza_topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#PizzaTopping")
+	title, qname, slug, props = data["groups"][str(pizza_topping.id)]
+	assert (title, slug) == (pizza_topping.title, pizza_topping.slug)
+	is_topping_of = [p for p in pizza_topping.domain_of if p.qname == "pizza.owl:isToppingOf"][0]
+	assert is_topping_of.id in props
+	row = data["props"][str(is_topping_of.id)]
+	assert row[:4] == [is_topping_of.title, is_topping_of.qname, is_topping_of.slug, "owl:ObjectProperty"]
+	assert [r[1] for r in row[5]] == [r.title for r in is_topping_of.ranges]
+	# the properties with no domain, under owl:Thing, are a group too
+	assert str(pizza.OWLTHING.id) in data["groups"]
+	# the page: the groups in order (the class, its ancestors, owl:Thing), no rows
+	page = (tmp_path / (topping.slug + ".html")).read_text(encoding="utf-8")
+	groups = [k.id for group in topping.domain_of_inferred for k, v in group.items() if v]
+	assert pizza_topping.id in groups and groups[-1] == pizza.OWLTHING.id
+	assert 'data-groups="{}"'.format(" ".join(map(str, groups))) in page
+	assert '<script src="usage.js"></script>' in page
+	assert 'custom/js/usage.js"></script>' in page
+	assert is_topping_of.slug + ".html" not in page.split('id="usage-table"')[1].split("</table>")[0]
+	assert (tmp_path / "static" / "custom" / "js" / "usage.js").exists()
+
+
 def test_html_multi_one_theme(pizza, tmp_path):
 	"""#21: only the chosen Bootswatch theme is copied, not all 14"""
 	from ..gendocs.viz.viz_html_multi import KompleteViz
@@ -418,11 +448,14 @@ def test_html_multi_one_theme(pizza, tmp_path):
 
 
 def test_html_multi_multimodel(pizza, tmp_path):
-	"""for the examples site: static files shared by several outputs, sidebar.js with each"""
+	"""for the examples site: static files shared by several outputs, sidebar.js and
+	usage.js with each"""
 	from ..gendocs.viz.viz_html_multi import KompleteVizMultiModel
 	v = KompleteVizMultiModel(pizza, static_url="../static/", output_path_static=str(tmp_path / "static"))
 	v.build(str(tmp_path / "pizza"))
 	assert (tmp_path / "pizza" / "sidebar.js").exists()
+	assert (tmp_path / "pizza" / "usage.js").exists()
+	assert (tmp_path / "static" / "custom" / "js" / "usage.js").exists()
 	assert not (tmp_path / "pizza" / "static").exists()
 	assert 'href="../static/libs/bootswatch3_2/' in (tmp_path / "pizza" / "index.html").read_text(encoding="utf-8")
 

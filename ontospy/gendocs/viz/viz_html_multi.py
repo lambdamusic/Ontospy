@@ -9,7 +9,7 @@
 # The sidebar's list of entities is written once, in sidebar.js, and built in the browser
 # (templates/html-multi/sidebar.html), rather than repeated in every page, which made the
 # output grow with the square of the number of entities: 1.6 GB for Brick, 27 GB for
-# FOVT (backlog #21).
+# FOVT (backlog #21). The same for the Usage tables of the class pages, in usage.js.
 
 import os, sys
 import json
@@ -58,6 +58,40 @@ def sidebar_js(g):
     }
     # "</" escaped, in case the file is ever inlined in a <script>
     return ("var SIDEBAR = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
+
+
+def usage_groups(c):
+    """The ids of the classes whose properties make up the Usage table of class c, in
+    order: c, its ancestors, then owl:Thing (properties with no domain); only those
+    with properties"""
+    return [k.id for group in c.domain_of_inferred for k, v in group.items() if v]
+
+
+def usage_js(g):
+    """The rows of the Usage tables of the class pages, as a script defining USAGE:
+
+    {"groups": {class id: [title, qname, page (without .html), [property ids]]},
+     "props": {property id: [title, qname, page, rdf type, description,
+                             [[range page or None, title, qname], ...]]}}
+
+    Written once, rather than a table on every class page that repeated the properties
+    of the top classes: on FOVT 377 KB of a 400 KB page (backlog #21). A page names its
+    groups (usage_groups) and builds the table in the browser (custom/js/usage.js)."""
+    groups, props = {}, {}
+    for c in g.all_classes:
+        for group in c.domain_of_inferred:
+            for k, v in group.items():
+                if v and k.id not in groups:
+                    groups[k.id] = [k.title, k.qname, k.slug, [p.id for p in v]]
+                    for p in v:
+                        if p.id not in props:
+                            ranges = p.ranges or p.ranges_inferred
+                            props[p.id] = [p.title, p.qname, p.slug, p.rdftype_qname,
+                                           p.bestDescription() or "",
+                                           [[None if r.ext_model else r.slug, r.title, r.qname]
+                                            for r in ranges]]
+    data = {"groups": groups, "props": props}
+    return ("var USAGE = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
 
 
 
@@ -134,6 +168,8 @@ class KompleteViz(VizFactory):
         """
         # SIDEBAR - the entities, for all pages
         self._save2File(sidebar_js(self.ontospy_graph).encode("utf-8"), "sidebar.js", self.output_path)
+        # USAGE - the properties of each class, for the Usage tables of the class pages
+        self._save2File(usage_js(self.ontospy_graph).encode("utf-8"), "usage.js", self.output_path)
 
         # INDEX - MAIN PAGE
         contents = self._renderTemplate("html-multi/index.html", extraContext={"theme": self.theme, "index_page_flag" : True})
@@ -182,7 +218,8 @@ class KompleteViz(VizFactory):
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "class",
                                 "theme": self.theme,
-                                "ontograph": self.ontospy_graph
+                                "ontograph": self.ontospy_graph,
+                                "usage_groups": usage_groups(entity)
                                 }
                 extra_context.update(self.highlight_code(entity))
                 contents = self._renderTemplate("html-multi/browser/browser_classinfo.html", extraContext=extra_context)
