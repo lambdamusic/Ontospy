@@ -5,6 +5,11 @@
 # ==================
 # VIZ HTML MULTI - html visualization with multiple files, one per entity
 # ==================
+#
+# The sidebar's list of entities is written once, in sidebar.js, and built in the browser
+# (templates/html-multi/sidebar.html), rather than repeated in every page, which made the
+# output grow with the square of the number of entities: 1.6 GB for Brick, 27 GB for
+# FOVT (backlog #21). The same for the Usage tables of the class pages, in usage.js.
 
 import os, sys
 import json
@@ -12,6 +17,7 @@ import json
 from ..utils import *
 from ..actions import *
 from ..viz_factory import VizFactory
+from ...core.utils import uri2niceString
 
 
 
@@ -33,6 +39,116 @@ def is_class_defined_as_shacl_node_shape(entity) -> bool:
     return (is_NodeShape and is_Class)
 
 
+def sidebar_js(g):
+    """The entities of the sidebar, as a script defining SIDEBAR: for each section a list
+    of [id, title, page (without .html), qname], the qname left out when it's the title"""
+    def entries(entities):
+        out = []
+        for e in entities:
+            entry = [e.id, e.title, e.slug]
+            if e.qname != e.title:
+                entry.append(e.qname)
+            out.append(entry)
+        return out
+    data = {
+        "classes": entries(g.all_classes),
+        "properties": entries(g.all_properties),
+        "concepts": entries(g.all_skos_concepts),
+        "individuals": entries(g.all_individuals),
+    }
+    # "</" escaped, in case the file is ever inlined in a <script>
+    return ("var SIDEBAR = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
+
+
+def usage_groups(c):
+    """The ids of the classes whose properties make up the Usage table of class c, in
+    order: c, its ancestors, then owl:Thing (properties with no domain); only those
+    with properties"""
+    return [k.id for group in c.domain_of_inferred for k, v in group.items() if v]
+
+
+def usage_js(g):
+    """The rows of the Usage tables of the class pages, as a script defining USAGE:
+
+    {"groups": {class id: [title, qname, page (without .html), [property ids]]},
+     "props": {property id: [title, qname, page, rdf type, description,
+                             [[range page or None, title, qname], ...]]}}
+
+    Written once, rather than a table on every class page that repeated the properties
+    of the top classes: on FOVT 377 KB of a 400 KB page (backlog #21). A page names its
+    groups (usage_groups) and builds the table in the browser (custom/js/usage.js)."""
+    groups, props = {}, {}
+    for c in g.all_classes:
+        for group in c.domain_of_inferred:
+            for k, v in group.items():
+                if v and k.id not in groups:
+                    groups[k.id] = [k.title, k.qname, k.slug, [p.id for p in v]]
+                    for p in v:
+                        if p.id not in props:
+                            ranges = p.ranges or p.ranges_inferred
+                            props[p.id] = [p.title, p.qname, p.slug, p.rdftype_qname,
+                                           p.bestDescription() or "",
+                                           [[None if r.ext_model else r.slug, r.title, r.qname]
+                                            for r in ranges]]
+    data = {"groups": groups, "props": props}
+    return ("var USAGE = %s;\n" % json.dumps(data, ensure_ascii=False)).replace("</", "<\\/")
+
+
+
+# The most circles the statistics page's pack chart draws. The pack repeats an entity
+# under each of its parents, so with multiple inheritance it can far outgrow the number
+# of entities: 221k circles for FOVT's 12k classes, which kept the page from loading
+# (backlog #45). Above this, the chart is left out, with a note.
+MAX_PACK_NODES = 20000
+
+
+def _count_nodes(tree):
+    return 1 + sum(_count_nodes(x) for x in tree.get("children", []))
+
+
+def statistics_charts(g, max_pack_nodes=MAX_PACK_NODES):
+    """For the statistics page: (key, label, bubble chart tree, pack tree, number of pack
+    nodes) for each kind of entity the graph has, built as for the D3 vizs; the pack tree
+    is None when it has more than max_pack_nodes"""
+    out = []
+    for key, label, toplayer, root in [
+            ("classes", "Classes", g.toplayer_classes, "owl:Thing"),
+            ("properties", "Properties", g.toplayer_properties, "Properties"),
+            ("concepts", "Concepts", g.toplayer_skos, "Concepts")]:
+        if toplayer:
+            pack = {'children': build_D3treeStandard(0, 99, 1, toplayer), 'name': root, 'id': "None"}
+            nodes = _count_nodes(pack)
+            out.append((key, label,
+                {'children': build_D3bubbleChart(0, 99, 1, toplayer), 'name': root, 'id': "None"},
+                pack if nodes <= max_pack_nodes else None, nodes))
+    return out
+
+
+def entity_info(g, max_description=300):
+    """For the drawer of the statistics page, the basics of each entity, by kind and id:
+    [title, qname, page (without .html), description (shortened), [parent ids], number of
+    children], and for properties also [domains] and [ranges], each as [id or None, name]"""
+    def short(text):
+        text = " ".join((text or "").split())
+        if len(text) > max_description:
+            text = text[:max_description].rsplit(" ", 1)[0] + "…"
+        return text
+
+    def named(entities):
+        # an entity of the graph, or a URI outside it (eg xsd:string)
+        return [[e.id, e.title] if hasattr(e, "id") else [None, uri2niceString(e, g.namespaces)]
+                for e in entities]
+
+    def info(e):
+        return [e.title, e.qname, e.slug, short(e.bestDescription()),
+                [p.id for p in e.parents()], len(e.children())]
+
+    return {
+        "classes": {c.id: info(c) for c in g.all_classes},
+        "properties": {p.id: info(p) + [named(p.domains), named(p.ranges)] for p in g.all_properties},
+        "concepts": {c.id: info(c) for c in g.all_skos_concepts},
+    }
+
 class KompleteViz(VizFactory):
     """
 
@@ -48,26 +164,46 @@ class KompleteViz(VizFactory):
         """
         super(KompleteViz, self).__init__(ontospy_graph, title, *args, **kwargs)
         self.non_redundant = non_redundant
+        self.theme = validate_theme(theme)
+        # only the chosen Bootswatch theme, not all of them
         self.static_files = [
                 "custom",
-                "libs/bootswatch3_2",
+                "libs/bootswatch3_2/" + self.theme,
+                "libs/bootswatch3_2/fonts",
                 "libs/bootstrap-3_3_7-dist",
                 "libs/jquery/1_12_4/",
-                "libs/chartjs-2_4_0"
+                "libs/chartjs-2_4_0",
+                "libs/d3-v7"
                 ]
-        self.theme = validate_theme(theme)
 
     def _buildTemplates(self):
         """
         OVERRIDING THIS METHOD from Factory
         """
+        # SIDEBAR - the entities, for all pages
+        self._save2File(sidebar_js(self.ontospy_graph).encode("utf-8"), "sidebar.js", self.output_path)
+        # USAGE - the properties of each class, for the Usage tables of the class pages
+        self._save2File(usage_js(self.ontospy_graph).encode("utf-8"), "usage.js", self.output_path)
+
         # INDEX - MAIN PAGE
         contents = self._renderTemplate("html-multi/index.html", extraContext={"theme": self.theme, "index_page_flag" : True})
         FILE_NAME = "index.html"
         main_url = self._save2File(contents, FILE_NAME, self.output_path)
 
-        # DASHBOARD
-        contents = self._renderTemplate("html-multi/statistics.html", extraContext={"theme": self.theme})
+        # DASHBOARD - with the hierarchy and the density of the classes, properties and
+        # concepts, drawn as in the D3 vizs (shared/js_d3_charts.html)
+        extra_context = {"theme": self.theme}
+        charts = statistics_charts(self.ontospy_graph)
+        if charts:
+            # "</" escaped, since it goes in a <script>
+            extra_context["CHARTS"] = [(key, label) for key, label, _, _, _ in charts]
+            extra_context["CHARTS_DATA"] = json.dumps(
+                {key: {"bubble": bubble, "pack": pack, "pack_nodes": nodes}
+                 for key, _, bubble, pack, nodes in charts},
+                ensure_ascii=False).replace("</", "<\\/")
+            extra_context["ENTITY_INFO"] = json.dumps(
+                entity_info(self.ontospy_graph), ensure_ascii=False).replace("</", "<\\/")
+        contents = self._renderTemplate("html-multi/statistics.html", extraContext=extra_context)
         FILE_NAME = "statistics.html"
         self._save2File(contents, FILE_NAME, self.output_path)
 
@@ -97,7 +233,8 @@ class KompleteViz(VizFactory):
                 extra_context = {"main_entity": entity,
                                 "main_entity_type": "class",
                                 "theme": self.theme,
-                                "ontograph": self.ontospy_graph
+                                "ontograph": self.ontospy_graph,
+                                "usage_groups": usage_groups(entity)
                                 }
                 extra_context.update(self.highlight_code(entity))
                 contents = self._renderTemplate("html-multi/browser/browser_classinfo.html", extraContext=extra_context)

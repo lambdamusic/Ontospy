@@ -25,12 +25,16 @@ class Dataviz(VizFactory):
         Init
         """
         super(Dataviz, self).__init__(*args, **kwargs)
-        self.static_files = ["libs/d3-v2", "libs/jquery"]
+        self.static_files = ["libs/d3-v7"]
 
     def _buildTemplates(self):
         """
         OVERRIDING THIS METHOD from Factory
         """
+
+        # for the side panel; "</" escaped, since it goes in a <script>
+        self.basic_context_data["PANEL_DATA"] = json.dumps(
+            build_D3panelData(self.ontospy_graph)).replace("</", "<\\/")
 
         c_total = len(self.ontospy_graph.all_classes)
         p_total = len(self.ontospy_graph.all_properties)

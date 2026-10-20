@@ -53,139 +53,83 @@
 {% endif %}
 
 
-      <div class="row">
+      {# the number of triples, then the entities by type; the two panels have the same height #}
+      <style>
+        .stats-top { display: flex; flex-wrap: wrap; }
+        .stats-top > [class*="col-"] { display: flex; }
+        .stats-top .panel { flex: 1; display: flex; flex-direction: column; }
+        .stats-top .panel-body { flex: 1; }
+        .stats-top .triples-total { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .stats-top .triples-total .number { font-size: 48px; font-weight: 300; line-height: 1.1; }
+        @media (max-width: 991px) { .stats-top > [class*="col-"] { width: 100%; } }
+      </style>
 
-        {# first column #}
-        <div class="col-md-6">
+      <div class="row stats-top">
 
-
-            <div class="row"><div class="col-md-12">
-                <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Entity Types</h3>
-              </div>
-              <div class="panel-body">
-
-
-                  <div class="row">
-
-
-                      <div class="col-md-12 ">
-                          <br />
-                          <canvas id="entitiesBarChart" ></canvas>
-                      </div>
-
-
-
-                  </div>
-
-
-              </div>
-            </div>
-             </div></div>
-
-
-
-
-
-              <div class="row"><div class="col-md-12">
-                 <div class="panel panel-default">
-               <div class="panel-heading">
-                 <h3 class="panel-title">Triples</h3>
-               </div>
-               <div class="panel-body">
-
-                   <div class="col-sm-3 col-md-3 ">
-                       <p id="chartsLegend">
-                           <span class="text-muted" style="text-transform: uppercase;">Triples</span>
-                           <br /><span style="font-size: 250%;"> {{ontospy_graph.triplesCount()}}</span>
-                       </p>
-                   </div>
-
-   	        	<canvas id="triplesStats" ></canvas>
-
-               </div>
-             </div>
-              </div></div>
-
-
-
-
-        </div>
-         {# END first column #}
-
-
-        {# second column #}
-        <div class="col-md-6">
-
-
-
-
-        {% if topclasses %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
+        <div class="col-md-4">
+          <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Top Classes</h3>
+              <h3 class="panel-title">Triples</h3>
             </div>
             <div class="panel-body">
-
-                <div class="row">
-
-
-                    <div class="col-md-12 ">
-
-                        <span class="text-muted">NOTE: size = number of sub-classes</span>
-                        <br />
-                        <canvas id="toplayerChart" ></canvas>
-
-
-                    </div>
-
-
-
-                </div>
-
+              <div class="triples-total">
+                <span class="number">{{ "{:,}".format(ontospy_graph.triplesCount()) }}</span>
+                <span class="text-muted">triples in the graph</span>
+              </div>
             </div>
           </div>
-          </div></div>
-        {% endif %}
+        </div>
 
-
-
-
-        {% if ontospy_graph.toplayer_skos %}
-            <div class="row"><div class="col-md-12">
-              <div class="panel panel-default">
+        <div class="col-md-8">
+          <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title">Top Layer: SKOS</h3>
+              <h3 class="panel-title">Entity Types</h3>
             </div>
             <div class="panel-body">
-
-                <div class="row">
-
-
-                    <div class="col-md-12 ">
-
-                        <span class="text-muted">NOTE: size = number of sub-classes</span>
-                        <br />
-                        <canvas id="toplayerChartSKOS"></canvas>
-                    </div>
-
-
-
-                </div>
-
+              <canvas id="entitiesBarChart" height="110"></canvas>
             </div>
           </div>
-          </div></div>
-        {% endif %}
-
-
-
-
         </div>
-         {# END second column #}
 
+      </div>
+
+
+      {# the hierarchy and the density of classes, properties and concepts, drawn as in the
+         D3 vizs (shared/js_d3_charts.html); a click on an entity opens a drawer with its
+         basics and a link to its page #}
+      {% if CHARTS %}
+      {% for chart, title in [("pack", "Entity Hierarchy"), ("bubble", "Entity Density")] %}
+      <div class="row"><div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="btn-group btn-group-xs pull-right chart-switch" role="group" data-chart="{{chart}}">
+              {% for key, label in CHARTS %}
+              <button type="button" class="btn btn-default" data-entities="{{key}}">{{label}}</button>
+              {% endfor %}
+            </div>
+            <h3 class="panel-title">{{title}}</h3>
+          </div>
+          <div class="panel-body">
+            <p class="text-muted chart-hint">
+              {% if chart == "pack" %}
+              The hierarchy as nested circles. Click a circle to zoom into it, click the circle in focus (or one with nothing inside) to see its details, click outside the circles to zoom out.
+              {% else %}
+              A circle per entity, sized by its number of direct sub-entities and coloured by its parent: where the hierarchy is bushiest. Click a circle to see its details.
+              {% endif %}
+            </p>
+            {% for key, label in CHARTS %}
+            <div class="entity-chart" id="chart-{{chart}}-{{key}}" style="display: none;"></div>
+            {% endfor %}
+          </div>
+        </div>
+      </div></div>
+      {% endfor %}
+      {% endif %}
+
+
+      <div id="entity-drawer" aria-hidden="true">
+        <button type="button" class="close" id="entity-drawer-close" title="Close (ESC)">&times;</button>
+        <div id="entity-drawer-contents"></div>
       </div>
 
 
@@ -204,6 +148,162 @@
 
 
 {% block extrajs %}
+
+
+{% if CHARTS %}
+
+<style type="text/css">
+  .entity-chart svg {
+    display: block;
+    margin: 0 auto;
+    max-height: 85vh;
+  }
+  #entity-drawer {
+    position: fixed;
+    top: 50px;
+    right: 0;
+    bottom: 0;
+    width: 380px;
+    max-width: 100%;
+    z-index: 1040;
+    overflow-y: auto;
+    padding: 20px;
+    background: white;
+    border-left: 1px solid #ddd;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.12);
+    transform: translateX(105%);
+    visibility: hidden;
+    transition: transform 0.2s ease, visibility 0.2s;
+  }
+  #entity-drawer.open {
+    transform: none;
+    visibility: visible;
+  }
+  #entity-drawer h4 {
+    margin-top: 4px;
+    word-break: break-word;
+  }
+  #entity-drawer dt {
+    margin-top: 10px;
+  }
+</style>
+
+<script src="{{STATIC_URL}}libs/d3-v7/d3.v7.min.js"></script>
+{% include "shared/js_d3_helpers.html" %}
+{% include "shared/js_d3_charts.html" %}
+
+<script type="text/javascript">
+
+  (function() {
+    var data = {{CHARTS_DATA|safe}};
+    var info = {{ENTITY_INFO|safe}};
+    var kinds = {
+      classes: {name: "Class", parents: "Subclass of", children: "subclasses"},
+      properties: {name: "Property", parents: "Subproperty of", children: "subproperties"},
+      concepts: {name: "Concept", parents: "Broader", children: "narrower concepts"}
+    };
+
+    // THE DRAWER: the basics of an entity, with links to its page and to related entities
+    var drawer = document.getElementById("entity-drawer");
+    var contents = document.getElementById("entity-drawer-contents");
+
+    function entityLink(kind, id, name) {
+      if (id != null && info[kind][id]) {
+        return "<a href='#' data-kind='" + kind + "' data-id='" + id + "'>" + escapeHtml(name || info[kind][id][0]) + "</a>";
+      }
+      return escapeHtml(name);
+    }
+
+    function showEntity(kind, id) {
+      var e = info[kind][id];
+      if (!e) {
+        return;
+      }
+      var k = kinds[kind];
+      var html = "<small class='text-muted'>" + k.name + "</small>" +
+        "<h4>" + escapeHtml(e[0]) + "</h4>" +
+        (e[1] != e[0] ? "<p><code>" + escapeHtml(e[1]) + "</code></p>" : "") +
+        (e[3] ? "<p>" + escapeHtml(e[3]) + "</p>" : "<p class='text-muted'>No description.</p>") +
+        "<dl>";
+      if (e[4].length) {
+        html += "<dt>" + k.parents + "</dt><dd>" +
+          e[4].map(function(p) { return entityLink(kind, p); }).join(", ") + "</dd>";
+      }
+      if (kind == "properties") {
+        [["Domain", e[6]], ["Range", e[7]]].forEach(function(row) {
+          if (row[1].length) {
+            html += "<dt>" + row[0] + "</dt><dd>" +
+              row[1].map(function(c) { return entityLink("classes", c[0], c[1]); }).join(", ") + "</dd>";
+          }
+        });
+      }
+      html += "<dt>Direct " + k.children + "</dt><dd>" + e[5] + "</dd></dl>" +
+        "<p style='margin-top: 20px;'><a class='btn btn-primary btn-sm' href='" + e[2] + ".html'>Open the " + k.name.toLowerCase() + " page &rarr;</a></p>";
+      contents.innerHTML = html;
+      contents.querySelectorAll("a[data-id]").forEach(function(a) {
+        a.addEventListener("click", function(event) {
+          event.preventDefault();
+          showEntity(this.getAttribute("data-kind"), this.getAttribute("data-id"));
+        });
+      });
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    function hideDrawer() {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("entity-drawer-close").addEventListener("click", hideDrawer);
+    document.addEventListener("keydown", function(event) {
+      if (event.key == "Escape") {
+        hideDrawer();
+      }
+    });
+
+    // THE CHARTS: each panel shows one kind of entity at a time; a chart is drawn when
+    // first shown, since its labels are measured and so must be visible
+    var drawn = {};
+
+    function show(chart, kind) {
+      document.querySelectorAll(".chart-switch[data-chart='" + chart + "'] button").forEach(function(button) {
+        button.classList.toggle("active", button.getAttribute("data-entities") == kind);
+      });
+      document.querySelectorAll("[id^='chart-" + chart + "-']").forEach(function(div) {
+        div.style.display = div.id == "chart-" + chart + "-" + kind ? "" : "none";
+      });
+      var id = "chart-" + chart + "-" + kind;
+      if (!drawn[id]) {
+        drawn[id] = true;
+        var onSelect = function(objid) { showEntity(kind, objid); };
+        if (chart == "bubble") {
+          drawBubbleChart("#" + id, data[kind].bubble, onSelect);
+        } else if (data[kind].pack) {
+          drawPackChart("#" + id, data[kind].pack, onSelect);
+        } else {
+          // too many circles to draw (MAX_PACK_NODES in viz_html_multi.py)
+          document.getElementById(id).innerHTML = "<p class='text-muted chart-too-big'><i>" +
+            "This hierarchy is too large to draw here: " + data[kind].pack_nodes.toLocaleString("en") +
+            " circles, as an entity with several parents appears under each of them. " +
+            "See the <a href='entities-tree-" + kind + ".html'>tree page</a>, or the density chart below.</i></p>";
+        }
+      }
+    }
+
+    document.querySelectorAll(".chart-switch").forEach(function(group) {
+      var chart = group.getAttribute("data-chart");
+      group.querySelectorAll("button").forEach(function(button) {
+        button.addEventListener("click", function() { show(chart, this.getAttribute("data-entities")); });
+      });
+      show(chart, group.querySelector("button").getAttribute("data-entities"));
+    });
+  })();
+
+</script>
+
+{% endif %}
+
 
 
 
@@ -282,165 +382,6 @@
     options: {
         legend: {
             display: false,
-        }
-        }
-    });
-
-
-
-
-// SECOND CHART : top layer Classes
-
-	{% if topclasses %}
-
-    var ctx2 = document.getElementById("toplayerChart").getContext("2d");
-
-    var data2 = {
-            datasets: [{
-                data: [
-                    {% for class in topclasses %}{{ class.descendants()|length|add("1")}}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                ],
-                backgroundColor: [
-                  // navy
-                  "#000080",
-                  // blue
-                  "#0000FF",
-                  // teal
-                  "#008080",
-                  // aqua
-                  "#00FFFF",
-                    // maroon
-                    "#800000",
-                    // red
-                    "#FF0000",
-                    // purple
-                    "#800080",
-                    // fuchsia
-                    "#FF00FF",
-                    // green
-                    "#008000",
-                    // lime
-                    "#00FF00",
-                    // olive
-                    "#808000",
-                    // yellow
-                    "#FFFF00",
-                    // black
-                    "#000000",
-                    // silver
-                    "#C0C0C0",
-                    // gray
-                    "#808080",
-                    // white
-                    "#FFFFFF"
-                  ],
-                label: 'Top Layer' // for legend
-            }],
-            labels: [
-                {% for class in topclasses %}"{{class.title|safe}}"{% if not loop.last %}, {% endif %}
-                {% endfor %}
-            ]
-        };
-    var myPolarChart = new Chart(ctx2, {
-    type: 'polarArea',
-    data: data2,
-    options: {
-        legend: {
-            display: true,
-        }
-        }
-    });
-
-    {% endif %}
-
-
-
-
-// SECOND CHART : top layer SKOS
-
-{% if ontospy_graph.toplayer_skos %}
-
-    var ctx2skos = document.getElementById("toplayerChartSKOS").getContext("2d");
-
-    var data2skos = {
-            datasets: [{
-                data: [
-                    {% for concept in ontospy_graph.toplayer_skos %}{{ concept.descendants()|length|add("1")}}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                ],
-                backgroundColor: [
-                    "#FF6384",
-                    "#4BC0C0",
-                    "#FFCE56",
-                    "#E7E9ED",
-                    "#36A2EB"
-                ],
-                label: 'Top Layer' // for legend
-            }],
-            labels: [
-                {% for concept in ontospy_graph.toplayer_skos %}"{{concept.title|safe}}"{% if not loop.last %}, {% endif %}
-                {% endfor %}
-            ]
-        };
-    var myPolarChart = new Chart(ctx2skos, {
-    type: 'polarArea',
-    data: data2skos,
-    options: {
-        legend: {
-            display: true,
-        }
-        }
-    });
-
-    {% endif %}
-
-
-
-
-
-
-// THIRD CHART: triples
-
-	var ctxTriples = document.getElementById("triplesStats").getContext("2d");
-	var dataTriples = {
-    labels: ["Triples"],
-    datasets: [
-                {
-                    label: "Triples Count",
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255,99,132,1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1,
-                    data: [{{ontospy_graph.triplesCount()}}],
-                }
-            ]
-        };
-
-    var myBarChart = new Chart(ctxTriples, {
-    type: 'bar',
-    data: dataTriples,
-    options: {
-        legend: {
-            display: false,
-            },
-        scales: {
-            yAxes: [{
-                stacked: true
-            }]
         }
         }
     });

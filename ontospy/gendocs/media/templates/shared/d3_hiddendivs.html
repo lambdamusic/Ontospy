@@ -1,194 +1,205 @@
+{# The hidden divs of the D3 visualizations: one per ontology, class, property, concept
+   and individual, copied into the side panel by showpanel(id) (shared/js_sidepanel.html).
+   They show what the html-multi page of the same entity shows, in a compact form
+   (backlog #26). A link to an entity with no div of its own (eg owl:Thing, or a class
+   defined elsewhere) is turned into plain text when the panel opens. #}
 
 
-{# hidden divs for d3 viz - shown within slider #}
+{# a link that opens an entity in the panel #}
+{% macro plink(s, css="class") -%}
+<a href="javascript:showpanel('{{s.id}}');" class="{{css}}" title="{{s.qname}}">{{s.title|default(s)}}</a>
+{%- endmacro %}
+
+{# a list of entities, separated by | #}
+{% macro plinks(items, css="class") -%}
+{% for s in items %}{{ plink(s, css) }}{% if not loop.last %} | {% endif %}{% endfor %}
+{%- endmacro %}
+
+{# the URI, label, description and rdfs:seeAlso of an entity #}
+{% macro basics(each) -%}
+	<p><b class="section-title">URI: </b><code>{{each.uri}}</code></p>
+	{% if each.bestLabel() %}
+		<p><b class="section-title">Label: </b>{{each.bestLabel()|capfirst}}</p>
+	{% endif %}
+	{% if each.bestDescription() %}
+		<p><b class="section-title">Description: </b>{{each.bestDescription()|linebreaks}}</p>
+	{% endif %}
+	{% if each.seeAlso() %}
+		<p><b class="section-title">See also: </b>
+		{% for x in each.seeAlso() %}{% if x is url %}<a href="{{x}}" target="_blank" class="greylink">{{x}}</a>{% else %}{{x}}{% endif %}{% if not loop.last %} | {% endif %}{% endfor %}
+		</p>
+	{% endif %}
+{%- endmacro %}
+
+{# the Turtle source #}
+{% macro implementation(each) -%}
+	<hr>
+	<b class="section-title">Implementation:</b>
+	<pre class="turtlesource">{{each.rdf_source()|escape}}</pre>
+{%- endmacro %}
+
+
+
 
 <div class="hidden" id="ontoinfo">
 
 {% for o in ontologies %}
-	
+
 	{% if o.uri %}
-		<h2>Ontology: <a href="{{o.uri|default('--')}}" target="_blank" class="class"  title="Try to open original URI">{{o.uri}}</a></h2>
+		<h2>Ontology: <a href="{{o.uri|default('--')}}" target="_blank" class="class" title="Try to open original URI">{{o.uri}}</a></h2>
 	{% else %}
-		<h2>Ontology:</h2> 
+		<h2>Ontology:</h2>
 		<em>Not defined</em>
 	{% endif %}
-		
-
 
 	<hr class="margintop">
 
-	{% if o.annotations()%}
-	<b class="section-title">Annotations:</b>
-
-		{# <h1><a name="annotations">&nbsp;</a>Ontology annotations</h1> #}
-		
+	{% if o.annotations() %}
+		<b class="section-title">Annotations:</b>
 		{% from "shared/ontology_metadata.html" import metadata_list %}
 		{{ metadata_list(o.metadata()) }}
-
 	{% else %}
 		<em>No annotations available</em>
 	{% endif %}
 
-
-	{% if o.annotations()%}
-	<hr>
-	<b class="section-title">Implementation:</b>
-	<pre class="turtlesource">{{o.rdf_source()|escape}}</pre>
-
+	{% if o.annotations() %}
+		{{ implementation(o) }}
 	{% endif %}
-
-
-
-	{% if topclasses %}
-	<hr>
-	<b class="section-title">Top Classes</b>
-	
-	<p>
-	{% for s in topclasses %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}
-	</p>
-
-	{% endif %}
-
 
 {% endfor %}
+
+	{% if topclasses %}
+		<hr>
+		<b class="section-title">Top Classes:</b>
+		<p>{{ plinks(topclasses) }}</p>
+	{% endif %}
+
+	{% if stats %}
+		<hr>
+		<b class="section-title">Metrics:</b>
+		<table class="panel-table">
+		{% for each in stats %}
+			{% if each.0 != "Data Sources" %}<tr><td>{{each.0}}</td><td>{{each.1}}</td></tr>{% endif %}
+		{% endfor %}
+		</table>
+	{% endif %}
+
+	{% if namespaces %}
+		<b class="section-title">Namespaces:</b>
+		<table class="panel-table">
+		{% for prefix, uri in namespaces %}
+			<tr><td>{{prefix|default(":")}}</td><td><code>{{uri}}</code></td></tr>
+		{% endfor %}
+		</table>
+	{% endif %}
+
 </div>
 
 
 
 
-{% for each in classes  %}
-	
+{# CLASSES #}
+
+{% for each in classes %}
+
 <div class="hidden" id="{{each.id}}">
 
-	
-	<h2 class="entity-section">Class: <a href="{{each.uri}}" class="class" target="_blank"
-                                          title="Try to open original URI">{{each.title}}</a>
-	</h2>
+	<h2 class="entity-section">Class: <a href="{{each.uri}}" class="class" target="_blank" title="Try to open original URI">{{each.title}}</a></h2>
 	<hr>
 
+	{{ basics(each) }}
 
-	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
-    {% if each.bestLabel() %}
-		<p><b class="section-title">Label: </b>
-			{{each.bestLabel()|capfirst}}
-		</p>
-    {% endif %}
-    {% if each.bestDescription() %}
-        <p><b class="section-title">Description: </b>
-			{{each.bestDescription()|linebreaks}}
-		</p>
-    {% endif %}
-
-
-
-	{% if each.parents() or each.children() or each.domain_of or each.range_of or each.instances %}
+	{% if each.parents() or each.children() or each.instances or each.all_shapes %}
 		<hr>
 	{% endif %}
-	
-	
+
 	{% if each.parents() %}
-		<p><b class="section-title">Has Super Class (direct):</b> {% for s in each.parents() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
-	{% endif %}
-	
-	{% if each.ancestors() and each.ancestors()|length > each.parents()|length %}
-		<p><b class="section-title">Has Super Class (all):</b> {% for s in each.ancestors() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Class (direct):</b> {{ plinks(each.parents()) }}</p>
 	{% endif %}
 
-	{% if each.children()  %}
-		<p><b class="section-title">Has Sub Class (direct):</b> {% for s in each.children() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+	{% if each.ancestors() and each.ancestors()|length > each.parents()|length %}
+		<p><b class="section-title">Has Super Class (all):</b> {{ plinks(each.ancestors()) }}</p>
 	{% endif %}
-	
+
+	{% if each.children() %}
+		<p><b class="section-title">Has Sub Class (direct):</b> {{ plinks(each.children()) }}</p>
+	{% endif %}
+
 	{% if each.descendants() and each.descendants()|length > each.children()|length %}
-		<p><b class="section-title">Has Sub Class (all):</b> {% for s in each.descendants() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Class (all):</b> {{ plinks(each.descendants()) }}</p>
 	{% endif %}
 
 	{% if each.instances %}
-		<p><b class="section-title">Has Instances (direct):</b> {% for s in each.instances %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Instances (direct):</b> {{ plinks(each.instances) }}</p>
 	{% endif %}
 
-	{% if each.domain_of %}
-		<p><b class="section-title">In Domain Of:</b> {% for s in each.domain_of %}<a href="javascript:showpanel('{{s.id}}');"  class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+	{% if each.all_shapes %}
+		<p><b class="section-title">Shapes:</b> {% for s in each.all_shapes %}<i title="{{s.uri}}">{{s.title}}</i>{% if not loop.last %} | {% endif %}{% endfor %}</p>
 	{% endif %}
-	
+
+	{# the properties that apply to instances of the class, its own and its superclasses':
+	   the table is built when the panel opens, from PANEL_DATA (js_sidepanel.html) #}
+	<div class="usage" data-class="{{each.id}}"></div>
+
 	{% if each.range_of %}
-		<p><b class="section-title">In Range Of:</b> {% for s in each.range_of %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">In Range Of:</b> {{ plinks(each.range_of, "prop") }}</p>
 	{% endif %}
 
-	<hr>
-	<b class="section-title">Implementation:</b>
-	<pre class="turtlesource">{{each.rdf_source()|escape}}</pre>
+	{# the SHACL property shapes of the class and its superclasses: built when the panel
+	   opens, from PANEL_DATA (js_sidepanel.html) #}
+	<div class="shapes" data-class="{{each.id}}"></div>
+
+	{{ implementation(each) }}
 
 </div>
-	
-	
+
 {% endfor %}
 
 
 
 
+{# PROPERTIES #}
 
-
-{# PROPERTIES SECTION #}
-
-
-{% for each in properties  %}
+{% for each in properties %}
 
 <div class="hidden" id="{{each.id}}">
-	
-	<h2 class="entity-section">Property: <a  href="{{each.uri}}" class="prop"  target="_blank"
-                                          title="Try to open original URI">{{each.title}}</a>
-	</h2>
+
+	<h2 class="entity-section">Property: <a href="{{each.uri}}" class="prop" target="_blank" title="Try to open original URI">{{each.title}}</a></h2>
 	<hr>
 
+	{{ basics(each) }}
 
-	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
-    {% if each.bestLabel() %}
-		<p><b class="section-title">Label: </b>
-			{{each.bestLabel()|capfirst}}
-		</p>
-    {% endif %}
-    {% if each.bestDescription() %}
-        <p><b class="section-title">Description: </b>
-			{{each.bestDescription()|linebreaks}}
-		</p>
-    {% endif %}
-
-
-	{% if each.parents() or each.children() or each.domains or each.ranges  %}
-		<hr>
+	{% if each.rdftypes_qnames %}
+		<p><b class="section-title">Type{% if each.rdftypes_qnames|length > 1 %}s{% endif %}:</b> {{each.rdftypes_qnames|join(", ")}}</p>
 	{% endif %}
 
+	<hr>
 
 	{% if each.parents() %}
-		<p><b  class="section-title">Has Super Property (direct):</b> {% for s in each.parents() %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Property (direct):</b> {{ plinks(each.parents(), "prop") }}</p>
 	{% endif %}
-	
+
 	{% if each.ancestors() and each.ancestors()|length > each.parents()|length %}
-		<p><b  class="section-title">Has Super Property (all):</b> {% for s in each.ancestors() %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Property (all):</b> {{ plinks(each.ancestors(), "prop") }}</p>
 	{% endif %}
-	
+
 	{% if each.children() %}
-		<p><b class="section-title">Has Sub Property (direct):</b> {% for s in each.children() %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Property (direct):</b> {{ plinks(each.children(), "prop") }}</p>
 	{% endif %}
-	
+
 	{% if each.descendants() and each.descendants()|length > each.children()|length %}
-		<p><b class="section-title">Has Sub Property (all):</b> {% for s in each.descendants() %}<a href="javascript:showpanel('{{s.id}}');" class="prop">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Property (all):</b> {{ plinks(each.descendants(), "prop") }}</p>
 	{% endif %}
-	
+
 	{% set domains = each.domains or each.domains_inferred %}
-	{% if domains %}
-		<p><b class="section-title">Domain{% if not each.domains %} (inferred){% endif %}:</b> {% for s in domains %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
-	{% endif %}
-	
+	<p><b class="section-title">Domain{% if not each.domains %} (inferred){% endif %}:</b>
+		{% if domains %}{{ plinks(domains) }}{% else %}<i>owl:Thing</i>{% endif %}</p>
+
 	{% set ranges = each.ranges or each.ranges_inferred %}
-	{% if ranges %}
-		<p><b class="section-title">Range{% if not each.ranges %} (inferred){% endif %}:</b> {% for s in ranges %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title|default(s)}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
-	{% endif %}
-	
-	<hr>
-	<b class="section-title">Implementation:</b>
-	<pre class="turtlesource">{{each.rdf_source()|escape}}</pre>
+	<p><b class="section-title">Range{% if not each.ranges %} (inferred){% endif %}:</b>
+		{% if ranges %}{{ plinks(ranges) }}{% else %}<i>owl:Thing</i>{% endif %}</p>
 
+	{{ implementation(each) }}
 
 </div>
 
@@ -197,110 +208,64 @@
 
 
 
+{# SKOS CONCEPTS #}
 
-
-
-{# SKOS CONCEPTS SECTION #}
-
-
-{% for each in skosConcepts  %}
+{% for each in skosConcepts %}
 
 <div class="hidden" id="{{each.id}}">
-	
-	<h2 class="entity-section">Concept: <a href="{{each.uri}}" class="class"  target="_blank"
-                                          title="Try to open original URI">{{each.title}}</a>
-	</h2>
+
+	<h2 class="entity-section">Concept: <a href="{{each.uri}}" class="class" target="_blank" title="Try to open original URI">{{each.title}}</a></h2>
 	<hr>
 
-	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
-    {% if each.bestLabel() %}
-		<p><b class="section-title">Label: </b>
-			{{each.bestLabel()|capfirst}}
-		</p>
-    {% endif %}
-    {% if each.bestDescription() %}
-        <p><b class="section-title">Description: </b>
-			{{each.bestDescription()|linebreaks}}
-		</p>
-    {% endif %}
+	{{ basics(each) }}
 
-
-	{% if each.parents() or each.children()  %}
+	{% if each.parents() or each.children() %}
 		<hr>
 	{% endif %}
-	
+
 	{% if each.parents() %}
-		<p><b class="section-title">Has Super Concept (direct):</b> {% for s in each.parents() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Concept (direct):</b> {{ plinks(each.parents()) }}</p>
 	{% endif %}
-	
+
 	{% if each.ancestors() and each.ancestors()|length > each.parents()|length %}
-		<p><b class="section-title">Has Super Concept (all):</b> {% for s in each.ancestors() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Super Concept (all):</b> {{ plinks(each.ancestors()) }}</p>
 	{% endif %}
-	
+
 	{% if each.children() %}
-		<p><b class="section-title">Has Sub Concept (direct):</b> {% for s in each.children() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Concept (direct):</b> {{ plinks(each.children()) }}</p>
 	{% endif %}
-	
+
 	{% if each.descendants() and each.descendants()|length > each.children()|length %}
-		<p><b class="section-title">Has Sub Concept (all):</b> {% for s in each.descendants() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
+		<p><b class="section-title">Has Sub Concept (all):</b> {{ plinks(each.descendants()) }}</p>
 	{% endif %}
-	
-	
-	<hr>
-	<b class="section-title">Implementation:</b>
-	<pre class="turtlesource">{{each.rdf_source()|escape}}</pre>
+
+	{{ implementation(each) }}
 
 </div>
-	
+
 {% endfor %}
 
 
 
 
+{# INDIVIDUALS #}
 
-
-
-
-
-{# INDIVIDUALS SECTION #}
-
-
-{% for each in individuals  %}
+{% for each in individuals %}
 
 <div class="hidden" id="{{each.id}}">
-	
-	<h2 class="entity-section">Individual: <a href="{{each.uri}}" class="class"  target="_blank"
-                                          title="Try to open original URI">{{each.title}}</a>
-	</h2>
+
+	<h2 class="entity-section">Individual: <a href="{{each.uri}}" class="class" target="_blank" title="Try to open original URI">{{each.title}}</a></h2>
 	<hr>
 
-	<p><b class="section-uri">URI: </b><code>{{each.uri}}</code></p>
-    {% if each.bestLabel() %}
-		<p><b class="section-title">Label: </b>
-			{{each.bestLabel()|capfirst}}
-		</p>
-    {% endif %}
-    {% if each.bestDescription() %}
-        <p><b class="section-title">Description: </b>
-			{{each.bestDescription()|linebreaks}}
-		</p>
-    {% endif %}
-
+	{{ basics(each) }}
 
 	{% if each.instance_of() %}
 		<hr>
+		<p><b class="section-title">Is Direct Instance Of:</b> {{ plinks(each.instance_of()) }}</p>
 	{% endif %}
-	
-	{% if each.instance_of() %}
-		<p><b class="section-title">Is Direct Instance Of:</b> {% for s in each.instance_of() %}<a href="javascript:showpanel('{{s.id}}');" class="class">{{s.title}}</a> {% if not loop.last %}|{% endif %} {% endfor %}</p>
-	{% endif %}
-	
-	<hr>
-	<b class="section-title">Implementation:</b>
-	<pre class="turtlesource">{{each.rdf_source()|escape}}</pre>
+
+	{{ implementation(each) }}
 
 </div>
-	
+
 {% endfor %}
-
-

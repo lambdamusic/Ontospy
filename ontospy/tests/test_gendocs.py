@@ -296,3 +296,224 @@ def test_ontology_metadata_rendered(viz_id, tmp_path):
 		< out.index(entry.format("rdfs:label")))
 	import re
 	assert not re.search(r"\bn[0-9a-f]{32}b\d+\b", out), "a blank-node id is shown"
+
+
+D3_VIZS = ["d3-dendogram", "d3-bubble-chart", "d3-pack-hierarchy"]
+
+
+@pytest.mark.parametrize("viz_id", D3_VIZS)
+def test_d3_libraries(pizza, viz_id, tmp_path):
+	"""#34: the D3 vizs use d3 v7, bundled, and plain JavaScript for the side panel: no
+	jQuery, slideReveal or older d3, and nothing loaded from the network"""
+	viz_index = [n for n, v in VIZ_TYPES if v == viz_id][0]
+	build_visualization(pizza, viz_index, path=str(tmp_path))
+	assert os.listdir(tmp_path / "static" / "libs") == ["d3-v7"]
+	assert (tmp_path / "static" / "libs" / "d3-v7" / "d3.v7.min.js").exists()
+	out = read_all_output(tmp_path)
+	for old in ["jquery", "slideReveal", "d3.v2", "d3-v3", "http://d3js.org"]:
+		assert old not in out, old
+	assert 'src="static/libs/d3-v7/d3.v7.min.js"' in out
+
+
+def _panel_data(html):
+	import json, re
+	return json.loads(re.search(r"var PANEL_DATA = (.*?);\n", html).group(1))
+
+
+def test_d3_panel_usage_data(pizza, tmp_path):
+	"""#26: a class's Usage table (its properties and its superclasses') is built in the
+	browser from data written once per page, not as a table per class"""
+	from ..gendocs.utils import build_D3panelData
+	data = build_D3panelData(pizza)
+	topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#SundriedTomatoTopping")
+	pizza_topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#PizzaTopping")
+	title, ancestors, own = data["classes"][topping.id]
+	assert title == topping.title
+	assert pizza_topping.id in ancestors
+	is_topping_of = [p.id for p in pizza_topping.domain_of]
+	assert is_topping_of and set(is_topping_of) <= set(data["classes"][pizza_topping.id][2])
+	# the properties with no domain apply to every class, and are listed once
+	assert [p.id for p in pizza.all_properties if p.qname == "pizza.owl:hasCountryOfOrigin"][0] in data["thing"]
+	# in the page, as JSON
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "d3-dendogram"][0], path=str(tmp_path))
+	html = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert _panel_data(html)["classes"][str(topping.id)][0] == topping.title
+	assert '<div class="usage" data-class="{}">'.format(topping.id) in html
+
+
+def test_d3_panel_shapes_data(tmp_path):
+	"""#26: the SHACL property shapes of a class, and of its superclasses, a group per
+	class written once"""
+	from .test_shacl_constraints import IMPLICIT_TTL
+	from ..gendocs.utils import build_D3panelData
+	g = Ontospy(data=IMPLICIT_TTL, rdf_format="turtle")
+	data = build_D3panelData(g)
+	person = g.get_class(uri="http://example.org/i#Person")
+	assert data["shapes"][person.id] == ["i:Person", "i:Agent"]
+	name_row = data["shape_groups"]["i:Agent"][0]
+	assert name_row[1:4] == ["i:name", "1", "1"]
+	assert name_row[0] == g.get_property(uri="http://example.org/i#name").id
+	assert name_row[4] == [[None, "xsd:string"]]
+	build_visualization(g, [n for n, v in VIZ_TYPES if v == "d3-dendogram"][0], path=str(tmp_path))
+	html = (tmp_path / "index.html").read_text(encoding="utf-8")
+	assert _panel_data(html)["shape_groups"]["i:Agent"][0][1] == "i:name"
+
+
+def test_d3_bubble_labels(tmp_path):
+	"""#32: in the bubble chart, parents and children are labelled the same way, honouring
+	--preflabel/--preflang (pizza's labels are Portuguese, with English qnames)"""
+	from ..gendocs.utils import build_D3bubbleChart
+	for pref_title in ["qname", "label"]:
+		g = Ontospy(TEST_RDF_FOLDER + "pizza.ttl", pref_title=pref_title)
+		by_id = {c.id: c for c in g.all_classes}
+		names = []
+		def walk(nodes):
+			for d in nodes:
+				names.append((d["name"], by_id[d["objid"]].title))
+				walk(d.get("children", []))
+		walk(build_D3bubbleChart(0, 99, 1, g.toplayer_classes))
+		assert names and all(name == title for name, title in names)
+
+
+DIAMOND_TTL = """
+@prefix : <http://example.org/d#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+:A a owl:Class .
+:B a owl:Class .
+:C a owl:Class ; rdfs:subClassOf :A, :B .
+:D a owl:Class ; rdfs:subClassOf :C .
+"""
+
+
+def test_d3_bubble_no_duplicates():
+	"""#21: the bubble chart shows density, so a class with several parents is one bubble,
+	not one under each parent (with its subtree repeated too)"""
+	from ..gendocs.utils import build_D3bubbleChart
+	g = Ontospy(data=DIAMOND_TTL, rdf_format="turtle")
+	bubbles = []
+	def walk(nodes):  # as drawBubbleChart's flatten(): a bubble per node with no children
+		for d in nodes:
+			if "children" in d:
+				walk(d["children"])
+			else:
+				bubbles.append(d["qname"])
+	walk(build_D3bubbleChart(0, 99, 1, g.toplayer_classes))
+	assert sorted(bubbles) == ["d:A", "d:B", "d:C", "d:D"]
+
+
+def test_viz_numbers(monkeypatch):
+	"""#21: a new viz can take a number above 10 (CONFIG.py), so that the numbers of the
+	vizs removed in 2.6 still fail with a message rather than picking the new one"""
+	from ..gendocs import actions
+	vizs = actions.VISUALIZATIONS_LIST + [{"ID": "new-viz", "Title": "New", "Number": 11}]
+	monkeypatch.setattr(actions, "VISUALIZATIONS_LIST", vizs)
+	assert [actions.viz_number(n) for n in range(len(vizs))] == [1, 2, 3, 4, 5, 6, 11]
+	assert actions._viz_index("11") == actions._viz_index("new-viz") == 6
+	assert actions._viz_index("7") is None
+	assert actions._viz_index("12") is None
+
+
+def test_html_multi_sidebar(pizza, tmp_path):
+	"""#21: html-multi writes the sidebar's entities once, in sidebar.js, rather than in
+	every page"""
+	import json
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	js = (tmp_path / "sidebar.js").read_text(encoding="utf-8")
+	assert js.startswith("var SIDEBAR = ")
+	data = json.loads(js[len("var SIDEBAR = "):].rstrip().rstrip(";"))
+	assert len(data["classes"]) == len(pizza.all_classes)
+	assert len(data["properties"]) == len(pizza.all_properties)
+	assert len(data["individuals"]) == len(pizza.all_individuals)
+	veneziana = [c for c in pizza.all_classes if c.qname == "pizza.owl:Veneziana"][0]
+	assert [veneziana.id, veneziana.title, veneziana.slug] in data["classes"]
+	# a page has the section headers and the script, not the entries
+	page = (tmp_path / (veneziana.slug + ".html")).read_text(encoding="utf-8")
+	assert page.count('class="second-level"') == 1  # in the script that builds the entries
+	assert 'href="entities-tree-classes.html">Classes (' in page
+	assert '<script src="sidebar.js"></script>' in page
+	assert 'data-thispage="pizza.owl:Veneziana"' in page
+
+
+def test_html_multi_usage(pizza, tmp_path):
+	"""#21: the rows of the class pages' Usage tables are written once, in usage.js; a
+	page names the classes whose properties it lists, and builds the rows in the browser"""
+	import json
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	js = (tmp_path / "usage.js").read_text(encoding="utf-8")
+	assert js.startswith("var USAGE = ")
+	data = json.loads(js[len("var USAGE = "):].rstrip().rstrip(";"))
+	topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#SundriedTomatoTopping")
+	pizza_topping = pizza.get_class(uri="http://www.co-ode.org/ontologies/pizza/pizza.owl#PizzaTopping")
+	title, qname, slug, props = data["groups"][str(pizza_topping.id)]
+	assert (title, slug) == (pizza_topping.title, pizza_topping.slug)
+	is_topping_of = [p for p in pizza_topping.domain_of if p.qname == "pizza.owl:isToppingOf"][0]
+	assert is_topping_of.id in props
+	row = data["props"][str(is_topping_of.id)]
+	assert row[:4] == [is_topping_of.title, is_topping_of.qname, is_topping_of.slug, "owl:ObjectProperty"]
+	assert [r[1] for r in row[5]] == [r.title for r in is_topping_of.ranges]
+	# the properties with no domain, under owl:Thing, are a group too
+	assert str(pizza.OWLTHING.id) in data["groups"]
+	# the page: the groups in order (the class, its ancestors, owl:Thing), no rows
+	page = (tmp_path / (topping.slug + ".html")).read_text(encoding="utf-8")
+	groups = [k.id for group in topping.domain_of_inferred for k, v in group.items() if v]
+	assert pizza_topping.id in groups and groups[-1] == pizza.OWLTHING.id
+	assert 'data-groups="{}"'.format(" ".join(map(str, groups))) in page
+	assert '<script src="usage.js"></script>' in page
+	assert 'custom/js/usage.js"></script>' in page
+	assert is_topping_of.slug + ".html" not in page.split('id="usage-table"')[1].split("</table>")[0]
+	assert (tmp_path / "static" / "custom" / "js" / "usage.js").exists()
+
+
+def test_html_multi_one_theme(pizza, tmp_path):
+	"""#21: only the chosen Bootswatch theme is copied, not all 14"""
+	from ..gendocs.viz.viz_html_multi import KompleteViz
+	KompleteViz(pizza, theme="flatly").build(str(tmp_path))
+	themes = os.listdir(tmp_path / "static" / "libs" / "bootswatch3_2")
+	assert sorted(themes) == ["flatly", "fonts"]
+	assert 'bootswatch3_2/flatly/bootstrap.min.css' in (tmp_path / "index.html").read_text(encoding="utf-8")
+
+
+def test_html_multi_multimodel(pizza, tmp_path):
+	"""for the examples site: static files shared by several outputs, sidebar.js and
+	usage.js with each"""
+	from ..gendocs.viz.viz_html_multi import KompleteVizMultiModel
+	v = KompleteVizMultiModel(pizza, static_url="../static/", output_path_static=str(tmp_path / "static"))
+	v.build(str(tmp_path / "pizza"))
+	assert (tmp_path / "pizza" / "sidebar.js").exists()
+	assert (tmp_path / "pizza" / "usage.js").exists()
+	assert (tmp_path / "static" / "custom" / "js" / "usage.js").exists()
+	assert not (tmp_path / "pizza" / "static").exists()
+	assert 'href="../static/libs/bootswatch3_2/' in (tmp_path / "pizza" / "index.html").read_text(encoding="utf-8")
+
+
+def test_html_multi_statistics_charts(pizza, tmp_path):
+	"""the statistics page draws the hierarchy and the density of classes and properties
+	as in the D3 vizs, with the basics of each entity for a drawer; d3 is copied with the
+	static files"""
+	import json, re
+	build_visualization(pizza, [n for n, v in VIZ_TYPES if v == "html-complex"][0], path=str(tmp_path))
+	page = (tmp_path / "statistics.html").read_text(encoding="utf-8")
+	assert "libs/d3-v7/d3.v7.min.js" in page
+	assert (tmp_path / "static" / "libs" / "d3-v7" / "d3.v7.min.js").exists()
+	assert 'id="chart-pack-classes"' in page and 'id="chart-bubble-properties"' in page
+	assert 'id="chart-pack-concepts"' not in page  # pizza has no SKOS concepts
+	info = json.loads(re.search(r"var info = (.*);\n", page).group(1))
+	veneziana = [c for c in pizza.all_classes if c.qname == "pizza.owl:Veneziana"][0]
+	title, qname, slug, description, parents, children = info["classes"][str(veneziana.id)]
+	assert (title, qname, slug) == (veneziana.title, veneziana.qname, veneziana.slug)
+	assert sorted(parents) == sorted(p.id for p in veneziana.parents())
+	assert "toplayerChart" not in page
+	# the number of triples, without a chart
+	assert "{:,}".format(pizza.triplesCount()) in page and "triplesStats" not in page
+
+
+def test_html_multi_statistics_pack_limit(pizza, monkeypatch):
+	"""#45: a pack with too many circles (an entity is repeated under each of its parents)
+	is left out of the statistics page, which otherwise couldn't load: FOVT had 221k"""
+	from ..gendocs.viz import viz_html_multi
+	charts = {key: (pack, nodes) for key, _, _, pack, nodes in viz_html_multi.statistics_charts(pizza)}
+	pack, nodes = charts["classes"]
+	assert pack is not None and nodes > len(pizza.all_classes)  # the root, and repeats
+	charts = {key: (pack, nodes) for key, _, _, pack, nodes in viz_html_multi.statistics_charts(pizza, max_pack_nodes=50)}
+	assert charts["classes"] == (None, nodes)

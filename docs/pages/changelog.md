@@ -7,6 +7,26 @@ nav_order: 7
 
 Summary of changes.
 
+## Oct, 2026: v 2.7
+
+- schema.org's `domainIncludes` and `rangeIncludes` are read in its `https://schema.org/` namespace too, which its current files use (eg version 30.1). Before, only `http://schema.org/` was, so the properties of a current schema.org file had no domains or ranges, and every class's Usage table listed all of them
+- Multi-page html (`--type 2`, `html-complex`)
+    - Much smaller output for large ontologies. Every page used to repeat the sidebar's full list of entities, and every class page the properties of all its superclasses in its Usage table, so the output grew with the square of the number of entities. Both are now written once, in `sidebar.js` and `usage.js` next to the pages, and shown in the browser. Only the chosen Bootswatch theme is copied, not all 14. Compared with 2.6: [Brick](https://brickschema.org/) 1.4.4 from 1.67 GB to 144 MB (and from 25s to 8s), schema.org from 432 to 36 MB, UCO from 324 to 42 MB, Pizza from 15 to 6 MB. [FOVT](http://purl.obolibrary.org/obo/fovt.owl) (12k classes) now builds in about 20s, after 27s loading, into 382 MB
+    - The sidebar and the Usage tables need JavaScript, and `sidebar.js` and `usage.js` must stay next to the pages. Without JavaScript, the sidebar shows only its section headers. The docs still work when opened from disk (`file://`)
+    - The statistics page shows the hierarchy (nested circles) and the density (bubbles) of the classes, properties and SKOS concepts, in place of the polar charts of the top classes and concepts. A click on an entity opens a drawer with its description, parents, domain and range and number of children, and a link to its page. The number of triples is shown as a number. A hierarchy too large to draw (over 20,000 circles, since an entity with several parents appears under each of them) is left out, with a note: FOVT's classes would need 221,000
+    - A class with no properties at all no longer shows an empty Usage table
+    - Lists in the entity pages (superclasses, shapes, instances, subproperties...) are indented, rather than their bullets sitting on the panel's border
+    - Fix a JavaScript error on every shape page
+- Interactive visualizations (D3 dendrogram, bubble chart, pack hierarchy)
+    - Ported to d3 v7, bundled with Ontospy. d3 v2, d3 v3, jQuery 1.7.1 and slideReveal are removed
+    - One side panel for the three, with back and close buttons. It shows what the multi-page html shows: see also, property types, a class's shapes, its Usage table and SHACL property shapes, and the ontology's metrics and namespaces. Links to entities that have no details (eg `owl:Thing`, `xsd:string`) are plain text
+    - Bubble chart: the full name of an entity is shown on hover, and its short name inside the circle. Parents and children are labelled the same way, so `--preflabel` and `--preflang` apply to both. A class with several parents is one bubble, not one under each parent: on FOVT, 12k bubbles instead of 288k
+    - Pack hierarchy: labels are shown only for the children of the circle in focus, so they no longer overlap. A click on the circle in focus, or on a leaf, opens the side panel. A breadcrumb shows where you are, and a click outside the circles zooms out
+    - Fix the tabs' links when an ontology has no classes
+- Fix two `SyntaxWarning: invalid escape sequence` messages printed on the first run after installing
+- Custom templates (`jinja2env`): if you override the multi-page html's `sidebar.html`, `base.html`, `statistics.html` or `browser/browser_classinfo.html`, or the D3 templates, compare them with the new ones, which changed in structure
+- [Examples](https://lambdamusic.github.io/ontospy-examples/): added schema.org 30.1 and Brick 1.4.4, which were too large for the site before. Now 35 ontologies, 327 MB in all
+
 ## Oct, 2026: v 2.6
 
 - Loading
