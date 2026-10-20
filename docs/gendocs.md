@@ -76,7 +76,7 @@ The visualizations, as listed by `--showtypes`; `--type` takes the number or the
 | `--type` | ID | Output |
 |---|---|---|
 | 1 | `html-simple` | Html, a single page with the whole vocabulary |
-| 2 | `html-complex` | Html, a page per entity, with trees, an A–Z index, statistics and SHACL shapes. What the [examples](https://lambdamusic.github.io/ontospy-examples/index.html) use. The sidebar's list of entities is in `sidebar.js`, next to the pages, and is shown with JavaScript |
+| 2 | `html-complex` | Html, a page per entity, with trees, an A–Z index, statistics and SHACL shapes. What the [examples](https://lambdamusic.github.io/ontospy-examples/index.html) use. The sidebar's list of entities and the rows of the class pages' Usage tables are in `sidebar.js` and `usage.js`, next to the pages, and are shown with JavaScript |
 | 3 | `markdown` | Markdown, a file per entity, eg for a wiki or a Git repository |
 | 4 | `d3-dendogram` | D3 dendrogram: collapsible trees of classes, properties and concepts |
 | 5 | `d3-bubble-chart` | D3 bubble chart: shows where an ontology has most subclasses |
