@@ -141,6 +141,7 @@
               <h3 class="panel-title">Superclasses ({{each.ancestors()|length}})</h3>
             </div>
             <div class="panel-body">
+              <ul class="entity-list">
               {% if each.ancestors() %}
                 {% for s in each.ancestors() %}
                   <li><a href="{{s.slug}}.html">{{s.title}}</a></li>
@@ -148,6 +149,7 @@
               {% else %}
                 <li>owl:Thing</li>
               {% endif %}
+              </ul>
             </div>
           </div>
         </div>
@@ -165,9 +167,11 @@
               <h3 class="panel-title">Targets ({{each.targets|length}})</h3>
             </div>
             <div class="panel-body">
+              <ul class="entity-list">
               {% for kind, t in each.targets %}
                 <li>{{ shacl.term(t) }} <small class="text-muted">{{kind}}</small></li>
               {% endfor %}
+              </ul>
             </div>
           </div>
         </div>
@@ -184,9 +188,11 @@
               <h3 class="panel-title">Used By ({{each.used_by|length}})</h3>
             </div>
             <div class="panel-body">
+              <ul class="entity-list">
               {% for t in each.used_by %}
                 <li>{{ shacl.term(t) }}</li>
               {% endfor %}
+              </ul>
             </div>
           </div>
         </div>

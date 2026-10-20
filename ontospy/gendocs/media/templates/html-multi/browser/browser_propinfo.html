@@ -168,6 +168,7 @@
                       <h3 class="panel-title">Inherits from</h3>
                     </div>
                     <div class="panel-body">
+                      <ul class="entity-list">
 
                     {% if each.ancestors() %}
                             {% for s in each.ancestors() %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.title}}</a></li>{% endfor %}
@@ -175,6 +176,7 @@
                         <li>owl:Thing</li>
                     {% endif %}
 
+                      </ul>
                     </div>
                   </div>
                    </div></div>
@@ -191,10 +193,12 @@
                     <h3 class="panel-title">Sub Property</h3>
                   </div>
                   <div class="panel-body">
+                    <ul class="entity-list">
 
                       {% for s in each.children() %}<li><a href="{{s.slug}}.html" title="{{s.uri}}">{{s.title}}</a></li>{% endfor %}
 
 
+                    </ul>
                   </div>
                 </div>
                  </div></div>
